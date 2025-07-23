@@ -97,12 +97,12 @@ void main() {
                   isPlayerTurn: true,
                   showReshuffleIndicator: deckState.isDrawPileEmpty,
                   onDrawCard: () {
-                    if (deckState.isDrawPileEmpty && deckState.discardPile.length > 1) {
-                      setState(() {
+                    setState(() {
+                      if (deckState.isDrawPileEmpty && deckState.discardPile.length > 1) {
                         deckState = deckState.reshuffleDiscardIntoDraw();
                         reshuffleTriggered = true;
-                      });
-                    }
+                      }
+                    });
                   },
                 );
               },

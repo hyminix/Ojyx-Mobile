@@ -161,7 +161,7 @@ void main() {
       expect(tooltip.message, contains('Piocher'));
     });
 
-    testWidgets('should be disabled when card count is 0', (tester) async {
+    testWidgets('should allow tap when card count is 0 for reshuffle', (tester) async {
       // Arrange
       bool tapped = false;
 
@@ -181,8 +181,12 @@ void main() {
       await tester.tap(find.byType(DrawPileWidget));
       await tester.pump();
 
-      // Assert
-      expect(tapped, isFalse);
+      // Assert - Now expects tap to work even with 0 cards
+      expect(tapped, isTrue);
+      
+      // Verify tooltip shows reshuffle message
+      final tooltip = tester.widget<Tooltip>(find.byType(Tooltip));
+      expect(tooltip.message, contains('Mélanger'));
     });
 
     testWidgets('should animate card count changes', (tester) async {

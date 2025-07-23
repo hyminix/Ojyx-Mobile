@@ -44,7 +44,7 @@ class _DrawPileWidgetState extends State<DrawPileWidget>
     super.dispose();
   }
 
-  bool get _canDraw => widget.isPlayerTurn && widget.cardCount > 0;
+  bool get _canDraw => widget.isPlayerTurn;
 
   void _handleTap() {
     if (_canDraw && widget.onTap != null) {
@@ -80,7 +80,9 @@ class _DrawPileWidgetState extends State<DrawPileWidget>
     return Semantics(
       label: 'Pioche avec ${widget.cardCount} cartes restantes',
       child: Tooltip(
-        message: _canDraw ? 'Piocher une carte' : 'Pas votre tour',
+        message: _canDraw 
+            ? (widget.cardCount > 0 ? 'Piocher une carte' : 'Mélanger la défausse')
+            : 'Pas votre tour',
         child: GestureDetector(
           onTap: _handleTap,
           onTapDown: _handleTapDown,

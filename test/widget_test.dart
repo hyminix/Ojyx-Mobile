@@ -9,6 +9,6 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify that the app starts with the home screen
-    expect(find.text('Ojyx'), findsOneWidget);
+    expect(find.text('OJYX'), findsOneWidget);
   });
 }
