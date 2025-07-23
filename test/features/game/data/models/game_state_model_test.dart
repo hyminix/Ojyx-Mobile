@@ -252,38 +252,38 @@ void main() {
         final json = model.toJson();
 
         // Assert
-        expect(json['roomId'], equals('room123'));
-        expect(json['currentPlayerIndex'], equals(0));
-        expect(json['status'], equals('waiting'));
-        expect(json['turnDirection'], equals('clockwise'));
-        expect(json['lastRound'], isFalse);
+        expect(json['room_id'], equals('room123'));
+        expect(json['current_player_index'], equals(0));
+        expect(json['status'], equals('waitingToStart'));
+        expect(json['turn_direction'], equals('clockwise'));
+        expect(json['last_round'], isFalse);
         expect(json['players'], isA<List>());
         expect(json['deck'], isA<List>());
-        expect(json['discardPile'], isA<List>());
-        expect(json['actionDeck'], isA<List>());
-        expect(json['actionDiscard'], isA<List>());
+        expect(json['discard_pile'], isA<List>());
+        expect(json['action_deck'], isA<List>());
+        expect(json['action_discard'], isA<List>());
       });
 
       test('should deserialize from JSON correctly', () {
         // Arrange
         final now = DateTime.now();
         final json = {
-          'roomId': 'room456',
+          'room_id': 'room456',
           'players': testPlayers.map((p) => p.toJson()).toList(),
-          'currentPlayerIndex': 1,
+          'current_player_index': 1,
           'deck': testDeck.map((c) => c.toJson()).toList(),
-          'discardPile': testDiscardPile.map((c) => c.toJson()).toList(),
-          'actionDeck': testActionDeck.map((c) => c.toJson()).toList(),
-          'actionDiscard': [],
+          'discard_pile': testDiscardPile.map((c) => c.toJson()).toList(),
+          'action_deck': testActionDeck.map((c) => c.toJson()).toList(),
+          'action_discard': [],
           'status': 'playing',
-          'turnDirection': 'counterClockwise',
-          'lastRound': true,
-          'initiatorPlayerId': 'player1',
-          'endRoundInitiator': null,
-          'drawnCard': null,
-          'createdAt': now.toIso8601String(),
-          'startedAt': now.toIso8601String(),
-          'finishedAt': null,
+          'turn_direction': 'counterClockwise',
+          'last_round': true,
+          'initiator_player_id': 'player1',
+          'end_round_initiator': null,
+          'drawn_card': null,
+          'created_at': now.toIso8601String(),
+          'started_at': now.toIso8601String(),
+          'finished_at': null,
         };
 
         // Act

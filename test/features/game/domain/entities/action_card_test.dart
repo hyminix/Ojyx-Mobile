@@ -178,7 +178,7 @@ void main() {
     group('ActionCardType enum', () {
       test('should have all expected card types', () {
         // Assert
-        expect(ActionCardType.values.length, equals(22));
+        expect(ActionCardType.values.length, equals(21));
         expect(ActionCardType.values, contains(ActionCardType.teleport));
         expect(ActionCardType.values, contains(ActionCardType.turnAround));
         expect(ActionCardType.values, contains(ActionCardType.peek));

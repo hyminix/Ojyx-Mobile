@@ -159,7 +159,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             children: [
               const Icon(Icons.error_outline, size: 48, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Erreur: ${error.toString()}'),
+              const Text('Erreur'),
+              const SizedBox(height: 8),
+              Text(error.toString()),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => context.go('/'),

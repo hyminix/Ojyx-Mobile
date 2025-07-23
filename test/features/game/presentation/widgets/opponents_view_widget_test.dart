@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:ojyx/features/game/presentation/widgets/opponents_view_widget.dart';
 import 'package:ojyx/features/game/presentation/widgets/opponent_grid_widget.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
-
-class MockPlayer extends Mock implements Player {}
 
 void main() {
   group('OpponentsViewWidget', () {
@@ -18,36 +15,43 @@ void main() {
     late Player opponent2;
 
     setUp(() {
-      currentPlayer = MockPlayer();
-      opponent1 = MockPlayer();
-      opponent2 = MockPlayer();
+      // Create current player with real Player object
+      currentPlayer = Player(
+        id: 'current-player-id',
+        name: 'Current Player',
+        grid: PlayerGrid.empty(),
+        actionCards: [],
+        isHost: false,
+        hasFinishedRound: false,
+      );
 
-      // Setup current player
-      when(() => currentPlayer.id).thenReturn('current-player-id');
-      when(() => currentPlayer.name).thenReturn('Current Player');
-      when(() => currentPlayer.grid).thenReturn(PlayerGrid.empty());
-      when(() => currentPlayer.currentScore).thenReturn(10);
-      when(() => currentPlayer.hasFinishedRound).thenReturn(false);
+      // Setup opponent 1 with revealed card
+      var grid1 = PlayerGrid.empty();
+      grid1 = grid1.placeCard(game.Card(value: 5, isRevealed: false), 0, 0);
+      grid1 = grid1.revealCard(0, 0);
+      
+      opponent1 = Player(
+        id: 'opponent-1-id',
+        name: 'Opponent 1',
+        grid: grid1,
+        actionCards: [],
+        isHost: false,
+        hasFinishedRound: false,
+      );
 
-      // Setup opponent 1
-      when(() => opponent1.id).thenReturn('opponent-1-id');
-      when(() => opponent1.name).thenReturn('Opponent 1');
-      when(() => opponent1.currentScore).thenReturn(15);
-      when(() => opponent1.hasFinishedRound).thenReturn(false);
-
-      final grid1 = PlayerGrid.empty();
-      grid1.placeCard(game.Card(value: 5, isRevealed: true), 0, 0);
-      when(() => opponent1.grid).thenReturn(grid1);
-
-      // Setup opponent 2
-      when(() => opponent2.id).thenReturn('opponent-2-id');
-      when(() => opponent2.name).thenReturn('Opponent 2');
-      when(() => opponent2.currentScore).thenReturn(20);
-      when(() => opponent2.hasFinishedRound).thenReturn(true);
-
-      final grid2 = PlayerGrid.empty();
-      grid2.placeCard(game.Card(value: 8, isRevealed: true), 1, 1);
-      when(() => opponent2.grid).thenReturn(grid2);
+      // Setup opponent 2 with revealed card
+      var grid2 = PlayerGrid.empty();
+      grid2 = grid2.placeCard(game.Card(value: 8, isRevealed: false), 1, 1);
+      grid2 = grid2.revealCard(1, 1);
+      
+      opponent2 = Player(
+        id: 'opponent-2-id',
+        name: 'Opponent 2',
+        grid: grid2,
+        actionCards: [],
+        isHost: false,
+        hasFinishedRound: true,
+      );
 
       mockGameState = GameState.initial(
         roomId: 'test-room',
@@ -211,7 +215,7 @@ void main() {
       );
 
       expect(opponentWidget.playerState.playerId, equals('opponent-1-id'));
-      expect(opponentWidget.playerState.currentScore, equals(15));
+      expect(opponentWidget.playerState.currentScore, equals(5)); // Score from one card with value 5
       expect(opponentWidget.playerState.revealedCount, equals(1));
     });
 
@@ -303,22 +307,25 @@ void main() {
     late List<Player> opponents;
 
     setUp(() {
-      currentPlayer = MockPlayer();
-      when(() => currentPlayer.id).thenReturn('current-player-id');
-      when(() => currentPlayer.name).thenReturn('Current Player');
-      when(() => currentPlayer.grid).thenReturn(PlayerGrid.empty());
-      when(() => currentPlayer.currentScore).thenReturn(10);
-      when(() => currentPlayer.hasFinishedRound).thenReturn(false);
+      currentPlayer = Player(
+        id: 'current-player-id',
+        name: 'Current Player',
+        grid: PlayerGrid.empty(),
+        actionCards: [],
+        isHost: false,
+        hasFinishedRound: false,
+      );
 
       // Create 4 opponents
       opponents = List.generate(4, (index) {
-        final opponent = MockPlayer();
-        when(() => opponent.id).thenReturn('opponent-$index-id');
-        when(() => opponent.name).thenReturn('Opponent $index');
-        when(() => opponent.grid).thenReturn(PlayerGrid.empty());
-        when(() => opponent.currentScore).thenReturn(10 + index * 5);
-        when(() => opponent.hasFinishedRound).thenReturn(false);
-        return opponent;
+        return Player(
+          id: 'opponent-$index-id',
+          name: 'Opponent $index',
+          grid: PlayerGrid.empty(),
+          actionCards: [],
+          isHost: false,
+          hasFinishedRound: false,
+        );
       });
 
       mockGameState = GameState.initial(

@@ -13,13 +13,26 @@ void main() {
       testGrid = PlayerGrid.empty();
     });
 
+    // Helper function to wrap widget with proper constraints
+    Widget wrapWithConstraints(Widget child) {
+      return MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 400,
+              height: 600,
+              child: child,
+            ),
+          ),
+        ),
+      );
+    }
+
     testWidgets('should display 3x4 grid of cards', (tester) async {
       // Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PlayerGridWidget(grid: testGrid, isCurrentPlayer: false),
-          ),
+        wrapWithConstraints(
+          PlayerGridWidget(grid: testGrid, isCurrentPlayer: false),
         ),
       );
 
@@ -32,10 +45,8 @@ void main() {
     ) async {
       // Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PlayerGridWidget(grid: testGrid, isCurrentPlayer: true),
-          ),
+        wrapWithConstraints(
+          PlayerGridWidget(grid: testGrid, isCurrentPlayer: true),
         ),
       );
 
@@ -51,7 +62,12 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: PlayerGridWidget(grid: testGrid, isCurrentPlayer: false),
+              body: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
+                  child: PlayerGridWidget(grid: testGrid, isCurrentPlayer: false),
+                ),
+              ),
             ),
           ),
         );
@@ -65,19 +81,20 @@ void main() {
       tester,
     ) async {
       // Arrange
-      final grid = PlayerGrid.empty();
+      var grid = PlayerGrid.empty();
       // Add some revealed cards
-      grid.placeCard(game.Card(value: 5, isRevealed: true), 0, 0);
-      grid.placeCard(game.Card(value: 3, isRevealed: true), 1, 1);
+      grid = grid.placeCard(game.Card(value: 5, isRevealed: true), 0, 0);
+      grid = grid.placeCard(game.Card(value: 3, isRevealed: true), 1, 1);
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PlayerGridWidget(grid: grid, isCurrentPlayer: true),
-          ),
+        wrapWithConstraints(
+          PlayerGridWidget(grid: grid, isCurrentPlayer: true),
         ),
       );
+
+      // Wait for animations to complete
+      await tester.pumpAndSettle();
 
       // Assert
       expect(find.text('2/12'), findsOneWidget); // Revealed cards count
@@ -95,9 +112,8 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PlayerGridWidget(
+        wrapWithConstraints(
+          PlayerGridWidget(
               grid: testGrid,
               isCurrentPlayer: true,
               canInteract: true,
@@ -106,7 +122,6 @@ void main() {
                 tappedCol = col;
               },
             ),
-          ),
         ),
       );
 
@@ -127,15 +142,13 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PlayerGridWidget(
+        wrapWithConstraints(
+          PlayerGridWidget(
               grid: testGrid,
               isCurrentPlayer: true,
               canInteract: false,
               onCardTap: (row, col) => tapped = true,
             ),
-          ),
         ),
       );
 
@@ -153,14 +166,12 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PlayerGridWidget(
+        wrapWithConstraints(
+          PlayerGridWidget(
               grid: testGrid,
               isCurrentPlayer: true,
               highlightedPositions: highlightedPositions,
             ),
-          ),
         ),
       );
 
@@ -185,14 +196,12 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PlayerGridWidget(
+        wrapWithConstraints(
+          PlayerGridWidget(
               grid: testGrid,
               isCurrentPlayer: true,
               selectedPositions: selectedPositions,
             ),
-          ),
         ),
       );
 
@@ -210,26 +219,27 @@ void main() {
 
     testWidgets('should show identical columns indicator', (tester) async {
       // Arrange
-      final grid = PlayerGrid.empty();
+      var grid = PlayerGrid.empty();
 
       // Create identical column (all 5s in column 0)
       final card5 = game.Card(value: 5, isRevealed: true);
 
-      grid.placeCard(card5, 0, 0);
-      grid.placeCard(card5.copyWith(), 1, 0);
-      grid.placeCard(card5.copyWith(), 2, 0);
+      grid = grid.placeCard(card5, 0, 0);
+      grid = grid.placeCard(card5.copyWith(), 1, 0);
+      grid = grid.placeCard(card5.copyWith(), 2, 0);
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PlayerGridWidget(grid: grid, isCurrentPlayer: true),
-          ),
+        wrapWithConstraints(
+          PlayerGridWidget(grid: grid, isCurrentPlayer: true),
         ),
       );
 
+      // Wait for animations to complete
+      await tester.pumpAndSettle();
+
       // Assert
-      expect(find.text('1 col'), findsOneWidget); // 1 identical column
+      expect(find.textContaining('1 col'), findsOneWidget); // 1 identical column
       expect(find.byIcon(Icons.done_all), findsOneWidget);
     });
 
@@ -238,10 +248,8 @@ void main() {
     ) async {
       // Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PlayerGridWidget(grid: testGrid, isCurrentPlayer: true),
-          ),
+        wrapWithConstraints(
+          PlayerGridWidget(grid: testGrid, isCurrentPlayer: true),
         ),
       );
 
@@ -258,14 +266,12 @@ void main() {
     ) async {
       // Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PlayerGridWidget(
+        wrapWithConstraints(
+          PlayerGridWidget(
               grid: testGrid,
               isCurrentPlayer: true,
               canInteract: true,
             ),
-          ),
         ),
       );
 

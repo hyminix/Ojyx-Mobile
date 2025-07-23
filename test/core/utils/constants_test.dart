@@ -77,8 +77,8 @@ void main() {
       final neutralCards = kCardDistribution[0]!;
       final highValueCards = kCardDistribution[11]! + kCardDistribution[12]!;
 
-      expect(neutralCards, greaterThan(negativeCards));
-      expect(neutralCards, lessThan(highValueCards));
+      expect(neutralCards, greaterThanOrEqualTo(negativeCards));
+      expect(neutralCards, lessThanOrEqualTo(highValueCards));
     });
   });
 

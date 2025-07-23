@@ -39,9 +39,10 @@ class OpponentGridWidget extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             // Header avec info joueur
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -169,28 +170,38 @@ class OpponentGridWidget extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildStat(
-                    context,
-                    Icons.visibility,
-                    '${playerState.revealedCount}',
-                    'Révélées',
+                  Expanded(
+                    child: _buildStat(
+                      context,
+                      Icons.visibility,
+                      '${playerState.revealedCount}',
+                      'Révélées',
+                      key: ValueKey('revealed_count_${playerState.playerId}'),
+                    ),
                   ),
-                  _buildStat(
-                    context,
-                    Icons.grid_on,
-                    '${playerState.identicalColumns.length}',
-                    'Colonnes',
+                  Expanded(
+                    child: _buildStat(
+                      context,
+                      Icons.grid_on,
+                      '${playerState.identicalColumns.length}',
+                      'Colonnes',
+                      key: ValueKey('identical_columns_${playerState.playerId}'),
+                    ),
                   ),
                   if (playerState.hasFinished)
-                    Icon(
-                      Icons.flag,
-                      size: 20,
-                      color: Theme.of(context).colorScheme.primary,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Icon(
+                        Icons.flag,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                 ],
               ),
             ),
           ],
+        ),
         ),
       ),
     );
@@ -260,9 +271,11 @@ class OpponentGridWidget extends StatelessWidget {
     BuildContext context,
     IconData icon,
     String value,
-    String label,
-  ) {
+    String label, {
+    Key? key,
+  }) {
     return Column(
+      key: key,
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
