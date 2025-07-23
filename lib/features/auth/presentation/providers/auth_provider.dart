@@ -9,13 +9,13 @@ class AuthNotifier extends _$AuthNotifier {
   @override
   Future<User?> build() async {
     final supabase = ref.watch(supabaseClientProvider);
-    
+
     // Check if user is already authenticated
     final currentUser = supabase.auth.currentUser;
     if (currentUser != null) {
       return currentUser;
     }
-    
+
     // Sign in anonymously
     try {
       final response = await supabase.auth.signInAnonymously();
@@ -25,13 +25,13 @@ class AuthNotifier extends _$AuthNotifier {
       return null;
     }
   }
-  
+
   Future<void> signOut() async {
     final supabase = ref.read(supabaseClientProvider);
     await supabase.auth.signOut();
     ref.invalidateSelf();
   }
-  
+
   String? get currentUserId => state.valueOrNull?.id;
 }
 

@@ -9,7 +9,8 @@ import 'package:ojyx/features/multiplayer/domain/entities/room_event.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import '../../../../mocks/mock_room_datasource.dart';
 
-class MockSupabaseRoomDatasource extends Mock implements SupabaseRoomDatasource {}
+class MockSupabaseRoomDatasource extends Mock
+    implements SupabaseRoomDatasource {}
 
 void main() {
   late SupabaseRoomDatasourceImpl datasource;
@@ -38,10 +39,12 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      when(() => mockSupabaseDatasource.createRoom(
-        creatorId: any(named: 'creatorId'),
-        maxPlayers: any(named: 'maxPlayers'),
-      )).thenAnswer((_) async => room.toModel());
+      when(
+        () => mockSupabaseDatasource.createRoom(
+          creatorId: any(named: 'creatorId'),
+          maxPlayers: any(named: 'maxPlayers'),
+        ),
+      ).thenAnswer((_) async => room.toModel());
 
       // Act
       final result = await datasource.createRoom(
@@ -51,10 +54,12 @@ void main() {
 
       // Assert
       expect(result, equals(room));
-      verify(() => mockSupabaseDatasource.createRoom(
-        creatorId: creatorId,
-        maxPlayers: maxPlayers,
-      )).called(1);
+      verify(
+        () => mockSupabaseDatasource.createRoom(
+          creatorId: creatorId,
+          maxPlayers: maxPlayers,
+        ),
+      ).called(1);
     });
 
     test('should throw exception on database error', () async {
@@ -62,17 +67,17 @@ void main() {
       const creatorId = 'user-123';
       const maxPlayers = 4;
 
-      when(() => mockSupabaseDatasource.createRoom(
-        creatorId: any(named: 'creatorId'),
-        maxPlayers: any(named: 'maxPlayers'),
-      )).thenThrow(Exception('Database error'));
+      when(
+        () => mockSupabaseDatasource.createRoom(
+          creatorId: any(named: 'creatorId'),
+          maxPlayers: any(named: 'maxPlayers'),
+        ),
+      ).thenThrow(Exception('Database error'));
 
       // Act & Assert
       expect(
-        () => datasource.createRoom(
-          creatorId: creatorId,
-          maxPlayers: maxPlayers,
-        ),
+        () =>
+            datasource.createRoom(creatorId: creatorId, maxPlayers: maxPlayers),
         throwsException,
       );
     });
@@ -91,8 +96,9 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      when(() => mockSupabaseDatasource.watchRoom(roomId))
-          .thenAnswer((_) => Stream.value(room.toModel()));
+      when(
+        () => mockSupabaseDatasource.watchRoom(roomId),
+      ).thenAnswer((_) => Stream.value(room.toModel()));
 
       // Act
       final stream = datasource.watchRoom(roomId);
@@ -116,25 +122,30 @@ void main() {
         updatedAt: DateTime.now(),
       );
 
-      when(() => mockSupabaseDatasource.updateRoomStatus(
-        roomId: any(named: 'roomId'),
-        status: any(named: 'status'),
-        gameId: any(named: 'gameId'),
-      )).thenAnswer((_) async {});
-      
-      when(() => mockSupabaseDatasource.getRoom(room.id))
-          .thenAnswer((_) async => room.toModel());
+      when(
+        () => mockSupabaseDatasource.updateRoomStatus(
+          roomId: any(named: 'roomId'),
+          status: any(named: 'status'),
+          gameId: any(named: 'gameId'),
+        ),
+      ).thenAnswer((_) async {});
+
+      when(
+        () => mockSupabaseDatasource.getRoom(room.id),
+      ).thenAnswer((_) async => room.toModel());
 
       // Act
       final result = await datasource.updateRoom(room);
 
       // Assert
       expect(result, equals(room));
-      verify(() => mockSupabaseDatasource.updateRoomStatus(
-        roomId: room.id,
-        status: 'in_game',
-        gameId: room.currentGameId,
-      )).called(1);
+      verify(
+        () => mockSupabaseDatasource.updateRoomStatus(
+          roomId: room.id,
+          status: 'in_game',
+          gameId: room.currentGameId,
+        ),
+      ).called(1);
     });
   });
 
@@ -160,8 +171,9 @@ void main() {
         ),
       ];
 
-      when(() => mockSupabaseDatasource.getAvailableRooms())
-          .thenAnswer((_) async => rooms.map((r) => r.toModel()).toList());
+      when(
+        () => mockSupabaseDatasource.getAvailableRooms(),
+      ).thenAnswer((_) async => rooms.map((r) => r.toModel()).toList());
 
       // Act
       final result = await datasource.getAvailableRooms();

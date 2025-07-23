@@ -29,7 +29,9 @@ void main() {
       expect(find.byType(DiscardPileWidget), findsOneWidget);
     });
 
-    testWidgets('should arrange piles horizontally with spacing', (tester) async {
+    testWidgets('should arrange piles horizontally with spacing', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -71,7 +73,9 @@ void main() {
       expect(find.byIcon(Icons.arrow_downward), findsOneWidget);
     });
 
-    testWidgets('should not show turn indicator when not player turn', (tester) async {
+    testWidgets('should not show turn indicator when not player turn', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -138,7 +142,9 @@ void main() {
 
       // Simulate card drop by calling the callback directly
       const cardToDiscard = game.Card(value: 8, isRevealed: true);
-      final discardPile = tester.widget<DiscardPileWidget>(find.byType(DiscardPileWidget));
+      final discardPile = tester.widget<DiscardPileWidget>(
+        find.byType(DiscardPileWidget),
+      );
       expect(discardPile.onCardDropped, isNotNull);
       discardPile.onCardDropped!(cardToDiscard);
 
@@ -146,7 +152,9 @@ void main() {
       expect(discardedCard, equals(cardToDiscard));
     });
 
-    testWidgets('should show reshuffle indicator when draw pile empty', (tester) async {
+    testWidgets('should show reshuffle indicator when draw pile empty', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -167,11 +175,13 @@ void main() {
       expect(find.byIcon(Icons.shuffle), findsOneWidget);
     });
 
-    testWidgets('should be responsive to different screen sizes', (tester) async {
+    testWidgets('should be responsive to different screen sizes', (
+      tester,
+    ) async {
       // Test on different screen sizes
       final sizes = [
-        const Size(400, 800),  // Phone
-        const Size(800, 600),  // Tablet landscape
+        const Size(400, 800), // Phone
+        const Size(800, 600), // Tablet landscape
         const Size(600, 1000), // Tablet portrait
       ];
 
@@ -251,10 +261,7 @@ void main() {
       );
 
       // Assert
-      expect(
-        find.bySemanticsLabel(RegExp(r'Zone commune')),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel(RegExp(r'Zone commune')), findsOneWidget);
     });
 
     testWidgets('should show game info when provided', (tester) async {
@@ -279,7 +286,9 @@ void main() {
       expect(find.text('Manche 3'), findsOneWidget);
     });
 
-    testWidgets('should disable interactions when game is paused', (tester) async {
+    testWidgets('should disable interactions when game is paused', (
+      tester,
+    ) async {
       // Arrange
       bool drawCalled = false;
 

@@ -8,19 +8,23 @@ class GameInitializationUseCase {
     required String roomId,
     String? startingPlayerId,
   }) {
-    final players = playerIds.map((id) => Player(
-      id: id,
-      name: 'Player $id',
-      grid: PlayerGrid.empty(),
-      actionCards: [],
-      isHost: playerIds.first == id,
-    )).toList();
+    final players = playerIds
+        .map(
+          (id) => Player(
+            id: id,
+            name: 'Player $id',
+            grid: PlayerGrid.empty(),
+            actionCards: [],
+            isHost: playerIds.first == id,
+          ),
+        )
+        .toList();
 
     return GameState.initial(
       roomId: roomId,
       players: players,
-      currentPlayerIndex: startingPlayerId != null 
-          ? playerIds.indexOf(startingPlayerId) 
+      currentPlayerIndex: startingPlayerId != null
+          ? playerIds.indexOf(startingPlayerId)
           : 0,
     );
   }

@@ -34,12 +34,9 @@ void main() {
       when(() => opponent1.name).thenReturn('Opponent 1');
       when(() => opponent1.currentScore).thenReturn(15);
       when(() => opponent1.hasFinishedRound).thenReturn(false);
-      
+
       final grid1 = PlayerGrid.empty();
-      grid1.placeCard(game.Card(
-        value: 5,
-        isRevealed: true,
-      ), 0, 0);
+      grid1.placeCard(game.Card(value: 5, isRevealed: true), 0, 0);
       when(() => opponent1.grid).thenReturn(grid1);
 
       // Setup opponent 2
@@ -47,12 +44,9 @@ void main() {
       when(() => opponent2.name).thenReturn('Opponent 2');
       when(() => opponent2.currentScore).thenReturn(20);
       when(() => opponent2.hasFinishedRound).thenReturn(true);
-      
+
       final grid2 = PlayerGrid.empty();
-      grid2.placeCard(game.Card(
-        value: 8,
-        isRevealed: true,
-      ), 1, 1);
+      grid2.placeCard(game.Card(value: 8, isRevealed: true), 1, 1);
       when(() => opponent2.grid).thenReturn(grid2);
 
       mockGameState = GameState.initial(
@@ -159,17 +153,19 @@ void main() {
       );
 
       // Assert
-      final opponentWidgets = tester.widgetList<OpponentGridWidget>(
-        find.byType(OpponentGridWidget),
-      ).toList();
-      
+      final opponentWidgets = tester
+          .widgetList<OpponentGridWidget>(find.byType(OpponentGridWidget))
+          .toList();
+
       // First opponent should be marked as current player
       expect(opponentWidgets[0].isCurrentPlayer, isTrue);
       // Second opponent should not be marked as current player
       expect(opponentWidgets[1].isCurrentPlayer, isFalse);
     });
 
-    testWidgets('should handle player tap when callback provided', (tester) async {
+    testWidgets('should handle player tap when callback provided', (
+      tester,
+    ) async {
       // Arrange
       String? tappedPlayerId;
 
@@ -194,7 +190,9 @@ void main() {
       expect(tappedPlayerId, equals('opponent-1-id'));
     });
 
-    testWidgets('should convert player to PlayerState correctly', (tester) async {
+    testWidgets('should convert player to PlayerState correctly', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -211,13 +209,15 @@ void main() {
       final opponentWidget = tester.widget<OpponentGridWidget>(
         find.byType(OpponentGridWidget).first,
       );
-      
+
       expect(opponentWidget.playerState.playerId, equals('opponent-1-id'));
       expect(opponentWidget.playerState.currentScore, equals(15));
       expect(opponentWidget.playerState.revealedCount, equals(1));
     });
 
-    testWidgets('should have correct spacing between opponents', (tester) async {
+    testWidgets('should have correct spacing between opponents', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -237,7 +237,7 @@ void main() {
           matching: find.byType(Padding),
         ),
       );
-      
+
       // Check that padding is applied between items
       expect(paddings, isNotEmpty);
     });
@@ -257,10 +257,12 @@ void main() {
 
       // Assert
       final sizedBox = tester.widget<SizedBox>(
-        find.ancestor(
-          of: find.byType(ListView),
-          matching: find.byType(SizedBox),
-        ).first,
+        find
+            .ancestor(
+              of: find.byType(ListView),
+              matching: find.byType(SizedBox),
+            )
+            .first,
       );
       expect(sizedBox.height, equals(220));
     });
@@ -285,7 +287,7 @@ void main() {
           matching: find.byType(SizedBox),
         ),
       );
-      
+
       // Find SizedBoxes that wrap OpponentGridWidget
       for (final sizedBox in sizedBoxes) {
         if (sizedBox.width == 200) {
@@ -360,7 +362,8 @@ void main() {
 
       // Assert
       final gridView = tester.widget<GridView>(find.byType(GridView));
-      final delegate = gridView.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+      final delegate =
+          gridView.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
       expect(delegate.crossAxisCount, equals(3));
     });
 

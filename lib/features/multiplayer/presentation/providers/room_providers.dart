@@ -32,7 +32,9 @@ RoomDatasource roomDatasource(RoomDatasourceRef ref) {
 @riverpod
 RoomRepository roomRepository(RoomRepositoryRef ref) {
   final datasource = ref.watch(roomDatasourceProvider);
-  final gameInitializationUseCase = ref.watch(gameInitializationUseCaseProvider);
+  final gameInitializationUseCase = ref.watch(
+    gameInitializationUseCaseProvider,
+  );
   return RoomRepositoryImpl(datasource, gameInitializationUseCase);
 }
 

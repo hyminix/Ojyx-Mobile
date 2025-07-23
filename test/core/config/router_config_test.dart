@@ -32,9 +32,11 @@ void main() {
 
       // Assert
       expect(routes.length, equals(5));
-      
+
       // Check route paths
-      final routePaths = routes.map((route) => (route as GoRoute).path).toList();
+      final routePaths = routes
+          .map((route) => (route as GoRoute).path)
+          .toList();
       expect(routePaths, contains('/'));
       expect(routePaths, contains('/create-room'));
       expect(routePaths, contains('/join-room'));
@@ -48,7 +50,9 @@ void main() {
       final routes = router.configuration.routes;
 
       // Assert
-      final namedRoutes = routes.map((route) => (route as GoRoute).name).toList();
+      final namedRoutes = routes
+          .map((route) => (route as GoRoute).name)
+          .toList();
       expect(namedRoutes, contains('home'));
       expect(namedRoutes, contains('createRoom'));
       expect(namedRoutes, contains('joinRoom'));
@@ -68,9 +72,11 @@ void main() {
     test('home route should build HomeScreen', () {
       // Act
       final router = container.read(routerProvider);
-      final homeRoute = router.configuration.routes.firstWhere(
-        (route) => (route as GoRoute).path == '/',
-      ) as GoRoute;
+      final homeRoute =
+          router.configuration.routes.firstWhere(
+                (route) => (route as GoRoute).path == '/',
+              )
+              as GoRoute;
 
       // Assert
       expect(homeRoute.builder, isNotNull);
@@ -80,12 +86,16 @@ void main() {
     test('room routes should extract roomId parameter', () {
       // Act
       final router = container.read(routerProvider);
-      final roomRoute = router.configuration.routes.firstWhere(
-        (route) => (route as GoRoute).path == '/room/:roomId',
-      ) as GoRoute;
-      final gameRoute = router.configuration.routes.firstWhere(
-        (route) => (route as GoRoute).path == '/game/:roomId',
-      ) as GoRoute;
+      final roomRoute =
+          router.configuration.routes.firstWhere(
+                (route) => (route as GoRoute).path == '/room/:roomId',
+              )
+              as GoRoute;
+      final gameRoute =
+          router.configuration.routes.firstWhere(
+                (route) => (route as GoRoute).path == '/game/:roomId',
+              )
+              as GoRoute;
 
       // Assert
       expect(roomRoute.builder, isNotNull);

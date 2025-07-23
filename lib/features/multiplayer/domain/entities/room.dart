@@ -20,9 +20,4 @@ class Room with _$Room {
   factory Room.fromJson(Map<String, dynamic> json) => _$RoomFromJson(json);
 }
 
-enum RoomStatus {
-  waiting,
-  inGame,
-  finished,
-  cancelled,
-}
+enum RoomStatus { waiting, inGame, finished, cancelled }

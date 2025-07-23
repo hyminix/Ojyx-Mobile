@@ -32,7 +32,7 @@ class CommonAreaWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Semantics(
       label: 'Zone commune de jeu',
       child: AnimatedContainer(
@@ -44,17 +44,15 @@ class CommonAreaWidget extends StatelessWidget {
             // Game info
             if (currentPlayerName != null || roundNumber != null)
               _buildGameInfo(context),
-            
+
             // Turn indicator
-            if (isPlayerTurn && !isGamePaused)
-              _buildTurnIndicator(context),
-            
+            if (isPlayerTurn && !isGamePaused) _buildTurnIndicator(context),
+
             // Pause indicator
-            if (isGamePaused)
-              _buildPauseIndicator(context),
-            
+            if (isGamePaused) _buildPauseIndicator(context),
+
             const SizedBox(height: 16),
-            
+
             // Piles row
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -65,9 +63,9 @@ class CommonAreaWidget extends StatelessWidget {
                   isPlayerTurn: isPlayerTurn && !isGamePaused,
                   onTap: isGamePaused ? null : onDrawCard,
                 ),
-                
+
                 const SizedBox(width: 32),
-                
+
                 // Discard pile
                 DiscardPileWidget(
                   topCard: topDiscardCard,
@@ -77,10 +75,9 @@ class CommonAreaWidget extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             // Reshuffle indicator
-            if (showReshuffleIndicator)
-              _buildReshuffleIndicator(context),
+            if (showReshuffleIndicator) _buildReshuffleIndicator(context),
           ],
         ),
       ),
@@ -89,15 +86,13 @@ class CommonAreaWidget extends StatelessWidget {
 
   Widget _buildGameInfo(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.2),
-        ),
+        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -139,15 +134,13 @@ class CommonAreaWidget extends StatelessWidget {
 
   Widget _buildTurnIndicator(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: theme.colorScheme.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.3),
-        ),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -172,24 +165,18 @@ class CommonAreaWidget extends StatelessWidget {
 
   Widget _buildPauseIndicator(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: theme.colorScheme.error.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: theme.colorScheme.error.withOpacity(0.3),
-        ),
+        border: Border.all(color: theme.colorScheme.error.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.pause,
-            size: 16,
-            color: theme.colorScheme.error,
-          ),
+          Icon(Icons.pause, size: 16, color: theme.colorScheme.error),
           const SizedBox(width: 8),
           Text(
             'Jeu en pause',
@@ -205,7 +192,7 @@ class CommonAreaWidget extends StatelessWidget {
 
   Widget _buildReshuffleIndicator(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Container(
@@ -220,11 +207,7 @@ class CommonAreaWidget extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.shuffle,
-              size: 16,
-              color: theme.colorScheme.tertiary,
-            ),
+            Icon(Icons.shuffle, size: 16, color: theme.colorScheme.tertiary),
             const SizedBox(width: 8),
             Text(
               'Mélange nécessaire',

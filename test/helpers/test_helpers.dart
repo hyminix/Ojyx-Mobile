@@ -27,18 +27,13 @@ class MockGoRouter extends Mock implements GoRouter {
 }
 
 // Helper to create a test app with router
-Widget createTestApp({
-  required Widget child,
-  GoRouter? router,
-}) {
+Widget createTestApp({required Widget child, GoRouter? router}) {
   if (router != null) {
     return MaterialApp.router(
       routerConfig: router,
       builder: (context, routerChild) => child,
     );
   }
-  
-  return MaterialApp(
-    home: child,
-  );
+
+  return MaterialApp(home: child);
 }

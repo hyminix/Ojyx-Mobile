@@ -8,7 +8,7 @@ class DeckAndDiscardWidget extends StatelessWidget {
   final bool canDraw;
   final VoidCallback? onDrawFromDeck;
   final VoidCallback? onDrawFromDiscard;
-  
+
   const DeckAndDiscardWidget({
     super.key,
     required this.gameState,
@@ -19,10 +19,10 @@ class DeckAndDiscardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final topDiscard = gameState.discardPile.isNotEmpty 
-        ? gameState.discardPile.first 
+    final topDiscard = gameState.discardPile.isNotEmpty
+        ? gameState.discardPile.first
         : null;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -38,9 +38,9 @@ class DeckAndDiscardWidget extends StatelessWidget {
             children: [
               Text(
                 'Pioche',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Stack(
@@ -55,7 +55,9 @@ class DeckAndDiscardWidget extends StatelessWidget {
                         height: 112,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color: Theme.of(context).colorScheme.outline,
@@ -89,7 +91,9 @@ class DeckAndDiscardWidget extends StatelessWidget {
                             Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
-                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.2),
                               ),
                               child: Center(
                                 child: Icon(
@@ -107,7 +111,10 @@ class DeckAndDiscardWidget extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(12),
@@ -123,23 +130,25 @@ class DeckAndDiscardWidget extends StatelessWidget {
               ),
             ],
           ),
-          
+
           // Center arrow
           Icon(
             Icons.arrow_forward,
             size: 32,
-            color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
-          
+
           // Discard pile
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'Défausse',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               GestureDetector(
@@ -163,19 +172,21 @@ class DeckAndDiscardWidget extends StatelessWidget {
                   child: topDiscard != null
                       ? Stack(
                           children: [
-                            CardWidget(
-                              card: topDiscard.reveal(),
-                            ),
+                            CardWidget(card: topDiscard.reveal()),
                             if (canDraw)
                               Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
-                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.2),
                                 ),
                                 child: Center(
                                   child: Icon(
                                     Icons.touch_app,
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                     size: 32,
                                   ),
                                 ),
@@ -187,7 +198,9 @@ class DeckAndDiscardWidget extends StatelessWidget {
                             color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outline.withValues(alpha: 0.5),
                               style: BorderStyle.solid,
                               width: 2,
                             ),
@@ -196,7 +209,9 @@ class DeckAndDiscardWidget extends StatelessWidget {
                             child: Text(
                               'Vide',
                               style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.5),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -206,7 +221,10 @@ class DeckAndDiscardWidget extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.secondaryContainer,
                   borderRadius: BorderRadius.circular(12),

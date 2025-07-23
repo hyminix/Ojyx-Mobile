@@ -8,7 +8,9 @@ import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockGoTrueClient extends Mock implements GoTrueClient {}
+
 class MockUser extends Mock implements User {
   @override
   String get id => 'test-user-id';
@@ -22,7 +24,7 @@ void main() {
     setUp(() {
       mockSupabaseClient = MockSupabaseClient();
       mockAuth = MockGoTrueClient();
-      
+
       when(() => mockSupabaseClient.auth).thenReturn(mockAuth);
     });
 
@@ -40,9 +42,7 @@ void main() {
           child: Consumer(
             builder: (context, ref, child) {
               final router = ref.watch(routerProvider);
-              return MaterialApp.router(
-                routerConfig: router,
-              );
+              return MaterialApp.router(routerConfig: router);
             },
           ),
         ),
@@ -51,7 +51,7 @@ void main() {
 
       // Verify we're on home screen
       expect(find.text('OJYX'), findsOneWidget);
-      
+
       // Tap create room button
       await tester.tap(find.text('Créer une partie'));
       await tester.pumpAndSettle();
@@ -74,10 +74,10 @@ void main() {
           child: Consumer(
             builder: (context, ref, child) {
               final router = ref.watch(routerProvider);
-              
+
               // Test that all routes are properly configured
               expect(router.configuration.routes.length, greaterThan(0));
-              
+
               return const SizedBox();
             },
           ),

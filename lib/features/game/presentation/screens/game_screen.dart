@@ -15,7 +15,7 @@ import '../../domain/entities/player.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   final String roomId;
-  
+
   const GameScreen({super.key, required this.roomId});
 
   @override
@@ -37,7 +37,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final currentUserId = ref.watch(currentUserIdProvider);
     final gameStateAsync = ref.watch(gameStateNotifierProvider);
     final roomAsync = ref.watch(currentRoomProvider(widget.roomId));
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ojyx'),
@@ -64,16 +64,17 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ),
             );
           }
-          
-          final currentPlayer = _getCurrentPlayer(gameStateAsync, currentUserId!);
+
+          final currentPlayer = _getCurrentPlayer(
+            gameStateAsync,
+            currentUserId!,
+          );
           if (currentPlayer == null) {
-            return Center(
-              child: Text('Erreur: Joueur non trouvé'),
-            );
+            return Center(child: Text('Erreur: Joueur non trouvé'));
           }
-          
+
           final isMyTurn = gameStateAsync.currentPlayer.id == currentUserId;
-          
+
           return SafeArea(
             child: Column(
               children: [
@@ -87,7 +88,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     ),
                   ),
                 ),
-                
+
                 // Main game area
                 Expanded(
                   child: SingleChildScrollView(
@@ -98,21 +99,24 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                           // Deck and discard piles
                           DeckAndDiscardWidget(
                             gameState: gameStateAsync,
-                            canDraw: isMyTurn && gameStateAsync.drawnCard == null,
+                            canDraw:
+                                isMyTurn && gameStateAsync.drawnCard == null,
                             onDrawFromDeck: () => _drawFromDeck(ref),
                             onDrawFromDiscard: () => _drawFromDiscard(ref),
                           ),
                           const SizedBox(height: 24),
-                          
+
                           // Player's grid
                           PlayerGridWidget(
                             grid: currentPlayer.grid,
                             isCurrentPlayer: true,
-                            canInteract: isMyTurn && gameStateAsync.drawnCard != null,
-                            onCardTap: (row, col) => _handleCardTap(ref, row, col),
+                            canInteract:
+                                isMyTurn && gameStateAsync.drawnCard != null,
+                            onCardTap: (row, col) =>
+                                _handleCardTap(ref, row, col),
                           ),
                           const SizedBox(height: 16),
-                          
+
                           // Other players' grids
                           if (gameStateAsync.players.length > 1) ...[
                             const SizedBox(height: 24),
@@ -135,7 +139,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     ),
                   ),
                 ),
-                
+
                 // Player hand (drawn card)
                 if (gameStateAsync.drawnCard != null && isMyTurn)
                   PlayerHandWidget(
@@ -167,7 +171,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       ),
     );
   }
-  
+
   Player? _getCurrentPlayer(GameState gameState, String playerId) {
     try {
       return gameState.players.firstWhere((p) => p.id == playerId);
@@ -175,27 +179,33 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       return null;
     }
   }
-  
+
   void _drawFromDeck(WidgetRef ref) {
-    final notifier = ref.read(multiplayerGameNotifierProvider(widget.roomId).notifier);
+    final notifier = ref.read(
+      multiplayerGameNotifierProvider(widget.roomId).notifier,
+    );
     final currentUserId = ref.read(currentUserIdProvider);
     if (currentUserId != null) {
       notifier.drawFromDeck(currentUserId);
     }
   }
-  
+
   void _drawFromDiscard(WidgetRef ref) {
-    final notifier = ref.read(multiplayerGameNotifierProvider(widget.roomId).notifier);
+    final notifier = ref.read(
+      multiplayerGameNotifierProvider(widget.roomId).notifier,
+    );
     final currentUserId = ref.read(currentUserIdProvider);
     if (currentUserId != null) {
       notifier.drawFromDiscard(currentUserId);
     }
   }
-  
+
   void _handleCardTap(WidgetRef ref, int row, int col) {
     final gameState = ref.read(gameStateNotifierProvider);
     if (gameState?.drawnCard != null) {
-      final notifier = ref.read(multiplayerGameNotifierProvider(widget.roomId).notifier);
+      final notifier = ref.read(
+        multiplayerGameNotifierProvider(widget.roomId).notifier,
+      );
       final currentUserId = ref.read(currentUserIdProvider);
       if (currentUserId != null) {
         // Calculate position index (row * 4 + col for 3x4 grid)
@@ -204,15 +214,17 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       }
     }
   }
-  
+
   void _discardDirectly(WidgetRef ref) {
-    final notifier = ref.read(multiplayerGameNotifierProvider(widget.roomId).notifier);
+    final notifier = ref.read(
+      multiplayerGameNotifierProvider(widget.roomId).notifier,
+    );
     final currentUserId = ref.read(currentUserIdProvider);
     if (currentUserId != null) {
       notifier.discardCard(currentUserId, -1); // -1 indicates direct discard
     }
   }
-  
+
   Future<void> _showExitDialog(BuildContext context) async {
     final result = await showDialog<bool>(
       context: context,
@@ -236,7 +248,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         ],
       ),
     );
-    
+
     if (result == true && context.mounted) {
       // TODO: Implement leave game logic
       context.go('/');

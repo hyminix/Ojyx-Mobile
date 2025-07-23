@@ -8,10 +8,7 @@ void main() {
       // Arrange
       final cards = List<game.Card?>.generate(12, (index) {
         if (index < 6) {
-          return game.Card(
-            value: index + 1,
-            isRevealed: index < 3,
-          );
+          return game.Card(value: index + 1, isRevealed: index < 3);
         }
         return null;
       });
@@ -56,10 +53,7 @@ void main() {
     test('should support value equality', () {
       // Arrange
       final cards = [
-        game.Card(
-          value: 5,
-          isRevealed: true,
-        ),
+        game.Card(value: 5, isRevealed: true),
         ...List.filled(11, null),
       ];
 
@@ -148,10 +142,7 @@ void main() {
     test('should serialize to/from JSON', () {
       // Arrange
       final cards = [
-        game.Card(
-          value: 7,
-          isRevealed: true,
-        ),
+        game.Card(value: 7, isRevealed: true),
         ...List.filled(11, null),
       ];
 
@@ -170,11 +161,23 @@ void main() {
 
       // Assert
       expect(deserializedState.playerId, equals(originalState.playerId));
-      expect(deserializedState.currentScore, equals(originalState.currentScore));
-      expect(deserializedState.revealedCount, equals(originalState.revealedCount));
-      expect(deserializedState.identicalColumns, equals(originalState.identicalColumns));
+      expect(
+        deserializedState.currentScore,
+        equals(originalState.currentScore),
+      );
+      expect(
+        deserializedState.revealedCount,
+        equals(originalState.revealedCount),
+      );
+      expect(
+        deserializedState.identicalColumns,
+        equals(originalState.identicalColumns),
+      );
       expect(deserializedState.hasFinished, equals(originalState.hasFinished));
-      expect(deserializedState.cards.length, equals(originalState.cards.length));
+      expect(
+        deserializedState.cards.length,
+        equals(originalState.cards.length),
+      );
     });
 
     test('should create a copy with copyWith', () {
@@ -199,7 +202,10 @@ void main() {
       expect(copiedState.cards, equals(originalState.cards));
       expect(copiedState.currentScore, equals(25));
       expect(copiedState.revealedCount, equals(originalState.revealedCount));
-      expect(copiedState.identicalColumns, equals(originalState.identicalColumns));
+      expect(
+        copiedState.identicalColumns,
+        equals(originalState.identicalColumns),
+      );
       expect(copiedState.hasFinished, isTrue);
     });
 

@@ -9,7 +9,7 @@ class CardWidget extends StatelessWidget {
   final bool isHighlighted;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
-  
+
   const CardWidget({
     super.key,
     this.card,
@@ -36,8 +36,8 @@ class CardWidget extends StatelessWidget {
               color: isSelected
                   ? Theme.of(context).colorScheme.primary
                   : isHighlighted
-                      ? Colors.orange
-                      : Colors.transparent,
+                  ? Colors.orange
+                  : Colors.transparent,
               width: isSelected || isHighlighted ? 3 : 0,
             ),
             boxShadow: [
@@ -57,7 +57,7 @@ class CardWidget extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildCardContent(BuildContext context) {
     if (isPlaceholder) {
       return Container(
@@ -66,16 +66,18 @@ class CardWidget extends StatelessWidget {
           child: Icon(
             Icons.add,
             size: 32,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.3),
           ),
         ),
       );
     }
-    
+
     if (card == null) {
       return const SizedBox.shrink();
     }
-    
+
     if (!card!.isRevealed) {
       return Container(
         decoration: BoxDecoration(
@@ -94,7 +96,9 @@ class CardWidget extends StatelessWidget {
             CustomPaint(
               size: Size.infinite,
               painter: _CardBackPainter(
-                color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.1),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onPrimary.withValues(alpha: 0.1),
               ),
             ),
             Center(
@@ -108,7 +112,7 @@ class CardWidget extends StatelessWidget {
         ),
       );
     }
-    
+
     // Carte révélée
     return Container(
       color: _getCardBackgroundColor(context),
@@ -130,14 +134,12 @@ class CardWidget extends StatelessWidget {
             ),
           ),
           // Valeur centrale
-          Center(
-            child: _buildCardValue(context, small: false),
-          ),
+          Center(child: _buildCardValue(context, small: false)),
         ],
       ),
     );
   }
-  
+
   Widget _buildCardValue(BuildContext context, {required bool small}) {
     final textStyle = small
         ? Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -148,13 +150,10 @@ class CardWidget extends StatelessWidget {
             fontWeight: FontWeight.bold,
             color: _getCardTextColor(),
           );
-    
-    return Text(
-      card!.value.toString(),
-      style: textStyle,
-    );
+
+    return Text(card!.value.toString(), style: textStyle);
   }
-  
+
   Color _getCardBackgroundColor(BuildContext context) {
     final baseColor = _getCardBaseColor();
     return Color.alphaBlend(
@@ -162,7 +161,7 @@ class CardWidget extends StatelessWidget {
       Theme.of(context).colorScheme.surface,
     );
   }
-  
+
   Color _getCardBaseColor() {
     switch (card!.color) {
       case CardValueColor.darkBlue:
@@ -176,7 +175,7 @@ class CardWidget extends StatelessWidget {
         return Colors.red.shade100;
     }
   }
-  
+
   Color _getCardTextColor() {
     switch (card!.color) {
       case CardValueColor.darkBlue:
@@ -194,18 +193,18 @@ class CardWidget extends StatelessWidget {
 
 class _CardBackPainter extends CustomPainter {
   final Color color;
-  
+
   _CardBackPainter({required this.color});
-  
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
-    
+
     const spacing = 15.0;
-    
+
     // Lignes diagonales
     for (double i = -size.height; i < size.width + size.height; i += spacing) {
       canvas.drawLine(
@@ -215,7 +214,7 @@ class _CardBackPainter extends CustomPainter {
       );
     }
   }
-  
+
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

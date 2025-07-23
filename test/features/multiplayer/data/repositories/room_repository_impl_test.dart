@@ -8,7 +8,8 @@ import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/use_cases/game_initialization_use_case.dart';
 import '../../../../mocks/mock_room_datasource.dart';
 
-class MockGameInitializationUseCase extends Mock implements GameInitializationUseCase {}
+class MockGameInitializationUseCase extends Mock
+    implements GameInitializationUseCase {}
 
 void main() {
   late RoomRepositoryImpl repository;
@@ -22,7 +23,10 @@ void main() {
   setUp(() {
     mockDatasource = MockRoomDatasource();
     mockGameInitializationUseCase = MockGameInitializationUseCase();
-    repository = RoomRepositoryImpl(mockDatasource, mockGameInitializationUseCase);
+    repository = RoomRepositoryImpl(
+      mockDatasource,
+      mockGameInitializationUseCase,
+    );
   });
 
   group('createRoom', () {
@@ -39,10 +43,12 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      when(() => mockDatasource.createRoom(
-        creatorId: any(named: 'creatorId'),
-        maxPlayers: any(named: 'maxPlayers'),
-      )).thenAnswer((_) async => expectedRoom);
+      when(
+        () => mockDatasource.createRoom(
+          creatorId: any(named: 'creatorId'),
+          maxPlayers: any(named: 'maxPlayers'),
+        ),
+      ).thenAnswer((_) async => expectedRoom);
 
       // Act
       final result = await repository.createRoom(
@@ -52,10 +58,12 @@ void main() {
 
       // Assert
       expect(result, equals(expectedRoom));
-      verify(() => mockDatasource.createRoom(
-        creatorId: any(named: 'creatorId'),
-        maxPlayers: any(named: 'maxPlayers'),
-      )).called(1);
+      verify(
+        () => mockDatasource.createRoom(
+          creatorId: any(named: 'creatorId'),
+          maxPlayers: any(named: 'maxPlayers'),
+        ),
+      ).called(1);
     });
 
     test('should throw exception when datasource throws exception', () async {
@@ -63,17 +71,17 @@ void main() {
       const creatorId = 'user-123';
       const maxPlayers = 4;
 
-      when(() => mockDatasource.createRoom(
-        creatorId: any(named: 'creatorId'),
-        maxPlayers: any(named: 'maxPlayers'),
-      )).thenThrow(Exception('Server error'));
+      when(
+        () => mockDatasource.createRoom(
+          creatorId: any(named: 'creatorId'),
+          maxPlayers: any(named: 'maxPlayers'),
+        ),
+      ).thenThrow(Exception('Server error'));
 
       // Act & Assert
       expect(
-        () => repository.createRoom(
-          creatorId: creatorId,
-          maxPlayers: maxPlayers,
-        ),
+        () =>
+            repository.createRoom(creatorId: creatorId, maxPlayers: maxPlayers),
         throwsException,
       );
     });
@@ -93,10 +101,12 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      when(() => mockDatasource.joinRoom(
-        roomId: any(named: 'roomId'),
-        playerId: any(named: 'playerId'),
-      )).thenAnswer((_) async => updatedRoom);
+      when(
+        () => mockDatasource.joinRoom(
+          roomId: any(named: 'roomId'),
+          playerId: any(named: 'playerId'),
+        ),
+      ).thenAnswer((_) async => updatedRoom);
 
       // Act
       final result = await repository.joinRoom(
@@ -106,10 +116,12 @@ void main() {
 
       // Assert
       expect(result, equals(updatedRoom));
-      verify(() => mockDatasource.joinRoom(
-        roomId: any(named: 'roomId'),
-        playerId: any(named: 'playerId'),
-      )).called(1);
+      verify(
+        () => mockDatasource.joinRoom(
+          roomId: any(named: 'roomId'),
+          playerId: any(named: 'playerId'),
+        ),
+      ).called(1);
     });
 
     test('should return null when join fails', () async {
@@ -117,17 +129,16 @@ void main() {
       const roomId = 'room-123';
       const playerId = 'user-789';
 
-      when(() => mockDatasource.joinRoom(
-        roomId: any(named: 'roomId'),
-        playerId: any(named: 'playerId'),
-      )).thenThrow(Exception('Room is full'));
+      when(
+        () => mockDatasource.joinRoom(
+          roomId: any(named: 'roomId'),
+          playerId: any(named: 'playerId'),
+        ),
+      ).thenThrow(Exception('Room is full'));
 
       // Act & Assert
       expect(
-        () => repository.joinRoom(
-          roomId: roomId,
-          playerId: playerId,
-        ),
+        () => repository.joinRoom(roomId: roomId, playerId: playerId),
         throwsException,
       );
     });
@@ -146,8 +157,9 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      when(() => mockDatasource.watchRoom(roomId))
-          .thenAnswer((_) => Stream.value(room));
+      when(
+        () => mockDatasource.watchRoom(roomId),
+      ).thenAnswer((_) => Stream.value(room));
 
       // Act
       final stream = repository.watchRoom(roomId);
@@ -166,8 +178,9 @@ void main() {
         playerName: 'Jane',
       );
 
-      when(() => mockDatasource.watchRoomEvents(roomId))
-          .thenAnswer((_) => Stream.value(event));
+      when(
+        () => mockDatasource.watchRoomEvents(roomId),
+      ).thenAnswer((_) => Stream.value(event));
 
       // Act
       final stream = repository.watchRoomEvents(roomId);
@@ -195,16 +208,13 @@ void main() {
         currentGameId: gameId,
       );
 
-      when(() => mockDatasource.getRoom(roomId))
-          .thenAnswer((_) async => room);
-      when(() => mockDatasource.updateRoom(any()))
-          .thenAnswer((_) async => updatedRoom);
+      when(() => mockDatasource.getRoom(roomId)).thenAnswer((_) async => room);
+      when(
+        () => mockDatasource.updateRoom(any()),
+      ).thenAnswer((_) async => updatedRoom);
 
       // Act
-      await repository.startGame(
-        roomId: roomId,
-        gameId: gameId,
-      );
+      await repository.startGame(roomId: roomId, gameId: gameId);
 
       // Assert
       verify(() => mockDatasource.getRoom(roomId)).called(1);
@@ -234,8 +244,9 @@ void main() {
         ),
       ];
 
-      when(() => mockDatasource.getAvailableRooms())
-          .thenAnswer((_) async => rooms);
+      when(
+        () => mockDatasource.getAvailableRooms(),
+      ).thenAnswer((_) async => rooms);
 
       // Act
       final result = await repository.getAvailableRooms();

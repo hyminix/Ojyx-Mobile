@@ -13,16 +13,10 @@ void main() {
       final cards = List<game.Card?>.generate(12, (index) {
         if (index < 4) {
           // First 4 cards are revealed
-          return game.Card(
-            value: index + 1,
-            isRevealed: true,
-          );
+          return game.Card(value: index + 1, isRevealed: true);
         } else if (index < 8) {
           // Next 4 cards are hidden
-          return game.Card(
-            value: index + 1,
-            isRevealed: false,
-          );
+          return game.Card(value: index + 1, isRevealed: false);
         } else {
           // Last 4 are null
           return null;
@@ -44,9 +38,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: OpponentGridWidget(
-              playerState: testPlayerState,
-            ),
+            body: OpponentGridWidget(playerState: testPlayerState),
           ),
         ),
       );
@@ -58,38 +50,39 @@ void main() {
       expect(find.text('1'), findsOneWidget); // Identical columns
     });
 
-    testWidgets('should show current player indicator when isCurrentPlayer is true', (tester) async {
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: OpponentGridWidget(
-              playerState: testPlayerState,
-              isCurrentPlayer: true,
+    testWidgets(
+      'should show current player indicator when isCurrentPlayer is true',
+      (tester) async {
+        // Act
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: OpponentGridWidget(
+                playerState: testPlayerState,
+                isCurrentPlayer: true,
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Assert
-      expect(find.text('En train de jouer'), findsOneWidget);
-      
-      // Check border styling
-      final container = tester.widget<AnimatedContainer>(
-        find.byType(AnimatedContainer),
-      );
-      final decoration = container.decoration as BoxDecoration;
-      expect(decoration.border?.top.width, equals(3));
-    });
+        // Assert
+        expect(find.text('En train de jouer'), findsOneWidget);
+
+        // Check border styling
+        final container = tester.widget<AnimatedContainer>(
+          find.byType(AnimatedContainer),
+        );
+        final decoration = container.decoration as BoxDecoration;
+        expect(decoration.border?.top.width, equals(3));
+      },
+    );
 
     testWidgets('should display mini grid with 12 cards', (tester) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: OpponentGridWidget(
-              playerState: testPlayerState,
-            ),
+            body: OpponentGridWidget(playerState: testPlayerState),
           ),
         ),
       );
@@ -98,11 +91,11 @@ void main() {
       // Count containers that represent mini cards
       final miniCardContainers = find.descendant(
         of: find.byType(Stack),
-        matching: find.byWidgetPredicate((widget) => 
-          widget is Container && widget.decoration != null
+        matching: find.byWidgetPredicate(
+          (widget) => widget is Container && widget.decoration != null,
         ),
       );
-      
+
       // Should have at least 12 containers for the cards
       expect(miniCardContainers, findsWidgets);
     });
@@ -112,9 +105,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: OpponentGridWidget(
-              playerState: testPlayerState,
-            ),
+            body: OpponentGridWidget(playerState: testPlayerState),
           ),
         ),
       );
@@ -150,19 +141,17 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('should display finish flag when player has finished', (tester) async {
+    testWidgets('should display finish flag when player has finished', (
+      tester,
+    ) async {
       // Arrange
-      final finishedPlayerState = testPlayerState.copyWith(
-        hasFinished: true,
-      );
+      final finishedPlayerState = testPlayerState.copyWith(hasFinished: true);
 
       // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: OpponentGridWidget(
-              playerState: finishedPlayerState,
-            ),
+            body: OpponentGridWidget(playerState: finishedPlayerState),
           ),
         ),
       );
@@ -176,9 +165,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: OpponentGridWidget(
-              playerState: testPlayerState,
-            ),
+            body: OpponentGridWidget(playerState: testPlayerState),
           ),
         ),
       );
@@ -193,9 +180,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: OpponentGridWidget(
-              playerState: testPlayerState,
-            ),
+            body: OpponentGridWidget(playerState: testPlayerState),
           ),
         ),
       );
@@ -222,9 +207,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: OpponentGridWidget(
-              playerState: emptyPlayerState,
-            ),
+            body: OpponentGridWidget(playerState: emptyPlayerState),
           ),
         ),
       );
@@ -234,27 +217,17 @@ void main() {
       expect(find.text('0'), findsNWidgets(2)); // Revealed count and columns
     });
 
-    testWidgets('should apply correct color for different card colors', (tester) async {
+    testWidgets('should apply correct color for different card colors', (
+      tester,
+    ) async {
       // Arrange
       final colorTestState = PlayerState(
         playerId: 'color-test',
         cards: [
-          game.Card(
-            value: 1,
-            isRevealed: true,
-          ),
-          game.Card(
-            value: 2,
-            isRevealed: true,
-          ),
-          game.Card(
-            value: 3,
-            isRevealed: true,
-          ),
-          game.Card(
-            value: 4,
-            isRevealed: true,
-          ),
+          game.Card(value: 1, isRevealed: true),
+          game.Card(value: 2, isRevealed: true),
+          game.Card(value: 3, isRevealed: true),
+          game.Card(value: 4, isRevealed: true),
           ...List.filled(8, null),
         ],
         currentScore: 10,
@@ -266,11 +239,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: OpponentGridWidget(
-              playerState: colorTestState,
-            ),
-          ),
+          home: Scaffold(body: OpponentGridWidget(playerState: colorTestState)),
         ),
       );
 
@@ -282,7 +251,9 @@ void main() {
       expect(find.text('4'), findsOneWidget);
     });
 
-    testWidgets('should animate container when properties change', (tester) async {
+    testWidgets('should animate container when properties change', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -309,10 +280,10 @@ void main() {
 
       // Assert - AnimatedContainer should exist
       expect(find.byType(AnimatedContainer), findsOneWidget);
-      
+
       // Pump to trigger animation
       await tester.pump(const Duration(milliseconds: 150));
-      
+
       // Animation should be in progress
       expect(find.byType(AnimatedContainer), findsOneWidget);
     });

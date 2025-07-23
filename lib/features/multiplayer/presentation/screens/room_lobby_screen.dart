@@ -7,14 +7,14 @@ import '../../domain/entities/room.dart';
 
 class RoomLobbyScreen extends ConsumerWidget {
   final String roomId;
-  
+
   const RoomLobbyScreen({super.key, required this.roomId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final roomAsync = ref.watch(currentRoomProvider(roomId));
     final currentUserId = ref.watch(currentUserIdProvider);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Salle d\'attente'),
@@ -39,8 +39,9 @@ class RoomLobbyScreen extends ConsumerWidget {
       body: roomAsync.when(
         data: (room) {
           final isCreator = room.creatorId == currentUserId;
-          final canStart = room.playerIds.length >= 2 && room.playerIds.length <= 8;
-          
+          final canStart =
+              room.playerIds.length >= 2 && room.playerIds.length <= 8;
+
           return SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
@@ -73,7 +74,10 @@ class RoomLobbyScreen extends ConsumerWidget {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: _getStatusColor(room.status, context).withValues(alpha: 0.2),
+                              color: _getStatusColor(
+                                room.status,
+                                context,
+                              ).withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
@@ -89,7 +93,7 @@ class RoomLobbyScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Players list
                   Expanded(
                     child: Card(
@@ -107,9 +111,12 @@ class RoomLobbyScreen extends ConsumerWidget {
                                 ),
                                 Text(
                                   '${room.playerIds.length}/${room.maxPlayers}',
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.primary,
-                                  ),
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                      ),
                                 ),
                               ],
                             ),
@@ -120,45 +127,68 @@ class RoomLobbyScreen extends ConsumerWidget {
                                 itemBuilder: (context, index) {
                                   if (index < room.playerIds.length) {
                                     final playerId = room.playerIds[index];
-                                    final isCurrentUser = playerId == currentUserId;
+                                    final isCurrentUser =
+                                        playerId == currentUserId;
                                     final isHost = playerId == room.creatorId;
-                                    
+
                                     return ListTile(
                                       leading: CircleAvatar(
                                         backgroundColor: isCurrentUser
-                                            ? Theme.of(context).colorScheme.primary
-                                            : Theme.of(context).colorScheme.surfaceContainerHighest,
+                                            ? Theme.of(
+                                                context,
+                                              ).colorScheme.primary
+                                            : Theme.of(context)
+                                                  .colorScheme
+                                                  .surfaceContainerHighest,
                                         child: Icon(
                                           isHost ? Icons.star : Icons.person,
                                           color: isCurrentUser
-                                              ? Theme.of(context).colorScheme.onPrimary
-                                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                                              ? Theme.of(
+                                                  context,
+                                                ).colorScheme.onPrimary
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurfaceVariant,
                                         ),
                                       ),
                                       title: Text(
-                                        isCurrentUser ? 'Vous' : 'Joueur ${index + 1}',
+                                        isCurrentUser
+                                            ? 'Vous'
+                                            : 'Joueur ${index + 1}',
                                         style: TextStyle(
-                                          fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.normal,
+                                          fontWeight: isCurrentUser
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
                                         ),
                                       ),
                                       subtitle: Text(
                                         isHost ? 'Créateur' : 'Joueur',
-                                        style: Theme.of(context).textTheme.bodySmall,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodySmall,
                                       ),
                                     );
                                   } else {
                                     return ListTile(
                                       leading: CircleAvatar(
-                                        backgroundColor: Theme.of(context).colorScheme.surface,
+                                        backgroundColor: Theme.of(
+                                          context,
+                                        ).colorScheme.surface,
                                         child: Icon(
                                           Icons.person_outline,
-                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.3),
                                         ),
                                       ),
                                       title: Text(
                                         'En attente...',
                                         style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.5),
                                         ),
                                       ),
                                     );
@@ -172,14 +202,16 @@ class RoomLobbyScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Action buttons
                   if (isCreator && room.status == RoomStatus.waiting) ...[
                     SizedBox(
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton.icon(
-                        onPressed: canStart ? () => _startGame(context, ref, room) : null,
+                        onPressed: canStart
+                            ? () => _startGame(context, ref, room)
+                            : null,
                         icon: const Icon(Icons.play_arrow),
                         label: Text(
                           canStart
@@ -225,7 +257,7 @@ class RoomLobbyScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   Color _getStatusColor(RoomStatus status, BuildContext context) {
     switch (status) {
       case RoomStatus.waiting:
@@ -238,7 +270,7 @@ class RoomLobbyScreen extends ConsumerWidget {
         return Colors.red;
     }
   }
-  
+
   String _getStatusText(RoomStatus status) {
     switch (status) {
       case RoomStatus.waiting:
@@ -251,8 +283,12 @@ class RoomLobbyScreen extends ConsumerWidget {
         return 'Annulée';
     }
   }
-  
-  Future<void> _startGame(BuildContext context, WidgetRef ref, Room room) async {
+
+  Future<void> _startGame(
+    BuildContext context,
+    WidgetRef ref,
+    Room room,
+  ) async {
     try {
       // TODO: Implement game start logic
       // For now, just navigate to game screen

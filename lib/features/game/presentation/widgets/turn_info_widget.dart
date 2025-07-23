@@ -5,7 +5,7 @@ import '../../domain/entities/player.dart';
 class TurnInfoWidget extends StatelessWidget {
   final GameState gameState;
   final String currentPlayerId;
-  
+
   const TurnInfoWidget({
     super.key,
     required this.gameState,
@@ -17,7 +17,7 @@ class TurnInfoWidget extends StatelessWidget {
     final currentPlayer = gameState.currentPlayer;
     final isMyTurn = currentPlayer.id == currentPlayerId;
     final turnDirection = gameState.turnDirection;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
@@ -65,8 +65,12 @@ class TurnInfoWidget extends StatelessWidget {
                 _getPhaseText(),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: isMyTurn
-                      ? Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8)
-                      : Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryContainer.withValues(alpha: 0.8)
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                 ),
               ),
             ],
@@ -102,7 +106,7 @@ class TurnInfoWidget extends StatelessWidget {
       ),
     );
   }
-  
+
   String _getPhaseText() {
     switch (gameState.status) {
       case GameStatus.drawPhase:

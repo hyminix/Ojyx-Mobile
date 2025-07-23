@@ -4,9 +4,9 @@ import '../repositories/room_repository.dart';
 
 class SyncGameStateUseCase {
   final RoomRepository _repository;
-  
+
   SyncGameStateUseCase(this._repository);
-  
+
   Future<void> syncGameState({
     required String roomId,
     required GameState gameState,
@@ -16,7 +16,7 @@ class SyncGameStateUseCase {
       event: RoomEvent.gameStateUpdated(newState: gameState),
     );
   }
-  
+
   Future<void> sendPlayerAction({
     required String roomId,
     required String playerId,
@@ -32,7 +32,7 @@ class SyncGameStateUseCase {
       ),
     );
   }
-  
+
   Stream<RoomEvent> watchGameEvents(String roomId) {
     return _repository.watchRoomEvents(roomId);
   }

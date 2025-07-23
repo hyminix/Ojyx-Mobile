@@ -101,7 +101,7 @@ class _DiscardPileWidgetState extends State<DiscardPileWidget> {
     // Wrap with DragTarget if card dropping is enabled
     // Skip DragTarget in test environment to avoid hanging
     final isTestEnvironment = Platform.environment.containsKey('FLUTTER_TEST');
-    
+
     if (widget.onCardDropped != null && !isTestEnvironment) {
       content = DragTarget<game.Card>(
         onWillAccept: (card) {
@@ -135,16 +135,14 @@ class _DiscardPileWidgetState extends State<DiscardPileWidget> {
       child: SizedBox(
         width: 80,
         height: 112,
-        child: CardWidget(
-          card: widget.topCard,
-        ),
+        child: CardWidget(card: widget.topCard),
       ),
     );
   }
 
   Widget _buildEmptyState(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       width: 80,
       height: 112,
@@ -179,7 +177,7 @@ class _DiscardPileWidgetState extends State<DiscardPileWidget> {
 
   Widget _buildShadowCard(BuildContext context, {required double opacity}) {
     final theme = Theme.of(context);
-    
+
     return Opacity(
       opacity: opacity,
       child: Container(

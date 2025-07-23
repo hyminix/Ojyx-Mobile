@@ -14,7 +14,7 @@ extension RoomExtensions on Room {
       updatedAt: updatedAt,
     );
   }
-  
+
   String _roomStatusToString(RoomStatus status) {
     switch (status) {
       case RoomStatus.waiting:

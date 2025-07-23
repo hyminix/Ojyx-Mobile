@@ -8,7 +8,7 @@ class OpponentGridWidget extends StatelessWidget {
   final PlayerState playerState;
   final bool isCurrentPlayer;
   final VoidCallback? onTap;
-  
+
   const OpponentGridWidget({
     super.key,
     required this.playerState,
@@ -81,25 +81,28 @@ class OpponentGridWidget extends StatelessWidget {
                       children: [
                         Text(
                           'Joueur ${playerState.playerId.substring(0, 6)}',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                           overflow: TextOverflow.ellipsis,
                         ),
                         if (isCurrentPlayer)
                           Text(
                             'En train de jouer',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.w500,
+                                ),
                           ),
                       ],
                     ),
                   ),
                   // Score
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.tertiaryContainer,
                       borderRadius: BorderRadius.circular(12),
@@ -109,14 +112,16 @@ class OpponentGridWidget extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onTertiaryContainer,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onTertiaryContainer,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             // Mini grille
             Padding(
               padding: const EdgeInsets.all(8),
@@ -126,7 +131,7 @@ class OpponentGridWidget extends StatelessWidget {
                   builder: (context, constraints) {
                     final cardWidth = constraints.maxWidth / kGridColumns;
                     final cardHeight = constraints.maxHeight / kGridRows;
-                    
+
                     return Stack(
                       children: [
                         // Grille de cartes
@@ -151,7 +156,7 @@ class OpponentGridWidget extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Stats footer
             Container(
               padding: const EdgeInsets.all(8),
@@ -190,7 +195,7 @@ class OpponentGridWidget extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildMiniCard(BuildContext context, game.Card? card) {
     if (card == null) {
       return Container(
@@ -203,7 +208,7 @@ class OpponentGridWidget extends StatelessWidget {
         ),
       );
     }
-    
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4),
@@ -237,8 +242,12 @@ class OpponentGridWidget extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-                      Theme.of(context).colorScheme.secondary.withValues(alpha: 0.8),
+                      Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.8),
+                      Theme.of(
+                        context,
+                      ).colorScheme.secondary.withValues(alpha: 0.8),
                     ],
                   ),
                 ),
@@ -246,8 +255,13 @@ class OpponentGridWidget extends StatelessWidget {
       ),
     );
   }
-  
-  Widget _buildStat(BuildContext context, IconData icon, String value, String label) {
+
+  Widget _buildStat(
+    BuildContext context,
+    IconData icon,
+    String value,
+    String label,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -258,9 +272,9 @@ class OpponentGridWidget extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               value,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -274,7 +288,7 @@ class OpponentGridWidget extends StatelessWidget {
       ],
     );
   }
-  
+
   Color _getMiniCardColor(BuildContext context, game.Card card) {
     switch (card.color) {
       case CardValueColor.darkBlue:
@@ -288,7 +302,7 @@ class OpponentGridWidget extends StatelessWidget {
         return Colors.red.shade100;
     }
   }
-  
+
   Color _getMiniCardTextColor(game.Card card) {
     switch (card.color) {
       case CardValueColor.darkBlue:

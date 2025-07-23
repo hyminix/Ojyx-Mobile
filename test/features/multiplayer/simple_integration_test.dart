@@ -58,7 +58,7 @@ void main() {
           isHost: true,
         ),
         Player(
-          id: 'user-456', 
+          id: 'user-456',
           name: 'Jane',
           grid: PlayerGrid.empty(),
           isHost: false,
@@ -66,10 +66,7 @@ void main() {
       ];
 
       // Act
-      final gameState = GameState.initial(
-        roomId: 'room-123',
-        players: players,
-      );
+      final gameState = GameState.initial(roomId: 'room-123', players: players);
 
       // Assert
       expect(gameState.roomId, 'room-123');
@@ -81,9 +78,18 @@ void main() {
     test('PlayerActionType covers all game actions', () {
       // Assert
       expect(PlayerActionType.values.contains(PlayerActionType.drawCard), true);
-      expect(PlayerActionType.values.contains(PlayerActionType.discardCard), true);
-      expect(PlayerActionType.values.contains(PlayerActionType.revealCard), true);
-      expect(PlayerActionType.values.contains(PlayerActionType.playActionCard), true);
+      expect(
+        PlayerActionType.values.contains(PlayerActionType.discardCard),
+        true,
+      );
+      expect(
+        PlayerActionType.values.contains(PlayerActionType.revealCard),
+        true,
+      );
+      expect(
+        PlayerActionType.values.contains(PlayerActionType.playActionCard),
+        true,
+      );
       expect(PlayerActionType.values.contains(PlayerActionType.endTurn), true);
     });
 
