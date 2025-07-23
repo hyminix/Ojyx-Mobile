@@ -190,6 +190,49 @@ void main() {
       });
     });
 
+    test('should reverse turn direction multiple times with Demi-tour', () async {
+      // Arrange
+      final actionCard = const ActionCard(
+        id: 'card1',
+        type: ActionCardType.turnAround,
+        name: 'Demi-tour',
+        description: 'Inversez le sens du jeu',
+        timing: ActionTiming.immediate,
+        target: ActionTarget.none,
+      );
+
+      // Start with counter-clockwise
+      final gameState = createTestGameState(
+        turnDirection: TurnDirection.counterClockwise,
+      );
+      final params = UseActionCardParams(
+        playerId: 'player1',
+        actionCard: actionCard,
+        gameState: gameState,
+        targetData: null,
+      );
+
+      when(
+        () => mockRepository.getPlayerActionCards('player1'),
+      ).thenReturn([actionCard]);
+      when(
+        () => mockRepository.removeActionCardFromPlayer('player1', actionCard),
+      ).thenAnswer((_) {});
+      when(
+        () => mockRepository.discardActionCard(actionCard),
+      ).thenAnswer((_) {});
+
+      // Act
+      final result = await useCase(params);
+
+      // Assert
+      expect(result.isRight(), isTrue);
+      result.fold((failure) => fail('Should not fail'), (updatedState) {
+        // Direction should be reversed to clockwise
+        expect(updatedState.turnDirection, equals(TurnDirection.clockwise));
+      });
+    });
+
     test('should validate target data for cards that require it', () async {
       // Arrange
       final actionCard = const ActionCard(

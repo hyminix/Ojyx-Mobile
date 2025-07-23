@@ -4,6 +4,7 @@ import '../../domain/entities/player.dart';
 import '../../domain/entities/player_state.dart';
 import '../../domain/entities/card.dart' as game_card;
 import 'opponent_grid_widget.dart';
+import 'action_card_hand_widget.dart';
 
 class OpponentsViewWidget extends StatelessWidget {
   final GameState gameState;
@@ -62,7 +63,7 @@ class OpponentsViewWidget extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 220,
+          height: 250,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -70,7 +71,7 @@ class OpponentsViewWidget extends StatelessWidget {
             itemBuilder: (context, index) {
               final opponent = opponents[index];
               final playerState = _playerToPlayerState(opponent);
-              final isCurrentTurn = gameState.currentPlayer.id == opponent.id;
+              final isCurrentTurn = gameState.players[gameState.currentPlayerIndex].id == opponent.id;
 
               return Padding(
                 padding: EdgeInsets.only(
@@ -78,12 +79,30 @@ class OpponentsViewWidget extends StatelessWidget {
                 ),
                 child: SizedBox(
                   width: 200,
-                  child: OpponentGridWidget(
-                    playerState: playerState,
-                    isCurrentPlayer: isCurrentTurn,
-                    onTap: onPlayerTap != null
-                        ? () => onPlayerTap!(opponent.id)
-                        : null,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: OpponentGridWidget(
+                          playerState: playerState,
+                          isCurrentPlayer: isCurrentTurn,
+                          onTap: onPlayerTap != null
+                              ? () => onPlayerTap!(opponent.id)
+                              : null,
+                        ),
+                      ),
+                      // Show compact action cards view
+                      if (opponent.actionCards.isNotEmpty)
+                        Container(
+                          height: 50,
+                          padding: const EdgeInsets.all(4),
+                          child: Center(
+                            child: Text(
+                              'Cartes Actions (${opponent.actionCards.length}/3)',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               );
@@ -170,7 +189,7 @@ class OpponentsGridViewWidget extends StatelessWidget {
               itemBuilder: (context, index) {
                 final opponent = opponents[index];
                 final playerState = _playerToPlayerState(opponent);
-                final isCurrentTurn = gameState.currentPlayer.id == opponent.id;
+                final isCurrentTurn = gameState.players[gameState.currentPlayerIndex].id == opponent.id;
 
                 return OpponentGridWidget(
                   playerState: playerState,

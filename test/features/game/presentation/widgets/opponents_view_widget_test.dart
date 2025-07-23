@@ -268,7 +268,7 @@ void main() {
             )
             .first,
       );
-      expect(sizedBox.height, equals(220));
+      expect(sizedBox.height, equals(250));
     });
 
     testWidgets('should set fixed width for each opponent', (tester) async {

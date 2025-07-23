@@ -147,4 +147,7 @@ const _$PlayerActionTypeEnumMap = {
   PlayerActionType.revealCard: 'revealCard',
   PlayerActionType.playActionCard: 'playActionCard',
   PlayerActionType.endTurn: 'endTurn',
+  PlayerActionType.drawActionCard: 'drawActionCard',
+  PlayerActionType.useActionCard: 'useActionCard',
+  PlayerActionType.discardActionCard: 'discardActionCard',
 };

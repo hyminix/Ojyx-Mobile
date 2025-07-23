@@ -38,4 +38,7 @@ enum PlayerActionType {
   revealCard,
   playActionCard,
   endTurn,
+  drawActionCard,
+  useActionCard,
+  discardActionCard,
 }

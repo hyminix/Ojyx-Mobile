@@ -5,13 +5,18 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../multiplayer/presentation/providers/room_providers.dart';
 import '../../../multiplayer/presentation/providers/multiplayer_game_notifier.dart';
 import '../providers/game_state_notifier.dart';
+import '../providers/direction_observer_provider.dart';
 import '../widgets/player_grid_widget.dart';
 import '../widgets/player_hand_widget.dart';
 import '../widgets/turn_info_widget.dart';
 import '../widgets/deck_and_discard_widget.dart';
 import '../widgets/opponents_view_widget.dart';
+import '../widgets/action_card_hand_widget.dart';
+import '../widgets/action_card_draw_pile_widget.dart';
+import '../widgets/game_animation_overlay.dart';
 import '../../domain/entities/game_state.dart';
 import '../../domain/entities/player.dart';
+import '../../domain/entities/action_card.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -34,6 +39,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Watch the direction observer to trigger animations
+    ref.watch(directionObserverProvider);
+    
     final currentUserId = ref.watch(currentUserIdProvider);
     final gameStateAsync = ref.watch(gameStateNotifierProvider);
     final roomAsync = ref.watch(currentRoomProvider(widget.roomId));
@@ -75,9 +83,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
           final isMyTurn = gameStateAsync.currentPlayer.id == currentUserId;
 
-          return SafeArea(
-            child: Column(
-              children: [
+          return GameAnimationOverlay(
+            child: SafeArea(
+              child: Column(
+                children: [
                 // Turn info
                 Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -96,13 +105,26 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Column(
                         children: [
-                          // Deck and discard piles
-                          DeckAndDiscardWidget(
-                            gameState: gameStateAsync,
-                            canDraw:
-                                isMyTurn && gameStateAsync.drawnCard == null,
-                            onDrawFromDeck: () => _drawFromDeck(ref),
-                            onDrawFromDiscard: () => _drawFromDiscard(ref),
+                          // Deck and discard piles with action card draw pile
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: DeckAndDiscardWidget(
+                                  gameState: gameStateAsync,
+                                  canDraw:
+                                      isMyTurn && gameStateAsync.drawnCard == null,
+                                  onDrawFromDeck: () => _drawFromDeck(ref),
+                                  onDrawFromDiscard: () => _drawFromDiscard(ref),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              ActionCardDrawPileWidget(
+                                canDraw: isMyTurn && 
+                                    currentPlayer.actionCards.length < 3,
+                                onDraw: () => _drawActionCard(ref),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 24),
 
@@ -148,7 +170,19 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     onDiscard: () => _discardDirectly(ref),
                     isCurrentPlayer: true,
                   ),
-              ],
+                
+                // Action cards hand
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ActionCardHandWidget(
+                    player: currentPlayer,
+                    isCurrentPlayer: true,
+                    onCardTap: isMyTurn ? (card) => _useActionCard(ref, card) : null,
+                    onCardDiscard: isMyTurn ? (card) => _discardActionCard(ref, card) : null,
+                  ),
+                ),
+                ],
+              ),
             ),
           );
         },
@@ -224,6 +258,36 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final currentUserId = ref.read(currentUserIdProvider);
     if (currentUserId != null) {
       notifier.discardCard(currentUserId, -1); // -1 indicates direct discard
+    }
+  }
+
+  void _drawActionCard(WidgetRef ref) {
+    final notifier = ref.read(
+      multiplayerGameNotifierProvider(widget.roomId).notifier,
+    );
+    final currentUserId = ref.read(currentUserIdProvider);
+    if (currentUserId != null) {
+      notifier.drawActionCard(currentUserId);
+    }
+  }
+
+  void _useActionCard(WidgetRef ref, ActionCard card) {
+    final notifier = ref.read(
+      multiplayerGameNotifierProvider(widget.roomId).notifier,
+    );
+    final currentUserId = ref.read(currentUserIdProvider);
+    if (currentUserId != null) {
+      notifier.useActionCard(currentUserId, card);
+    }
+  }
+
+  void _discardActionCard(WidgetRef ref, ActionCard card) {
+    final notifier = ref.read(
+      multiplayerGameNotifierProvider(widget.roomId).notifier,
+    );
+    final currentUserId = ref.read(currentUserIdProvider);
+    if (currentUserId != null) {
+      notifier.discardActionCard(currentUserId, card);
     }
   }
 

@@ -3,6 +3,7 @@ import 'dart:async';
 
 import '../../../game/domain/entities/game_state.dart';
 import '../../../game/domain/entities/card.dart';
+import '../../../game/domain/entities/action_card.dart';
 import '../../../game/presentation/providers/game_state_notifier.dart';
 import '../../domain/entities/room_event.dart';
 import '../../domain/use_cases/sync_game_state_use_case.dart';
@@ -109,5 +110,33 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
 
   Future<void> endTurn(String playerId) async {
     await syncAction(playerId: playerId, actionType: PlayerActionType.endTurn);
+  }
+
+  Future<void> drawActionCard(String playerId) async {
+    await syncAction(
+      playerId: playerId,
+      actionType: PlayerActionType.drawActionCard,
+    );
+  }
+
+  Future<void> useActionCard(String playerId, ActionCard card) async {
+    await syncAction(
+      playerId: playerId,
+      actionType: PlayerActionType.useActionCard,
+      actionData: {
+        'cardId': card.id,
+        'cardType': card.type.toString(),
+      },
+    );
+  }
+
+  Future<void> discardActionCard(String playerId, ActionCard card) async {
+    await syncAction(
+      playerId: playerId,
+      actionType: PlayerActionType.discardActionCard,
+      actionData: {
+        'cardId': card.id,
+      },
+    );
   }
 }
