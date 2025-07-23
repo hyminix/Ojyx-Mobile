@@ -17,7 +17,7 @@ void main() {
     testWidgets('should display app title and logo', (tester) async {
       // Arrange
       final mockRouter = MockGoRouter();
-      
+
       // Act
       await tester.pumpWidget(
         ProviderScope(
@@ -26,10 +26,7 @@ void main() {
               return AuthNotifier();
             }),
           ],
-          child: createTestApp(
-            child: const HomeScreen(),
-            router: mockRouter,
-          ),
+          child: createTestApp(child: const HomeScreen(), router: mockRouter),
         ),
       );
       await tester.pump();
@@ -40,17 +37,16 @@ void main() {
       expect(find.byIcon(Icons.style), findsOneWidget);
     });
 
-    testWidgets('should display loading indicator when auth is loading', (tester) async {
+    testWidgets('should display loading indicator when auth is loading', (
+      tester,
+    ) async {
       // Arrange
       final mockRouter = MockGoRouter();
-      
+
       // Act
       await tester.pumpWidget(
         ProviderScope(
-          child: createTestApp(
-            child: const HomeScreen(),
-            router: mockRouter,
-          ),
+          child: createTestApp(child: const HomeScreen(), router: mockRouter),
         ),
       );
       await tester.pump();
@@ -59,11 +55,13 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('should display create and join buttons when authenticated', (tester) async {
+    testWidgets('should display create and join buttons when authenticated', (
+      tester,
+    ) async {
       // Arrange
       final mockRouter = MockGoRouter();
       final mockUser = MockUser();
-      
+
       // Act
       await tester.pumpWidget(
         ProviderScope(
@@ -75,10 +73,7 @@ void main() {
               return notifier;
             }),
           ],
-          child: createTestApp(
-            child: const HomeScreen(),
-            router: mockRouter,
-          ),
+          child: createTestApp(child: const HomeScreen(), router: mockRouter),
         ),
       );
       await tester.pumpAndSettle();
@@ -94,7 +89,7 @@ void main() {
       // Arrange
       final mockRouter = MockGoRouter();
       final mockUser = MockUser();
-      
+
       // Act
       await tester.pumpWidget(
         ProviderScope(
@@ -105,10 +100,7 @@ void main() {
               return notifier;
             }),
           ],
-          child: createTestApp(
-            child: const HomeScreen(),
-            router: mockRouter,
-          ),
+          child: createTestApp(child: const HomeScreen(), router: mockRouter),
         ),
       );
       await tester.pumpAndSettle();
@@ -119,11 +111,13 @@ void main() {
       expect(find.byIcon(Icons.person), findsOneWidget);
     });
 
-    testWidgets('should navigate to create room when create button is tapped', (tester) async {
+    testWidgets('should navigate to create room when create button is tapped', (
+      tester,
+    ) async {
       // Arrange
       final mockRouter = MockGoRouter();
       final mockUser = MockUser();
-      
+
       // Act
       await tester.pumpWidget(
         ProviderScope(
@@ -134,14 +128,11 @@ void main() {
               return notifier;
             }),
           ],
-          child: createTestApp(
-            child: const HomeScreen(),
-            router: mockRouter,
-          ),
+          child: createTestApp(child: const HomeScreen(), router: mockRouter),
         ),
       );
       await tester.pumpAndSettle();
-      
+
       await tester.tap(find.text('Créer une partie'));
       await tester.pumpAndSettle();
 
@@ -149,11 +140,13 @@ void main() {
       expect(mockRouter.pushedRoutes, contains('/create-room'));
     });
 
-    testWidgets('should navigate to join room when join button is tapped', (tester) async {
+    testWidgets('should navigate to join room when join button is tapped', (
+      tester,
+    ) async {
       // Arrange
       final mockRouter = MockGoRouter();
       final mockUser = MockUser();
-      
+
       // Act
       await tester.pumpWidget(
         ProviderScope(
@@ -164,14 +157,11 @@ void main() {
               return notifier;
             }),
           ],
-          child: createTestApp(
-            child: const HomeScreen(),
-            router: mockRouter,
-          ),
+          child: createTestApp(child: const HomeScreen(), router: mockRouter),
         ),
       );
       await tester.pumpAndSettle();
-      
+
       await tester.tap(find.text('Rejoindre une partie'));
       await tester.pumpAndSettle();
 
@@ -182,21 +172,21 @@ void main() {
     testWidgets('should display error state with retry button', (tester) async {
       // Arrange
       final mockRouter = MockGoRouter();
-      
+
       // Act
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
             authNotifierProvider.overrideWith(() {
               final notifier = AuthNotifier();
-              notifier.state = AsyncValue.error('Connection failed', StackTrace.empty);
+              notifier.state = AsyncValue.error(
+                'Connection failed',
+                StackTrace.empty,
+              );
               return notifier;
             }),
           ],
-          child: createTestApp(
-            child: const HomeScreen(),
-            router: mockRouter,
-          ),
+          child: createTestApp(child: const HomeScreen(), router: mockRouter),
         ),
       );
       await tester.pumpAndSettle();

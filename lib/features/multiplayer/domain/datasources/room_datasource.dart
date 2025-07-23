@@ -6,10 +6,7 @@ import 'package:ojyx/features/game/domain/entities/game_state.dart';
 /// This abstracts the data source implementation (e.g., Supabase)
 abstract class RoomDatasource {
   /// Creates a new room
-  Future<Room> createRoom({
-    required String creatorId,
-    required int maxPlayers,
-  });
+  Future<Room> createRoom({required String creatorId, required int maxPlayers});
 
   /// Gets a room by ID
   Future<Room?> getRoom(String roomId);
@@ -18,16 +15,10 @@ abstract class RoomDatasource {
   Future<Room> updateRoom(Room room);
 
   /// Joins a room
-  Future<Room> joinRoom({
-    required String roomId,
-    required String playerId,
-  });
+  Future<Room> joinRoom({required String roomId, required String playerId});
 
   /// Leaves a room
-  Future<Room> leaveRoom({
-    required String roomId,
-    required String playerId,
-  });
+  Future<Room> leaveRoom({required String roomId, required String playerId});
 
   /// Watches room updates in real-time
   Stream<Room> watchRoom(String roomId);
@@ -36,10 +27,7 @@ abstract class RoomDatasource {
   Stream<RoomEvent> watchRoomEvents(String roomId);
 
   /// Sends an event to a room
-  Future<void> sendEvent({
-    required String roomId,
-    required RoomEvent event,
-  });
+  Future<void> sendEvent({required String roomId, required RoomEvent event});
 
   /// Gets all available rooms
   Future<List<Room>> getAvailableRooms();

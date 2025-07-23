@@ -5,7 +5,9 @@ import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 
 void main() {
   group('PlayerHandWidget', () {
-    testWidgets('should show nothing when not current player', (WidgetTester tester) async {
+    testWidgets('should show nothing when not current player', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       const drawnCard = game.Card(value: 5, isRevealed: false);
 
@@ -26,15 +28,14 @@ void main() {
       expect(find.text('Carte en main'), findsNothing);
     });
 
-    testWidgets('should show nothing when no drawn card', (WidgetTester tester) async {
+    testWidgets('should show nothing when no drawn card', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: PlayerHandWidget(
-              drawnCard: null,
-              isCurrentPlayer: true,
-            ),
+            body: PlayerHandWidget(drawnCard: null, isCurrentPlayer: true),
           ),
         ),
       );
@@ -44,7 +45,9 @@ void main() {
       expect(find.text('Carte en main'), findsNothing);
     });
 
-    testWidgets('should show card when current player has drawn card', (WidgetTester tester) async {
+    testWidgets('should show card when current player has drawn card', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       const drawnCard = game.Card(value: 5, isRevealed: false);
 
@@ -52,10 +55,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: PlayerHandWidget(
-              drawnCard: drawnCard,
-              isCurrentPlayer: true,
-            ),
+            body: PlayerHandWidget(drawnCard: drawnCard, isCurrentPlayer: true),
           ),
         ),
       );
@@ -65,7 +65,9 @@ void main() {
       expect(find.byIcon(Icons.pan_tool), findsOneWidget);
     });
 
-    testWidgets('should show discard button when canDiscard is true', (WidgetTester tester) async {
+    testWidgets('should show discard button when canDiscard is true', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       const drawnCard = game.Card(value: 7, isRevealed: false);
 
@@ -90,9 +92,11 @@ void main() {
       expect(find.byIcon(Icons.arrow_forward), findsOneWidget);
     });
 
-    testWidgets('should not show discard button when canDiscard is false', (WidgetTester tester) async {
+    testWidgets('should not show discard button when canDiscard is false', (
+      WidgetTester tester,
+    ) async {
       // Arrange
-      const drawnCard = game.Card( value: 3, isRevealed: false);
+      const drawnCard = game.Card(value: 3, isRevealed: false);
 
       // Act
       await tester.pumpWidget(
@@ -114,9 +118,11 @@ void main() {
       expect(find.byIcon(Icons.arrow_forward), findsNothing);
     });
 
-    testWidgets('should call onDiscard when button is pressed', (WidgetTester tester) async {
+    testWidgets('should call onDiscard when button is pressed', (
+      WidgetTester tester,
+    ) async {
       // Arrange
-      const drawnCard = game.Card( value: 10, isRevealed: false);
+      const drawnCard = game.Card(value: 10, isRevealed: false);
       var discardCalled = false;
 
       // Act
@@ -144,7 +150,7 @@ void main() {
 
     testWidgets('should apply proper styling', (WidgetTester tester) async {
       // Arrange
-      const drawnCard = game.Card( value: 2, isRevealed: false);
+      const drawnCard = game.Card(value: 2, isRevealed: false);
 
       // Act
       await tester.pumpWidget(
@@ -168,9 +174,7 @@ void main() {
       );
 
       // Assert
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final container = tester.widget<Container>(find.byType(Container).first);
       final decoration = container.decoration as BoxDecoration;
       expect(decoration.borderRadius, BorderRadius.circular(16));
       expect(decoration.color, Colors.grey);
@@ -180,32 +184,31 @@ void main() {
       expect(textButton.style?.foregroundColor?.resolve({}), Colors.red);
     });
 
-    testWidgets('should display card with correct dimensions', (WidgetTester tester) async {
+    testWidgets('should display card with correct dimensions', (
+      WidgetTester tester,
+    ) async {
       // Arrange
-      const drawnCard = game.Card( value: 8, isRevealed: false);
+      const drawnCard = game.Card(value: 8, isRevealed: false);
 
       // Act
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: PlayerHandWidget(
-              drawnCard: drawnCard,
-              isCurrentPlayer: true,
-            ),
+            body: PlayerHandWidget(drawnCard: drawnCard, isCurrentPlayer: true),
           ),
         ),
       );
 
       // Assert
       final sizedBoxes = tester.widgetList<SizedBox>(find.byType(SizedBox));
-      
+
       // Find the SizedBox with height 140
       final heightSizedBox = sizedBoxes.firstWhere(
         (widget) => widget.height == 140,
         orElse: () => throw StateError('SizedBox with height 140 not found'),
       );
       expect(heightSizedBox.height, equals(140));
-      
+
       // Find the SizedBox with width 100
       final widthSizedBox = sizedBoxes.firstWhere(
         (widget) => widget.width == 100,
@@ -216,24 +219,19 @@ void main() {
 
     testWidgets('should apply shadow correctly', (WidgetTester tester) async {
       // Arrange
-      const drawnCard = game.Card( value: 4, isRevealed: false);
+      const drawnCard = game.Card(value: 4, isRevealed: false);
 
       // Act
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: PlayerHandWidget(
-              drawnCard: drawnCard,
-              isCurrentPlayer: true,
-            ),
+            body: PlayerHandWidget(drawnCard: drawnCard, isCurrentPlayer: true),
           ),
         ),
       );
 
       // Assert
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final container = tester.widget<Container>(find.byType(Container).first);
       final decoration = container.decoration as BoxDecoration;
       expect(decoration.boxShadow, isNotNull);
       expect(decoration.boxShadow!.length, equals(1));
@@ -241,9 +239,11 @@ void main() {
       expect(decoration.boxShadow!.first.offset, equals(const Offset(0, -2)));
     });
 
-    testWidgets('should handle null onDiscard callback', (WidgetTester tester) async {
+    testWidgets('should handle null onDiscard callback', (
+      WidgetTester tester,
+    ) async {
       // Arrange
-      const drawnCard = game.Card( value: 6, isRevealed: false);
+      const drawnCard = game.Card(value: 6, isRevealed: false);
 
       // Act
       await tester.pumpWidget(

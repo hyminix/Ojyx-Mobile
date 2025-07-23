@@ -50,7 +50,7 @@ void main() {
         // Test edge cases
         expect(kMinCardValue.displayColor, isA<Color>());
         expect(kMaxCardValue.displayColor, isA<Color>());
-        
+
         // Test all values have a color
         for (int value = kMinCardValue; value <= kMaxCardValue; value++) {
           expect(value.displayColor, isA<Color>());
@@ -64,10 +64,10 @@ void main() {
       test('should return a new shuffled list', () {
         // Arrange
         final original = [1, 2, 3, 4, 5];
-        
+
         // Act
         final shuffled = original.shuffled();
-        
+
         // Assert
         expect(shuffled.length, equals(original.length));
         expect(shuffled, containsAll(original));
@@ -78,10 +78,10 @@ void main() {
         // Arrange
         final original = [1, 2, 3, 4, 5];
         final copy = List<int>.from(original);
-        
+
         // Act
         original.shuffled();
-        
+
         // Assert
         expect(original, equals(copy));
       });
@@ -89,10 +89,10 @@ void main() {
       test('should handle empty list', () {
         // Arrange
         final empty = <int>[];
-        
+
         // Act
         final shuffled = empty.shuffled();
-        
+
         // Assert
         expect(shuffled, isEmpty);
       });
@@ -102,10 +102,10 @@ void main() {
       test('should split list into chunks of specified size', () {
         // Arrange
         final list = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-        
+
         // Act
         final chunks = list.chunked(3);
-        
+
         // Assert
         expect(chunks.length, equals(3));
         expect(chunks[0], equals([1, 2, 3]));
@@ -116,10 +116,10 @@ void main() {
       test('should handle incomplete last chunk', () {
         // Arrange
         final list = [1, 2, 3, 4, 5];
-        
+
         // Act
         final chunks = list.chunked(2);
-        
+
         // Assert
         expect(chunks.length, equals(3));
         expect(chunks[0], equals([1, 2]));
@@ -130,10 +130,10 @@ void main() {
       test('should handle chunk size larger than list', () {
         // Arrange
         final list = [1, 2, 3];
-        
+
         // Act
         final chunks = list.chunked(5);
-        
+
         // Assert
         expect(chunks.length, equals(1));
         expect(chunks[0], equals([1, 2, 3]));
@@ -142,10 +142,10 @@ void main() {
       test('should handle empty list', () {
         // Arrange
         final empty = <int>[];
-        
+
         // Act
         final chunks = empty.chunked(3);
-        
+
         // Assert
         expect(chunks, isEmpty);
       });
@@ -153,10 +153,10 @@ void main() {
       test('should handle chunk size of 1', () {
         // Arrange
         final list = [1, 2, 3];
-        
+
         // Act
         final chunks = list.chunked(1);
-        
+
         // Assert
         expect(chunks.length, equals(3));
         expect(chunks[0], equals([1]));

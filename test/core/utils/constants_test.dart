@@ -33,7 +33,7 @@ void main() {
       expect(kReconnectionTimeout, equals(const Duration(minutes: 2)));
       expect(kTurnTimeout, equals(const Duration(seconds: 60)));
       expect(kAnimationDuration, equals(const Duration(milliseconds: 300)));
-      
+
       // Verify relationships
       expect(kReconnectionTimeout, greaterThan(kTurnTimeout));
       expect(kTurnTimeout, greaterThan(kAnimationDuration));
@@ -44,8 +44,11 @@ void main() {
     test('should have distribution for all card values', () {
       // Check all values from min to max are present
       for (int value = kMinCardValue; value <= kMaxCardValue; value++) {
-        expect(kCardDistribution.containsKey(value), isTrue,
-            reason: 'Missing distribution for card value $value');
+        expect(
+          kCardDistribution.containsKey(value),
+          isTrue,
+          reason: 'Missing distribution for card value $value',
+        );
       }
     });
 
@@ -58,11 +61,14 @@ void main() {
       expect(kCardDistribution[-2], equals(5));
       expect(kCardDistribution[-1], equals(10));
       expect(kCardDistribution[0], equals(15));
-      
+
       // All positive values should have 10 cards each
       for (int value = 1; value <= 12; value++) {
-        expect(kCardDistribution[value], equals(10),
-            reason: 'Card value $value should have 10 cards');
+        expect(
+          kCardDistribution[value],
+          equals(10),
+          reason: 'Card value $value should have 10 cards',
+        );
       }
     });
 
@@ -70,7 +76,7 @@ void main() {
       final negativeCards = kCardDistribution[-2]! + kCardDistribution[-1]!;
       final neutralCards = kCardDistribution[0]!;
       final highValueCards = kCardDistribution[11]! + kCardDistribution[12]!;
-      
+
       expect(neutralCards, greaterThan(negativeCards));
       expect(neutralCards, lessThan(highValueCards));
     });

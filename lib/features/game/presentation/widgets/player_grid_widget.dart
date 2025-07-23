@@ -10,7 +10,7 @@ class PlayerGridWidget extends StatelessWidget {
   final Function(int row, int col)? onCardTap;
   final Set<(int, int)> highlightedPositions;
   final Set<(int, int)> selectedPositions;
-  
+
   const PlayerGridWidget({
     super.key,
     required this.grid,
@@ -25,14 +25,17 @@ class PlayerGridWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final cardWidth = (constraints.maxWidth - 32) / 4; // 4 colonnes + marges
+        final cardWidth =
+            (constraints.maxWidth - 32) / 4; // 4 colonnes + marges
         final cardHeight = cardWidth / 0.7; // Ratio carte
-        
+
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isCurrentPlayer
-                ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3)
+                ? Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer.withValues(alpha: 0.3)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
@@ -59,10 +62,11 @@ class PlayerGridWidget extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         'Votre grille',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                     ],
                   ),
@@ -77,9 +81,11 @@ class PlayerGridWidget extends StatelessWidget {
                       children: List.generate(4, (col) {
                         final card = grid.getCard(row, col);
                         final position = (row, col);
-                        final isHighlighted = highlightedPositions.contains(position);
+                        final isHighlighted = highlightedPositions.contains(
+                          position,
+                        );
                         final isSelected = selectedPositions.contains(position);
-                        
+
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4.0),
                           child: SizedBox(
@@ -112,12 +118,12 @@ class PlayerGridWidget extends StatelessWidget {
       },
     );
   }
-  
+
   Widget _buildGridStats(BuildContext context) {
     final revealedCount = _countRevealedCards();
     final totalScore = grid.totalScore;
     final identicalColumns = grid.getIdenticalColumns();
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -145,7 +151,7 @@ class PlayerGridWidget extends StatelessWidget {
       ],
     );
   }
-  
+
   int _countRevealedCards() {
     int count = 0;
     for (final row in grid.cards) {
@@ -166,7 +172,7 @@ class _StatChip extends StatelessWidget {
   final BuildContext context;
   final bool highlight;
   final Color? color;
-  
+
   const _StatChip({
     required this.icon,
     required this.label,
@@ -175,13 +181,15 @@ class _StatChip extends StatelessWidget {
     this.highlight = false,
     this.color,
   });
-  
+
   @override
   Widget build(BuildContext context) {
-    final chipColor = color ?? (highlight
-        ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.secondary);
-    
+    final chipColor =
+        color ??
+        (highlight
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.secondary);
+
     return Tooltip(
       message: tooltip,
       child: Container(
@@ -189,18 +197,12 @@ class _StatChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: chipColor.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: chipColor.withValues(alpha: 0.5),
-          ),
+          border: Border.all(color: chipColor.withValues(alpha: 0.5)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 16,
-              color: chipColor,
-            ),
+            Icon(icon, size: 16, color: chipColor),
             const SizedBox(width: 4),
             Text(
               label,

@@ -3,7 +3,8 @@ import 'package:mocktail/mocktail.dart';
 import 'package:ojyx/features/game/data/datasources/action_card_local_datasource.dart';
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
 
-class MockActionCardLocalDataSource extends Mock implements ActionCardLocalDataSource {}
+class MockActionCardLocalDataSource extends Mock
+    implements ActionCardLocalDataSource {}
 
 void main() {
   late MockActionCardLocalDataSource mockDataSource;
@@ -31,8 +32,9 @@ void main() {
           description: 'Protect from attacks',
         ),
       ];
-      when(() => mockDataSource.getAvailableActionCards())
-          .thenReturn(expectedCards);
+      when(
+        () => mockDataSource.getAvailableActionCards(),
+      ).thenReturn(expectedCards);
 
       // Act
       final result = mockDataSource.getAvailableActionCards();
@@ -46,8 +48,9 @@ void main() {
       // Arrange
       const playerId = 'player1';
       final expectedCards = [testActionCard];
-      when(() => mockDataSource.getPlayerActionCards(playerId))
-          .thenReturn(expectedCards);
+      when(
+        () => mockDataSource.getPlayerActionCards(playerId),
+      ).thenReturn(expectedCards);
 
       // Act
       final result = mockDataSource.getPlayerActionCards(playerId);
@@ -60,55 +63,69 @@ void main() {
     test('should define addActionCardToPlayer method', () {
       // Arrange
       const playerId = 'player1';
-      when(() => mockDataSource.addActionCardToPlayer(playerId, testActionCard))
-          .thenReturn(null);
+      when(
+        () => mockDataSource.addActionCardToPlayer(playerId, testActionCard),
+      ).thenReturn(null);
 
       // Act & Assert
       expect(
         () => mockDataSource.addActionCardToPlayer(playerId, testActionCard),
         returnsNormally,
       );
-      verify(() => mockDataSource.addActionCardToPlayer(playerId, testActionCard))
-          .called(1);
-    });
-
-    test('should handle exception when adding card to player with full hand', () {
-      // Arrange
-      const playerId = 'player1';
-      when(() => mockDataSource.addActionCardToPlayer(playerId, testActionCard))
-          .thenThrow(Exception('Player already has 3 cards'));
-
-      // Act & Assert
-      expect(
+      verify(
         () => mockDataSource.addActionCardToPlayer(playerId, testActionCard),
-        throwsException,
-      );
+      ).called(1);
     });
+
+    test(
+      'should handle exception when adding card to player with full hand',
+      () {
+        // Arrange
+        const playerId = 'player1';
+        when(
+          () => mockDataSource.addActionCardToPlayer(playerId, testActionCard),
+        ).thenThrow(Exception('Player already has 3 cards'));
+
+        // Act & Assert
+        expect(
+          () => mockDataSource.addActionCardToPlayer(playerId, testActionCard),
+          throwsException,
+        );
+      },
+    );
 
     test('should define removeActionCardFromPlayer method', () {
       // Arrange
       const playerId = 'player1';
-      when(() => mockDataSource.removeActionCardFromPlayer(playerId, testActionCard))
-          .thenReturn(null);
+      when(
+        () =>
+            mockDataSource.removeActionCardFromPlayer(playerId, testActionCard),
+      ).thenReturn(null);
 
       // Act & Assert
       expect(
-        () => mockDataSource.removeActionCardFromPlayer(playerId, testActionCard),
+        () =>
+            mockDataSource.removeActionCardFromPlayer(playerId, testActionCard),
         returnsNormally,
       );
-      verify(() => mockDataSource.removeActionCardFromPlayer(playerId, testActionCard))
-          .called(1);
+      verify(
+        () =>
+            mockDataSource.removeActionCardFromPlayer(playerId, testActionCard),
+      ).called(1);
     });
 
     test('should handle exception when removing card player doesn\'t have', () {
       // Arrange
       const playerId = 'player1';
-      when(() => mockDataSource.removeActionCardFromPlayer(playerId, testActionCard))
-          .thenThrow(Exception('Player doesn\'t have this card'));
+      when(
+        () =>
+            mockDataSource.removeActionCardFromPlayer(playerId, testActionCard),
+      ).thenThrow(Exception('Player doesn\'t have this card'));
 
       // Act & Assert
       expect(
-        () => mockDataSource.removeActionCardFromPlayer(playerId, testActionCard),
+        () =>
+            mockDataSource.removeActionCardFromPlayer(playerId, testActionCard),
         throwsException,
       );
     });
@@ -139,8 +156,9 @@ void main() {
 
     test('should define discardActionCard method', () {
       // Arrange
-      when(() => mockDataSource.discardActionCard(testActionCard))
-          .thenReturn(null);
+      when(
+        () => mockDataSource.discardActionCard(testActionCard),
+      ).thenReturn(null);
 
       // Act & Assert
       expect(
@@ -155,10 +173,7 @@ void main() {
       when(() => mockDataSource.shuffleActionCards()).thenReturn(null);
 
       // Act & Assert
-      expect(
-        () => mockDataSource.shuffleActionCards(),
-        returnsNormally,
-      );
+      expect(() => mockDataSource.shuffleActionCards(), returnsNormally);
       verify(() => mockDataSource.shuffleActionCards()).called(1);
     });
 
@@ -166,10 +181,12 @@ void main() {
       // Arrange
       const playerId = 'player1';
       when(() => mockDataSource.drawActionCard()).thenReturn(testActionCard);
-      when(() => mockDataSource.addActionCardToPlayer(playerId, testActionCard))
-          .thenReturn(null);
-      when(() => mockDataSource.getPlayerActionCards(playerId))
-          .thenReturn([testActionCard]);
+      when(
+        () => mockDataSource.addActionCardToPlayer(playerId, testActionCard),
+      ).thenReturn(null);
+      when(
+        () => mockDataSource.getPlayerActionCards(playerId),
+      ).thenReturn([testActionCard]);
 
       // Act
       final drawnCard = mockDataSource.drawActionCard();
@@ -180,8 +197,9 @@ void main() {
       expect(drawnCard, equals(testActionCard));
       expect(playerCards, contains(testActionCard));
       verify(() => mockDataSource.drawActionCard()).called(1);
-      verify(() => mockDataSource.addActionCardToPlayer(playerId, testActionCard))
-          .called(1);
+      verify(
+        () => mockDataSource.addActionCardToPlayer(playerId, testActionCard),
+      ).called(1);
       verify(() => mockDataSource.getPlayerActionCards(playerId)).called(1);
     });
   });

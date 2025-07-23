@@ -47,11 +47,7 @@ void main() {
 
       // Act & Assert
       expect(
-        () => SentryConfig.captureMessage(
-          message,
-          level: level,
-          extra: extra,
-        ),
+        () => SentryConfig.captureMessage(message, level: level, extra: extra),
         returnsNormally,
       );
     });
@@ -83,10 +79,7 @@ void main() {
 
     test('should clear user when null', () {
       // Act & Assert
-      expect(
-        () => SentryConfig.setUser(null),
-        returnsNormally,
-      );
+      expect(() => SentryConfig.setUser(null), returnsNormally);
     });
   });
 }

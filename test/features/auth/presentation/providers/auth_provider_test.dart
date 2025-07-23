@@ -6,11 +6,14 @@ import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
 import 'package:ojyx/core/providers/supabase_provider.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockGoTrueClient extends Mock implements GoTrueClient {}
+
 class MockUser extends Mock implements User {
   @override
   String get id => 'test-user-id';
 }
+
 class MockAuthResponse extends Mock implements AuthResponse {
   @override
   User? get user => MockUser();
@@ -24,13 +27,11 @@ void main() {
   setUp(() {
     mockSupabaseClient = MockSupabaseClient();
     mockAuth = MockGoTrueClient();
-    
+
     when(() => mockSupabaseClient.auth).thenReturn(mockAuth);
-    
+
     container = ProviderContainer(
-      overrides: [
-        supabaseClientProvider.overrideWithValue(mockSupabaseClient),
-      ],
+      overrides: [supabaseClientProvider.overrideWithValue(mockSupabaseClient)],
     );
   });
 
@@ -57,7 +58,9 @@ void main() {
       // Arrange
       final mockAuthResponse = MockAuthResponse();
       when(() => mockAuth.currentUser).thenReturn(null);
-      when(() => mockAuth.signInAnonymously()).thenAnswer((_) async => mockAuthResponse);
+      when(
+        () => mockAuth.signInAnonymously(),
+      ).thenAnswer((_) async => mockAuthResponse);
 
       // Act
       final result = await container.read(authNotifierProvider.future);
@@ -71,7 +74,9 @@ void main() {
     test('should return null if anonymous sign in fails', () async {
       // Arrange
       when(() => mockAuth.currentUser).thenReturn(null);
-      when(() => mockAuth.signInAnonymously()).thenThrow(Exception('Auth failed'));
+      when(
+        () => mockAuth.signInAnonymously(),
+      ).thenThrow(Exception('Auth failed'));
 
       // Act
       final result = await container.read(authNotifierProvider.future);
@@ -114,7 +119,9 @@ void main() {
     test('currentUserId should return null when not authenticated', () async {
       // Arrange
       when(() => mockAuth.currentUser).thenReturn(null);
-      when(() => mockAuth.signInAnonymously()).thenThrow(Exception('Auth failed'));
+      when(
+        () => mockAuth.signInAnonymously(),
+      ).thenThrow(Exception('Auth failed'));
 
       // Act
       await container.read(authNotifierProvider.future);
@@ -143,7 +150,9 @@ void main() {
     test('should return null when user is not authenticated', () async {
       // Arrange
       when(() => mockAuth.currentUser).thenReturn(null);
-      when(() => mockAuth.signInAnonymously()).thenThrow(Exception('Auth failed'));
+      when(
+        () => mockAuth.signInAnonymously(),
+      ).thenThrow(Exception('Auth failed'));
 
       // Act
       await container.read(authNotifierProvider.future);

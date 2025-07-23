@@ -24,7 +24,7 @@ void main() {
       // This test verifies that all methods are defined on the class
       // without actually testing their implementation since Supabase mocking
       // is complex and error-prone
-      
+
       // Act & Assert - Check that methods exist
       expect(datasource.createRoom, isA<Function>());
       expect(datasource.joinRoom, isA<Function>());

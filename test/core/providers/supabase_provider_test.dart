@@ -8,14 +8,14 @@ void main() {
     test('should provide SupabaseClient instance', () {
       // Arrange
       final container = ProviderContainer();
-      
+
       // Act & Assert
       // In test environment without Supabase initialized, this will throw
       expect(
         () => container.read(supabaseClientProvider),
         throwsA(isA<Error>()),
       );
-      
+
       // Clean up
       container.dispose();
     });

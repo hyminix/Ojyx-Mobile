@@ -9,7 +9,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authNotifierProvider);
-    
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -49,11 +49,13 @@ class HomeScreen extends ConsumerWidget {
                     Text(
                       'Le jeu de cartes stratégique',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground.withValues(alpha: 0.7),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onBackground.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 48),
-                    
+
                     // Loading or buttons
                     authState.when(
                       data: (user) {
@@ -78,7 +80,7 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            
+
                             // Join Room Button
                             SizedBox(
                               width: double.infinity,
@@ -95,7 +97,7 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 32),
-                            
+
                             // User info
                             Container(
                               padding: const EdgeInsets.all(16),
@@ -107,22 +109,33 @@ class HomeScreen extends ConsumerWidget {
                                 children: [
                                   Icon(
                                     Icons.person,
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Joueur anonyme',
-                                          style: Theme.of(context).textTheme.titleSmall,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleSmall,
                                         ),
                                         Text(
                                           'ID: ${user.id.substring(0, 8)}...',
-                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withValues(alpha: 0.6),
+                                              ),
                                         ),
                                       ],
                                     ),

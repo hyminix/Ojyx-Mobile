@@ -51,10 +51,7 @@ void main() {
 
     test('should return null for top discard when pile is empty', () {
       // Arrange
-      final deckState = DeckState(
-        drawPile: testCards,
-        discardPile: const [],
-      );
+      final deckState = DeckState(drawPile: testCards, discardPile: const []);
 
       // Act
       final topCard = deckState.topDiscardCard;
@@ -95,10 +92,7 @@ void main() {
 
     test('should draw a card from draw pile', () {
       // Arrange
-      final deckState = DeckState(
-        drawPile: testCards,
-        discardPile: const [],
-      );
+      final deckState = DeckState(drawPile: testCards, discardPile: const []);
 
       // Act
       final (newState, drawnCard) = deckState.drawCard();
@@ -142,10 +136,7 @@ void main() {
 
     test('should reshuffle discard pile into draw pile', () {
       // Arrange
-      final deckState = DeckState(
-        drawPile: const [],
-        discardPile: testCards,
-      );
+      final deckState = DeckState(drawPile: const [], discardPile: testCards);
 
       // Act
       final newState = deckState.reshuffleDiscardIntoDraw();
@@ -154,7 +145,7 @@ void main() {
       expect(newState.drawPile.length, equals(3)); // All but top card
       expect(newState.discardPile.length, equals(1)); // Keep top card
       expect(newState.discardPile.first, equals(testCards.last));
-      
+
       // Verify cards were moved (not necessarily in same order due to shuffle)
       final allCards = [...newState.drawPile, ...newState.discardPile];
       expect(allCards.length, equals(testCards.length));
@@ -222,9 +213,7 @@ void main() {
       );
 
       // Act
-      final modified = original.copyWith(
-        drawPile: testCards.sublist(0, 1),
-      );
+      final modified = original.copyWith(drawPile: testCards.sublist(0, 1));
 
       // Assert
       expect(modified.drawPile.length, equals(1));

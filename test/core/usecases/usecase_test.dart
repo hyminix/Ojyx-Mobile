@@ -16,9 +16,9 @@ class TestUseCase extends UseCase<String, TestParams> {
 
 class TestUseCaseNoParams extends UseCaseNoParams<int> {
   final bool shouldFail;
-  
+
   TestUseCaseNoParams({this.shouldFail = false});
-  
+
   @override
   Future<Either<Failure, int>> call() async {
     if (shouldFail) {
@@ -31,25 +31,25 @@ class TestUseCaseNoParams extends UseCaseNoParams<int> {
 class TestParams {
   final String value;
   final bool shouldFail;
-  
+
   TestParams({required this.value, this.shouldFail = false});
 }
 
 void main() {
   group('UseCase', () {
     late TestUseCase useCase;
-    
+
     setUp(() {
       useCase = TestUseCase();
     });
-    
+
     test('should return success result when params are valid', () async {
       // Arrange
       final params = TestParams(value: 'test');
-      
+
       // Act
       final result = await useCase(params);
-      
+
       // Assert
       expect(result.isRight(), isTrue);
       result.fold(
@@ -57,14 +57,14 @@ void main() {
         (value) => expect(value, equals('Result: test')),
       );
     });
-    
+
     test('should return failure when params indicate failure', () async {
       // Arrange
       final params = TestParams(value: 'test', shouldFail: true);
-      
+
       // Act
       final result = await useCase(params);
-      
+
       // Assert
       expect(result.isLeft(), isTrue);
       result.fold(
@@ -73,15 +73,15 @@ void main() {
       );
     });
   });
-  
+
   group('UseCaseNoParams', () {
     test('should return success result without params', () async {
       // Arrange
       final useCase = TestUseCaseNoParams();
-      
+
       // Act
       final result = await useCase();
-      
+
       // Assert
       expect(result.isRight(), isTrue);
       result.fold(
@@ -89,14 +89,14 @@ void main() {
         (value) => expect(value, equals(42)),
       );
     });
-    
+
     test('should return failure when configured to fail', () async {
       // Arrange
       final useCase = TestUseCaseNoParams(shouldFail: true);
-      
+
       // Act
       final result = await useCase();
-      
+
       // Assert
       expect(result.isLeft(), isTrue);
       result.fold(
@@ -105,12 +105,12 @@ void main() {
       );
     });
   });
-  
+
   group('NoParams', () {
     test('should be constructable', () {
       // Act
       const noParams = NoParams();
-      
+
       // Assert
       expect(noParams, isA<NoParams>());
     });

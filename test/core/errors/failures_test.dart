@@ -39,10 +39,7 @@ void main() {
       final error = Exception('No internet');
 
       // Act
-      final failure = Failure.network(
-        message: message,
-        error: error,
-      );
+      final failure = Failure.network(message: message, error: error);
 
       // Assert
       expect(failure, isA<NetworkFailure>());
@@ -59,10 +56,7 @@ void main() {
       };
 
       // Act
-      final failure = Failure.validation(
-        message: message,
-        errors: errors,
-      );
+      final failure = Failure.validation(message: message, errors: errors);
 
       // Assert
       expect(failure, isA<ValidationFailure>());
@@ -76,10 +70,7 @@ void main() {
       const code = 'INVALID_CARD_PLACEMENT';
 
       // Act
-      final failure = Failure.gameLogic(
-        message: message,
-        code: code,
-      );
+      final failure = Failure.gameLogic(message: message, code: code);
 
       // Assert
       expect(failure, isA<GameLogicFailure>());
@@ -93,10 +84,7 @@ void main() {
       const code = 'INVALID_CREDENTIALS';
 
       // Act
-      final failure = Failure.authentication(
-        message: message,
-        code: code,
-      );
+      final failure = Failure.authentication(message: message, code: code);
 
       // Assert
       expect(failure, isA<AuthenticationFailure>());
@@ -110,10 +98,7 @@ void main() {
       const duration = Duration(seconds: 30);
 
       // Act
-      final failure = Failure.timeout(
-        message: message,
-        duration: duration,
-      );
+      final failure = Failure.timeout(message: message, duration: duration);
 
       // Assert
       expect(failure, isA<TimeoutFailure>());

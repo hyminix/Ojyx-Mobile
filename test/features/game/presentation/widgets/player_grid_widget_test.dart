@@ -18,10 +18,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PlayerGridWidget(
-              grid: testGrid,
-              isCurrentPlayer: false,
-            ),
+            body: PlayerGridWidget(grid: testGrid, isCurrentPlayer: false),
           ),
         ),
       );
@@ -30,15 +27,14 @@ void main() {
       expect(find.byType(CardWidget), findsNWidgets(12)); // 3 rows * 4 columns
     });
 
-    testWidgets('should display "Votre grille" when isCurrentPlayer is true', (tester) async {
+    testWidgets('should display "Votre grille" when isCurrentPlayer is true', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PlayerGridWidget(
-              grid: testGrid,
-              isCurrentPlayer: true,
-            ),
+            body: PlayerGridWidget(grid: testGrid, isCurrentPlayer: true),
           ),
         ),
       );
@@ -48,44 +44,37 @@ void main() {
       expect(find.byIcon(Icons.person), findsOneWidget);
     });
 
-    testWidgets('should not display "Votre grille" when isCurrentPlayer is false', (tester) async {
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PlayerGridWidget(
-              grid: testGrid,
-              isCurrentPlayer: false,
+    testWidgets(
+      'should not display "Votre grille" when isCurrentPlayer is false',
+      (tester) async {
+        // Act
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: PlayerGridWidget(grid: testGrid, isCurrentPlayer: false),
             ),
           ),
-        ),
-      );
+        );
 
-      // Assert
-      expect(find.text('Votre grille'), findsNothing);
-    });
+        // Assert
+        expect(find.text('Votre grille'), findsNothing);
+      },
+    );
 
-    testWidgets('should display grid stats when isCurrentPlayer is true', (tester) async {
+    testWidgets('should display grid stats when isCurrentPlayer is true', (
+      tester,
+    ) async {
       // Arrange
       final grid = PlayerGrid.empty();
       // Add some revealed cards
-      grid.placeCard(game.Card(
-        value: 5,
-        isRevealed: true,
-      ), 0, 0);
-      grid.placeCard(game.Card(
-        value: 3,
-        isRevealed: true,
-      ), 1, 1);
+      grid.placeCard(game.Card(value: 5, isRevealed: true), 0, 0);
+      grid.placeCard(game.Card(value: 3, isRevealed: true), 1, 1);
 
       // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PlayerGridWidget(
-              grid: grid,
-              isCurrentPlayer: true,
-            ),
+            body: PlayerGridWidget(grid: grid, isCurrentPlayer: true),
           ),
         ),
       );
@@ -97,7 +86,9 @@ void main() {
       expect(find.byIcon(Icons.calculate), findsOneWidget);
     });
 
-    testWidgets('should handle card tap when canInteract is true', (tester) async {
+    testWidgets('should handle card tap when canInteract is true', (
+      tester,
+    ) async {
       // Arrange
       int? tappedRow;
       int? tappedCol;
@@ -128,7 +119,9 @@ void main() {
       expect(tappedCol, equals(0));
     });
 
-    testWidgets('should not handle tap when canInteract is false', (tester) async {
+    testWidgets('should not handle tap when canInteract is false', (
+      tester,
+    ) async {
       // Arrange
       bool tapped = false;
 
@@ -172,14 +165,16 @@ void main() {
       );
 
       // Assert
-      final cardWidgets = tester.widgetList<CardWidget>(find.byType(CardWidget)).toList();
-      
+      final cardWidgets = tester
+          .widgetList<CardWidget>(find.byType(CardWidget))
+          .toList();
+
       // Check first card (0,0) is highlighted
       expect(cardWidgets[0].isHighlighted, isTrue);
-      
+
       // Check card at (1,2) is highlighted (row 1 * 4 + col 2 = index 6)
       expect(cardWidgets[6].isHighlighted, isTrue);
-      
+
       // Check other cards are not highlighted
       expect(cardWidgets[1].isHighlighted, isFalse);
     });
@@ -202,11 +197,13 @@ void main() {
       );
 
       // Assert
-      final cardWidgets = tester.widgetList<CardWidget>(find.byType(CardWidget)).toList();
-      
+      final cardWidgets = tester
+          .widgetList<CardWidget>(find.byType(CardWidget))
+          .toList();
+
       // Check card at (2,3) is selected (row 2 * 4 + col 3 = index 11)
       expect(cardWidgets[11].isSelected, isTrue);
-      
+
       // Check other cards are not selected
       expect(cardWidgets[0].isSelected, isFalse);
     });
@@ -214,13 +211,10 @@ void main() {
     testWidgets('should show identical columns indicator', (tester) async {
       // Arrange
       final grid = PlayerGrid.empty();
-      
+
       // Create identical column (all 5s in column 0)
-      final card5 = game.Card(
-        value: 5,
-        isRevealed: true,
-      );
-      
+      final card5 = game.Card(value: 5, isRevealed: true);
+
       grid.placeCard(card5, 0, 0);
       grid.placeCard(card5.copyWith(), 1, 0);
       grid.placeCard(card5.copyWith(), 2, 0);
@@ -229,10 +223,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PlayerGridWidget(
-              grid: grid,
-              isCurrentPlayer: true,
-            ),
+            body: PlayerGridWidget(grid: grid, isCurrentPlayer: true),
           ),
         ),
       );
@@ -242,30 +233,29 @@ void main() {
       expect(find.byIcon(Icons.done_all), findsOneWidget);
     });
 
-    testWidgets('should apply correct styling for current player', (tester) async {
+    testWidgets('should apply correct styling for current player', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PlayerGridWidget(
-              grid: testGrid,
-              isCurrentPlayer: true,
-            ),
+            body: PlayerGridWidget(grid: testGrid, isCurrentPlayer: true),
           ),
         ),
       );
 
       // Assert
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final container = tester.widget<Container>(find.byType(Container).first);
       final decoration = container.decoration as BoxDecoration;
-      
+
       // Should have primary color border when current player
       expect(decoration.border?.top.width, equals(2));
     });
 
-    testWidgets('should show placeholders when canInteract is true', (tester) async {
+    testWidgets('should show placeholders when canInteract is true', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -280,25 +270,26 @@ void main() {
       );
 
       // Assert
-      final cardWidgets = tester.widgetList<CardWidget>(find.byType(CardWidget));
-      
+      final cardWidgets = tester.widgetList<CardWidget>(
+        find.byType(CardWidget),
+      );
+
       // All cards should be placeholders since grid is empty
       for (final widget in cardWidgets) {
         expect(widget.isPlaceholder, isTrue);
       }
     });
 
-    testWidgets('should calculate correct layout based on constraints', (tester) async {
+    testWidgets('should calculate correct layout based on constraints', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: SizedBox(
               width: 400, // Fixed width to test layout calculation
-              child: PlayerGridWidget(
-                grid: testGrid,
-                isCurrentPlayer: true,
-              ),
+              child: PlayerGridWidget(grid: testGrid, isCurrentPlayer: true),
             ),
           ),
         ),
@@ -311,7 +302,7 @@ void main() {
           matching: find.byType(SizedBox),
         ),
       );
-      
+
       // Check that cards have appropriate width
       // (400 - 32 padding) / 4 columns = 92 per card
       expect(cardWidgets.isNotEmpty, isTrue);

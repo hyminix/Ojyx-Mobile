@@ -11,27 +11,25 @@ class RoomEvent with _$RoomEvent {
     required String playerId,
     required String playerName,
   }) = PlayerJoined;
-  
-  const factory RoomEvent.playerLeft({
-    required String playerId,
-  }) = PlayerLeft;
-  
+
+  const factory RoomEvent.playerLeft({required String playerId}) = PlayerLeft;
+
   const factory RoomEvent.gameStarted({
     required String gameId,
     required GameState initialState,
   }) = GameStarted;
-  
-  const factory RoomEvent.gameStateUpdated({
-    required GameState newState,
-  }) = GameStateUpdated;
-  
+
+  const factory RoomEvent.gameStateUpdated({required GameState newState}) =
+      GameStateUpdated;
+
   const factory RoomEvent.playerAction({
     required String playerId,
     required PlayerActionType actionType,
     Map<String, dynamic>? actionData,
   }) = PlayerAction;
 
-  factory RoomEvent.fromJson(Map<String, dynamic> json) => _$RoomEventFromJson(json);
+  factory RoomEvent.fromJson(Map<String, dynamic> json) =>
+      _$RoomEventFromJson(json);
 }
 
 enum PlayerActionType {

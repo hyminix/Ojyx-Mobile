@@ -11,11 +11,7 @@ void main() {
       // Arrange & Act
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: DiscardPileWidget(
-              topCard: testCard,
-            ),
-          ),
+          home: Scaffold(body: DiscardPileWidget(topCard: testCard)),
         ),
       );
 
@@ -28,11 +24,7 @@ void main() {
       // Arrange & Act
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: DiscardPileWidget(
-              topCard: null,
-            ),
-          ),
+          home: Scaffold(body: DiscardPileWidget(topCard: null)),
         ),
       );
 
@@ -41,15 +33,14 @@ void main() {
       expect(find.byIcon(Icons.layers_clear), findsOneWidget);
     });
 
-    testWidgets('should show stack effect with multiple cards beneath', (tester) async {
+    testWidgets('should show stack effect with multiple cards beneath', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: DiscardPileWidget(
-              topCard: testCard,
-              showStackEffect: true,
-            ),
+            body: DiscardPileWidget(topCard: testCard, showStackEffect: true),
           ),
         ),
       );
@@ -88,10 +79,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: DiscardPileWidget(
-              topCard: testCard,
-              canDiscard: true,
-            ),
+            body: DiscardPileWidget(topCard: testCard, canDiscard: true),
           ),
         ),
       );
@@ -100,16 +88,17 @@ void main() {
       // Check for highlight effect (border or glow)
       final containers = tester.widgetList<Container>(find.byType(Container));
       bool hasHighlight = false;
-      
+
       for (final container in containers) {
         final decoration = container.decoration as BoxDecoration?;
-        if (decoration?.border != null || 
-            (decoration?.boxShadow != null && decoration!.boxShadow!.any((s) => s.color.opacity > 0.3))) {
+        if (decoration?.border != null ||
+            (decoration?.boxShadow != null &&
+                decoration!.boxShadow!.any((s) => s.color.opacity > 0.3))) {
           hasHighlight = true;
           break;
         }
       }
-      
+
       expect(hasHighlight, isTrue);
     });
 
@@ -117,11 +106,7 @@ void main() {
       // Arrange
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: DiscardPileWidget(
-              topCard: testCard,
-            ),
-          ),
+          home: Scaffold(body: DiscardPileWidget(topCard: testCard)),
         ),
       );
 
@@ -129,11 +114,7 @@ void main() {
       const newCard = game.Card(value: 3, isRevealed: true);
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: DiscardPileWidget(
-              topCard: newCard,
-            ),
-          ),
+          home: Scaffold(body: DiscardPileWidget(topCard: newCard)),
         ),
       );
 
@@ -141,15 +122,13 @@ void main() {
       expect(find.byType(AnimatedSwitcher), findsWidgets);
     });
 
-    testWidgets('should show slight rotation for visual effect', (tester) async {
+    testWidgets('should show slight rotation for visual effect', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: DiscardPileWidget(
-              topCard: testCard,
-            ),
-          ),
+          home: Scaffold(body: DiscardPileWidget(topCard: testCard)),
         ),
       );
 
@@ -157,12 +136,14 @@ void main() {
       expect(find.byType(Transform), findsWidgets);
     });
 
-    testWidgets('should display different cards with correct colors', (tester) async {
+    testWidgets('should display different cards with correct colors', (
+      tester,
+    ) async {
       // Test multiple card values
       final testCases = [
         const game.Card(value: -2, isRevealed: true), // Dark blue
-        const game.Card(value: 0, isRevealed: true),  // Light blue
-        const game.Card(value: 5, isRevealed: true),  // Yellow
+        const game.Card(value: 0, isRevealed: true), // Light blue
+        const game.Card(value: 5, isRevealed: true), // Yellow
         const game.Card(value: 12, isRevealed: true), // Red
       ];
 
@@ -170,11 +151,7 @@ void main() {
         // Act
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: DiscardPileWidget(
-                topCard: card,
-              ),
-            ),
+            home: Scaffold(body: DiscardPileWidget(topCard: card)),
           ),
         );
 
@@ -188,10 +165,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DiscardPileWidget(
-              topCard: testCard,
-              onTap: () {},
-            ),
+            body: DiscardPileWidget(topCard: testCard, onTap: () {}),
           ),
         ),
       );
@@ -204,11 +178,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: DiscardPileWidget(
-              topCard: testCard,
-            ),
-          ),
+          home: Scaffold(body: DiscardPileWidget(topCard: testCard)),
         ),
       );
 
@@ -238,15 +208,19 @@ void main() {
       );
 
       // Verify the widget can accept dropped cards by calling the callback directly
-      final discardWidget = tester.widget<DiscardPileWidget>(find.byType(DiscardPileWidget));
+      final discardWidget = tester.widget<DiscardPileWidget>(
+        find.byType(DiscardPileWidget),
+      );
       expect(discardWidget.onCardDropped, isNotNull);
-      
+
       // Simulate drop by calling the callback
       discardWidget.onCardDropped!(testDropCard);
       expect(droppedCard, equals(testDropCard));
     });
 
-    testWidgets('should not accept drops when canDiscard is false', (tester) async {
+    testWidgets('should not accept drops when canDiscard is false', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -261,7 +235,9 @@ void main() {
       );
 
       // Verify widget state
-      final discardWidget = tester.widget<DiscardPileWidget>(find.byType(DiscardPileWidget));
+      final discardWidget = tester.widget<DiscardPileWidget>(
+        find.byType(DiscardPileWidget),
+      );
       expect(discardWidget.canDiscard, isFalse);
     });
   });

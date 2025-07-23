@@ -9,24 +9,26 @@ class OpponentsViewWidget extends StatelessWidget {
   final GameState gameState;
   final String currentPlayerId;
   final Function(String playerId)? onPlayerTap;
-  
+
   const OpponentsViewWidget({
     super.key,
     required this.gameState,
     required this.currentPlayerId,
     this.onPlayerTap,
   });
-  
+
   PlayerState _playerToPlayerState(Player player) {
     // Flatten the 2D grid to 1D list
     final flatCards = <game_card.Card?>[];
     for (final row in player.grid.cards) {
       flatCards.addAll(row);
     }
-    
-    final revealedCount = flatCards.where((card) => card?.isRevealed ?? false).length;
+
+    final revealedCount = flatCards
+        .where((card) => card?.isRevealed ?? false)
+        .length;
     final identicalColumns = player.grid.getIdenticalColumns();
-    
+
     return PlayerState(
       playerId: player.id,
       cards: flatCards,
@@ -42,11 +44,11 @@ class OpponentsViewWidget extends StatelessWidget {
     final opponents = gameState.players
         .where((player) => player.id != currentPlayerId)
         .toList();
-    
+
     if (opponents.isEmpty) {
       return const SizedBox.shrink();
     }
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -54,9 +56,9 @@ class OpponentsViewWidget extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
             'Adversaires (${opponents.length})',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
         SizedBox(
@@ -69,7 +71,7 @@ class OpponentsViewWidget extends StatelessWidget {
               final opponent = opponents[index];
               final playerState = _playerToPlayerState(opponent);
               final isCurrentTurn = gameState.currentPlayer.id == opponent.id;
-              
+
               return Padding(
                 padding: EdgeInsets.only(
                   right: index < opponents.length - 1 ? 12 : 0,
@@ -99,7 +101,7 @@ class OpponentsGridViewWidget extends StatelessWidget {
   final String currentPlayerId;
   final Function(String playerId)? onPlayerTap;
   final int crossAxisCount;
-  
+
   const OpponentsGridViewWidget({
     super.key,
     required this.gameState,
@@ -107,17 +109,19 @@ class OpponentsGridViewWidget extends StatelessWidget {
     this.onPlayerTap,
     this.crossAxisCount = 2,
   });
-  
+
   PlayerState _playerToPlayerState(Player player) {
     // Flatten the 2D grid to 1D list
     final flatCards = <game_card.Card?>[];
     for (final row in player.grid.cards) {
       flatCards.addAll(row);
     }
-    
-    final revealedCount = flatCards.where((card) => card?.isRevealed ?? false).length;
+
+    final revealedCount = flatCards
+        .where((card) => card?.isRevealed ?? false)
+        .length;
     final identicalColumns = player.grid.getIdenticalColumns();
-    
+
     return PlayerState(
       playerId: player.id,
       cards: flatCards,
@@ -133,11 +137,11 @@ class OpponentsGridViewWidget extends StatelessWidget {
     final opponents = gameState.players
         .where((player) => player.id != currentPlayerId)
         .toList();
-    
+
     if (opponents.isEmpty) {
       return const SizedBox.shrink();
     }
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -145,9 +149,9 @@ class OpponentsGridViewWidget extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
             'Adversaires (${opponents.length})',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
         Padding(
@@ -166,7 +170,7 @@ class OpponentsGridViewWidget extends StatelessWidget {
               final opponent = opponents[index];
               final playerState = _playerToPlayerState(opponent);
               final isCurrentTurn = gameState.currentPlayer.id == opponent.id;
-              
+
               return OpponentGridWidget(
                 playerState: playerState,
                 isCurrentPlayer: isCurrentTurn,

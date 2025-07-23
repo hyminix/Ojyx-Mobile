@@ -44,52 +44,44 @@ void main() {
       // Assert
       expect(find.text('Pioche'), findsOneWidget);
       expect(find.text('Défausse'), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_forward), findsOneWidget); // Arrow between deck and discard
+      expect(
+        find.byIcon(Icons.arrow_forward),
+        findsOneWidget,
+      ); // Arrow between deck and discard
     });
 
     testWidgets('should show top discard card when available', (tester) async {
       // Arrange
-      const discardCard = game.Card(
-        value: 7,
-        isRevealed: true,
-      );
-      
-      final gameState = mockGameState.copyWith(
-        discardPile: [discardCard],
-      );
+      const discardCard = game.Card(value: 7, isRevealed: true);
+
+      final gameState = mockGameState.copyWith(discardPile: [discardCard]);
 
       // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DeckAndDiscardWidget(
-              gameState: gameState,
-              canDraw: false,
-            ),
+            body: DeckAndDiscardWidget(gameState: gameState, canDraw: false),
           ),
         ),
       );
 
       // Assert
       expect(find.byType(CardWidget), findsNWidgets(2)); // Deck + discard
-      final discardWidget = tester.widget<CardWidget>(find.byType(CardWidget).last);
+      final discardWidget = tester.widget<CardWidget>(
+        find.byType(CardWidget).last,
+      );
       expect(discardWidget.card, equals(discardCard));
     });
 
     testWidgets('should show empty discard pile', (tester) async {
       // Arrange
-      final gameState = mockGameState.copyWith(
-        discardPile: [],
-      );
+      final gameState = mockGameState.copyWith(discardPile: []);
 
       // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DeckAndDiscardWidget(
-              gameState: gameState,
-              canDraw: false,
-            ),
+            body: DeckAndDiscardWidget(gameState: gameState, canDraw: false),
           ),
         ),
       );
@@ -122,17 +114,14 @@ void main() {
       expect(deckTapped, isTrue);
     });
 
-    testWidgets('should handle discard tap when canDraw is true', (tester) async {
+    testWidgets('should handle discard tap when canDraw is true', (
+      tester,
+    ) async {
       // Arrange
       bool discardTapped = false;
-      const discardCard = game.Card(
-        value: 5,
-        isRevealed: true,
-      );
-      
-      final gameState = mockGameState.copyWith(
-        discardPile: [discardCard],
-      );
+      const discardCard = game.Card(value: 5, isRevealed: true);
+
+      final gameState = mockGameState.copyWith(discardPile: [discardCard]);
 
       // Act
       await tester.pumpWidget(
@@ -154,7 +143,9 @@ void main() {
       expect(discardTapped, isTrue);
     });
 
-    testWidgets('should not handle taps when interaction disabled', (tester) async {
+    testWidgets('should not handle taps when interaction disabled', (
+      tester,
+    ) async {
       // Arrange
       bool tapped = false;
 
@@ -183,64 +174,58 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DeckAndDiscardWidget(
-              gameState: mockGameState,
-              canDraw: true,
-            ),
+            body: DeckAndDiscardWidget(gameState: mockGameState, canDraw: true),
           ),
         ),
       );
 
       // Assert
       // When canDraw is true, the deck should show a touch_app icon
-      expect(find.byIcon(Icons.touch_app), findsOneWidget); // Only deck shows icon (discard is empty)
+      expect(
+        find.byIcon(Icons.touch_app),
+        findsOneWidget,
+      ); // Only deck shows icon (discard is empty)
     });
 
-    testWidgets('should highlight discard when canDraw is true', (tester) async {
+    testWidgets('should highlight discard when canDraw is true', (
+      tester,
+    ) async {
       // Arrange
-      const discardCard = game.Card(
-        value: 3,
-        isRevealed: true,
-      );
-      
-      final gameState = mockGameState.copyWith(
-        discardPile: [discardCard],
-      );
+      const discardCard = game.Card(value: 3, isRevealed: true);
+
+      final gameState = mockGameState.copyWith(discardPile: [discardCard]);
 
       // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DeckAndDiscardWidget(
-              gameState: gameState,
-              canDraw: true,
-            ),
+            body: DeckAndDiscardWidget(gameState: gameState, canDraw: true),
           ),
         ),
       );
 
       // Assert
       // When canDraw is true, both deck and discard should show touch_app icons
-      expect(find.byIcon(Icons.touch_app), findsNWidgets(2)); // One for deck, one for discard
+      expect(
+        find.byIcon(Icons.touch_app),
+        findsNWidgets(2),
+      ); // One for deck, one for discard
     });
 
     testWidgets('should display remaining cards count', (tester) async {
       // Arrange
       final gameState = mockGameState.copyWith(
-        deck: List.generate(25, (i) => game.Card(
-          value: i % 13,
-          isRevealed: false,
-        )),
+        deck: List.generate(
+          25,
+          (i) => game.Card(value: i % 13, isRevealed: false),
+        ),
       );
 
       // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DeckAndDiscardWidget(
-              gameState: gameState,
-              canDraw: false,
-            ),
+            body: DeckAndDiscardWidget(gameState: gameState, canDraw: false),
           ),
         ),
       );

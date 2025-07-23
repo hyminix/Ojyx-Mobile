@@ -46,64 +46,70 @@ List<Override> createTestProviders({
 class FakeRoom extends Fake implements Room {
   @override
   final String id = 'test-room-id';
-  
+
   @override
   final String hostId = 'test-host-id';
-  
+
   @override
   final int maxPlayers = 4;
-  
+
   @override
   final List<String> playerIds = ['test-host-id'];
-  
+
   @override
   final RoomStatus status = RoomStatus.waiting;
-  
+
   @override
   final String? gameStateJson;
-  
+
   @override
   final DateTime createdAt = DateTime.now();
-  
+
   @override
   final DateTime updatedAt = DateTime.now();
-  
+
   FakeRoom({this.gameStateJson});
 }
 
 // Setup functions for common test scenarios
 void setupCreateRoomSuccess(MockCreateRoomUseCase mockUseCase, {Room? room}) {
-  when(() => mockUseCase.call(
-    creatorId: any(named: 'creatorId'),
-    maxPlayers: any(named: 'maxPlayers'),
-  )).thenAnswer(
-    (_) async => room ?? FakeRoom(),
-  );
+  when(
+    () => mockUseCase.call(
+      creatorId: any(named: 'creatorId'),
+      maxPlayers: any(named: 'maxPlayers'),
+    ),
+  ).thenAnswer((_) async => room ?? FakeRoom());
 }
 
-void setupCreateRoomFailure(MockCreateRoomUseCase mockUseCase, {Exception? exception}) {
-  when(() => mockUseCase.call(
-    creatorId: any(named: 'creatorId'),
-    maxPlayers: any(named: 'maxPlayers'),
-  )).thenThrow(
-    exception ?? Exception('Failed to create room'),
-  );
+void setupCreateRoomFailure(
+  MockCreateRoomUseCase mockUseCase, {
+  Exception? exception,
+}) {
+  when(
+    () => mockUseCase.call(
+      creatorId: any(named: 'creatorId'),
+      maxPlayers: any(named: 'maxPlayers'),
+    ),
+  ).thenThrow(exception ?? Exception('Failed to create room'));
 }
 
 void setupJoinRoomSuccess(MockJoinRoomUseCase mockUseCase, {Room? room}) {
-  when(() => mockUseCase.call(
-    roomId: any(named: 'roomId'),
-    playerId: any(named: 'playerId'),
-  )).thenAnswer(
-    (_) async => room ?? FakeRoom(),
-  );
+  when(
+    () => mockUseCase.call(
+      roomId: any(named: 'roomId'),
+      playerId: any(named: 'playerId'),
+    ),
+  ).thenAnswer((_) async => room ?? FakeRoom());
 }
 
-void setupJoinRoomFailure(MockJoinRoomUseCase mockUseCase, {Exception? exception}) {
-  when(() => mockUseCase.call(
-    roomId: any(named: 'roomId'),
-    playerId: any(named: 'playerId'),
-  )).thenThrow(
-    exception ?? Exception('Failed to join room'),
-  );
+void setupJoinRoomFailure(
+  MockJoinRoomUseCase mockUseCase, {
+  Exception? exception,
+}) {
+  when(
+    () => mockUseCase.call(
+      roomId: any(named: 'roomId'),
+      playerId: any(named: 'playerId'),
+    ),
+  ).thenThrow(exception ?? Exception('Failed to join room'));
 }

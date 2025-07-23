@@ -8,7 +8,7 @@ void main() {
     test('should create RoomModel with all required fields', () {
       // Arrange
       final now = DateTime.now();
-      
+
       // Act
       final model = RoomModel(
         id: 'room123',
@@ -103,8 +103,14 @@ void main() {
         expect(model.status, equals('in_game'));
         expect(model.maxPlayers, equals(6));
         expect(model.currentGameId, equals('game456'));
-        expect(model.createdAt?.toIso8601String(), equals(now.toIso8601String()));
-        expect(model.updatedAt?.toIso8601String(), equals(now.toIso8601String()));
+        expect(
+          model.createdAt?.toIso8601String(),
+          equals(now.toIso8601String()),
+        );
+        expect(
+          model.updatedAt?.toIso8601String(),
+          equals(now.toIso8601String()),
+        );
       });
     });
 

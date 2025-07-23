@@ -37,7 +37,7 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
       status: _roomStatusToString(room.status),
       gameId: room.currentGameId,
     );
-    
+
     // Return the updated room
     final updated = await getRoom(room.id);
     if (updated == null) {
@@ -66,11 +66,8 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
     required String roomId,
     required String playerId,
   }) async {
-    await _supabaseDataSource.leaveRoom(
-      roomId: roomId,
-      playerId: playerId,
-    );
-    
+    await _supabaseDataSource.leaveRoom(roomId: roomId, playerId: playerId);
+
     final updated = await getRoom(roomId);
     if (updated == null) {
       throw Exception('Room not found after leaving');
@@ -80,13 +77,15 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
 
   @override
   Stream<Room> watchRoom(String roomId) {
-    return _supabaseDataSource.watchRoom(roomId)
+    return _supabaseDataSource
+        .watchRoom(roomId)
         .map((model) => model.toDomain());
   }
 
   @override
   Stream<RoomEvent> watchRoomEvents(String roomId) {
-    return _supabaseDataSource.watchRoomEvents(roomId)
+    return _supabaseDataSource
+        .watchRoomEvents(roomId)
         .where((data) => data.isNotEmpty)
         .map((data) => _mapDataToEvent(data));
   }
@@ -97,10 +96,7 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
     required RoomEvent event,
   }) async {
     final eventData = _mapEventToData(event);
-    await _supabaseDataSource.sendEvent(
-      roomId: roomId,
-      eventData: eventData,
-    );
+    await _supabaseDataSource.sendEvent(roomId: roomId, eventData: eventData);
   }
 
   @override
@@ -128,9 +124,7 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
     // For now, we store it as part of room events
     await sendEvent(
       roomId: gameState.roomId,
-      event: RoomEvent.gameStateUpdated(
-        newState: gameState,
-      ),
+      event: RoomEvent.gameStateUpdated(newState: gameState),
     );
   }
 
@@ -154,10 +148,7 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
         'player_id': playerId,
         'player_name': playerName,
       },
-      playerLeft: (playerId) => {
-        'type': 'player_left',
-        'player_id': playerId,
-      },
+      playerLeft: (playerId) => {'type': 'player_left', 'player_id': playerId},
       gameStarted: (gameId, initialState) => {
         'type': 'game_started',
         'game_id': gameId,
@@ -175,10 +166,10 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
       },
     );
   }
-  
+
   RoomEvent _mapDataToEvent(Map<String, dynamic> data) {
     final type = data['type'] as String;
-    
+
     switch (type) {
       case 'player_joined':
         return RoomEvent.playerJoined(
@@ -186,13 +177,13 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
           playerName: data['player_name'],
         );
       case 'player_left':
-        return RoomEvent.playerLeft(
-          playerId: data['player_id'],
-        );
+        return RoomEvent.playerLeft(playerId: data['player_id']);
       case 'game_started':
         return RoomEvent.gameStarted(
           gameId: data['game_id'],
-          initialState: GameStateModel.fromJson(data['initial_state']).toDomain(),
+          initialState: GameStateModel.fromJson(
+            data['initial_state'],
+          ).toDomain(),
         );
       case 'game_state_updated':
         return RoomEvent.gameStateUpdated(
@@ -208,7 +199,7 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
         throw Exception('Unknown event type: $type');
     }
   }
-  
+
   PlayerActionType _parseActionType(String type) {
     switch (type) {
       case 'drawCard':

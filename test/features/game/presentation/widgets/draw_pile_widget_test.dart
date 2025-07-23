@@ -9,10 +9,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: DrawPileWidget(
-              cardCount: 42,
-              isPlayerTurn: false,
-            ),
+            body: DrawPileWidget(cardCount: 42, isPlayerTurn: false),
           ),
         ),
       );
@@ -27,10 +24,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: DrawPileWidget(
-              cardCount: 0,
-              isPlayerTurn: false,
-            ),
+            body: DrawPileWidget(cardCount: 0, isPlayerTurn: false),
           ),
         ),
       );
@@ -41,7 +35,9 @@ void main() {
       expect(find.byType(Container), findsWidgets);
     });
 
-    testWidgets('should handle tap when onTap is provided and is player turn', (tester) async {
+    testWidgets('should handle tap when onTap is provided and is player turn', (
+      tester,
+    ) async {
       // Arrange
       bool tapped = false;
 
@@ -94,10 +90,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: DrawPileWidget(
-              cardCount: 10,
-              isPlayerTurn: true,
-            ),
+            body: DrawPileWidget(cardCount: 10, isPlayerTurn: true),
           ),
         ),
       );
@@ -106,10 +99,11 @@ void main() {
       // Find the main container and check for box shadow
       final containers = tester.widgetList<Container>(find.byType(Container));
       bool hasGlowEffect = false;
-      
+
       for (final container in containers) {
         final decoration = container.decoration as BoxDecoration?;
-        if (decoration?.boxShadow != null && decoration!.boxShadow!.isNotEmpty) {
+        if (decoration?.boxShadow != null &&
+            decoration!.boxShadow!.isNotEmpty) {
           // Check for glow-like shadow (checking for spread radius or large blur)
           for (final shadow in decoration.boxShadow!) {
             if (shadow.blurRadius >= 16 || shadow.spreadRadius > 0) {
@@ -119,7 +113,7 @@ void main() {
           }
         }
       }
-      
+
       expect(hasGlowEffect, isTrue);
     });
 
@@ -128,10 +122,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: DrawPileWidget(
-              cardCount: 20,
-              isPlayerTurn: false,
-            ),
+            body: DrawPileWidget(cardCount: 20, isPlayerTurn: false),
           ),
         ),
       );
@@ -147,10 +138,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: DrawPileWidget(
-              cardCount: 15,
-              isPlayerTurn: true,
-            ),
+            body: DrawPileWidget(cardCount: 15, isPlayerTurn: true),
           ),
         ),
       );
@@ -161,7 +149,9 @@ void main() {
       expect(tooltip.message, contains('Piocher'));
     });
 
-    testWidgets('should allow tap when card count is 0 for reshuffle', (tester) async {
+    testWidgets('should allow tap when card count is 0 for reshuffle', (
+      tester,
+    ) async {
       // Arrange
       bool tapped = false;
 
@@ -183,7 +173,7 @@ void main() {
 
       // Assert - Now expects tap to work even with 0 cards
       expect(tapped, isTrue);
-      
+
       // Verify tooltip shows reshuffle message
       final tooltip = tester.widget<Tooltip>(find.byType(Tooltip));
       expect(tooltip.message, contains('Mélanger'));
@@ -194,10 +184,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: DrawPileWidget(
-              cardCount: 10,
-              isPlayerTurn: false,
-            ),
+            body: DrawPileWidget(cardCount: 10, isPlayerTurn: false),
           ),
         ),
       );
@@ -206,10 +193,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: DrawPileWidget(
-              cardCount: 9,
-              isPlayerTurn: false,
-            ),
+            body: DrawPileWidget(cardCount: 9, isPlayerTurn: false),
           ),
         ),
       );
@@ -223,10 +207,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: DrawPileWidget(
-              cardCount: 30,
-              isPlayerTurn: false,
-            ),
+            body: DrawPileWidget(cardCount: 30, isPlayerTurn: false),
           ),
         ),
       );
@@ -250,8 +231,10 @@ void main() {
       );
 
       // Get initial scale
-      final gesture = tester.widget<GestureDetector>(find.byType(GestureDetector).first);
-      
+      final gesture = tester.widget<GestureDetector>(
+        find.byType(GestureDetector).first,
+      );
+
       // Simulate tap down
       await tester.press(find.byType(DrawPileWidget));
       await tester.pump(const Duration(milliseconds: 50));
@@ -265,10 +248,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: DrawPileWidget(
-              cardCount: 25,
-              isPlayerTurn: true,
-            ),
+            body: DrawPileWidget(cardCount: 25, isPlayerTurn: true),
           ),
         ),
       );

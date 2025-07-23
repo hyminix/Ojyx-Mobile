@@ -12,7 +12,9 @@ import '../../domain/use_cases/use_action_card_use_case.dart';
 part 'action_card_providers.g.dart';
 
 @riverpod
-ActionCardLocalDataSource actionCardLocalDataSource(ActionCardLocalDataSourceRef ref) {
+ActionCardLocalDataSource actionCardLocalDataSource(
+  ActionCardLocalDataSourceRef ref,
+) {
   return ActionCardLocalDataSourceImpl();
 }
 
@@ -40,7 +42,7 @@ bool canUseActionCard(
   ({String playerId, ActionCard? actionCard}) params,
 ) {
   if (params.actionCard == null) return false;
-  
+
   final playerCards = ref.watch(playerActionCardsProvider(params.playerId));
   return playerCards.contains(params.actionCard);
 }
@@ -51,7 +53,7 @@ class ActionCardNotifier extends _$ActionCardNotifier {
   AsyncValue<void> build() {
     return const AsyncData(null);
   }
-  
+
   Future<Either<Failure, GameState>> useActionCard({
     required String playerId,
     required ActionCard actionCard,
@@ -59,7 +61,7 @@ class ActionCardNotifier extends _$ActionCardNotifier {
     Map<String, dynamic>? targetData,
   }) async {
     state = const AsyncLoading();
-    
+
     try {
       final useCase = ref.read(useActionCardUseCaseProvider);
       final params = UseActionCardParams(
@@ -68,18 +70,20 @@ class ActionCardNotifier extends _$ActionCardNotifier {
         gameState: gameState,
         targetData: targetData,
       );
-      
+
       final result = await useCase(params);
-      
+
       result.fold(
         (failure) => state = AsyncError(failure, StackTrace.current),
         (_) => state = const AsyncData(null),
       );
-      
+
       return result;
     } catch (e, stack) {
       state = AsyncError(e, stack);
-      return Left(Failure.unknown(message: 'Failed to use action card', error: e));
+      return Left(
+        Failure.unknown(message: 'Failed to use action card', error: e),
+      );
     }
   }
 }

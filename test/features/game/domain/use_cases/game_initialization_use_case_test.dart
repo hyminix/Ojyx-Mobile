@@ -60,7 +60,7 @@ void main() {
         // PlayerGrid has a 2D structure (3 rows x 4 columns = 12 cards)
         expect(player.grid.cards.length, equals(3)); // 3 rows
         expect(player.grid.cards[0].length, equals(4)); // 4 columns
-        
+
         // Check that all cards are initially null (empty grid)
         bool allCardsNull = true;
         for (final row in player.grid.cards) {
@@ -93,37 +93,43 @@ void main() {
       expect(gameState.players[1].name, equals('Player player2'));
     });
 
-    test('should start with first player when no starting player specified', () {
-      // Arrange
-      final playerIds = ['player1', 'player2', 'player3'];
-      const roomId = 'room123';
+    test(
+      'should start with first player when no starting player specified',
+      () {
+        // Arrange
+        final playerIds = ['player1', 'player2', 'player3'];
+        const roomId = 'room123';
 
-      // Act
-      final gameState = useCase.initializeGame(
-        playerIds: playerIds,
-        roomId: roomId,
-      );
+        // Act
+        final gameState = useCase.initializeGame(
+          playerIds: playerIds,
+          roomId: roomId,
+        );
 
-      // Assert
-      expect(gameState.currentPlayerIndex, equals(0));
-    });
+        // Assert
+        expect(gameState.currentPlayerIndex, equals(0));
+      },
+    );
 
-    test('should start with specified player when startingPlayerId is provided', () {
-      // Arrange
-      final playerIds = ['player1', 'player2', 'player3'];
-      const roomId = 'room123';
-      const startingPlayerId = 'player2';
+    test(
+      'should start with specified player when startingPlayerId is provided',
+      () {
+        // Arrange
+        final playerIds = ['player1', 'player2', 'player3'];
+        const roomId = 'room123';
+        const startingPlayerId = 'player2';
 
-      // Act
-      final gameState = useCase.initializeGame(
-        playerIds: playerIds,
-        roomId: roomId,
-        startingPlayerId: startingPlayerId,
-      );
+        // Act
+        final gameState = useCase.initializeGame(
+          playerIds: playerIds,
+          roomId: roomId,
+          startingPlayerId: startingPlayerId,
+        );
 
-      // Assert
-      expect(gameState.currentPlayerIndex, equals(1));
-    });
+        // Assert
+        expect(gameState.currentPlayerIndex, equals(1));
+      },
+    );
 
     test('should default to first player if startingPlayerId not found', () {
       // Arrange

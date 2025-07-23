@@ -17,14 +17,16 @@ import 'package:ojyx/features/game/presentation/providers/game_state_notifier.da
 import '../../../../helpers/test_helpers.dart';
 
 class MockRoom extends Mock implements Room {}
+
 class MockGameState extends Mock implements GameState {}
+
 class MockPlayer extends Mock implements Player {}
 
 class FakeGameStateNotifier extends GameStateNotifier {
   final GameState? _gameState;
-  
+
   FakeGameStateNotifier(this._gameState);
-  
+
   @override
   GameState? build() => _gameState;
 }
@@ -64,7 +66,9 @@ void main() {
 
       when(() => mockRoom.id).thenReturn('test-room-id');
       when(() => mockRoom.status).thenReturn(RoomStatus.inGame);
-      when(() => mockRoom.playerIds).thenReturn(['current-user-id', 'opponent-id']);
+      when(
+        () => mockRoom.playerIds,
+      ).thenReturn(['current-user-id', 'opponent-id']);
     });
 
     Widget createWidgetUnderTest({
@@ -74,8 +78,12 @@ void main() {
     }) {
       return ProviderScope(
         overrides: [
-          currentUserIdProvider.overrideWithValue(currentUserId ?? 'current-user-id'),
-          gameStateNotifierProvider.overrideWith(() => FakeGameStateNotifier(gameState)),
+          currentUserIdProvider.overrideWithValue(
+            currentUserId ?? 'current-user-id',
+          ),
+          gameStateNotifierProvider.overrideWith(
+            () => FakeGameStateNotifier(gameState),
+          ),
           currentRoomProvider('test-room-id').overrideWith((ref) {
             if (roomAsync != null) {
               return roomAsync.when(
@@ -87,17 +95,15 @@ void main() {
             return Stream.value(mockRoom);
           }),
         ],
-        child: createTestApp(
-          child: const GameScreen(roomId: 'test-room-id'),
-        ),
+        child: createTestApp(child: const GameScreen(roomId: 'test-room-id')),
       );
     }
 
-    testWidgets('should display loading when game state is null', (tester) async {
+    testWidgets('should display loading when game state is null', (
+      tester,
+    ) async {
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        gameState: null,
-      ));
+      await tester.pumpWidget(createWidgetUnderTest(gameState: null));
       await tester.pump();
 
       // Assert
@@ -105,11 +111,11 @@ void main() {
       expect(find.text('En attente du début de la partie...'), findsOneWidget);
     });
 
-    testWidgets('should display game components when game state is loaded', (tester) async {
+    testWidgets('should display game components when game state is loaded', (
+      tester,
+    ) async {
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        gameState: mockGameState,
-      ));
+      await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
       await tester.pumpAndSettle();
 
       // Assert
@@ -119,11 +125,11 @@ void main() {
       expect(find.byType(PlayerGridWidget), findsOneWidget);
     });
 
-    testWidgets('should display app bar with title and exit button', (tester) async {
+    testWidgets('should display app bar with title and exit button', (
+      tester,
+    ) async {
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        gameState: mockGameState,
-      ));
+      await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
       await tester.pumpAndSettle();
 
       // Assert
@@ -131,11 +137,11 @@ void main() {
       expect(find.byIcon(Icons.exit_to_app), findsOneWidget);
     });
 
-    testWidgets('should show exit dialog when exit button is pressed', (tester) async {
+    testWidgets('should show exit dialog when exit button is pressed', (
+      tester,
+    ) async {
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        gameState: mockGameState,
-      ));
+      await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.exit_to_app));
@@ -146,34 +152,44 @@ void main() {
       expect(find.text('Quitter la partie'), findsOneWidget);
     });
 
-    testWidgets('should display error when current player not found', (tester) async {
+    testWidgets('should display error when current player not found', (
+      tester,
+    ) async {
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        currentUserId: 'unknown-user-id',
-        gameState: mockGameState,
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          currentUserId: 'unknown-user-id',
+          gameState: mockGameState,
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Assert
       expect(find.text('Erreur: Joueur non trouvé'), findsOneWidget);
     });
 
-    testWidgets('should display loading state when room is loading', (tester) async {
+    testWidgets('should display loading state when room is loading', (
+      tester,
+    ) async {
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        roomAsync: const AsyncValue.loading(),
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(roomAsync: const AsyncValue.loading()),
+      );
       await tester.pump();
 
       // Assert
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('should display error state when room loading fails', (tester) async {
+    testWidgets('should display error state when room loading fails', (
+      tester,
+    ) async {
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        roomAsync: AsyncValue.error('Failed to load room', StackTrace.empty),
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          roomAsync: AsyncValue.error('Failed to load room', StackTrace.empty),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Assert
@@ -183,9 +199,7 @@ void main() {
 
     testWidgets('should initialize multiplayer sync on init', (tester) async {
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        gameState: mockGameState,
-      ));
+      await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
       await tester.pumpAndSettle();
 
       // Assert
@@ -196,14 +210,10 @@ void main() {
 
     testWidgets('should handle game over state', (tester) async {
       // Arrange
-      final gameOverState = mockGameState.copyWith(
-        status: GameStatus.finished,
-      );
+      final gameOverState = mockGameState.copyWith(status: GameStatus.finished);
 
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        gameState: gameOverState,
-      ));
+      await tester.pumpWidget(createWidgetUnderTest(gameState: gameOverState));
       await tester.pumpAndSettle();
 
       // Assert
@@ -213,27 +223,27 @@ void main() {
 
     testWidgets('should pass correct props to child widgets', (tester) async {
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        gameState: mockGameState,
-      ));
+      await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
       await tester.pumpAndSettle();
 
       // Assert TurnInfoWidget props
-      final turnInfo = tester.widget<TurnInfoWidget>(find.byType(TurnInfoWidget));
+      final turnInfo = tester.widget<TurnInfoWidget>(
+        find.byType(TurnInfoWidget),
+      );
       expect(turnInfo.gameState, equals(mockGameState));
       expect(turnInfo.currentPlayerId, equals('current-user-id'));
 
       // Assert OpponentsViewWidget props
-      final opponentsView = tester.widget<OpponentsViewWidget>(find.byType(OpponentsViewWidget));
+      final opponentsView = tester.widget<OpponentsViewWidget>(
+        find.byType(OpponentsViewWidget),
+      );
       expect(opponentsView.gameState, equals(mockGameState));
       expect(opponentsView.currentPlayerId, equals('current-user-id'));
     });
 
     testWidgets('should be scrollable', (tester) async {
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        gameState: mockGameState,
-      ));
+      await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
       await tester.pumpAndSettle();
 
       // Assert

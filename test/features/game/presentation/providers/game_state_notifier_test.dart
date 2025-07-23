@@ -92,10 +92,10 @@ void main() {
       notifier.loadState(initialState);
 
       // Act
-      notifier.updateState((state) => state.copyWith(
-        status: GameStatus.playing,
-        currentPlayerIndex: 1,
-      ));
+      notifier.updateState(
+        (state) =>
+            state.copyWith(status: GameStatus.playing, currentPlayerIndex: 1),
+      );
 
       final updatedState = container.read(gameStateNotifierProvider);
 
@@ -112,9 +112,9 @@ void main() {
       final notifier = container.read(gameStateNotifierProvider.notifier);
 
       // Act
-      notifier.updateState((state) => state.copyWith(
-        status: GameStatus.playing,
-      ));
+      notifier.updateState(
+        (state) => state.copyWith(status: GameStatus.playing),
+      );
 
       final state = container.read(gameStateNotifierProvider);
 
@@ -155,21 +155,20 @@ void main() {
 
       // Act
       notifier.loadState(initialState);
-      
+
       // First update
-      notifier.updateState((state) => state.copyWith(
-        status: GameStatus.playing,
-      ));
-      
+      notifier.updateState(
+        (state) => state.copyWith(status: GameStatus.playing),
+      );
+
       // Second update
-      notifier.updateState((state) => state.copyWith(
-        currentPlayerIndex: 1,
-      ));
-      
+      notifier.updateState((state) => state.copyWith(currentPlayerIndex: 1));
+
       // Third update
-      notifier.updateState((state) => state.copyWith(
-        turnDirection: TurnDirection.counterClockwise,
-      ));
+      notifier.updateState(
+        (state) =>
+            state.copyWith(turnDirection: TurnDirection.counterClockwise),
+      );
 
       final finalState = container.read(gameStateNotifierProvider);
 

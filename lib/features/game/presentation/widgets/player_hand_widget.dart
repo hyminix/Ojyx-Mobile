@@ -7,7 +7,7 @@ class PlayerHandWidget extends StatelessWidget {
   final bool canDiscard;
   final VoidCallback? onDiscard;
   final bool isCurrentPlayer;
-  
+
   const PlayerHandWidget({
     super.key,
     this.drawnCard,
@@ -21,7 +21,7 @@ class PlayerHandWidget extends StatelessWidget {
     if (!isCurrentPlayer || drawnCard == null) {
       return const SizedBox.shrink();
     }
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -48,9 +48,9 @@ class PlayerHandWidget extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 'Carte en main',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               const Spacer(),
               if (canDiscard)

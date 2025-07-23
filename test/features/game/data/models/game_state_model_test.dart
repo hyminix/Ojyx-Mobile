@@ -37,9 +37,7 @@ void main() {
         const Card(value: 10, isRevealed: false),
       ];
 
-      testDiscardPile = [
-        const Card(value: 7, isRevealed: true),
-      ];
+      testDiscardPile = [const Card(value: 7, isRevealed: true)];
 
       testActionDeck = [
         const ActionCard(
@@ -188,7 +186,10 @@ void main() {
         // Assert
         expect(domainEntity.roomId, equals(model.roomId));
         expect(domainEntity.players, equals(model.players));
-        expect(domainEntity.currentPlayerIndex, equals(model.currentPlayerIndex));
+        expect(
+          domainEntity.currentPlayerIndex,
+          equals(model.currentPlayerIndex),
+        );
         expect(domainEntity.deck, equals(model.deck));
         expect(domainEntity.discardPile, equals(model.discardPile));
         expect(domainEntity.actionDeck, equals(model.actionDeck));

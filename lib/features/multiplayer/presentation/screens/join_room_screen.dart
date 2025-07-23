@@ -11,7 +11,7 @@ class JoinRoomScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final availableRoomsAsync = ref.watch(availableRoomsProvider);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Rejoindre une partie'),
@@ -28,7 +28,9 @@ class JoinRoomScreen extends ConsumerWidget {
                     Icon(
                       Icons.search_off,
                       size: 64,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -39,7 +41,9 @@ class JoinRoomScreen extends ConsumerWidget {
                     Text(
                       'Créez une nouvelle partie pour commencer',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -52,7 +56,7 @@ class JoinRoomScreen extends ConsumerWidget {
                 ),
               );
             }
-            
+
             return RefreshIndicator(
               onRefresh: () async {
                 ref.invalidate(availableRoomsProvider);
@@ -72,11 +76,7 @@ class JoinRoomScreen extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.error_outline,
-                  size: 48,
-                  color: Colors.red,
-                ),
+                const Icon(Icons.error_outline, size: 48, color: Colors.red),
                 const SizedBox(height: 16),
                 Text(
                   'Erreur de chargement',
@@ -104,7 +104,7 @@ class JoinRoomScreen extends ConsumerWidget {
 
 class _RoomCard extends ConsumerStatefulWidget {
   final Room room;
-  
+
   const _RoomCard({required this.room});
 
   @override
@@ -116,19 +116,19 @@ class _RoomCardState extends ConsumerState<_RoomCard> {
 
   Future<void> _joinRoom() async {
     setState(() => _isJoining = true);
-    
+
     try {
       final userId = ref.read(currentUserIdProvider);
       if (userId == null) {
         throw Exception('Utilisateur non connecté');
       }
-      
+
       final joinRoomUseCase = ref.read(joinRoomUseCaseProvider);
       final room = await joinRoomUseCase(
         roomId: widget.room.id,
         playerId: userId,
       );
-      
+
       if (room != null && mounted) {
         context.go('/room/${room.id}');
       }
@@ -150,8 +150,9 @@ class _RoomCardState extends ConsumerState<_RoomCard> {
 
   @override
   Widget build(BuildContext context) {
-    final spotsAvailable = widget.room.maxPlayers - widget.room.playerIds.length;
-    
+    final spotsAvailable =
+        widget.room.maxPlayers - widget.room.playerIds.length;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
@@ -173,7 +174,9 @@ class _RoomCardState extends ConsumerState<_RoomCard> {
                 Icon(
                   Icons.person,
                   size: 16,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -188,7 +191,9 @@ class _RoomCardState extends ConsumerState<_RoomCard> {
                 Icon(
                   Icons.access_time,
                   size: 16,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -215,13 +220,13 @@ class _RoomCardState extends ConsumerState<_RoomCard> {
       ),
     );
   }
-  
+
   String _formatTime(DateTime? dateTime) {
     if (dateTime == null) return 'récemment';
-    
+
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-    
+
     if (difference.inMinutes < 1) {
       return 'à l\'instant';
     } else if (difference.inMinutes < 60) {

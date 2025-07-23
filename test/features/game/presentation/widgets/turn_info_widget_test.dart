@@ -55,7 +55,10 @@ void main() {
 
       // Assert
       expect(find.text('Votre tour'), findsOneWidget);
-      expect(find.byIcon(Icons.rotate_right), findsOneWidget); // Default is clockwise
+      expect(
+        find.byIcon(Icons.rotate_right),
+        findsOneWidget,
+      ); // Default is clockwise
     });
 
     testWidgets('should display opponent turn', (tester) async {
@@ -78,10 +81,15 @@ void main() {
 
       // Assert
       expect(find.text('Tour de Opponent Player'), findsOneWidget);
-      expect(find.byIcon(Icons.rotate_right), findsOneWidget); // Default is clockwise
+      expect(
+        find.byIcon(Icons.rotate_right),
+        findsOneWidget,
+      ); // Default is clockwise
     });
 
-    testWidgets('should show last round indicator when lastRound is true', (tester) async {
+    testWidgets('should show last round indicator when lastRound is true', (
+      tester,
+    ) async {
       // Arrange
       final gameState = mockGameState.copyWith(
         lastRound: true,
@@ -107,9 +115,7 @@ void main() {
 
     testWidgets('should show draw phase status', (tester) async {
       // Arrange
-      final gameState = mockGameState.copyWith(
-        status: GameStatus.drawPhase,
-      );
+      final gameState = mockGameState.copyWith(status: GameStatus.drawPhase);
 
       // Act
       await tester.pumpWidget(
@@ -152,9 +158,7 @@ void main() {
 
     testWidgets('should show finished status', (tester) async {
       // Arrange
-      final gameState = mockGameState.copyWith(
-        status: GameStatus.finished,
-      );
+      final gameState = mockGameState.copyWith(status: GameStatus.finished);
 
       // Act
       await tester.pumpWidget(
@@ -194,11 +198,11 @@ void main() {
       expect(find.byIcon(Icons.rotate_left), findsOneWidget);
     });
 
-    testWidgets('should apply correct styling for current player turn', (tester) async {
+    testWidgets('should apply correct styling for current player turn', (
+      tester,
+    ) async {
       // Arrange
-      final gameState = mockGameState.copyWith(
-        currentPlayerIndex: 0,
-      );
+      final gameState = mockGameState.copyWith(currentPlayerIndex: 0);
 
       // Act
       await tester.pumpWidget(
@@ -216,9 +220,7 @@ void main() {
       );
 
       // Assert
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final container = tester.widget<Container>(find.byType(Container).first);
       expect(container.decoration, isNotNull);
     });
   });

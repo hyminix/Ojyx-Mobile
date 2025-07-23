@@ -37,13 +37,12 @@ void main() {
       const roomId = 'room-123';
       final eventStream = Stream<RoomEvent>.empty();
 
-      when(() => mockSyncUseCase.watchGameEvents(roomId))
-          .thenAnswer((_) => eventStream);
+      when(
+        () => mockSyncUseCase.watchGameEvents(roomId),
+      ).thenAnswer((_) => eventStream);
 
       // Act
-      await container.read(
-        multiplayerGameNotifierProvider(roomId).future,
-      );
+      await container.read(multiplayerGameNotifierProvider(roomId).future);
 
       // Assert
       verify(() => mockSyncUseCase.watchGameEvents(roomId)).called(1);
@@ -55,11 +54,21 @@ void main() {
       final initialState = GameState.initial(
         roomId: roomId,
         players: [
-          Player(id: 'user-123', name: 'John', grid: PlayerGrid.empty(), isHost: true),
-          Player(id: 'user-456', name: 'Jane', grid: PlayerGrid.empty(), isHost: false),
+          Player(
+            id: 'user-123',
+            name: 'John',
+            grid: PlayerGrid.empty(),
+            isHost: true,
+          ),
+          Player(
+            id: 'user-456',
+            name: 'Jane',
+            grid: PlayerGrid.empty(),
+            isHost: false,
+          ),
         ],
       );
-      
+
       final gameStartedEvent = RoomEvent.gameStarted(
         gameId: 'game-123',
         initialState: initialState,
@@ -67,20 +76,19 @@ void main() {
 
       final eventController = StreamController<RoomEvent>.broadcast();
       final receivedEvents = <RoomEvent>[];
-      
-      when(() => mockSyncUseCase.watchGameEvents(roomId))
-          .thenAnswer((_) => eventController.stream);
+
+      when(
+        () => mockSyncUseCase.watchGameEvents(roomId),
+      ).thenAnswer((_) => eventController.stream);
 
       // Act
-      await container.read(
-        multiplayerGameNotifierProvider(roomId).future,
-      );
-      
+      await container.read(multiplayerGameNotifierProvider(roomId).future);
+
       // Listen to events from the controller to verify they're being processed
       eventController.stream.listen((event) {
         receivedEvents.add(event);
       });
-      
+
       // Add event
       eventController.add(gameStartedEvent);
       await Future.delayed(const Duration(milliseconds: 100));
@@ -99,29 +107,38 @@ void main() {
       final updatedState = GameState.initial(
         roomId: roomId,
         players: [
-          Player(id: 'user-123', name: 'John', grid: PlayerGrid.empty(), isHost: true),
-          Player(id: 'user-456', name: 'Jane', grid: PlayerGrid.empty(), isHost: false),
+          Player(
+            id: 'user-123',
+            name: 'John',
+            grid: PlayerGrid.empty(),
+            isHost: true,
+          ),
+          Player(
+            id: 'user-456',
+            name: 'Jane',
+            grid: PlayerGrid.empty(),
+            isHost: false,
+          ),
         ],
       ).copyWith(currentPlayerIndex: 1);
-      
+
       final updateEvent = RoomEvent.gameStateUpdated(newState: updatedState);
-      
+
       final eventController = StreamController<RoomEvent>.broadcast();
       final receivedEvents = <RoomEvent>[];
-      
-      when(() => mockSyncUseCase.watchGameEvents(roomId))
-          .thenAnswer((_) => eventController.stream);
+
+      when(
+        () => mockSyncUseCase.watchGameEvents(roomId),
+      ).thenAnswer((_) => eventController.stream);
 
       // Act
-      await container.read(
-        multiplayerGameNotifierProvider(roomId).future,
-      );
-      
+      await container.read(multiplayerGameNotifierProvider(roomId).future);
+
       // Listen to events
       eventController.stream.listen((event) {
         receivedEvents.add(event);
       });
-      
+
       // Add event
       eventController.add(updateEvent);
       await Future.delayed(const Duration(milliseconds: 100));
@@ -144,33 +161,36 @@ void main() {
       const playerId = 'user-123';
       final actionData = {'source': 'deck'};
 
-      when(() => mockSyncUseCase.watchGameEvents(roomId))
-          .thenAnswer((_) => Stream.empty());
-      when(() => mockSyncUseCase.sendPlayerAction(
-        roomId: roomId,
-        playerId: playerId,
-        actionType: PlayerActionType.drawCard,
-        actionData: actionData,
-      )).thenAnswer((_) async {});
+      when(
+        () => mockSyncUseCase.watchGameEvents(roomId),
+      ).thenAnswer((_) => Stream.empty());
+      when(
+        () => mockSyncUseCase.sendPlayerAction(
+          roomId: roomId,
+          playerId: playerId,
+          actionType: PlayerActionType.drawCard,
+          actionData: actionData,
+        ),
+      ).thenAnswer((_) async {});
 
       // Act
-      await container.read(
-        multiplayerGameNotifierProvider(roomId).future,
-      );
-      
+      await container.read(multiplayerGameNotifierProvider(roomId).future);
+
       final notifier = container.read(
         multiplayerGameNotifierProvider(roomId).notifier,
       );
-      
+
       await notifier.drawFromDeck(playerId);
 
       // Assert
-      verify(() => mockSyncUseCase.sendPlayerAction(
-        roomId: roomId,
-        playerId: playerId,
-        actionType: PlayerActionType.drawCard,
-        actionData: {'source': 'deck'},
-      )).called(1);
+      verify(
+        () => mockSyncUseCase.sendPlayerAction(
+          roomId: roomId,
+          playerId: playerId,
+          actionType: PlayerActionType.drawCard,
+          actionData: {'source': 'deck'},
+        ),
+      ).called(1);
     });
 
     test('should handle player action events', () async {
@@ -183,14 +203,13 @@ void main() {
       );
 
       final eventController = StreamController<RoomEvent>.broadcast();
-      when(() => mockSyncUseCase.watchGameEvents(roomId))
-          .thenAnswer((_) => eventController.stream);
+      when(
+        () => mockSyncUseCase.watchGameEvents(roomId),
+      ).thenAnswer((_) => eventController.stream);
 
       // Act
-      await container.read(
-        multiplayerGameNotifierProvider(roomId).future,
-      );
-      
+      await container.read(multiplayerGameNotifierProvider(roomId).future);
+
       // Add event - should be handled silently
       eventController.add(actionEvent);
       await Future.delayed(const Duration(milliseconds: 100));

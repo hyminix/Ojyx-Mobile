@@ -6,7 +6,7 @@ void main() {
     test('should have default values', () {
       // Since we can't test String.fromEnvironment directly in unit tests,
       // we test the expected behavior and document the contract
-      
+
       // These will be empty in tests but populated via --dart-define in builds
       expect(EnvConfig.supabaseUrl, isEmpty);
       expect(EnvConfig.supabaseAnonKey, isEmpty);
@@ -37,9 +37,9 @@ void main() {
     test('should validate in order of priority', () {
       // This test documents the validation order
       // 1. SUPABASE_URL (always required)
-      // 2. SUPABASE_ANON_KEY (always required)  
+      // 2. SUPABASE_ANON_KEY (always required)
       // 3. SENTRY_DSN (only in production)
-      
+
       // Since we can't mock String.fromEnvironment,
       // we document the expected behavior
       expect(EnvConfig.validate, throwsException);

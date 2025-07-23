@@ -13,19 +13,18 @@ class MockRoomRepository extends Mock implements RoomRepository {}
 void main() {
   late SyncGameStateUseCase syncGameStateUseCase;
   late MockRoomRepository mockRepository;
-  
+
   setUpAll(() {
-    registerFallbackValue(const RoomEvent.playerJoined(
-      playerId: 'test',
-      playerName: 'Test',
-    ));
+    registerFallbackValue(
+      const RoomEvent.playerJoined(playerId: 'test', playerName: 'Test'),
+    );
   });
-  
+
   setUp(() {
     mockRepository = MockRoomRepository();
     syncGameStateUseCase = SyncGameStateUseCase(mockRepository);
   });
-  
+
   group('SyncGameStateUseCase', () {
     test('should sync game state successfully', () async {
       // Arrange
@@ -36,7 +35,9 @@ void main() {
           Player(
             id: 'player1',
             name: 'Player 1',
-            grid: PlayerGrid.fromCards(List.generate(12, (_) => const Card(value: 5, isRevealed: false))),
+            grid: PlayerGrid.fromCards(
+              List.generate(12, (_) => const Card(value: 5, isRevealed: false)),
+            ),
             actionCards: [],
             isConnected: true,
             isHost: false,
@@ -49,9 +50,7 @@ void main() {
           const Card(value: 1, isRevealed: false),
           const Card(value: 2, isRevealed: false),
         ],
-        discardPile: [
-          const Card(value: 3, isRevealed: true),
-        ],
+        discardPile: [const Card(value: 3, isRevealed: true)],
         actionDeck: [],
         actionDiscard: [],
         status: GameStatus.playing,
@@ -60,37 +59,43 @@ void main() {
         drawnCard: null,
         createdAt: DateTime.now(),
       );
-      
-      when(() => mockRepository.sendEvent(
-        roomId: roomId,
-        event: any(named: 'event'),
-      )).thenAnswer((_) async {});
-      
+
+      when(
+        () => mockRepository.sendEvent(
+          roomId: roomId,
+          event: any(named: 'event'),
+        ),
+      ).thenAnswer((_) async {});
+
       // Act
       await syncGameStateUseCase.syncGameState(
         roomId: roomId,
         gameState: gameState,
       );
-      
+
       // Assert
-      verify(() => mockRepository.sendEvent(
-        roomId: roomId,
-        event: any(named: 'event'),
-      )).called(1);
+      verify(
+        () => mockRepository.sendEvent(
+          roomId: roomId,
+          event: any(named: 'event'),
+        ),
+      ).called(1);
     });
-    
+
     test('should send player action successfully', () async {
       // Arrange
       const roomId = 'room123';
       const playerId = 'player1';
       const actionType = PlayerActionType.drawCard;
       final actionData = {'source': 'deck'};
-      
-      when(() => mockRepository.sendEvent(
-        roomId: roomId,
-        event: any(named: 'event'),
-      )).thenAnswer((_) async {});
-      
+
+      when(
+        () => mockRepository.sendEvent(
+          roomId: roomId,
+          event: any(named: 'event'),
+        ),
+      ).thenAnswer((_) async {});
+
       // Act
       await syncGameStateUseCase.sendPlayerAction(
         roomId: roomId,
@@ -98,14 +103,16 @@ void main() {
         actionType: actionType,
         actionData: actionData,
       );
-      
+
       // Assert
-      verify(() => mockRepository.sendEvent(
-        roomId: roomId,
-        event: any(named: 'event'),
-      )).called(1);
+      verify(
+        () => mockRepository.sendEvent(
+          roomId: roomId,
+          event: any(named: 'event'),
+        ),
+      ).called(1);
     });
-    
+
     test('should watch game events', () {
       // Arrange
       const roomId = 'room123';
@@ -120,13 +127,14 @@ void main() {
           actionData: {'source': 'deck'},
         ),
       ];
-      
-      when(() => mockRepository.watchRoomEvents(roomId))
-          .thenAnswer((_) => Stream.fromIterable(events));
-      
+
+      when(
+        () => mockRepository.watchRoomEvents(roomId),
+      ).thenAnswer((_) => Stream.fromIterable(events));
+
       // Act
       final stream = syncGameStateUseCase.watchGameEvents(roomId);
-      
+
       // Assert
       expect(stream, emitsInOrder(events));
     });

@@ -24,7 +24,7 @@ void main() {
     test('should ensure all widgets are accessible through barrel import', () {
       // This test verifies that we can import all widgets through the barrel file
       // If the barrel file has any issues, this test will fail at compile time
-      
+
       // Act - Create variables to reference all exported classes
       final widgets = [
         CardWidget,
@@ -40,7 +40,7 @@ void main() {
       for (final widget in widgets) {
         expect(widget, isNotNull);
       }
-      
+
       expect(widgets.length, equals(7));
     });
   });

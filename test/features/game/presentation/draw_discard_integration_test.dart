@@ -11,10 +11,13 @@ void main() {
     testWidgets('should handle complete draw and discard flow', (tester) async {
       // Arrange
       var deckState = DeckState(
-        drawPile: List.generate(10, (i) => game.Card(value: i, isRevealed: false)),
+        drawPile: List.generate(
+          10,
+          (i) => game.Card(value: i, isRevealed: false),
+        ),
         discardPile: [const game.Card(value: 5, isRevealed: true)],
       );
-      
+
       game.Card? lastDrawnCard;
       game.Card? lastDiscardedCard;
 
@@ -66,7 +69,9 @@ void main() {
 
       // Discard the drawn card
       const cardToDiscard = game.Card(value: 0, isRevealed: true);
-      final discardPile = tester.widget<DiscardPileWidget>(find.byType(DiscardPileWidget));
+      final discardPile = tester.widget<DiscardPileWidget>(
+        find.byType(DiscardPileWidget),
+      );
       expect(discardPile.onCardDropped, isNotNull);
       discardPile.onCardDropped!(cardToDiscard);
       await tester.pumpAndSettle();
@@ -76,13 +81,18 @@ void main() {
       expect(deckState.topDiscardCard?.value, equals(0));
     });
 
-    testWidgets('should handle reshuffle when draw pile is empty', (tester) async {
+    testWidgets('should handle reshuffle when draw pile is empty', (
+      tester,
+    ) async {
       // Arrange
       var deckState = DeckState(
         drawPile: const [],
-        discardPile: List.generate(5, (i) => game.Card(value: i, isRevealed: true)),
+        discardPile: List.generate(
+          5,
+          (i) => game.Card(value: i, isRevealed: true),
+        ),
       );
-      
+
       bool reshuffleTriggered = false;
 
       // Act
@@ -98,7 +108,8 @@ void main() {
                   showReshuffleIndicator: deckState.isDrawPileEmpty,
                   onDrawCard: () {
                     setState(() {
-                      if (deckState.isDrawPileEmpty && deckState.discardPile.length > 1) {
+                      if (deckState.isDrawPileEmpty &&
+                          deckState.discardPile.length > 1) {
                         deckState = deckState.reshuffleDiscardIntoDraw();
                         reshuffleTriggered = true;
                       }
@@ -152,7 +163,9 @@ void main() {
       expect(actionTriggered, isFalse);
     });
 
-    testWidgets('should show proper animations during card transitions', (tester) async {
+    testWidgets('should show proper animations during card transitions', (
+      tester,
+    ) async {
       // Arrange
       const initialCard = game.Card(value: 3, isRevealed: true);
       const newCard = game.Card(value: 8, isRevealed: true);
@@ -186,29 +199,36 @@ void main() {
       expect(find.text('3'), findsWidgets);
 
       // Trigger discard with new card
-      final discardPile = tester.widget<DiscardPileWidget>(find.byType(DiscardPileWidget));
+      final discardPile = tester.widget<DiscardPileWidget>(
+        find.byType(DiscardPileWidget),
+      );
       expect(discardPile.onCardDropped, isNotNull);
       discardPile.onCardDropped!(newCard);
-      
+
       // Pump a few frames to see animation
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
-      
+
       // Animation in progress
       expect(find.byType(AnimatedSwitcher), findsWidgets);
-      
+
       // Complete animation
       await tester.pumpAndSettle();
-      
+
       // Verify new state
       expect(find.text('8'), findsWidgets);
       expect(find.text('3'), findsNothing);
     });
 
-    testWidgets('should update UI correctly after multiple operations', (tester) async {
+    testWidgets('should update UI correctly after multiple operations', (
+      tester,
+    ) async {
       // Arrange
       var deckState = DeckState(
-        drawPile: List.generate(5, (i) => game.Card(value: i * 2, isRevealed: false)),
+        drawPile: List.generate(
+          5,
+          (i) => game.Card(value: i * 2, isRevealed: false),
+        ),
         discardPile: [const game.Card(value: 1, isRevealed: true)],
       );
 

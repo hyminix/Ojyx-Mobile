@@ -12,7 +12,7 @@ void main() {
     test('should expose client getters', () {
       // These tests verify that the static getters are properly defined
       // In a real test environment, Supabase must be initialized first
-      
+
       // Act & Assert
       expect(() => SupabaseConfig.client, throwsA(isA<Error>()));
       expect(() => SupabaseConfig.auth, throwsA(isA<Error>()));

@@ -16,10 +16,7 @@ class DeckState with _$DeckState {
   factory DeckState.fromJson(Map<String, dynamic> json) =>
       _$DeckStateFromJson(json);
 
-  factory DeckState.empty() => const DeckState(
-    drawPile: [],
-    discardPile: [],
-  );
+  factory DeckState.empty() => const DeckState(drawPile: [], discardPile: []);
 
   Card? get topDiscardCard => discardPile.isEmpty ? null : discardPile.last;
 
@@ -35,16 +32,11 @@ class DeckState with _$DeckState {
     final drawnCard = drawPile.first;
     final newDrawPile = drawPile.sublist(1);
 
-    return (
-      copyWith(drawPile: newDrawPile),
-      drawnCard,
-    );
+    return (copyWith(drawPile: newDrawPile), drawnCard);
   }
 
   DeckState discardCard(Card card) {
-    return copyWith(
-      discardPile: [...discardPile, card],
-    );
+    return copyWith(discardPile: [...discardPile, card]);
   }
 
   DeckState reshuffleDiscardIntoDraw() {
@@ -55,13 +47,10 @@ class DeckState with _$DeckState {
     // Keep the top card of discard pile
     final topCard = discardPile.last;
     final cardsToShuffle = discardPile.sublist(0, discardPile.length - 1);
-    
+
     // Shuffle the cards
     final shuffled = List<Card>.from(cardsToShuffle)..shuffle();
 
-    return copyWith(
-      drawPile: shuffled,
-      discardPile: [topCard],
-    );
+    return copyWith(drawPile: shuffled, discardPile: [topCard]);
   }
 }

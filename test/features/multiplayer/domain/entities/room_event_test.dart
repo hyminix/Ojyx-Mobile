@@ -22,7 +22,8 @@ void main() {
         playerLeft: (playerId) => fail('Wrong event type'),
         gameStarted: (gameId, initialState) => fail('Wrong event type'),
         gameStateUpdated: (newState) => fail('Wrong event type'),
-        playerAction: (playerId, actionType, actionData) => fail('Wrong event type'),
+        playerAction: (playerId, actionType, actionData) =>
+            fail('Wrong event type'),
       );
     });
 
@@ -38,7 +39,8 @@ void main() {
         },
         gameStarted: (gameId, initialState) => fail('Wrong event type'),
         gameStateUpdated: (newState) => fail('Wrong event type'),
-        playerAction: (playerId, actionType, actionData) => fail('Wrong event type'),
+        playerAction: (playerId, actionType, actionData) =>
+            fail('Wrong event type'),
       );
     });
 
@@ -77,7 +79,8 @@ void main() {
           expect(gameState, equals(initialState));
         },
         gameStateUpdated: (newState) => fail('Wrong event type'),
-        playerAction: (playerId, actionType, actionData) => fail('Wrong event type'),
+        playerAction: (playerId, actionType, actionData) =>
+            fail('Wrong event type'),
       );
     });
 

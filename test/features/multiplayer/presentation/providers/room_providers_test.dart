@@ -15,8 +15,12 @@ import 'package:ojyx/features/multiplayer/domain/entities/room_event.dart';
 import 'package:ojyx/core/providers/supabase_provider.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
-class MockSupabaseRoomDatasource extends Mock implements SupabaseRoomDatasource {}
+
+class MockSupabaseRoomDatasource extends Mock
+    implements SupabaseRoomDatasource {}
+
 class MockRoomDatasource extends Mock implements RoomDatasource {}
+
 class MockRoomRepository extends Mock implements RoomRepository {}
 
 void main() {
@@ -59,7 +63,9 @@ void main() {
       // Arrange
       container = ProviderContainer(
         overrides: [
-          supabaseRoomDatasourceProvider.overrideWithValue(mockSupabaseRoomDatasource),
+          supabaseRoomDatasourceProvider.overrideWithValue(
+            mockSupabaseRoomDatasource,
+          ),
         ],
       );
 
@@ -117,10 +123,12 @@ void main() {
         maxPlayers: maxPlayers,
       );
 
-      when(() => mockRoomRepository.createRoom(
-        creatorId: creatorId,
-        maxPlayers: maxPlayers,
-      )).thenAnswer((_) async => expectedRoom);
+      when(
+        () => mockRoomRepository.createRoom(
+          creatorId: creatorId,
+          maxPlayers: maxPlayers,
+        ),
+      ).thenAnswer((_) async => expectedRoom);
 
       container = ProviderContainer(
         overrides: [
@@ -188,8 +196,9 @@ void main() {
         ),
       );
 
-      when(() => mockRoomRepository.watchRoom(roomId))
-          .thenAnswer((_) => roomStream);
+      when(
+        () => mockRoomRepository.watchRoom(roomId),
+      ).thenAnswer((_) => roomStream);
 
       container = ProviderContainer(
         overrides: [
@@ -202,19 +211,14 @@ void main() {
 
       // Assert
       expect(stream, isA<Stream<Room>>());
-      expectLater(
-        stream,
-        emits(
-          predicate<Room>((room) => room.id == roomId),
-        ),
-      );
+      expectLater(stream, emits(predicate<Room>((room) => room.id == roomId)));
     });
 
     test('should handle different room IDs', () {
       // Arrange
       const roomId1 = 'room123';
       const roomId2 = 'room456';
-      
+
       final roomStream1 = Stream<Room>.value(
         const Room(
           id: roomId1,
@@ -224,7 +228,7 @@ void main() {
           maxPlayers: 4,
         ),
       );
-      
+
       final roomStream2 = Stream<Room>.value(
         const Room(
           id: roomId2,
@@ -235,10 +239,12 @@ void main() {
         ),
       );
 
-      when(() => mockRoomRepository.watchRoom(roomId1))
-          .thenAnswer((_) => roomStream1);
-      when(() => mockRoomRepository.watchRoom(roomId2))
-          .thenAnswer((_) => roomStream2);
+      when(
+        () => mockRoomRepository.watchRoom(roomId1),
+      ).thenAnswer((_) => roomStream1);
+      when(
+        () => mockRoomRepository.watchRoom(roomId2),
+      ).thenAnswer((_) => roomStream2);
 
       container = ProviderContainer(
         overrides: [
@@ -260,14 +266,12 @@ void main() {
       // Arrange
       const roomId = 'room123';
       final eventStream = Stream<RoomEvent>.value(
-        RoomEvent.playerJoined(
-          playerId: 'player456',
-          playerName: 'Player 456',
-        ),
+        RoomEvent.playerJoined(playerId: 'player456', playerName: 'Player 456'),
       );
 
-      when(() => mockRoomRepository.watchRoomEvents(roomId))
-          .thenAnswer((_) => eventStream);
+      when(
+        () => mockRoomRepository.watchRoomEvents(roomId),
+      ).thenAnswer((_) => eventStream);
 
       container = ProviderContainer(
         overrides: [
@@ -283,9 +287,8 @@ void main() {
       expectLater(
         stream,
         emits(
-          predicate<RoomEvent>((event) => 
-            event is PlayerJoined &&
-            event.playerId == 'player456'
+          predicate<RoomEvent>(
+            (event) => event is PlayerJoined && event.playerId == 'player456',
           ),
         ),
       );
@@ -312,8 +315,9 @@ void main() {
         ),
       ];
 
-      when(() => mockRoomRepository.getAvailableRooms())
-          .thenAnswer((_) async => expectedRooms);
+      when(
+        () => mockRoomRepository.getAvailableRooms(),
+      ).thenAnswer((_) async => expectedRooms);
 
       container = ProviderContainer(
         overrides: [
@@ -331,8 +335,9 @@ void main() {
 
     test('should handle empty room list', () async {
       // Arrange
-      when(() => mockRoomRepository.getAvailableRooms())
-          .thenAnswer((_) async => []);
+      when(
+        () => mockRoomRepository.getAvailableRooms(),
+      ).thenAnswer((_) async => []);
 
       container = ProviderContainer(
         overrides: [
@@ -363,9 +368,7 @@ void main() {
     test('should be overridable', () {
       // Arrange
       container = ProviderContainer(
-        overrides: [
-          currentRoomIdProvider.overrideWithValue('room123'),
-        ],
+        overrides: [currentRoomIdProvider.overrideWithValue('room123')],
       );
 
       // Act

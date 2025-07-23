@@ -15,19 +15,19 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
   late SyncGameStateUseCase _syncUseCase;
   StreamSubscription<RoomEvent>? _eventSubscription;
   String? _roomId;
-  
+
   @override
   Future<void> build(String roomId) async {
     _roomId = roomId;
     _syncUseCase = ref.read(syncGameStateUseCaseProvider);
-    
+
     ref.onDispose(() {
       _eventSubscription?.cancel();
     });
-    
+
     _listenToRoomEvents(roomId);
   }
-  
+
   void _listenToRoomEvents(String roomId) {
     _eventSubscription = _syncUseCase.watchGameEvents(roomId).listen((event) {
       event.when(
@@ -49,7 +49,7 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
       );
     });
   }
-  
+
   void _handlePlayerAction(
     String playerId,
     PlayerActionType actionType,
@@ -60,7 +60,7 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
     // Cette méthode pourrait être utilisée pour des effets locaux
     // comme des animations ou des sons
   }
-  
+
   Future<void> syncAction({
     required String playerId,
     required PlayerActionType actionType,
@@ -74,7 +74,7 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
       actionData: actionData,
     );
   }
-  
+
   Future<void> drawFromDeck(String playerId) async {
     await syncAction(
       playerId: playerId,
@@ -82,7 +82,7 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
       actionData: {'source': 'deck'},
     );
   }
-  
+
   Future<void> drawFromDiscard(String playerId) async {
     await syncAction(
       playerId: playerId,
@@ -90,7 +90,7 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
       actionData: {'source': 'discard'},
     );
   }
-  
+
   Future<void> discardCard(String playerId, int cardIndex) async {
     await syncAction(
       playerId: playerId,
@@ -98,7 +98,7 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
       actionData: {'cardIndex': cardIndex},
     );
   }
-  
+
   Future<void> revealCard(String playerId, int position) async {
     await syncAction(
       playerId: playerId,
@@ -106,11 +106,8 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
       actionData: {'position': position},
     );
   }
-  
+
   Future<void> endTurn(String playerId) async {
-    await syncAction(
-      playerId: playerId,
-      actionType: PlayerActionType.endTurn,
-    );
+    await syncAction(playerId: playerId, actionType: PlayerActionType.endTurn);
   }
 }

@@ -17,19 +17,19 @@ class _CreateRoomScreenState extends ConsumerState<CreateRoomScreen> {
 
   Future<void> _createRoom() async {
     setState(() => _isCreating = true);
-    
+
     try {
       final userId = ref.read(currentUserIdProvider);
       if (userId == null) {
         throw Exception('Utilisateur non connecté');
       }
-      
+
       final createRoomUseCase = ref.read(createRoomUseCaseProvider);
       final room = await createRoomUseCase(
         creatorId: userId,
         maxPlayers: _selectedPlayers,
       );
-      
+
       if (mounted) {
         context.go('/room/${room.id}');
       }
@@ -52,10 +52,7 @@ class _CreateRoomScreenState extends ConsumerState<CreateRoomScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Créer une partie'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Créer une partie'), centerTitle: true),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -77,7 +74,7 @@ class _CreateRoomScreenState extends ConsumerState<CreateRoomScreen> {
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 48),
-                  
+
                   // Number of players selector
                   Card(
                     child: Padding(
@@ -103,16 +100,23 @@ class _CreateRoomScreenState extends ConsumerState<CreateRoomScreen> {
                                 width: 80,
                                 height: 80,
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.primaryContainer,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primaryContainer,
                                   shape: BoxShape.circle,
                                 ),
                                 child: Center(
                                   child: Text(
                                     '$_selectedPlayers',
-                                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displaySmall
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onPrimaryContainer,
+                                        ),
                                   ),
                                 ),
                               ),
@@ -128,16 +132,18 @@ class _CreateRoomScreenState extends ConsumerState<CreateRoomScreen> {
                           const SizedBox(height: 8),
                           Text(
                             '2 à 8 joueurs',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                            ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
+                                ),
                           ),
                         ],
                       ),
                     ),
                   ),
                   const SizedBox(height: 48),
-                  
+
                   // Create button
                   SizedBox(
                     width: double.infinity,

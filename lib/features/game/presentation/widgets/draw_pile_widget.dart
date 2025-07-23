@@ -29,13 +29,9 @@ class _DrawPileWidgetState extends State<DrawPileWidget>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.95,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -76,12 +72,14 @@ class _DrawPileWidgetState extends State<DrawPileWidget>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Semantics(
       label: 'Pioche avec ${widget.cardCount} cartes restantes',
       child: Tooltip(
-        message: _canDraw 
-            ? (widget.cardCount > 0 ? 'Piocher une carte' : 'Mélanger la défausse')
+        message: _canDraw
+            ? (widget.cardCount > 0
+                  ? 'Piocher une carte'
+                  : 'Mélanger la défausse')
             : 'Pas votre tour',
         child: GestureDetector(
           onTap: _handleTap,

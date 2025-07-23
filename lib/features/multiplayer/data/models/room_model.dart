@@ -34,7 +34,7 @@ extension RoomModelX on RoomModel {
       updatedAt: updatedAt,
     );
   }
-  
+
   static RoomStatus _parseRoomStatus(String status) {
     switch (status) {
       case 'waiting':
