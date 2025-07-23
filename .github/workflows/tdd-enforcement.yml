@@ -1,11 +1,10 @@
 name: TDD Enforcement
 
 on:
-  workflow_dispatch:  # Temporairement désactivé
-  # pull_request:
-  #   branches: [main]
-  # push:
-  #   branches: [main]
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
 
 jobs:
   tdd-compliance:
