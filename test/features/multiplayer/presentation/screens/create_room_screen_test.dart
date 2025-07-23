@@ -1,0 +1,361 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ojyx/features/multiplayer/presentation/screens/create_room_screen.dart';
+import 'package:ojyx/features/multiplayer/presentation/providers/room_providers.dart';
+import 'package:ojyx/features/multiplayer/domain/use_cases/create_room_use_case.dart';
+import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
+import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
+
+class MockCreateRoomUseCase extends Mock implements CreateRoomUseCase {}
+
+class MockGoRouter extends Mock implements GoRouter {}
+
+void main() {
+  late MockCreateRoomUseCase mockCreateRoomUseCase;
+  late MockGoRouter mockGoRouter;
+
+  setUp(() {
+    mockCreateRoomUseCase = MockCreateRoomUseCase();
+    mockGoRouter = MockGoRouter();
+  });
+
+  Widget createWidgetUnderTest({String? userId}) {
+    return ProviderScope(
+      overrides: [
+        createRoomUseCaseProvider.overrideWithValue(mockCreateRoomUseCase),
+        currentUserIdProvider.overrideWithValue(userId),
+      ],
+      child: MaterialApp.router(
+        routerConfig: GoRouter(
+          routes: [
+            GoRoute(
+              path: '/',
+              builder: (context, state) => const CreateRoomScreen(),
+            ),
+            GoRoute(
+              path: '/room/:id',
+              builder: (context, state) =>
+                  Scaffold(body: Text('Room ${state.pathParameters['id']}')),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  group('CreateRoomScreen', () {
+    testWidgets('should display initial UI elements', (
+      WidgetTester tester,
+    ) async {
+      // Act
+      await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
+
+      // Assert
+      expect(find.text('Créer une partie'), findsOneWidget);
+      expect(find.text('Configuration de la partie'), findsOneWidget);
+      expect(find.text('Nombre de joueurs'), findsOneWidget);
+      expect(find.text('4'), findsOneWidget); // Default player count
+      expect(find.text('2 à 8 joueurs'), findsOneWidget);
+      expect(find.text('Créer la partie'), findsOneWidget);
+      expect(find.byIcon(Icons.group_add), findsOneWidget);
+      expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget);
+      expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
+    });
+
+    testWidgets('should allow increasing player count', (
+      WidgetTester tester,
+    ) async {
+      // Arrange
+      await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
+
+      // Act
+      await tester.tap(find.byIcon(Icons.add_circle_outline));
+      await tester.pump();
+
+      // Assert
+      expect(find.text('5'), findsOneWidget);
+    });
+
+    testWidgets('should allow decreasing player count', (
+      WidgetTester tester,
+    ) async {
+      // Arrange
+      await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
+
+      // First increase to 5, then decrease to 3
+      await tester.tap(find.byIcon(Icons.add_circle_outline));
+      await tester.pump();
+
+      // Act
+      await tester.tap(find.byIcon(Icons.remove_circle_outline));
+      await tester.pump();
+
+      // Assert
+      expect(find.text('4'), findsOneWidget);
+    });
+
+    testWidgets('should not allow player count below 2', (
+      WidgetTester tester,
+    ) async {
+      // Arrange
+      await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
+
+      // Decrease to minimum (2)
+      await tester.tap(find.byIcon(Icons.remove_circle_outline));
+      await tester.tap(find.byIcon(Icons.remove_circle_outline));
+      await tester.pump();
+
+      expect(find.text('2'), findsOneWidget);
+
+      // Act - try to decrease further
+      final decreaseButton = find.byIcon(Icons.remove_circle_outline);
+      await tester.tap(decreaseButton);
+      await tester.pump();
+
+      // Assert - should still be 2
+      expect(find.text('2'), findsOneWidget);
+    });
+
+    testWidgets('should not allow player count above 8', (
+      WidgetTester tester,
+    ) async {
+      // Arrange
+      await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
+
+      // Increase to maximum (8)
+      for (int i = 0; i < 4; i++) {
+        await tester.tap(find.byIcon(Icons.add_circle_outline));
+        await tester.pump();
+      }
+
+      expect(find.text('8'), findsOneWidget);
+
+      // Act - try to increase further
+      await tester.tap(find.byIcon(Icons.add_circle_outline));
+      await tester.pump();
+
+      // Assert - should still be 8
+      expect(find.text('8'), findsOneWidget);
+    });
+
+    testWidgets('should create room successfully', (WidgetTester tester) async {
+      // Arrange
+      const userId = 'user123';
+      const roomId = 'room456';
+      final expectedRoom = Room(
+        id: roomId,
+        creatorId: userId,
+        playerIds: [userId],
+        status: RoomStatus.waiting,
+        maxPlayers: 4,
+      );
+
+      when(
+        () => mockCreateRoomUseCase.call(creatorId: userId, maxPlayers: 4),
+      ).thenAnswer((_) async => expectedRoom);
+
+      await tester.pumpWidget(createWidgetUnderTest(userId: userId));
+
+      // Act
+      await tester.tap(find.text('Créer la partie'));
+      await tester.pump(); // Trigger the async operation
+      await tester.pumpAndSettle(); // Wait for navigation
+
+      // Assert
+      verify(
+        () => mockCreateRoomUseCase.call(creatorId: userId, maxPlayers: 4),
+      ).called(1);
+
+      // Verify navigation occurred
+      expect(find.text('Room $roomId'), findsOneWidget);
+    });
+
+    testWidgets('should show loading state during room creation', (
+      WidgetTester tester,
+    ) async {
+      // Arrange
+      const userId = 'user123';
+      final expectedRoom = Room(
+        id: 'room456',
+        creatorId: userId,
+        playerIds: [userId],
+        status: RoomStatus.waiting,
+        maxPlayers: 4,
+      );
+
+      // Add delay to simulate async operation
+      when(
+        () => mockCreateRoomUseCase.call(creatorId: userId, maxPlayers: 4),
+      ).thenAnswer((_) async {
+        await Future.delayed(const Duration(milliseconds: 100));
+        return expectedRoom;
+      });
+
+      await tester.pumpWidget(createWidgetUnderTest(userId: userId));
+
+      // Act
+      await tester.tap(find.text('Créer la partie'));
+      await tester.pump(); // Start the async operation
+
+      // Assert
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Créer la partie'), findsNothing);
+
+      // Wait for completion
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('should show error when user not logged in', (
+      WidgetTester tester,
+    ) async {
+      // Arrange
+      await tester.pumpWidget(createWidgetUnderTest(userId: null));
+
+      // Act
+      await tester.tap(find.text('Créer la partie'));
+      await tester.pump();
+      await tester.pump(); // Allow snackbar to appear
+
+      // Assert
+      expect(
+        find.text('Erreur: Exception: Utilisateur non connecté'),
+        findsOneWidget,
+      );
+      expect(find.byType(SnackBar), findsOneWidget);
+    });
+
+    testWidgets('should show error when room creation fails', (
+      WidgetTester tester,
+    ) async {
+      // Arrange
+      const userId = 'user123';
+      const errorMessage = 'Network error';
+
+      when(
+        () => mockCreateRoomUseCase.call(creatorId: userId, maxPlayers: 4),
+      ).thenThrow(Exception(errorMessage));
+
+      await tester.pumpWidget(createWidgetUnderTest(userId: userId));
+
+      // Act
+      await tester.tap(find.text('Créer la partie'));
+      await tester.pump();
+      await tester.pump(); // Allow snackbar to appear
+
+      // Assert
+      expect(find.text('Erreur: Exception: $errorMessage'), findsOneWidget);
+      expect(find.byType(SnackBar), findsOneWidget);
+    });
+
+    testWidgets('should disable controls during room creation', (
+      WidgetTester tester,
+    ) async {
+      // Arrange
+      const userId = 'user123';
+      final expectedRoom = Room(
+        id: 'room456',
+        creatorId: userId,
+        playerIds: [userId],
+        status: RoomStatus.waiting,
+        maxPlayers: 4,
+      );
+
+      when(
+        () => mockCreateRoomUseCase.call(creatorId: userId, maxPlayers: 4),
+      ).thenAnswer((_) async {
+        await Future.delayed(const Duration(milliseconds: 100));
+        return expectedRoom;
+      });
+
+      await tester.pumpWidget(createWidgetUnderTest(userId: userId));
+
+      // Act
+      await tester.tap(find.text('Créer la partie'));
+      await tester.pump(); // Start the async operation
+
+      // Assert - buttons should be disabled
+      final increaseButton = tester.widget<IconButton>(
+        find.byIcon(Icons.add_circle_outline),
+      );
+      final decreaseButton = tester.widget<IconButton>(
+        find.byIcon(Icons.remove_circle_outline),
+      );
+      final createButton = tester.widget<ElevatedButton>(
+        find.byType(ElevatedButton),
+      );
+
+      expect(increaseButton.onPressed, isNull);
+      expect(decreaseButton.onPressed, isNull);
+      expect(createButton.onPressed, isNull);
+
+      // Wait for completion
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('should create room with selected player count', (
+      WidgetTester tester,
+    ) async {
+      // Arrange
+      const userId = 'user123';
+      const selectedPlayers = 6;
+      final expectedRoom = Room(
+        id: 'room456',
+        creatorId: userId,
+        playerIds: [userId],
+        status: RoomStatus.waiting,
+        maxPlayers: selectedPlayers,
+      );
+
+      when(
+        () => mockCreateRoomUseCase.call(
+          creatorId: userId,
+          maxPlayers: selectedPlayers,
+        ),
+      ).thenAnswer((_) async => expectedRoom);
+
+      await tester.pumpWidget(createWidgetUnderTest(userId: userId));
+
+      // Change player count to 6
+      await tester.tap(find.byIcon(Icons.add_circle_outline));
+      await tester.tap(find.byIcon(Icons.add_circle_outline));
+      await tester.pump();
+
+      expect(find.text('6'), findsOneWidget);
+
+      // Act
+      await tester.tap(find.text('Créer la partie'));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      // Assert
+      verify(
+        () => mockCreateRoomUseCase.call(
+          creatorId: userId,
+          maxPlayers: selectedPlayers,
+        ),
+      ).called(1);
+    });
+
+    testWidgets('should apply correct styling', (WidgetTester tester) async {
+      // Arrange
+      await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
+
+      // Assert
+      expect(find.byType(Card), findsOneWidget);
+      expect(find.byType(ConstrainedBox), findsOneWidget);
+      expect(find.byType(SafeArea), findsOneWidget);
+
+      // Check that player count is displayed in a circular container
+      final container = tester.widget<Container>(
+        find
+            .descendant(of: find.byType(Row), matching: find.byType(Container))
+            .first,
+      );
+      final decoration = container.decoration as BoxDecoration;
+      expect(decoration.shape, BoxShape.circle);
+    });
+  });
+}
