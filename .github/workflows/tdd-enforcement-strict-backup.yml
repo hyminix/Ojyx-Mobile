@@ -100,78 +100,47 @@ jobs:
           
           echo "✅ Tous les fichiers ont des tests correspondants"
       
-      - name: Check git history for test-first (PRAGMATIC)
+      - name: Check git history for test-first
         id: git-history
         run: |
-          echo "Checking git history for test-first approach (PRAGMATIC MODE)..."
+          echo "Checking git history for test-first approach..."
           
           # Obtenir les fichiers modifiés dans cette PR
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             BASE_SHA="${{ github.event.pull_request.base.sha }}"
             HEAD_SHA="${{ github.event.pull_request.head.sha }}"
             
-            # ====================================================================
-            # CHANGEMENT MAJEUR : Approche pragmatique pour le code existant
-            # ====================================================================
-            # 1. On récupère TOUS les fichiers nouveaux dans la PR (pas juste ceux créés)
-            # 2. On vérifie s'ils existaient déjà dans la branche de base
-            # 3. Pour les vrais nouveaux fichiers : règle stricte TDD
-            # 4. Pour les fichiers existants modifiés : on vérifie juste qu'ils ont des tests
-            
-            # Obtenir tous les fichiers ajoutés/modifiés dans la PR
-            ALL_CODE_FILES=$(git diff --name-only $BASE_SHA..$HEAD_SHA | grep "^lib/.*\\.dart$" | grep -v "\\.g\\.dart$" | grep -v "\\.freezed\\.dart$" || true)
+            # Pour chaque nouveau fichier de code, vérifier que le test a été créé avant ou en même temps
+            NEW_CODE_FILES=$(git diff --name-only --diff-filter=A $BASE_SHA..$HEAD_SHA | grep "^lib/.*\\.dart$" | grep -v "\\.g\\.dart$" | grep -v "\\.freezed\\.dart$" || true)
             
             VIOLATIONS=""
-            for code_file in $ALL_CODE_FILES; do
+            for code_file in $NEW_CODE_FILES; do
               test_file=$(echo "$code_file" | sed 's|^lib/|test/|' | sed 's|\.dart$|_test.dart|')
               
-              # Vérifier si le fichier existait déjà dans la branche de base
-              if git ls-tree $BASE_SHA --name-only | grep -q "^$code_file$"; then
-                echo "📝 $code_file est un fichier EXISTANT modifié"
+              # Obtenir la date de création du fichier de code
+              CODE_DATE=$(git log --format="%at" --diff-filter=A -- "$code_file" | tail -1)
+              
+              # Obtenir la date de création du fichier de test
+              if [ -f "$test_file" ]; then
+                TEST_DATE=$(git log --format="%at" --diff-filter=A -- "$test_file" | tail -1)
                 
-                # Pour les fichiers existants, on vérifie seulement qu'ils ont un test
-                if [ ! -f "$test_file" ]; then
-                  # Vérifier aussi sans le suffixe _test
-                  ALT_TEST_FILE=$(echo "$code_file" | sed 's|^lib/|test/|')
-                  if [ ! -f "$ALT_TEST_FILE" ]; then
-                    VIOLATIONS="${VIOLATIONS}\\n❌ Fichier existant modifié sans test: $code_file"
-                  fi
+                # Si le code a été créé avant le test, c'est une violation
+                if [ ! -z "$CODE_DATE" ] && [ ! -z "$TEST_DATE" ] && [ "$CODE_DATE" -lt "$TEST_DATE" ]; then
+                  VIOLATIONS="${VIOLATIONS}\\n❌ Code créé avant le test: $code_file"
                 fi
               else
-                echo "🆕 $code_file est un NOUVEAU fichier"
-                
-                # Pour les nouveaux fichiers, appliquer la règle stricte du test-first
-                if [ -f "$test_file" ]; then
-                  # Obtenir la date de création du fichier de code dans cette PR
-                  CODE_DATE=$(git log --format="%at" --diff-filter=A $BASE_SHA..$HEAD_SHA -- "$code_file" | tail -1)
-                  
-                  # Obtenir la date de création du fichier de test dans cette PR
-                  TEST_DATE=$(git log --format="%at" --diff-filter=A $BASE_SHA..$HEAD_SHA -- "$test_file" | tail -1)
-                  
-                  # Si le code a été créé avant le test, c'est une violation
-                  if [ ! -z "$CODE_DATE" ] && [ ! -z "$TEST_DATE" ] && [ "$CODE_DATE" -lt "$TEST_DATE" ]; then
-                    VIOLATIONS="${VIOLATIONS}\\n❌ NOUVEAU code créé avant le test: $code_file"
-                    VIOLATIONS="${VIOLATIONS}\\n   ℹ️  Pour les nouveaux fichiers, le test DOIT être créé avant ou en même temps que le code"
-                  fi
-                else
-                  VIOLATIONS="${VIOLATIONS}\\n❌ NOUVEAU fichier sans test: $code_file"
-                fi
+                VIOLATIONS="${VIOLATIONS}\\n❌ Aucun test trouvé pour: $code_file"
               fi
             done
             
             if [ ! -z "$VIOLATIONS" ]; then
-              echo "::error::Violations du principe TDD détectées!"
+              echo "::error::Violations du principe test-first détectées!"
               echo -e "VIOLATIONS:$VIOLATIONS"
-              echo ""
-              echo "📋 RÈGLES TDD PRAGMATIQUES:"
-              echo "  - Pour les NOUVEAUX fichiers : Le test DOIT être créé AVANT le code"
-              echo "  - Pour les fichiers EXISTANTS : Ils doivent avoir des tests (peu importe l'ordre)"
-              echo "  - Cette approche permet de travailler sur le code legacy tout en appliquant le TDD strict sur le nouveau code"
               exit 1
             fi
           fi
           
-          echo "✅ Principe TDD respecté (mode pragmatique)"
+          echo "✅ Principe test-first respecté"
       
       - name: Validate test content
         id: test-content
@@ -230,11 +199,7 @@ jobs:
       - name: Generate compliance report
         if: always()
         run: |
-          echo "## 📊 TDD Compliance Report (Mode Pragmatique)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### ℹ️ Mode Pragmatique Activé" >> $GITHUB_STEP_SUMMARY
-          echo "- **Nouveaux fichiers** : Test-first strict (test créé avant le code)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Fichiers existants** : Doivent avoir des tests (ordre non vérifié)" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 TDD Compliance Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [ "${{ steps.commented-tests.outcome }}" == "success" ]; then
@@ -256,7 +221,7 @@ jobs:
           fi
           
           if [ "${{ steps.git-history.outcome }}" == "success" ]; then
-            echo "✅ **Test-first (historique git)**: Respecté (mode pragmatique)" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Test-first (historique git)**: Respecté" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Test-first (historique git)**: Violations détectées" >> $GITHUB_STEP_SUMMARY
           fi
@@ -275,7 +240,7 @@ jobs:
           
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "⚠️ **Rappel**: Le TDD reste OBLIGATOIRE pour tout nouveau code." >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ **Rappel**: Le TDD est OBLIGATOIRE et NON-NÉGOCIABLE dans ce projet." >> $GITHUB_STEP_SUMMARY
 
   close-pr-on-violation:
     name: Close PR on TDD Violation
@@ -296,13 +261,11 @@ jobs:
             **Actions requises :**
             1. Créer une nouvelle branche
             2. Corriger TOUTES les violations TDD
-            3. S'assurer que tous les tests sont écrits AVANT le code (pour les nouveaux fichiers)
-            4. S'assurer que tous les fichiers modifiés ont des tests
-            5. Soumettre une nouvelle PR
+            3. S'assurer que tous les tests sont écrits AVANT le code
+            4. Soumettre une nouvelle PR
             
-            **Règles TDD (Mode Pragmatique) :**
-            - ✅ Pour les NOUVEAUX fichiers : Écrire les tests AVANT le code
-            - ✅ Pour les fichiers EXISTANTS : Ils doivent avoir des tests (peu importe l'ordre)
+            **Rappel des règles TDD :**
+            - ✅ Écrire les tests AVANT le code
             - ❌ Ne JAMAIS commenter ou désactiver des tests
             - ❌ Ne JAMAIS créer de fichiers "test_summary"
             - ✅ TOUS les tests doivent passer (100%)
@@ -310,7 +273,7 @@ jobs:
             
             📖 Consultez \`CLAUDE.md\` et \`GITHUB_BRANCH_PROTECTION.md\` pour les règles complètes.
             
-            **Le TDD reste obligatoire pour tout nouveau code.**`;
+            **Le TDD n'est pas négociable.**`;
             
             // Commenter la PR
             await github.rest.issues.createComment({
