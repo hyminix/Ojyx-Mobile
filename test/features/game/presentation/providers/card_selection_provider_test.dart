@@ -69,6 +69,50 @@ void main() {
         expect(state.secondSelection, isNull);
       });
 
+      test('should start peek selection correctly', () {
+        // Arrange
+        final notifier = container.read(cardSelectionProvider.notifier);
+
+        // Act
+        notifier.startPeekSelection(maxCards: 3);
+
+        // Assert
+        final state = container.read(cardSelectionProvider);
+        expect(state.isSelecting, isTrue);
+        expect(state.selectionType, equals(CardSelectionType.peek));
+        expect(state.maxSelections, equals(3));
+        expect(state.selections.isEmpty, isTrue);
+      });
+
+      test('should start single card selection correctly', () {
+        // Arrange
+        final notifier = container.read(cardSelectionProvider.notifier);
+
+        // Act
+        notifier.startSingleSelection(CardSelectionType.bomb);
+
+        // Assert
+        final state = container.read(cardSelectionProvider);
+        expect(state.isSelecting, isTrue);
+        expect(state.selectionType, equals(CardSelectionType.bomb));
+        expect(state.maxSelections, equals(1));
+        expect(state.selections.isEmpty, isTrue);
+      });
+
+      test('should start opponent selection correctly', () {
+        // Arrange
+        final notifier = container.read(cardSelectionProvider.notifier);
+
+        // Act
+        notifier.startOpponentSelection();
+
+        // Assert
+        final state = container.read(cardSelectionProvider);
+        expect(state.isSelecting, isTrue);
+        expect(state.selectionType, equals(CardSelectionType.selectOpponent));
+        expect(state.selectedOpponentId, isNull);
+      });
+
       test('should reset previous selections when starting new selection', () {
         // Arrange
         final notifier = container.read(cardSelectionProvider.notifier);
@@ -104,6 +148,55 @@ void main() {
         expect(state.firstSelection?.row, equals(0));
         expect(state.firstSelection?.col, equals(1));
         expect(state.secondSelection, isNull);
+      });
+
+      test('should handle multiple card selection for peek', () {
+        // Arrange
+        final notifier = container.read(cardSelectionProvider.notifier);
+        notifier.startPeekSelection(maxCards: 3);
+
+        // Act
+        notifier.selectCard(0, 0);
+        notifier.selectCard(0, 1);
+        notifier.selectCard(0, 2);
+
+        // Assert
+        final state = container.read(cardSelectionProvider);
+        expect(state.selections.length, equals(3));
+        expect(state.isSelectionComplete, isTrue);
+        expect(state.canCompleteSelection, isTrue);
+      });
+
+      test('should not exceed max selections for peek', () {
+        // Arrange
+        final notifier = container.read(cardSelectionProvider.notifier);
+        notifier.startPeekSelection(maxCards: 2);
+
+        // Act
+        notifier.selectCard(0, 0);
+        notifier.selectCard(0, 1);
+        notifier.selectCard(0, 2); // This should replace the first
+
+        // Assert
+        final state = container.read(cardSelectionProvider);
+        expect(state.selections.length, equals(2));
+        expect(state.selections.any((s) => s.row == 0 && s.col == 0), isFalse);
+        expect(state.selections.any((s) => s.row == 0 && s.col == 1), isTrue);
+        expect(state.selections.any((s) => s.row == 0 && s.col == 2), isTrue);
+      });
+
+      test('should toggle selection for multi-select modes', () {
+        // Arrange
+        final notifier = container.read(cardSelectionProvider.notifier);
+        notifier.startPeekSelection(maxCards: 3);
+
+        // Act
+        notifier.selectCard(0, 0);
+        notifier.selectCard(0, 0); // Toggle off
+
+        // Assert
+        final state = container.read(cardSelectionProvider);
+        expect(state.selections.isEmpty, isTrue);
       });
 
       test('should select second card correctly', () {
@@ -268,6 +361,40 @@ void main() {
       });
     });
 
+    group('Opponent Selection', () {
+      test('should select opponent correctly', () {
+        // Arrange
+        final notifier = container.read(cardSelectionProvider.notifier);
+        notifier.startOpponentSelection();
+
+        // Act
+        notifier.selectOpponent('player-2');
+
+        // Assert
+        final state = container.read(cardSelectionProvider);
+        expect(state.selectedOpponentId, equals('player-2'));
+        expect(state.canCompleteSelection, isTrue);
+      });
+
+      test('should handle two-phase selection (opponent then card)', () {
+        // Arrange
+        final notifier = container.read(cardSelectionProvider.notifier);
+        notifier.startStealSelection(); // Requires opponent + card
+
+        // Act - Phase 1: Select opponent
+        notifier.selectOpponent('player-2');
+        var state = container.read(cardSelectionProvider);
+        expect(state.selectedOpponentId, equals('player-2'));
+        expect(state.canCompleteSelection, isFalse); // Need card too
+
+        // Act - Phase 2: Select card
+        notifier.selectCard(1, 2);
+        state = container.read(cardSelectionProvider);
+        expect(state.hasFirstSelection, isTrue);
+        expect(state.canCompleteSelection, isTrue);
+      });
+    });
+
     group('Complete Selection', () {
       test('should complete selection and return target data', () {
         // Arrange
@@ -291,6 +418,42 @@ void main() {
         expect(state.isSelecting, isFalse);
         expect(state.firstSelection, isNull);
         expect(state.secondSelection, isNull);
+      });
+
+      test('should complete multi-selection and return all positions', () {
+        // Arrange
+        final notifier = container.read(cardSelectionProvider.notifier);
+        notifier.startPeekSelection(maxCards: 3);
+        notifier.selectCard(0, 0);
+        notifier.selectCard(1, 1);
+        notifier.selectCard(2, 2);
+
+        // Act
+        final targetData = notifier.completeSelection();
+
+        // Assert
+        expect(targetData, isNotNull);
+        expect(targetData!['positions'], isA<List>());
+        expect(targetData['positions'].length, equals(3));
+        expect(targetData['positions'][0]['row'], equals(0));
+        expect(targetData['positions'][0]['col'], equals(0));
+      });
+
+      test('should complete steal selection with opponent and card', () {
+        // Arrange
+        final notifier = container.read(cardSelectionProvider.notifier);
+        notifier.startStealSelection();
+        notifier.selectOpponent('player-2');
+        notifier.selectCard(1, 2);
+
+        // Act
+        final targetData = notifier.completeSelection();
+
+        // Assert
+        expect(targetData, isNotNull);
+        expect(targetData!['opponentId'], equals('player-2'));
+        expect(targetData['position']['row'], equals(1));
+        expect(targetData['position']['col'], equals(2));
       });
 
       test('should return null if selection is incomplete', () {
