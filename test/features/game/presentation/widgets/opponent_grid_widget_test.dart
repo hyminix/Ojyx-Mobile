@@ -46,8 +46,30 @@ void main() {
       // Assert
       expect(find.text('Joueur test-p'), findsOneWidget); // Truncated player ID
       expect(find.text('15 pts'), findsOneWidget); // Score
-      expect(find.text('4'), findsOneWidget); // Revealed count
-      expect(find.text('1'), findsOneWidget); // Identical columns
+      
+      // Find revealed count in the stats section specifically
+      final revealedCountFinder = find.descendant(
+        of: find.byWidgetPredicate((widget) =>
+          widget is Container && 
+          widget.decoration is BoxDecoration &&
+          (widget.decoration as BoxDecoration).borderRadius == 
+            const BorderRadius.vertical(bottom: Radius.circular(12))
+        ),
+        matching: find.text('4'),
+      );
+      expect(revealedCountFinder, findsOneWidget);
+      
+      // Find identical columns count in the stats section
+      final columnsCountFinder = find.descendant(
+        of: find.byWidgetPredicate((widget) =>
+          widget is Container && 
+          widget.decoration is BoxDecoration &&
+          (widget.decoration as BoxDecoration).borderRadius == 
+            const BorderRadius.vertical(bottom: Radius.circular(12))
+        ),
+        matching: find.text('1'),
+      );
+      expect(columnsCountFinder, findsOneWidget);
     });
 
     testWidgets(
@@ -68,9 +90,9 @@ void main() {
         // Assert
         expect(find.text('En train de jouer'), findsOneWidget);
 
-        // Check border styling
+        // Check border styling - find the main AnimatedContainer (first one)
         final container = tester.widget<AnimatedContainer>(
-          find.byType(AnimatedContainer),
+          find.byType(AnimatedContainer).first,
         );
         final decoration = container.decoration as BoxDecoration;
         expect(decoration.border?.top.width, equals(3));
@@ -112,10 +134,12 @@ void main() {
 
       // Assert
       // First 4 cards are revealed with values 1-4
-      expect(find.text('1'), findsOneWidget);
-      expect(find.text('2'), findsOneWidget);
-      expect(find.text('3'), findsOneWidget);
-      expect(find.text('4'), findsOneWidget);
+      // Find card values within the mini grid (not in stats)
+      final gridFinder = find.byType(AspectRatio);
+      expect(find.descendant(of: gridFinder, matching: find.text('1')), findsOneWidget);
+      expect(find.descendant(of: gridFinder, matching: find.text('2')), findsOneWidget);
+      expect(find.descendant(of: gridFinder, matching: find.text('3')), findsOneWidget);
+      expect(find.descendant(of: gridFinder, matching: find.text('4')), findsOneWidget);
     });
 
     testWidgets('should handle tap when onTap is provided', (tester) async {
@@ -214,7 +238,18 @@ void main() {
 
       // Assert
       expect(find.text('0 pts'), findsOneWidget);
-      expect(find.text('0'), findsNWidgets(2)); // Revealed count and columns
+      
+      // Find the two '0' texts in the stats section
+      final zeroTextsInStats = find.descendant(
+        of: find.byWidgetPredicate((widget) =>
+          widget is Container && 
+          widget.decoration is BoxDecoration &&
+          (widget.decoration as BoxDecoration).borderRadius == 
+            const BorderRadius.vertical(bottom: Radius.circular(12))
+        ),
+        matching: find.text('0'),
+      );
+      expect(zeroTextsInStats, findsNWidgets(2)); // Revealed count and columns
     });
 
     testWidgets('should apply correct color for different card colors', (
@@ -245,10 +280,12 @@ void main() {
 
       // Assert
       // All revealed cards should be displayed
-      expect(find.text('1'), findsOneWidget);
-      expect(find.text('2'), findsOneWidget);
-      expect(find.text('3'), findsOneWidget);
-      expect(find.text('4'), findsOneWidget);
+      // Find card values within the mini grid (not in stats)
+      final gridFinder = find.byType(AspectRatio);
+      expect(find.descendant(of: gridFinder, matching: find.text('1')), findsOneWidget);
+      expect(find.descendant(of: gridFinder, matching: find.text('2')), findsOneWidget);
+      expect(find.descendant(of: gridFinder, matching: find.text('3')), findsOneWidget);
+      expect(find.descendant(of: gridFinder, matching: find.text('4')), findsOneWidget);
     });
 
     testWidgets('should animate container when properties change', (
@@ -278,14 +315,14 @@ void main() {
         ),
       );
 
-      // Assert - AnimatedContainer should exist
-      expect(find.byType(AnimatedContainer), findsOneWidget);
+      // Assert - AnimatedContainer should exist (the main container)
+      expect(find.byType(AnimatedContainer).first, findsOneWidget);
 
       // Pump to trigger animation
       await tester.pump(const Duration(milliseconds: 150));
 
       // Animation should be in progress
-      expect(find.byType(AnimatedContainer), findsOneWidget);
+      expect(find.byType(AnimatedContainer).first, findsOneWidget);
     });
   });
 }

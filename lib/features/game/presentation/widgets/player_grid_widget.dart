@@ -25,8 +25,10 @@ class PlayerGridWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final cardWidth =
-            (constraints.maxWidth - 32) / 4; // 4 colonnes + marges
+        // Calculate card dimensions with a slightly smaller size to prevent overflow
+        final totalPadding = 32 + (4 * 8); // Container padding + card paddings
+        final availableWidth = constraints.maxWidth - totalPadding - 8; // Extra margin for safety
+        final cardWidth = availableWidth / 4;
         final cardHeight = cardWidth / 0.7; // Ratio carte
 
         return Container(
@@ -45,9 +47,10 @@ class PlayerGridWidget extends StatelessWidget {
               width: isCurrentPlayer ? 2 : 1,
             ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+          child: IntrinsicHeight(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
               if (isCurrentPlayer)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
@@ -79,30 +82,30 @@ class PlayerGridWidget extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(4, (col) {
-                        final card = grid.getCard(row, col);
-                        final position = (row, col);
-                        final isHighlighted = highlightedPositions.contains(
-                          position,
-                        );
-                        final isSelected = selectedPositions.contains(position);
+                          final card = grid.getCard(row, col);
+                          final position = (row, col);
+                          final isHighlighted = highlightedPositions.contains(
+                            position,
+                          );
+                          final isSelected = selectedPositions.contains(position);
 
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: SizedBox(
-                            width: cardWidth,
-                            height: cardHeight,
-                            child: CardWidget(
-                              card: card,
-                              isPlaceholder: card == null && canInteract,
-                              isHighlighted: isHighlighted,
-                              isSelected: isSelected,
-                              onTap: canInteract && onCardTap != null
-                                  ? () => onCardTap!(row, col)
-                                  : null,
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: SizedBox(
+                              width: cardWidth,
+                              height: cardHeight,
+                              child: CardWidget(
+                                card: card,
+                                isPlaceholder: card == null && canInteract,
+                                isHighlighted: isHighlighted,
+                                isSelected: isSelected,
+                                onTap: canInteract && onCardTap != null
+                                    ? () => onCardTap!(row, col)
+                                    : null,
+                              ),
                             ),
-                          ),
-                        );
-                      }),
+                          );
+                        }),
                     ),
                   );
                 }),
@@ -113,6 +116,7 @@ class PlayerGridWidget extends StatelessWidget {
                   child: _buildGridStats(context),
                 ),
             ],
+          ),
           ),
         );
       },

@@ -183,18 +183,17 @@ void main() {
   });
 
   group('currentRoomProvider', () {
-    test('should watch room stream', () {
+    test('should watch room stream', () async {
       // Arrange
       const roomId = 'room123';
-      final roomStream = Stream<Room>.value(
-        const Room(
-          id: roomId,
-          creatorId: 'creator123',
-          playerIds: ['creator123'],
-          status: RoomStatus.waiting,
-          maxPlayers: 4,
-        ),
+      final expectedRoom = const Room(
+        id: roomId,
+        creatorId: 'creator123',
+        playerIds: ['creator123'],
+        status: RoomStatus.waiting,
+        maxPlayers: 4,
       );
+      final roomStream = Stream<Room>.value(expectedRoom);
 
       when(
         () => mockRoomRepository.watchRoom(roomId),
@@ -207,37 +206,36 @@ void main() {
       );
 
       // Act
-      final stream = container.read(currentRoomProvider(roomId));
+      final asyncValue = await container.read(currentRoomProvider(roomId).future);
 
       // Assert
-      expect(stream, isA<Stream<Room>>());
-      expectLater(stream, emits(predicate<Room>((room) => room.id == roomId)));
+      expect(asyncValue, equals(expectedRoom));
+      expect(asyncValue.id, equals(roomId));
     });
 
-    test('should handle different room IDs', () {
+    test('should handle different room IDs', () async {
       // Arrange
       const roomId1 = 'room123';
       const roomId2 = 'room456';
 
-      final roomStream1 = Stream<Room>.value(
-        const Room(
-          id: roomId1,
-          creatorId: 'creator1',
-          playerIds: ['creator1'],
-          status: RoomStatus.waiting,
-          maxPlayers: 4,
-        ),
+      final expectedRoom1 = const Room(
+        id: roomId1,
+        creatorId: 'creator1',
+        playerIds: ['creator1'],
+        status: RoomStatus.waiting,
+        maxPlayers: 4,
       );
 
-      final roomStream2 = Stream<Room>.value(
-        const Room(
-          id: roomId2,
-          creatorId: 'creator2',
-          playerIds: ['creator2'],
-          status: RoomStatus.inGame,
-          maxPlayers: 6,
-        ),
+      final expectedRoom2 = const Room(
+        id: roomId2,
+        creatorId: 'creator2',
+        playerIds: ['creator2'],
+        status: RoomStatus.inGame,
+        maxPlayers: 6,
       );
+
+      final roomStream1 = Stream<Room>.value(expectedRoom1);
+      final roomStream2 = Stream<Room>.value(expectedRoom2);
 
       when(
         () => mockRoomRepository.watchRoom(roomId1),
@@ -253,21 +251,22 @@ void main() {
       );
 
       // Act
-      final stream1 = container.read(currentRoomProvider(roomId1));
-      final stream2 = container.read(currentRoomProvider(roomId2));
+      final room1 = await container.read(currentRoomProvider(roomId1).future);
+      final room2 = await container.read(currentRoomProvider(roomId2).future);
 
       // Assert
-      expect(stream1, isNot(equals(stream2)));
+      expect(room1.id, equals(roomId1));
+      expect(room2.id, equals(roomId2));
+      expect(room1, isNot(equals(room2)));
     });
   });
 
   group('roomEventsProvider', () {
-    test('should watch room events stream', () {
+    test('should watch room events stream', () async {
       // Arrange
       const roomId = 'room123';
-      final eventStream = Stream<RoomEvent>.value(
-        RoomEvent.playerJoined(playerId: 'player456', playerName: 'Player 456'),
-      );
+      final expectedEvent = RoomEvent.playerJoined(playerId: 'player456', playerName: 'Player 456');
+      final eventStream = Stream<RoomEvent>.value(expectedEvent);
 
       when(
         () => mockRoomRepository.watchRoomEvents(roomId),
@@ -280,18 +279,13 @@ void main() {
       );
 
       // Act
-      final stream = container.read(roomEventsProvider(roomId));
+      final event = await container.read(roomEventsProvider(roomId).future);
 
       // Assert
-      expect(stream, isA<Stream<RoomEvent>>());
-      expectLater(
-        stream,
-        emits(
-          predicate<RoomEvent>(
-            (event) => event is PlayerJoined && event.playerId == 'player456',
-          ),
-        ),
-      );
+      expect(event, equals(expectedEvent));
+      expect(event, isA<PlayerJoined>());
+      final playerJoinedEvent = event as PlayerJoined;
+      expect(playerJoinedEvent.playerId, equals('player456'));
     });
   });
 

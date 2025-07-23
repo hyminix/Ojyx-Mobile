@@ -142,46 +142,48 @@ class OpponentsGridViewWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(
-            'Adversaires (${opponents.length})',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 0.9,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              'Adversaires (${opponents.length})',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
-            itemCount: opponents.length,
-            itemBuilder: (context, index) {
-              final opponent = opponents[index];
-              final playerState = _playerToPlayerState(opponent);
-              final isCurrentTurn = gameState.currentPlayer.id == opponent.id;
-
-              return OpponentGridWidget(
-                playerState: playerState,
-                isCurrentPlayer: isCurrentTurn,
-                onTap: onPlayerTap != null
-                    ? () => onPlayerTap!(opponent.id)
-                    : null,
-              );
-            },
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.9,
+              ),
+              itemCount: opponents.length,
+              itemBuilder: (context, index) {
+                final opponent = opponents[index];
+                final playerState = _playerToPlayerState(opponent);
+                final isCurrentTurn = gameState.currentPlayer.id == opponent.id;
+
+                return OpponentGridWidget(
+                  playerState: playerState,
+                  isCurrentPlayer: isCurrentTurn,
+                  onTap: onPlayerTap != null
+                      ? () => onPlayerTap!(opponent.id)
+                      : null,
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

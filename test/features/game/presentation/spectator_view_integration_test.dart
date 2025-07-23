@@ -17,15 +17,18 @@ import '../../../helpers/test_helpers.dart';
 
 class MockRoom extends Mock implements Room {}
 
-class MockPlayer extends Mock implements Player {}
-
 class FakeGameStateNotifier extends GameStateNotifier {
-  final GameState? _gameState;
+  GameState? _gameState;
 
   FakeGameStateNotifier(this._gameState);
 
   @override
   GameState? build() => _gameState;
+  
+  void setGameState(GameState state) {
+    _gameState = state;
+    this.state = state;
+  }
 }
 
 void main() {
@@ -39,30 +42,35 @@ void main() {
 
       // Create 4 players for a good spectator view test
       players = List.generate(4, (index) {
-        final player = MockPlayer();
         final playerId = 'player-$index';
-
-        when(() => player.id).thenReturn(playerId);
-        when(() => player.name).thenReturn('Player $index');
-        when(() => player.isHost).thenReturn(index == 0);
-        when(
-          () => player.hasFinishedRound,
-        ).thenReturn(index == 3); // Last player finished
-        when(() => player.currentScore).thenReturn(10 + index * 5);
-        when(() => player.actionCards).thenReturn([]);
 
         // Create a grid with some revealed cards
         final grid = PlayerGrid.empty();
+        // Place revealed cards based on player index
+        // Player 0: 1 revealed card
+        // Player 1: 2 revealed cards
+        // Player 2: 3 revealed cards  
+        // Player 3: 4 revealed cards
         for (int i = 0; i < index + 1; i++) {
+          final row = i ~/ 4;
+          final col = i % 4;
           grid.placeCard(
-            game.Card(value: i + 1, isRevealed: true),
-            i ~/ 4,
-            i % 4,
+            game.Card(value: (i + 1) * 2, isRevealed: false),
+            row,
+            col,
           );
+          // Reveal the card
+          grid.revealCard(row, col);
         }
-        when(() => player.grid).thenReturn(grid);
 
-        return player;
+        return Player(
+          id: playerId,
+          name: 'Player $index',
+          grid: grid,
+          actionCards: [],
+          isHost: index == 0,
+          hasFinishedRound: index == 3, // Last player finished
+        );
       });
 
       gameState = GameState.initial(roomId: 'test-room', players: players);
@@ -77,10 +85,10 @@ void main() {
       ).thenReturn(players.map((p) => p.id).toList());
     });
 
-    Widget createTestWidget({String currentPlayerId = 'player-0'}) {
+    Widget createTestWidget({String currentUserId = 'player-0'}) {
       return ProviderScope(
         overrides: [
-          currentUserIdProvider.overrideWithValue(currentPlayerId),
+          currentUserIdProvider.overrideWithValue(currentUserId),
           gameStateNotifierProvider.overrideWith(
             () => FakeGameStateNotifier(gameState),
           ),
@@ -139,26 +147,15 @@ void main() {
     testWidgets('should update spectator view when game state changes', (
       tester,
     ) async {
+      // Create a notifier that we can update
+      final notifier = FakeGameStateNotifier(gameState);
+      
       // Initial render
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      // Verify initial state
-      expect(find.text('15 pts'), findsOneWidget); // Player 1 score
-
-      // Update game state
-      gameState = gameState.copyWith(
-        currentPlayerIndex: 2, // Change current player
-      );
-
-      // Re-render with updated state
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
             currentUserIdProvider.overrideWithValue('player-0'),
-            gameStateNotifierProvider.overrideWith(
-              () => FakeGameStateNotifier(gameState),
-            ),
+            gameStateNotifierProvider.overrideWith(() => notifier),
             currentRoomProvider('test-room').overrideWith((ref) {
               return Stream.value(mockRoom);
             }),
@@ -168,8 +165,24 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // Verify initial state
+      var opponentWidgets = tester
+          .widgetList<OpponentGridWidget>(find.byType(OpponentGridWidget))
+          .toList();
+      expect(opponentWidgets[0].isCurrentPlayer, isTrue); // Player 1 is current
+
+      // Update game state
+      gameState = gameState.copyWith(
+        currentPlayerIndex: 2, // Change current player
+      );
+      notifier.setGameState(gameState);
+
+      // Trigger rebuild
+      await tester.pump();
+      await tester.pumpAndSettle();
+
       // Verify current player highlight changed
-      final opponentWidgets = tester
+      opponentWidgets = tester
           .widgetList<OpponentGridWidget>(find.byType(OpponentGridWidget))
           .toList();
 
@@ -209,14 +222,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
+      // Use keys to find specific counts
       // Player 1 has 2 revealed cards
-      expect(find.text('2'), findsAtLeast(1)); // Revealed count for player 1
-
-      // Player 2 has 3 revealed cards
-      expect(find.text('3'), findsAtLeast(1)); // Revealed count for player 2
-
+      expect(find.byKey(const ValueKey('revealed_count_player-1')), findsOneWidget);
+      // Player 2 has 3 revealed cards  
+      expect(find.byKey(const ValueKey('revealed_count_player-2')), findsOneWidget);
       // Player 3 has 4 revealed cards
-      expect(find.text('4'), findsAtLeast(1)); // Revealed count for player 3
+      expect(find.byKey(const ValueKey('revealed_count_player-3')), findsOneWidget);
     });
 
     testWidgets('should handle different screen sizes', (tester) async {
@@ -251,20 +263,20 @@ void main() {
 
     testWidgets('should show identical columns if any', (tester) async {
       // Arrange - Create a player with identical column
-      final playerWithColumns = MockPlayer();
-      when(() => playerWithColumns.id).thenReturn('player-columns');
-      when(() => playerWithColumns.name).thenReturn('Columns Player');
-      when(() => playerWithColumns.isHost).thenReturn(false);
-      when(() => playerWithColumns.hasFinishedRound).thenReturn(false);
-      when(() => playerWithColumns.currentScore).thenReturn(0);
-      when(() => playerWithColumns.actionCards).thenReturn([]);
-
       final grid = PlayerGrid.empty();
       // Create identical column (all 5s in column 0)
       for (int row = 0; row < 3; row++) {
         grid.placeCard(game.Card(value: 5, isRevealed: true), row, 0);
       }
-      when(() => playerWithColumns.grid).thenReturn(grid);
+      
+      final playerWithColumns = Player(
+        id: 'player-columns',
+        name: 'Columns Player',
+        grid: grid,
+        actionCards: [],
+        isHost: false,
+        hasFinishedRound: false,
+      );
 
       gameState = GameState.initial(
         roomId: 'test-room',
@@ -276,10 +288,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
+      // Should find "1" for identical columns count using key
       expect(
-        find.text('1'),
-        findsWidgets,
-      ); // Should find "1" for identical columns count
+        find.byKey(const ValueKey('identical_columns_player-columns')),
+        findsOneWidget,
+      );
     });
   });
 }

@@ -61,8 +61,8 @@ void main() {
       final transaction = SentryConfig.startTransaction(name, operation);
 
       // Assert
-      // In test environment without Sentry init, this returns null
-      expect(transaction, isNull);
+      // In test environment without Sentry init, this returns NoOpSentrySpan
+      expect(transaction, isA<NoOpSentrySpan>());
     });
 
     test('should set user with data', () {

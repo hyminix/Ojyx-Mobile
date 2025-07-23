@@ -24,4 +24,7 @@ abstract class ActionCardLocalDataSource {
 
   /// Shuffle the action card pile
   void shuffleActionCards();
+
+  /// Initialize or reset the deck
+  void initializeDeck();
 }
