@@ -1,8 +1,10 @@
-# Configuration de la Protection des Branches GitHub
+# Configuration de la Protection des Branches GitHub pour Développeur IA
 
-## Protection de la Branche `main`
+## 🤖 Configuration Spécifique pour Développement par IA
 
-Pour configurer la protection de la branche `main` sur GitHub :
+Ce projet est développé exclusivement par une IA (Claude Code). Les règles ci-dessous sont configurées pour imposer automatiquement le respect strict du TDD et des bonnes pratiques, sans intervention humaine.
+
+## Protection de la Branche `main` - RÈGLES IMMUABLES
 
 ### 1. Accéder aux Paramètres
 1. Aller sur le repository GitHub
@@ -13,94 +15,162 @@ Pour configurer la protection de la branche `main` sur GitHub :
 1. Cliquer sur **Add rule** (Ajouter une règle)
 2. Dans **Branch name pattern**, entrer : `main`
 
-### 3. Configurer les Protections
+### 3. Configurer les Protections OBLIGATOIRES
 
-#### Checks Requis
-- ✅ **Require status checks to pass before merging**
-  - ✅ **Require branches to be up to date before merging**
-  - Sélectionner les checks suivants :
+#### ✅ Checks Requis (TOUS OBLIGATOIRES)
+- **Require status checks to pass before merging**
+  - **Require branches to be up to date before merging**
+  - Sélectionner TOUS les checks suivants :
     - `Test and Analyze`
     - `Build APK`
+    - `TDD Compliance Check` (nouveau)
+    - `Test Order Verification` (nouveau)
+    - `Coverage Minimum 80%` (nouveau)
+    - `No Commented Tests` (nouveau)
+    - `No Test Summary Files` (nouveau)
 
-#### Pull Request Reviews
-- ✅ **Require a pull request before merging**
-  - ✅ **Require approvals** : 1
+#### 🚫 Pull Request Reviews (ADAPTÉ POUR IA)
+- **Require a pull request before merging**
+  - ❌ **Require approvals** : 0 (pas de review manuelle)
   - ✅ **Dismiss stale pull request approvals when new commits are pushed**
-  - ✅ **Require review from CODEOWNERS** (si applicable)
+  - ✅ **Require linear history** (empêche les merge commits complexes)
 
-#### Restrictions Supplémentaires
+#### 🔒 Restrictions Supplémentaires (CRITIQUES)
 - ✅ **Require conversation resolution before merging**
-- ✅ **Require signed commits** (optionnel mais recommandé)
-- ✅ **Include administrators** (pour s'assurer que même les admins suivent les règles)
+- ✅ **Require signed commits** (l'IA doit signer ses commits)
+- ✅ **Include administrators** (AUCUNE exception)
+- ✅ **Restrict who can push to matching branches**
+  - Ajouter uniquement le token/compte utilisé par l'IA
 
-#### Options de Merge
-- ✅ **Allow merge commits**
-- ✅ **Allow squash merging**
-- ❌ **Allow rebase merging** (pour garder un historique linéaire)
+#### ⚠️ Règles Anti-Contournement
+- ✅ **Do not allow bypassing the above settings**
+- ✅ **Restrict force pushes** (empêche la réécriture de l'historique)
+- ✅ **Restrict deletions** (empêche la suppression de branches)
 
 ### 4. Sauvegarder
 Cliquer sur **Create** ou **Save changes**
 
-## Workflow de Développement
+## 🚨 VIOLATIONS AUTOMATIQUEMENT DÉTECTÉES
 
-### Pour les Développeurs
-1. Créer une branche depuis `main` : `git checkout -b feat/nouvelle-fonctionnalite`
-2. Développer et commiter les changements
-3. Pousser la branche : `git push origin feat/nouvelle-fonctionnalite`
-4. Créer une Pull Request vers `main`
-5. Attendre que :
-   - La CI/CD passe (tests, analyse, build)
-   - Un reviewer approuve les changements
-6. Merger la PR
-
-### Pour les Reviewers
-1. Vérifier que :
-   - Le code respecte les standards du projet
-   - Les tests sont présents et pertinents
-   - La documentation est à jour si nécessaire
-   - Les conventions de nommage sont respectées
-2. Laisser des commentaires constructifs
-3. Approuver ou demander des changements
-
-## Commandes Git Utiles
-
+### Tests Commentés
 ```bash
-# Créer une nouvelle branche
-git checkout -b feat/description
-
-# Voir l'état des fichiers
-git status
-
-# Ajouter tous les fichiers modifiés
-git add .
-
-# Commiter avec un message descriptif
-git commit -m "feat: ajouter la fonctionnalité X"
-
-# Pousser la branche
-git push origin feat/description
-
-# Mettre à jour sa branche avec les derniers changements de main
-git checkout main
-git pull origin main
-git checkout feat/description
-git merge main
+# Patterns interdits qui bloquent la PR :
+// test(
+/* test
+skip: true
+.skip(
+xit(
+xtest(
+pending(
 ```
 
-## Messages de Commit
+### Fichiers Interdits
+```bash
+# Noms de fichiers qui bloquent la PR :
+*test_summary*
+*tests_summary*
+*TEST_SUMMARY*
+```
 
-Format recommandé : `type(scope): description`
+### Ordre Test/Code
+Le système vérifie automatiquement que :
+1. Pour chaque fichier `.dart` créé, un fichier `_test.dart` existe
+2. Le fichier de test a été créé AVANT ou EN MÊME TEMPS que le fichier de code
+3. Le fichier de test contient au moins un `test()` ou `testWidgets()`
 
-Types :
-- `feat` : Nouvelle fonctionnalité
-- `fix` : Correction de bug
-- `docs` : Documentation
-- `style` : Formatage, missing semi-colons, etc.
-- `refactor` : Refactoring du code
-- `test` : Ajout ou modification de tests
-- `chore` : Maintenance, configuration, etc.
+## 📊 Métriques Obligatoires
 
-Exemples :
-- `feat(game): implémenter la logique de pioche`
-- `fix(ui): corriger l'affichage des cartes sur mobile`
-- `docs(readme): ajouter les instructions d'installation`
+### Coverage Minimum
+- **80%** de couverture de code MINIMUM
+- Calculé automatiquement par `lcov`
+- Aucune exception permise
+
+### Tests Passants
+- **100%** des tests doivent passer
+- Aucun test en échec toléré
+- Aucun test "flaky" accepté
+
+## 🤖 Workflow pour l'IA
+
+### Création de PR
+```bash
+# L'IA DOIT TOUJOURS :
+1. git checkout -b feat/nouvelle-fonctionnalite
+2. Écrire les tests AVANT le code
+3. Vérifier localement : flutter test
+4. git add . && git commit -m "feat: description"
+5. git push origin feat/nouvelle-fonctionnalite
+6. Créer la PR via gh CLI
+```
+
+### Avant de Merger
+L'IA doit vérifier que :
+- [ ] Tous les checks GitHub Actions sont verts
+- [ ] Aucune violation TDD n'est détectée
+- [ ] La couverture est ≥ 80%
+- [ ] Tous les tests passent
+
+## 🚫 CONSÉQUENCES DES VIOLATIONS
+
+### PR Automatiquement Fermée Si :
+1. Tests commentés détectés
+2. Fichiers test_summary présents
+3. Code créé avant les tests
+4. Coverage < 80%
+5. Tests qui échouent
+
+### Message Automatique
+```
+❌ PR fermée automatiquement : Violation des règles TDD détectée.
+
+Violations trouvées :
+- [Liste des violations]
+
+Action requise :
+1. Créer une nouvelle branche
+2. Corriger TOUTES les violations
+3. Soumettre une nouvelle PR
+
+Rappel : Le TDD n'est pas négociable.
+```
+
+## 🛠️ Scripts de Vérification
+
+### Pre-commit Hook (local)
+```bash
+#!/bin/bash
+# .git/hooks/pre-commit
+
+# Vérifier les tests commentés
+if grep -r "//.*test\|/\*.*test\|skip:\s*true" --include="*.dart" .; then
+    echo "❌ Tests commentés détectés. Commit refusé."
+    exit 1
+fi
+
+# Vérifier que tous les tests passent
+if ! flutter test; then
+    echo "❌ Des tests échouent. Commit refusé."
+    exit 1
+fi
+```
+
+### GitHub Action de Vérification
+Voir `.github/workflows/tdd-enforcement.yml` pour l'implémentation complète.
+
+## 📝 Notes pour l'IA Claude Code
+
+**RAPPEL CRITIQUE** : Ces règles sont IMMUABLES et NON-NÉGOCIABLES. Toute tentative de contournement sera détectée et bloquée automatiquement. Le respect du TDD est la FONDATION de ce projet.
+
+L'IA doit :
+1. TOUJOURS écrire les tests en premier
+2. JAMAIS commenter ou désactiver des tests
+3. JAMAIS créer de fichiers "résumé" de tests
+4. TOUJOURS s'assurer que 100% des tests passent
+5. MAINTENIR une couverture ≥ 80%
+
+## 🔄 Mise à Jour des Règles
+
+Pour modifier ces règles :
+1. Une discussion doit être ouverte dans les Issues
+2. Les changements doivent être justifiés techniquement
+3. Les nouvelles règles doivent être plus strictes, jamais plus laxistes

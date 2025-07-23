@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/game_state.dart';
+import '../../domain/use_cases/game_initialization_use_case.dart';
 
 part 'game_state_notifier.g.dart';
 
@@ -40,4 +41,9 @@ class GameStateNotifier extends _$GameStateNotifier {
   void endTurn() {
     // TODO: Implement end turn logic
   }
+}
+
+@riverpod
+GameInitializationUseCase gameInitializationUseCase(GameInitializationUseCaseRef ref) {
+  return GameInitializationUseCase();
 }

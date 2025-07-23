@@ -3,7 +3,7 @@ import 'dart:async';
 
 import '../../../game/domain/entities/game_state.dart';
 import '../../../game/domain/entities/card.dart';
-import '../../../game/presentation/providers/game_providers.dart';
+import '../../../game/presentation/providers/game_state_notifier.dart';
 import '../../domain/entities/room_event.dart';
 import '../../domain/use_cases/sync_game_state_use_case.dart';
 import 'room_providers.dart';
@@ -38,10 +38,10 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
           // Géré par le provider de room
         },
         gameStarted: (gameId, initialState) {
-          ref.read(gameStateNotifierProvider.notifier).state = initialState;
+          ref.read(gameStateNotifierProvider.notifier).loadState(initialState);
         },
         gameStateUpdated: (newState) {
-          ref.read(gameStateNotifierProvider.notifier).state = newState;
+          ref.read(gameStateNotifierProvider.notifier).loadState(newState);
         },
         playerAction: (playerId, actionType, actionData) {
           _handlePlayerAction(playerId, actionType, actionData);

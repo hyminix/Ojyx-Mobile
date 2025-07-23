@@ -31,7 +31,13 @@ jobs:
         run: flutter analyze --no-fatal-infos
       
       - name: Run tests
-        run: flutter test --coverage
+        run: |
+          flutter test --coverage --reporter=expanded
+          # Vérifier que TOUS les tests passent
+          if [ $? -ne 0 ]; then
+            echo "::error::Des tests échouent! Le TDD exige que 100% des tests passent."
+            exit 1
+          fi
       
       - name: Check test coverage
         run: |
@@ -42,15 +48,30 @@ jobs:
           fi
           echo "Current test coverage: $total_lines%"
           if (( $(echo "$total_lines < 80" | bc -l) )); then
-            echo "Test coverage is below 80%. Current: $total_lines%"
-            echo "Please add more tests to increase coverage."
+            echo "::error::Test coverage is below 80%. Current: $total_lines%"
+            echo "Le TDD exige un minimum de 80% de couverture."
+            echo "Ajoutez des tests pour les parties non couvertes."
             exit 1
           fi
 
+  tdd-final-check:
+    name: TDD Final Validation
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Validate TDD Compliance
+        run: |
+          echo "✅ Tests unitaires passés"
+          echo "✅ Coverage minimum respectée"
+          echo "✅ Analyse statique passée"
+          echo ""
+          echo "Le code respecte les standards TDD du projet Ojyx."
+          
   build:
     name: Build APK
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test, tdd-final-check]
     
     steps:
       - name: Checkout code

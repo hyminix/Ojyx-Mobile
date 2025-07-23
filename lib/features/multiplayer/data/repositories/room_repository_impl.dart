@@ -1,14 +1,14 @@
 import '../../domain/entities/room.dart';
 import '../../domain/entities/room_event.dart';
 import '../../domain/repositories/room_repository.dart';
-import '../datasources/supabase_room_datasource.dart';
-import '../models/room_model.dart';
-import '../../../game/data/models/game_state_model.dart';
+import '../../domain/datasources/room_datasource.dart';
+import '../../../game/domain/use_cases/game_initialization_use_case.dart';
 
 class RoomRepositoryImpl implements RoomRepository {
-  final SupabaseRoomDatasource _datasource;
+  final RoomDatasource _datasource;
+  final GameInitializationUseCase _gameInitializationUseCase;
   
-  RoomRepositoryImpl(this._datasource);
+  RoomRepositoryImpl(this._datasource, this._gameInitializationUseCase);
   
   @override
   Future<Room> createRoom({
@@ -19,7 +19,7 @@ class RoomRepositoryImpl implements RoomRepository {
       creatorId: creatorId,
       maxPlayers: maxPlayers,
     );
-    return model.toDomain();
+    return model;
   }
   
   @override
@@ -31,7 +31,7 @@ class RoomRepositoryImpl implements RoomRepository {
       roomId: roomId,
       playerId: playerId,
     );
-    return model?.toDomain();
+    return model;
   }
   
   @override
@@ -48,12 +48,12 @@ class RoomRepositoryImpl implements RoomRepository {
   @override
   Future<Room?> getRoom(String roomId) async {
     final model = await _datasource.getRoom(roomId);
-    return model?.toDomain();
+    return model;
   }
   
   @override
   Stream<Room> watchRoom(String roomId) {
-    return _datasource.watchRoom(roomId).map((model) => model.toDomain());
+    return _datasource.watchRoom(roomId);
   }
   
   @override
@@ -61,24 +61,21 @@ class RoomRepositoryImpl implements RoomRepository {
     required String roomId,
     required RoomEvent event,
   }) async {
-    final eventData = _mapEventToData(event);
     await _datasource.sendEvent(
       roomId: roomId,
-      eventData: eventData,
+      event: event,
     );
   }
   
   @override
   Stream<RoomEvent> watchRoomEvents(String roomId) {
-    return _datasource.watchRoomEvents(roomId)
-        .where((data) => data.isNotEmpty)
-        .map((data) => _mapDataToEvent(data));
+    return _datasource.watchRoomEvents(roomId);
   }
   
   @override
   Future<List<Room>> getAvailableRooms() async {
     final models = await _datasource.getAvailableRooms();
-    return models.map((model) => model.toDomain()).toList();
+    return models;
   }
   
   @override
@@ -86,11 +83,15 @@ class RoomRepositoryImpl implements RoomRepository {
     required String roomId,
     required String gameId,
   }) async {
-    await _datasource.updateRoomStatus(
-      roomId: roomId,
-      status: 'in_game',
-      gameId: gameId,
-    );
+    final room = await _datasource.getRoom(roomId);
+    if (room != null) {
+      await _datasource.updateRoom(
+        room.copyWith(
+          status: RoomStatus.inGame,
+          currentGameId: gameId,
+        ),
+      );
+    }
   }
   
   @override
@@ -98,101 +99,9 @@ class RoomRepositoryImpl implements RoomRepository {
     required String roomId,
     required RoomStatus status,
   }) async {
-    await _datasource.updateRoomStatus(
-      roomId: roomId,
-      status: _roomStatusToString(status),
-    );
-  }
-  
-  Map<String, dynamic> _mapEventToData(RoomEvent event) {
-    return event.when(
-      playerJoined: (playerId, playerName) => {
-        'type': 'player_joined',
-        'player_id': playerId,
-        'player_name': playerName,
-      },
-      playerLeft: (playerId) => {
-        'type': 'player_left',
-        'player_id': playerId,
-      },
-      gameStarted: (gameId, initialState) => {
-        'type': 'game_started',
-        'game_id': gameId,
-        'initial_state': GameStateModel.fromDomain(initialState).toJson(),
-      },
-      gameStateUpdated: (newState) => {
-        'type': 'game_state_updated',
-        'new_state': GameStateModel.fromDomain(newState).toJson(),
-      },
-      playerAction: (playerId, actionType, actionData) => {
-        'type': 'player_action',
-        'player_id': playerId,
-        'action_type': actionType.toString().split('.').last,
-        'action_data': actionData,
-      },
-    );
-  }
-  
-  RoomEvent _mapDataToEvent(Map<String, dynamic> data) {
-    final type = data['type'] as String;
-    
-    switch (type) {
-      case 'player_joined':
-        return RoomEvent.playerJoined(
-          playerId: data['player_id'],
-          playerName: data['player_name'],
-        );
-      case 'player_left':
-        return RoomEvent.playerLeft(
-          playerId: data['player_id'],
-        );
-      case 'game_started':
-        return RoomEvent.gameStarted(
-          gameId: data['game_id'],
-          initialState: GameStateModel.fromJson(data['initial_state']).toDomain(),
-        );
-      case 'game_state_updated':
-        return RoomEvent.gameStateUpdated(
-          newState: GameStateModel.fromJson(data['new_state']).toDomain(),
-        );
-      case 'player_action':
-        return RoomEvent.playerAction(
-          playerId: data['player_id'],
-          actionType: _parseActionType(data['action_type']),
-          actionData: data['action_data'],
-        );
-      default:
-        throw Exception('Unknown event type: $type');
-    }
-  }
-  
-  PlayerActionType _parseActionType(String type) {
-    switch (type) {
-      case 'drawCard':
-        return PlayerActionType.drawCard;
-      case 'discardCard':
-        return PlayerActionType.discardCard;
-      case 'revealCard':
-        return PlayerActionType.revealCard;
-      case 'playActionCard':
-        return PlayerActionType.playActionCard;
-      case 'endTurn':
-        return PlayerActionType.endTurn;
-      default:
-        throw Exception('Unknown action type: $type');
-    }
-  }
-
-  String _roomStatusToString(RoomStatus status) {
-    switch (status) {
-      case RoomStatus.waiting:
-        return 'waiting';
-      case RoomStatus.inGame:
-        return 'in_game';
-      case RoomStatus.finished:
-        return 'finished';
-      case RoomStatus.cancelled:
-        return 'cancelled';
+    final room = await _datasource.getRoom(roomId);
+    if (room != null) {
+      await _datasource.updateRoom(room.copyWith(status: status));
     }
   }
 }

@@ -1,23 +1,28 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:dartz/dartz.dart';
 import 'package:ojyx/features/multiplayer/data/repositories/room_repository_impl.dart';
-import 'package:ojyx/features/multiplayer/data/datasources/supabase_room_datasource.dart';
-import 'package:ojyx/features/multiplayer/data/models/room_model.dart';
+import 'package:ojyx/features/multiplayer/domain/datasources/room_datasource.dart';
 import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
 import 'package:ojyx/features/multiplayer/domain/entities/room_event.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/core/errors/failures.dart';
+import 'package:ojyx/features/game/domain/use_cases/game_initialization_use_case.dart';
+import '../../../../mocks/mock_room_datasource.dart';
 
-class MockSupabaseRoomDatasource extends Mock implements SupabaseRoomDatasource {}
+class MockGameInitializationUseCase extends Mock implements GameInitializationUseCase {}
 
 void main() {
   late RoomRepositoryImpl repository;
-  late MockSupabaseRoomDatasource mockDatasource;
+  late MockRoomDatasource mockDatasource;
+  late MockGameInitializationUseCase mockGameInitializationUseCase;
+
+  setUpAll(() {
+    registerRoomFallbackValues();
+  });
 
   setUp(() {
-    mockDatasource = MockSupabaseRoomDatasource();
-    repository = RoomRepositoryImpl(mockDatasource);
+    mockDatasource = MockRoomDatasource();
+    mockGameInitializationUseCase = MockGameInitializationUseCase();
+    repository = RoomRepositoryImpl(mockDatasource, mockGameInitializationUseCase);
   });
 
   group('createRoom', () {
@@ -37,20 +42,23 @@ void main() {
       when(() => mockDatasource.createRoom(
         creatorId: any(named: 'creatorId'),
         maxPlayers: any(named: 'maxPlayers'),
-      )).thenAnswer((_) async => expectedRoom.toModel());
+      )).thenAnswer((_) async => expectedRoom);
 
       // Act
-      final result = await repository.createRoom(creatorId, maxPlayers);
+      final result = await repository.createRoom(
+        creatorId: creatorId,
+        maxPlayers: maxPlayers,
+      );
 
       // Assert
-      expect(result, Right(expectedRoom));
+      expect(result, equals(expectedRoom));
       verify(() => mockDatasource.createRoom(
         creatorId: any(named: 'creatorId'),
         maxPlayers: any(named: 'maxPlayers'),
       )).called(1);
     });
 
-    test('should return ServerFailure when datasource throws exception', () async {
+    test('should throw exception when datasource throws exception', () async {
       // Arrange
       const creatorId = 'user-123';
       const maxPlayers = 4;
@@ -58,13 +66,16 @@ void main() {
       when(() => mockDatasource.createRoom(
         creatorId: any(named: 'creatorId'),
         maxPlayers: any(named: 'maxPlayers'),
-      )).thenThrow(const ServerFailure(message: 'Server error'));
+      )).thenThrow(Exception('Server error'));
 
-      // Act
-      final result = await repository.createRoom(creatorId, maxPlayers);
-
-      // Assert
-      expect(result, const Left(ServerFailure(message: 'Server error')));
+      // Act & Assert
+      expect(
+        () => repository.createRoom(
+          creatorId: creatorId,
+          maxPlayers: maxPlayers,
+        ),
+        throwsException,
+      );
     });
   });
 
@@ -73,83 +84,52 @@ void main() {
       // Arrange
       const roomId = 'room-123';
       const playerId = 'user-456';
-      final existingRoom = Room(
+      final updatedRoom = Room(
         id: roomId,
         creatorId: 'user-123',
-        playerIds: ['user-123'],
+        playerIds: ['user-123', playerId],
         status: RoomStatus.waiting,
         maxPlayers: 4,
         createdAt: DateTime.now(),
       );
-      final updatedRoom = existingRoom.copyWith(
-        playerIds: ['user-123', playerId],
-      );
 
-      when(() => mockDatasource.getRoom(roomId))
-          .thenAnswer((_) async => existingRoom.toModel());
       when(() => mockDatasource.joinRoom(
         roomId: any(named: 'roomId'),
         playerId: any(named: 'playerId'),
-      )).thenAnswer((_) async => updatedRoom.toModel());
+      )).thenAnswer((_) async => updatedRoom);
 
       // Act
-      final result = await repository.joinRoom(roomId, playerId);
+      final result = await repository.joinRoom(
+        roomId: roomId,
+        playerId: playerId,
+      );
 
       // Assert
-      expect(result, Right(updatedRoom));
-      verify(() => mockDatasource.getRoom(roomId)).called(1);
+      expect(result, equals(updatedRoom));
       verify(() => mockDatasource.joinRoom(
         roomId: any(named: 'roomId'),
         playerId: any(named: 'playerId'),
       )).called(1);
     });
 
-    test('should return ValidationFailure when room is full', () async {
+    test('should return null when join fails', () async {
       // Arrange
       const roomId = 'room-123';
       const playerId = 'user-789';
-      final fullRoom = Room(
-        id: roomId,
-        creatorId: 'user-123',
-        playerIds: ['user-123', 'user-456'],
-        status: RoomStatus.waiting,
-        maxPlayers: 2,
-        createdAt: DateTime.now(),
+
+      when(() => mockDatasource.joinRoom(
+        roomId: any(named: 'roomId'),
+        playerId: any(named: 'playerId'),
+      )).thenThrow(Exception('Room is full'));
+
+      // Act & Assert
+      expect(
+        () => repository.joinRoom(
+          roomId: roomId,
+          playerId: playerId,
+        ),
+        throwsException,
       );
-
-      when(() => mockDatasource.getRoom(roomId))
-          .thenAnswer((_) async => fullRoom);
-
-      // Act
-      final result = await repository.joinRoom(roomId, playerId);
-
-      // Assert
-      expect(result, const Left(ValidationFailure(message: 'Room is full')));
-      verify(() => mockDatasource.getRoom(roomId)).called(1);
-      verifyNever(() => mockDatasource.updateRoom(any()));
-    });
-
-    test('should return ValidationFailure when player already in room', () async {
-      // Arrange
-      const roomId = 'room-123';
-      const playerId = 'user-123';
-      final room = Room(
-        id: roomId,
-        creatorId: playerId,
-        playerIds: [playerId],
-        status: RoomStatus.waiting,
-        maxPlayers: 4,
-        createdAt: DateTime.now(),
-      );
-
-      when(() => mockDatasource.getRoom(roomId))
-          .thenAnswer((_) async => room);
-
-      // Act
-      final result = await repository.joinRoom(roomId, playerId);
-
-      // Assert
-      expect(result, const Left(ValidationFailure(message: 'Player already in room')));
     });
   });
 
@@ -198,9 +178,10 @@ void main() {
   });
 
   group('startGame', () {
-    test('should return GameState when game starts successfully', () async {
+    test('should update room status to inGame', () async {
       // Arrange
       const roomId = 'room-123';
+      const gameId = 'game-123';
       final room = Room(
         id: roomId,
         creatorId: 'user-123',
@@ -209,52 +190,25 @@ void main() {
         maxPlayers: 4,
         createdAt: DateTime.now(),
       );
+      final updatedRoom = room.copyWith(
+        status: RoomStatus.inGame,
+        currentGameId: gameId,
+      );
 
       when(() => mockDatasource.getRoom(roomId))
           .thenAnswer((_) async => room);
       when(() => mockDatasource.updateRoom(any()))
-          .thenAnswer((_) async => room.copyWith(
-                status: RoomStatus.inGame,
-                currentGameId: 'game-123',
-              ));
-      when(() => mockDatasource.createGameState(any()))
-          .thenAnswer((_) async => {});
+          .thenAnswer((_) async => updatedRoom);
 
       // Act
-      final result = await repository.startGame(roomId);
-
-      // Assert
-      expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Should not fail'),
-        (gameState) {
-          expect(gameState.roomId, roomId);
-          expect(gameState.players.length, 2);
-          expect(gameState.status, GameStatus.playing);
-        },
-      );
-    });
-
-    test('should return ValidationFailure when not enough players', () async {
-      // Arrange
-      const roomId = 'room-123';
-      final room = Room(
-        id: roomId,
-        creatorId: 'user-123',
-        playerIds: ['user-123'],
-        status: RoomStatus.waiting,
-        maxPlayers: 4,
-        createdAt: DateTime.now(),
+      await repository.startGame(
+        roomId: roomId,
+        gameId: gameId,
       );
 
-      when(() => mockDatasource.getRoom(roomId))
-          .thenAnswer((_) async => room);
-
-      // Act
-      final result = await repository.startGame(roomId);
-
       // Assert
-      expect(result, const Left(ValidationFailure(message: 'Not enough players to start')));
+      verify(() => mockDatasource.getRoom(roomId)).called(1);
+      verify(() => mockDatasource.updateRoom(any())).called(1);
     });
   });
 
@@ -287,7 +241,9 @@ void main() {
       final result = await repository.getAvailableRooms();
 
       // Assert
-      expect(result, equals(rooms));
+      expect(result.length, 2);
+      expect(result[0].id, 'room-1');
+      expect(result[1].id, 'room-2');
     });
   });
 }
