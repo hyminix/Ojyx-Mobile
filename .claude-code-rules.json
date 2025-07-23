@@ -1,0 +1,124 @@
+{
+  "project": "Ojyx",
+  "version": "1.0.0",
+  "description": "Règles strictes pour Claude Code - Développement TDD obligatoire",
+  
+  "critical_rules": {
+    "tdd_mandatory": {
+      "enabled": true,
+      "priority": "CRITICAL",
+      "description": "Test-Driven Development est OBLIGATOIRE et NON-NÉGOCIABLE",
+      "rules": [
+        "TOUJOURS écrire les tests AVANT le code de production",
+        "JAMAIS commenter ou désactiver des tests",
+        "JAMAIS créer de fichiers test_summary",
+        "100% des tests doivent passer avant de continuer",
+        "Coverage minimum de 80% obligatoire"
+      ]
+    }
+  },
+  
+  "workflow_enforcement": {
+    "before_writing_code": [
+      "Vérifier si un test existe déjà pour cette fonctionnalité",
+      "Créer le fichier de test avec le suffixe _test.dart",
+      "Écrire des tests qui échouent (RED phase)",
+      "Valider que les tests échouent pour la bonne raison"
+    ],
+    
+    "while_writing_code": [
+      "Implémenter le MINIMUM de code pour faire passer les tests",
+      "Ne pas ajouter de fonctionnalités non testées",
+      "Exécuter les tests après chaque modification",
+      "Si un test échoue, corriger immédiatement"
+    ],
+    
+    "after_writing_code": [
+      "Vérifier que TOUS les tests passent",
+      "Vérifier la couverture de code (minimum 80%)",
+      "Refactorer si nécessaire en gardant les tests verts",
+      "Exécuter 'flutter analyze' et corriger les warnings"
+    ]
+  },
+  
+  "prohibited_patterns": {
+    "commented_tests": [
+      "//.*test\\(",
+      "/\\*.*test",
+      "skip:\\s*true",
+      "\\.skip\\(",
+      "xit\\(",
+      "xtest\\(",
+      "pending\\("
+    ],
+    
+    "forbidden_files": [
+      "*test_summary*",
+      "*tests_summary*",
+      "*TEST_SUMMARY*"
+    ],
+    
+    "bad_practices": [
+      "TODO.*test",
+      "FIXME.*test",
+      "HACK.*test",
+      "ignore:.*test"
+    ]
+  },
+  
+  "automated_checks": {
+    "pre_commit": {
+      "enabled": true,
+      "script": ".githooks/pre-commit",
+      "actions": [
+        "Vérifier les tests commentés",
+        "Vérifier la présence de tests pour chaque fichier",
+        "Exécuter tous les tests",
+        "Vérifier la couverture minimale"
+      ]
+    },
+    
+    "ci_cd": {
+      "enabled": true,
+      "workflows": [
+        "tdd-enforcement.yml",
+        "ci.yml"
+      ],
+      "auto_close_pr_on_violation": true
+    }
+  },
+  
+  "reminders": {
+    "on_new_file": "📝 Rappel: Créez d'abord le fichier de test avant d'implémenter cette fonctionnalité!",
+    "on_test_failure": "❌ Un test échoue! Corrigez-le immédiatement avant de continuer.",
+    "on_low_coverage": "📊 Coverage insuffisante! Ajoutez des tests pour atteindre 80% minimum.",
+    "on_commented_test": "🚫 INTERDIT: Ne commentez JAMAIS les tests! Corrigez-les ou supprimez-les.",
+    "on_test_summary": "🚫 INTERDIT: Les fichiers test_summary ne sont pas de vrais tests!"
+  },
+  
+  "ai_behavior_rules": {
+    "priority_order": [
+      "1. Respect du TDD avant tout",
+      "2. Qualité du code",
+      "3. Performance",
+      "4. Fonctionnalités"
+    ],
+    
+    "when_blocked": {
+      "by_failing_test": "Corriger le test ou l'implémentation, JAMAIS commenter le test",
+      "by_coverage": "Ajouter plus de tests, pas réduire le seuil",
+      "by_complexity": "Refactorer en gardant les tests verts",
+      "by_time": "Mieux vaut un code de qualité en retard qu'un code sans tests"
+    }
+  },
+  
+  "reporting": {
+    "tdd_violations": {
+      "log_location": ".claude-code-violations.log",
+      "track_patterns": true,
+      "alert_on_repeated_violations": true
+    }
+  },
+  
+  "final_reminder": "Le TDD n'est pas une option, c'est LA méthode de développement de ce projet. Toute déviation sera automatiquement détectée et bloquée."
+}
