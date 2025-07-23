@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,11 @@ void main() {
     mockJoinRoomUseCase = MockJoinRoomUseCase();
   });
 
+  void setLargeScreenSize(WidgetTester tester) {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1.0;
+  }
+
   Widget createWidgetUnderTest({
     List<Room>? rooms,
     Object? error,
@@ -30,7 +36,7 @@ void main() {
         currentUserIdProvider.overrideWithValue(userId),
         availableRoomsProvider.overrideWith((ref) async {
           if (isLoading) {
-            await Future.delayed(const Duration(hours: 1));
+            await Completer<Never>().future;
             return [];
           } else if (error != null) {
             throw error;
@@ -82,6 +88,8 @@ void main() {
 
   group('JoinRoomScreen', () {
     testWidgets('should display app bar', (WidgetTester tester) async {
+      setLargeScreenSize(tester);
+      
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
 
@@ -93,6 +101,8 @@ void main() {
     testWidgets('should show loading indicator when loading', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Act
       await tester.pumpWidget(createWidgetUnderTest(isLoading: true));
 
@@ -103,6 +113,8 @@ void main() {
     testWidgets('should show empty state when no rooms available', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Act
       await tester.pumpWidget(createWidgetUnderTest(rooms: []));
 
@@ -135,6 +147,8 @@ void main() {
     testWidgets('should show error state when loading fails', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       const errorMessage = 'Network error';
 
@@ -153,6 +167,8 @@ void main() {
     testWidgets('should display list of available rooms', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       final rooms = [
         createTestRoom(id: 'room1', playerIds: ['creator1']),
@@ -176,6 +192,8 @@ void main() {
     testWidgets('should show room details correctly', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       final room = createTestRoom(
         id: 'room123456789',
@@ -199,6 +217,8 @@ void main() {
     testWidgets('should show join button for available rooms', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       final room = createTestRoom(playerIds: ['creator1'], maxPlayers: 4);
 
@@ -214,6 +234,8 @@ void main() {
     testWidgets('should show full status for full rooms', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       final room = createTestRoom(
         playerIds: ['creator1', 'player2', 'player3', 'player4'],
@@ -235,6 +257,8 @@ void main() {
     });
 
     testWidgets('should join room successfully', (WidgetTester tester) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       const userId = 'user123';
       const roomId = 'room123';
@@ -274,6 +298,8 @@ void main() {
     testWidgets('should show loading state during join', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       const userId = 'user123';
       const roomId = 'room123';
@@ -314,6 +340,8 @@ void main() {
     testWidgets('should show error when user not logged in', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       final room = createTestRoom(playerIds: ['creator1'], maxPlayers: 4);
 
@@ -337,6 +365,8 @@ void main() {
     testWidgets('should show error when join fails', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       const userId = 'user123';
       const roomId = 'room123';
@@ -368,6 +398,8 @@ void main() {
     testWidgets('should handle null result from join room', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       const userId = 'user123';
       const roomId = 'room123';
@@ -401,6 +433,8 @@ void main() {
     testWidgets('should display time formatting correctly', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange - Test various time formats
       final rooms = [
         createTestRoom(
@@ -432,6 +466,8 @@ void main() {
     });
 
     testWidgets('should handle null created time', (WidgetTester tester) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       final room = createTestRoom(createdAt: null);
 
@@ -443,6 +479,8 @@ void main() {
     });
 
     testWidgets('should support pull to refresh', (WidgetTester tester) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       final rooms = [createTestRoom()];
 
@@ -458,6 +496,8 @@ void main() {
     });
 
     testWidgets('should apply correct styling', (WidgetTester tester) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       final room = createTestRoom();
 

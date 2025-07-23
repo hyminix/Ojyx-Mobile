@@ -19,6 +19,11 @@ void main() {
     registerFallbackValue(RoomStatus.waiting);
   });
 
+  void setLargeScreenSize(WidgetTester tester) {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1.0;
+  }
+
   Room createTestRoom({
     String id = 'room123',
     String creatorId = 'creator1',

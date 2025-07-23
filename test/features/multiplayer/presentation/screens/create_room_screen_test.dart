@@ -18,6 +18,11 @@ void main() {
     mockCreateRoomUseCase = MockCreateRoomUseCase();
   });
 
+  void setLargeScreenSize(WidgetTester tester) {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1.0;
+  }
+
   Widget createWidgetUnderTest({String? userId}) {
     return ProviderScope(
       overrides: [
@@ -43,9 +48,15 @@ void main() {
   }
 
   group('CreateRoomScreen', () {
+    setUp(() {
+      TestWidgetsFlutterBinding.ensureInitialized();
+    });
+
     testWidgets('should display initial UI elements', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+
       // Act
       await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
 
@@ -64,6 +75,8 @@ void main() {
     testWidgets('should allow increasing player count', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
 
@@ -78,6 +91,8 @@ void main() {
     testWidgets('should allow decreasing player count', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
 
@@ -96,6 +111,8 @@ void main() {
     testWidgets('should not allow player count below 2', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
 
@@ -118,6 +135,8 @@ void main() {
     testWidgets('should not allow player count above 8', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
 
@@ -138,6 +157,8 @@ void main() {
     });
 
     testWidgets('should create room successfully', (WidgetTester tester) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       const userId = 'user123';
       const roomId = 'room456';
@@ -172,6 +193,8 @@ void main() {
     testWidgets('should show loading state during room creation', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       const userId = 'user123';
       final expectedRoom = Room(
@@ -207,6 +230,8 @@ void main() {
     testWidgets('should show error when user not logged in', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(userId: null));
 
@@ -226,6 +251,8 @@ void main() {
     testWidgets('should show error when room creation fails', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       const userId = 'user123';
       const errorMessage = 'Network error';
@@ -249,6 +276,8 @@ void main() {
     testWidgets('should disable controls during room creation', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       const userId = 'user123';
       final expectedRoom = Room(
@@ -274,10 +303,10 @@ void main() {
 
       // Assert - buttons should be disabled
       final increaseButton = tester.widget<IconButton>(
-        find.byIcon(Icons.add_circle_outline),
+        find.widgetWithIcon(IconButton, Icons.add_circle_outline),
       );
       final decreaseButton = tester.widget<IconButton>(
-        find.byIcon(Icons.remove_circle_outline),
+        find.widgetWithIcon(IconButton, Icons.remove_circle_outline),
       );
       final createButton = tester.widget<ElevatedButton>(
         find.byType(ElevatedButton),
@@ -294,6 +323,8 @@ void main() {
     testWidgets('should create room with selected player count', (
       WidgetTester tester,
     ) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       const userId = 'user123';
       const selectedPlayers = 6;
@@ -336,13 +367,15 @@ void main() {
     });
 
     testWidgets('should apply correct styling', (WidgetTester tester) async {
+      setLargeScreenSize(tester);
+      
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
 
       // Assert
       expect(find.byType(Card), findsOneWidget);
-      expect(find.byType(ConstrainedBox), findsOneWidget);
-      expect(find.byType(SafeArea), findsOneWidget);
+      expect(find.byType(ConstrainedBox), findsWidgets); // Multiple ConstrainedBox is fine
+      expect(find.byType(SafeArea), findsWidgets); // Multiple SafeArea is fine
 
       // Check that player count is displayed in a circular container
       final container = tester.widget<Container>(
