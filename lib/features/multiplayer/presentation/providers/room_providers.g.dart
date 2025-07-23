@@ -26,7 +26,24 @@ final supabaseRoomDatasourceProvider =
 // ignore: unused_element
 typedef SupabaseRoomDatasourceRef =
     AutoDisposeProviderRef<SupabaseRoomDatasource>;
-String _$roomRepositoryHash() => r'b5eabcf064e048dc25be83dde6ee41c851cb22c5';
+String _$roomDatasourceHash() => r'dab29ceca2f77ffa43a9275a814aa42e8b29472b';
+
+/// See also [roomDatasource].
+@ProviderFor(roomDatasource)
+final roomDatasourceProvider = AutoDisposeProvider<RoomDatasource>.internal(
+  roomDatasource,
+  name: r'roomDatasourceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$roomDatasourceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef RoomDatasourceRef = AutoDisposeProviderRef<RoomDatasource>;
+String _$roomRepositoryHash() => r'6ec55a7764a456a6ab135d85f1f7c9ebbed03861';
 
 /// See also [roomRepository].
 @ProviderFor(roomRepository)

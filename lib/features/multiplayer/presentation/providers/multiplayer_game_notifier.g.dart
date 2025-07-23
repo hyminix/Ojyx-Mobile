@@ -7,7 +7,7 @@ part of 'multiplayer_game_notifier.dart';
 // **************************************************************************
 
 String _$multiplayerGameNotifierHash() =>
-    r'1c6177fcf95f38428b80951b48db13af203d1aac';
+    r'5c828b76d77299c21f16b5d4b13e5b2f73a9638a';
 
 /// Copied from Dart SDK
 class _SystemHash {

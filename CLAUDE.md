@@ -148,6 +148,41 @@ Le workflow doit vérifier automatiquement :
 
 **⚠️ RAPPEL** : Le TDD n'est pas négociable. C'est la FONDATION du projet. Toute déviation compromet la qualité et la maintenabilité du code.
 
+### 🚨 CONSÉQUENCES DES VIOLATIONS TDD (AUTOMATIQUES)
+
+**Toute violation des règles TDD entraîne des conséquences IMMÉDIATES et AUTOMATIQUES :**
+
+1. **Commit Local Bloqué**
+   - Le pre-commit hook empêche tout commit avec violations
+   - Message d'erreur détaillé avec les violations trouvées
+   - Obligation de corriger avant de pouvoir commiter
+
+2. **Pull Request Fermée Automatiquement**
+   - La CI/CD détecte et ferme immédiatement toute PR avec violations
+   - Message automatique expliquant les violations
+   - Labels "tdd-violation" et "auto-closed" ajoutés
+   - Impossibilité de merger même en forçant
+
+3. **Violations Détectées**
+   - Tests commentés (//test, /*test, skip:true, etc.)
+   - Fichiers test_summary ou similaires
+   - Code créé avant les tests (vérifié via git history)
+   - Tests vides ou placeholder
+   - Coverage < 80%
+   - Tests qui échouent
+
+4. **Notification et Tracking**
+   - Rapport détaillé dans GitHub Actions
+   - Métriques de violations trackées
+   - Historique des tentatives de contournement
+
+5. **Aucune Exception Possible**
+   - Même les administrateurs ne peuvent pas contourner
+   - Pas de merge direct sur main
+   - Pas de force push autorisé
+
+**RAPPEL POUR L'IA** : Ces mécanismes sont en place pour VOUS aider à maintenir la qualité. Les violations ne sont pas des "erreurs" mais des garde-fous pour garantir le succès du projet.
+
 ### Gestion des Secrets
 - Utiliser GitHub Secrets pour CI/CD
 - Fichier `.env` local (dans .gitignore)

@@ -6,6 +6,26 @@ part of 'game_state_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$gameInitializationUseCaseHash() =>
+    r'fdb8b21942040076f7131ddef231ffd326ce4eb5';
+
+/// See also [gameInitializationUseCase].
+@ProviderFor(gameInitializationUseCase)
+final gameInitializationUseCaseProvider =
+    AutoDisposeProvider<GameInitializationUseCase>.internal(
+      gameInitializationUseCase,
+      name: r'gameInitializationUseCaseProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$gameInitializationUseCaseHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef GameInitializationUseCaseRef =
+    AutoDisposeProviderRef<GameInitializationUseCase>;
 String _$gameStateNotifierHash() => r'4c0fe805e5a8dbf262456a01d4ac7ff6bd318e60';
 
 /// See also [GameStateNotifier].
