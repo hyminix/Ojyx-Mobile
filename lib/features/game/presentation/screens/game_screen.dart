@@ -7,6 +7,7 @@ import '../../../multiplayer/presentation/providers/multiplayer_game_notifier.da
 import '../providers/game_state_notifier.dart';
 import '../providers/direction_observer_provider.dart';
 import '../widgets/player_grid_widget.dart';
+import '../widgets/player_grid_with_selection.dart';
 import '../widgets/player_hand_widget.dart';
 import '../widgets/turn_info_widget.dart';
 import '../widgets/deck_and_discard_widget.dart';
@@ -14,6 +15,7 @@ import '../widgets/opponents_view_widget.dart';
 import '../widgets/action_card_hand_widget.dart';
 import '../widgets/action_card_draw_pile_widget.dart';
 import '../widgets/game_animation_overlay.dart';
+import '../providers/card_selection_provider.dart';
 import '../../domain/entities/game_state.dart';
 import '../../domain/entities/player.dart';
 import '../../domain/entities/action_card.dart';
@@ -28,6 +30,8 @@ class GameScreen extends ConsumerStatefulWidget {
 }
 
 class _GameScreenState extends ConsumerState<GameScreen> {
+  ActionCard? _pendingTeleportCard;
+
   @override
   void initState() {
     super.initState();
@@ -129,13 +133,31 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                           const SizedBox(height: 24),
 
                           // Player's grid
-                          PlayerGridWidget(
-                            grid: currentPlayer.grid,
-                            isCurrentPlayer: true,
-                            canInteract:
-                                isMyTurn && gameStateAsync.drawnCard != null,
-                            onCardTap: (row, col) =>
-                                _handleCardTap(ref, row, col),
+                          Consumer(
+                            builder: (context, ref, child) {
+                              final selectionState = ref.watch(cardSelectionProvider);
+                              
+                              if (selectionState.isSelecting && 
+                                  selectionState.selectionType == CardSelectionType.teleport) {
+                                return PlayerGridWithSelection(
+                                  grid: currentPlayer.grid,
+                                  isCurrentPlayer: true,
+                                  canInteract: isMyTurn,
+                                  onCardTap: (row, col) => _handleCardTap(ref, row, col),
+                                  onTeleportComplete: (targetData) =>
+                                      _handleTeleportComplete(ref, targetData),
+                                );
+                              }
+                              
+                              return PlayerGridWidget(
+                                grid: currentPlayer.grid,
+                                isCurrentPlayer: true,
+                                canInteract:
+                                    isMyTurn && gameStateAsync.drawnCard != null,
+                                onCardTap: (row, col) =>
+                                    _handleCardTap(ref, row, col),
+                              );
+                            },
                           ),
                           const SizedBox(height: 16),
 
@@ -272,12 +294,20 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   void _useActionCard(WidgetRef ref, ActionCard card) {
-    final notifier = ref.read(
-      multiplayerGameNotifierProvider(widget.roomId).notifier,
-    );
-    final currentUserId = ref.read(currentUserIdProvider);
-    if (currentUserId != null) {
-      notifier.useActionCard(currentUserId, card);
+    // Handle teleportation cards specially
+    if (card.type == ActionCardType.teleport) {
+      ref.read(cardSelectionProvider.notifier).startTeleportSelection();
+      // Store the card for later use when selection is complete
+      _pendingTeleportCard = card;
+    } else {
+      // Handle other action cards normally
+      final notifier = ref.read(
+        multiplayerGameNotifierProvider(widget.roomId).notifier,
+      );
+      final currentUserId = ref.read(currentUserIdProvider);
+      if (currentUserId != null) {
+        notifier.useActionCard(currentUserId, card);
+      }
     }
   }
 
@@ -289,6 +319,26 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     if (currentUserId != null) {
       notifier.discardActionCard(currentUserId, card);
     }
+  }
+
+  void _handleTeleportComplete(WidgetRef ref, Map<String, dynamic> targetData) {
+    if (_pendingTeleportCard == null) return;
+    
+    final notifier = ref.read(
+      multiplayerGameNotifierProvider(widget.roomId).notifier,
+    );
+    final currentUserId = ref.read(currentUserIdProvider);
+    
+    if (currentUserId != null) {
+      notifier.useActionCard(
+        currentUserId, 
+        _pendingTeleportCard!,
+        targetData: targetData,
+      );
+    }
+    
+    // Clear the pending card
+    _pendingTeleportCard = null;
   }
 
   Future<void> _showExitDialog(BuildContext context) async {
