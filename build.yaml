@@ -1,0 +1,25 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          explicit_to_json: true
+          field_rename: snake
+          checked: true
+          
+      freezed:
+        options:
+          # Generate copyWith method
+          copy_with: true
+          # Generate toString method
+          to_string: true
+          # Generate == and hashCode
+          equal: true
+          # Make all properties required by default
+          make_collections_unmodifiable: true
+          
+      riverpod_generator:
+        options:
+          # Generate providers with proper names
+          provider_name_prefix: ""
+          provider_name_suffix: "Provider"
