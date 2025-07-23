@@ -98,7 +98,9 @@ void main() {
             return Stream.value(mockRoom);
           }),
         ],
-        child: createTestApp(child: const GameScreen(roomId: 'test-room-id')),
+        child: createTestApp(
+          child: const GameScreen(roomId: 'test-room-id'),
+        ),
       );
     }
 
@@ -108,7 +110,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
       await tester.pumpAndSettle();
 
-      // Initially should show normal PlayerGridWidget
+      // Initially should show normal PlayerGridWidget (not in selection mode)
       expect(find.byType(PlayerGridWidget), findsOneWidget);
       expect(find.byType(PlayerGridWithSelection), findsNothing);
 
@@ -121,9 +123,9 @@ void main() {
       container.read(cardSelectionProvider.notifier).startTeleportSelection();
       await tester.pump();
 
-      // Now it should show PlayerGridWithSelection instead
-      expect(find.byType(PlayerGridWidget), findsNothing);
+      // Now it should show PlayerGridWithSelection which contains PlayerGridWidget
       expect(find.byType(PlayerGridWithSelection), findsOneWidget);
+      expect(find.byType(PlayerGridWidget), findsOneWidget);
     });
 
     testWidgets('should show selection instructions during teleportation', 
@@ -190,7 +192,8 @@ void main() {
       container.read(cardSelectionProvider.notifier).selectCard(0, 0);
       await tester.pump();
 
-      // Act - Tap cancel
+      // Act - Scroll to cancel button and tap it
+      await tester.ensureVisible(find.text('Annuler'));
       await tester.tap(find.text('Annuler'));
       await tester.pump();
 

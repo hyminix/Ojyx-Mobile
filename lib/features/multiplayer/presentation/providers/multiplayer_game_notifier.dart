@@ -120,7 +120,7 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
   }
 
   Future<void> useActionCard(String playerId, ActionCard card, {Map<String, dynamic>? targetData}) async {
-    final actionData = {
+    final actionData = <String, dynamic>{
       'cardId': card.id,
       'cardType': card.type.toString(),
     };

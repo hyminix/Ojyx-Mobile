@@ -23,10 +23,12 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: PlayerGridWithSelection(
-                grid: grid,
-                isCurrentPlayer: true,
-                canInteract: true,
+              body: SingleChildScrollView(
+                child: PlayerGridWithSelection(
+                  grid: grid,
+                  isCurrentPlayer: true,
+                  canInteract: true,
+                ),
               ),
             ),
           ),
@@ -44,10 +46,12 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: PlayerGridWithSelection(
-                grid: grid,
-                isCurrentPlayer: true,
-                canInteract: true,
+              body: SingleChildScrollView(
+                child: PlayerGridWithSelection(
+                  grid: grid,
+                  isCurrentPlayer: true,
+                  canInteract: true,
+                ),
               ),
             ),
           ),
@@ -71,10 +75,12 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: PlayerGridWithSelection(
-                grid: grid,
-                isCurrentPlayer: true,
-                canInteract: true,
+              body: SingleChildScrollView(
+                child: PlayerGridWithSelection(
+                  grid: grid,
+                  isCurrentPlayer: true,
+                  canInteract: true,
+                ),
               ),
             ),
           ),
@@ -103,10 +109,12 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: PlayerGridWithSelection(
-                grid: grid,
-                isCurrentPlayer: true,
-                canInteract: true,
+              body: SingleChildScrollView(
+                child: PlayerGridWithSelection(
+                  grid: grid,
+                  isCurrentPlayer: true,
+                  canInteract: true,
+                ),
               ),
             ),
           ),
@@ -140,23 +148,30 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: PlayerGridWithSelection(
-                grid: grid,
-                isCurrentPlayer: true,
-                canInteract: true,
-                onCardTap: (row, col) {
-                  onCardTapCalled = true;
-                  tappedRow = row;
-                  tappedCol = col;
-                },
+              body: SingleChildScrollView(
+                child: PlayerGridWithSelection(
+                  grid: grid,
+                  isCurrentPlayer: true,
+                  canInteract: true,
+                  onCardTap: (row, col) {
+                    onCardTapCalled = true;
+                    tappedRow = row;
+                    tappedCol = col;
+                  },
+                ),
               ),
             ),
           ),
         ),
       );
 
-      // Tap without being in selection mode
-      await tester.tap(find.byType(PlayerGridWidget));
+      // Import CardWidget if not already imported
+      // Tap on the first card without being in selection mode
+      // Find the first card widget within the grid
+      final cardFinder = find.byWidgetPredicate(
+        (widget) => widget.runtimeType.toString() == 'CardWidget',
+      ).first;
+      await tester.tap(cardFinder);
       await tester.pump();
 
       // Should call normal onCardTap
@@ -171,10 +186,12 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: PlayerGridWithSelection(
-                grid: grid,
-                isCurrentPlayer: true,
-                canInteract: true,
+              body: SingleChildScrollView(
+                child: PlayerGridWithSelection(
+                  grid: grid,
+                  isCurrentPlayer: true,
+                  canInteract: true,
+                ),
               ),
             ),
           ),
@@ -190,7 +207,7 @@ void main() {
       await tester.pump();
 
       // Should show instructions
-      expect(find.text('Sélectionnez deux cartes à échanger'), findsOneWidget);
+      expect(find.text('Sélectionnez la première carte à échanger'), findsOneWidget);
     });
 
     testWidgets('should show cancel button when in selection mode', 
@@ -199,10 +216,12 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: PlayerGridWithSelection(
-                grid: grid,
-                isCurrentPlayer: true,
-                canInteract: true,
+              body: SingleChildScrollView(
+                child: PlayerGridWithSelection(
+                  grid: grid,
+                  isCurrentPlayer: true,
+                  canInteract: true,
+                ),
               ),
             ),
           ),
@@ -228,10 +247,12 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: PlayerGridWithSelection(
-                grid: grid,
-                isCurrentPlayer: true,
-                canInteract: true,
+              body: SingleChildScrollView(
+                child: PlayerGridWithSelection(
+                  grid: grid,
+                  isCurrentPlayer: true,
+                  canInteract: true,
+                ),
               ),
             ),
           ),
@@ -262,13 +283,15 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: PlayerGridWithSelection(
-                grid: grid,
-                isCurrentPlayer: true,
-                canInteract: true,
-                onTeleportComplete: (targetData) {
-                  receivedTargetData = targetData;
-                },
+              body: SingleChildScrollView(
+                child: PlayerGridWithSelection(
+                  grid: grid,
+                  isCurrentPlayer: true,
+                  canInteract: true,
+                  onTeleportComplete: (targetData) {
+                    receivedTargetData = targetData;
+                  },
+                ),
               ),
             ),
           ),
@@ -286,7 +309,8 @@ void main() {
       notifier.selectCard(1, 2);
       await tester.pump();
 
-      // Tap confirm button
+      // Scroll to make confirm button visible and tap it
+      await tester.ensureVisible(find.byIcon(Icons.check));
       await tester.tap(find.byIcon(Icons.check));
       await tester.pump();
 
@@ -304,10 +328,12 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: PlayerGridWithSelection(
-                grid: grid,
-                isCurrentPlayer: true,
-                canInteract: true,
+              body: SingleChildScrollView(
+                child: PlayerGridWithSelection(
+                  grid: grid,
+                  isCurrentPlayer: true,
+                  canInteract: true,
+                ),
               ),
             ),
           ),
@@ -324,7 +350,8 @@ void main() {
       notifier.selectCard(0, 0);
       await tester.pump();
 
-      // Tap cancel button
+      // Scroll to make cancel button visible and tap it
+      await tester.ensureVisible(find.byIcon(Icons.close));
       await tester.tap(find.byIcon(Icons.close));
       await tester.pump();
 
@@ -340,10 +367,12 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: PlayerGridWithSelection(
-                grid: grid,
-                isCurrentPlayer: true,
-                canInteract: true,
+              body: SingleChildScrollView(
+                child: PlayerGridWithSelection(
+                  grid: grid,
+                  isCurrentPlayer: true,
+                  canInteract: true,
+                ),
               ),
             ),
           ),

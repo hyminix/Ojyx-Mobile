@@ -26,9 +26,7 @@ void main() {
               container = ProviderScope.containerOf(context);
               return MaterialApp(
                 home: Scaffold(
-                  body: SizedBox(
-                    width: 400,
-                    height: 600,
+                  body: SingleChildScrollView(
                     child: PlayerGridWithSelection(
                       grid: grid,
                       isCurrentPlayer: true,
@@ -209,7 +207,8 @@ void main() {
       notifier.selectCard(0, 0);
       await tester.pump();
 
-      // Tap cancel button
+      // Scroll to make cancel button visible and tap it
+      await tester.ensureVisible(find.text('Annuler'));
       await tester.tap(find.text('Annuler'));
       await tester.pump();
 

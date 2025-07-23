@@ -42,33 +42,42 @@ class PlayerGridWithSelection extends ConsumerWidget {
       ));
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Selection instructions and controls
-        if (selectionState.isSelecting) ...[
+    if (!selectionState.isSelecting) {
+      // When not selecting, just return the plain grid
+      return PlayerGridWidget(
+        grid: grid,
+        isCurrentPlayer: isCurrentPlayer,
+        canInteract: canInteract,
+        highlightedPositions: highlightedPositions,
+        selectedPositions: selectedPositions,
+        onCardTap: onCardTap,
+      );
+    }
+
+    // When selecting, wrap in a scrollable column
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Selection instructions
           _buildSelectionHeader(context, selectionState, selectionNotifier),
           const SizedBox(height: 8),
-        ],
 
-        // Player grid
-        PlayerGridWidget(
-          grid: grid,
-          isCurrentPlayer: isCurrentPlayer,
-          canInteract: canInteract,
-          highlightedPositions: highlightedPositions,
-          selectedPositions: selectedPositions,
-          onCardTap: selectionState.isSelecting
-              ? (row, col) => _handleSelectionTap(selectionNotifier, row, col)
-              : onCardTap,
-        ),
+          // Player grid
+          PlayerGridWidget(
+            grid: grid,
+            isCurrentPlayer: isCurrentPlayer,
+            canInteract: canInteract,
+            highlightedPositions: highlightedPositions,
+            selectedPositions: selectedPositions,
+            onCardTap: (row, col) => _handleSelectionTap(selectionNotifier, row, col),
+          ),
 
-        // Selection controls
-        if (selectionState.isSelecting) ...[
+          // Selection controls
           const SizedBox(height: 12),
           _buildSelectionControls(context, selectionState, selectionNotifier),
         ],
-      ],
+      ),
     );
   }
 
