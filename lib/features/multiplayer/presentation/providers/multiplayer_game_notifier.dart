@@ -119,14 +119,21 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
     );
   }
 
-  Future<void> useActionCard(String playerId, ActionCard card) async {
+  Future<void> useActionCard(String playerId, ActionCard card, {Map<String, dynamic>? targetData}) async {
+    final actionData = <String, dynamic>{
+      'cardId': card.id,
+      'cardType': card.type.toString(),
+    };
+    
+    // Add targetData if provided (for cards like teleportation)
+    if (targetData != null) {
+      actionData['targetData'] = targetData;
+    }
+    
     await syncAction(
       playerId: playerId,
       actionType: PlayerActionType.useActionCard,
-      actionData: {
-        'cardId': card.id,
-        'cardType': card.type.toString(),
-      },
+      actionData: actionData,
     );
   }
 
