@@ -19,6 +19,22 @@ void main() {
     registerFallbackValue(RoomStatus.waiting);
   });
 
+  Room createTestRoom({
+    String id = 'room123',
+    String creatorId = 'creator1',
+    List<String> playerIds = const ['creator1'],
+    RoomStatus status = RoomStatus.waiting,
+    int maxPlayers = 4,
+  }) {
+    return Room(
+      id: id,
+      creatorId: creatorId,
+      playerIds: playerIds,
+      status: status,
+      maxPlayers: maxPlayers,
+    );
+  }
+
   Widget createWidgetUnderTest({
     required String roomId,
     Room? room,
@@ -32,13 +48,13 @@ void main() {
         currentUserIdProvider.overrideWithValue(currentUserId),
         currentRoomProvider(roomId).overrideWith((ref) {
           if (isLoading) {
-            return const AsyncValue.loading();
+            return Stream.value(room ?? createTestRoom());
           } else if (error != null) {
-            return AsyncValue.error(error, StackTrace.current);
+            return Stream.error(error);
           } else if (room != null) {
-            return AsyncValue.data(room);
+            return Stream.value(room);
           } else {
-            return const AsyncValue.loading();
+            return Stream.value(createTestRoom());
           }
         }),
       ],
@@ -64,22 +80,6 @@ void main() {
           initialLocation: '/room/$roomId',
         ),
       ),
-    );
-  }
-
-  Room createTestRoom({
-    String id = 'room123',
-    String creatorId = 'creator1',
-    List<String> playerIds = const ['creator1'],
-    RoomStatus status = RoomStatus.waiting,
-    int maxPlayers = 4,
-  }) {
-    return Room(
-      id: id,
-      creatorId: creatorId,
-      playerIds: playerIds,
-      status: status,
-      maxPlayers: maxPlayers,
     );
   }
 

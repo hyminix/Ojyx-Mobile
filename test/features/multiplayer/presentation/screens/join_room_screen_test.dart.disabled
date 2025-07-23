@@ -28,13 +28,14 @@ void main() {
       overrides: [
         joinRoomUseCaseProvider.overrideWithValue(mockJoinRoomUseCase),
         currentUserIdProvider.overrideWithValue(userId),
-        availableRoomsProvider.overrideWith((ref) {
+        availableRoomsProvider.overrideWith((ref) async {
           if (isLoading) {
-            return const AsyncValue.loading();
+            await Future.delayed(const Duration(hours: 1));
+            return [];
           } else if (error != null) {
-            return AsyncValue.error(error, StackTrace.current);
+            throw error;
           } else {
-            return AsyncValue.data(rooms ?? []);
+            return rooms ?? [];
           }
         }),
       ],

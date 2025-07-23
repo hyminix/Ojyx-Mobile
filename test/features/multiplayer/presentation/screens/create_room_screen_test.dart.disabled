@@ -11,15 +11,11 @@ import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
 
 class MockCreateRoomUseCase extends Mock implements CreateRoomUseCase {}
 
-class MockGoRouter extends Mock implements GoRouter {}
-
 void main() {
   late MockCreateRoomUseCase mockCreateRoomUseCase;
-  late MockGoRouter mockGoRouter;
 
   setUp(() {
     mockCreateRoomUseCase = MockCreateRoomUseCase();
-    mockGoRouter = MockGoRouter();
   });
 
   Widget createWidgetUnderTest({String? userId}) {
