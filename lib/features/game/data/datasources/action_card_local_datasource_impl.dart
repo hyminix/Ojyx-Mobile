@@ -166,7 +166,7 @@ class ActionCardLocalDataSourceImpl implements ActionCardLocalDataSource {
 
     if (playerCards.length >= kMaxActionCardsInHand) {
       throw Exception(
-        'Player cannot have more than $kMaxActionCardsInHand action cards',
+        'GamePlayer cannot have more than $kMaxActionCardsInHand action cards',
       );
     }
 
@@ -177,7 +177,7 @@ class ActionCardLocalDataSourceImpl implements ActionCardLocalDataSource {
   void removeActionCardFromPlayer(String playerId, ActionCard card) {
     final playerCards = _playerCards[playerId];
     if (playerCards == null || !playerCards.contains(card)) {
-      throw Exception('Player does not have this action card');
+      throw Exception('GamePlayer does not have this action card');
     }
 
     playerCards.remove(card);

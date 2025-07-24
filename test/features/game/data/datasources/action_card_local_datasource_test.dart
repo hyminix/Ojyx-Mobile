@@ -84,7 +84,7 @@ void main() {
         const playerId = 'player1';
         when(
           () => mockDataSource.addActionCardToPlayer(playerId, testActionCard),
-        ).thenThrow(Exception('Player already has 3 cards'));
+        ).thenThrow(Exception('GamePlayer already has 3 cards'));
 
         // Act & Assert
         expect(
@@ -120,7 +120,7 @@ void main() {
       when(
         () =>
             mockDataSource.removeActionCardFromPlayer(playerId, testActionCard),
-      ).thenThrow(Exception('Player doesn\'t have this card'));
+      ).thenThrow(Exception('GamePlayer doesn\'t have this card'));
 
       // Act & Assert
       expect(

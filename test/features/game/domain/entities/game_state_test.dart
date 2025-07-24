@@ -1,23 +1,23 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/core/utils/constants.dart';
 
 void main() {
   group('GameState Entity', () {
-    late List<Player> players;
+    late List<GamePlayer> players;
 
     setUp(() {
       players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
       ];
     });
 

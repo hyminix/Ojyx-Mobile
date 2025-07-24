@@ -3,13 +3,13 @@ import 'package:ojyx/core/utils/constants.dart';
 import 'player_grid.dart';
 import 'action_card.dart';
 
-part 'player.freezed.dart';
-part 'player.g.dart';
+part 'game_player.freezed.dart';
+part 'game_player.g.dart';
 
 @freezed
-class Player with _$Player {
+class GamePlayer with _$GamePlayer {
   @Assert('actionCards.length <= kMaxActionCardsInHand')
-  const factory Player({
+  const factory GamePlayer({
     required String id,
     required String name,
     required PlayerGrid grid,
@@ -18,38 +18,38 @@ class Player with _$Player {
     @Default(false) bool isHost,
     @Default(false) bool hasFinishedRound,
     @Default(1) int scoreMultiplier,
-  }) = _Player;
+  }) = _GamePlayer;
 
-  const Player._();
+  const GamePlayer._();
 
-  factory Player.fromJson(Map<String, dynamic> json) => _$PlayerFromJson(json);
+  factory GamePlayer.fromJson(Map<String, dynamic> json) => _$GamePlayerFromJson(json);
 
   int get currentScore => grid.totalScore * scoreMultiplier;
 
-  Player addActionCard(ActionCard card) {
+  GamePlayer addActionCard(ActionCard card) {
     assert(actionCards.length < kMaxActionCardsInHand);
     return copyWith(actionCards: [...actionCards, card]);
   }
 
-  Player removeActionCard(String cardId) {
+  GamePlayer removeActionCard(String cardId) {
     return copyWith(
       actionCards: actionCards.where((card) => card.id != cardId).toList(),
     );
   }
 
-  Player updateGrid(PlayerGrid newGrid) {
+  GamePlayer updateGrid(PlayerGrid newGrid) {
     return copyWith(grid: newGrid);
   }
 
-  Player disconnect() {
+  GamePlayer disconnect() {
     return copyWith(isConnected: false);
   }
 
-  Player reconnect() {
+  GamePlayer reconnect() {
     return copyWith(isConnected: true);
   }
 
-  Player markRoundFinished() {
+  GamePlayer markRoundFinished() {
     return copyWith(hasFinishedRound: true);
   }
 }

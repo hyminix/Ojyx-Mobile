@@ -5,7 +5,7 @@ import 'package:ojyx/core/errors/failures.dart';
 import 'package:ojyx/core/utils/constants.dart';
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game_card;
 import 'package:ojyx/features/game/domain/repositories/action_card_repository.dart';
@@ -36,9 +36,9 @@ void main() {
       List.generate(12, (i) => game_card.Card(value: 0, isRevealed: false)),
     );
 
-    final testPlayer = Player(
+    final testPlayer = GamePlayer(
       id: 'player1',
-      name: 'Test Player',
+      name: 'Test GamePlayer',
       grid: testGrid,
       actionCards: [],
     );
@@ -133,9 +133,9 @@ void main() {
 
     test('should fail when it is not the player\'s turn', () async {
       // Arrange
-      final otherPlayer = Player(
+      final otherPlayer = GamePlayer(
         id: 'player2',
-        name: 'Other Player',
+        name: 'Other GamePlayer',
         grid: testGrid,
         actionCards: [],
       );

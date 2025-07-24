@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 
 void main() {
-  group('Player Entity', () {
-    test('should create player with required fields', () {
-      final player = Player(
+  group('GamePlayer Entity', () {
+    test('should create game player with required fields', () {
+      final player = GamePlayer(
         id: 'player1',
         name: 'John Doe',
         grid: PlayerGrid.empty(),
@@ -22,10 +22,10 @@ void main() {
       expect(player.hasFinishedRound, false);
     });
 
-    test('should create host player', () {
-      final player = Player(
+    test('should create host game player', () {
+      final player = GamePlayer(
         id: 'host1',
-        name: 'Host Player',
+        name: 'Host GamePlayer',
         grid: PlayerGrid.empty(),
         isHost: true,
       );
@@ -34,7 +34,7 @@ void main() {
     });
 
     test('should add action card to hand', () {
-      final player = Player(
+      final player = GamePlayer(
         id: 'player1',
         name: 'John',
         grid: PlayerGrid.empty(),
@@ -55,7 +55,7 @@ void main() {
     });
 
     test('should not add more than 3 action cards', () {
-      var player = Player(
+      var player = GamePlayer(
         id: 'player1',
         name: 'John',
         grid: PlayerGrid.empty(),
@@ -90,7 +90,7 @@ void main() {
     });
 
     test('should remove action card from hand', () {
-      var player = Player(
+      var player = GamePlayer(
         id: 'player1',
         name: 'John',
         grid: PlayerGrid.empty(),
@@ -128,7 +128,7 @@ void main() {
           .setCard(0, 1, const Card(value: -2, isRevealed: true))
           .setCard(1, 0, const Card(value: 12, isRevealed: true));
 
-      final player = Player(id: 'player1', name: 'John', grid: gridWithCards);
+      final player = GamePlayer(id: 'player1', name: 'John', grid: gridWithCards);
 
       expect(player.currentScore, 5 + (-2) + 12);
     });
@@ -136,11 +136,11 @@ void main() {
     test('should support value equality', () {
       final grid = PlayerGrid.empty();
 
-      final player1 = Player(id: 'player1', name: 'John', grid: grid);
+      final player1 = GamePlayer(id: 'player1', name: 'John', grid: grid);
 
-      final player2 = Player(id: 'player1', name: 'John', grid: grid);
+      final player2 = GamePlayer(id: 'player1', name: 'John', grid: grid);
 
-      final player3 = Player(id: 'player2', name: 'John', grid: grid);
+      final player3 = GamePlayer(id: 'player2', name: 'John', grid: grid);
 
       expect(player1, equals(player2));
       expect(player1, isNot(equals(player3)));

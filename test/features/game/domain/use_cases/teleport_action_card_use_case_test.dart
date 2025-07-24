@@ -3,7 +3,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:ojyx/features/game/domain/use_cases/use_action_card_use_case.dart';
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/features/game/domain/repositories/action_card_repository.dart';
@@ -62,7 +62,7 @@ void main() {
     late UseActionCardUseCase useCase;
     late FakeActionCardRepository repository;
     late GameState gameState;
-    late Player player;
+    late GamePlayer player;
     late ActionCard teleportCard;
 
     setUp(() {
@@ -86,9 +86,9 @@ void main() {
       ];
 
       final grid = PlayerGrid.fromCards(testCards);
-      player = Player(
+      player = GamePlayer(
         id: 'player1',
-        name: 'Test Player',
+        name: 'Test GamePlayer',
         grid: grid,
         actionCards: [],
       );
@@ -253,7 +253,7 @@ void main() {
 
     group('Teleport Validation Failures', () {
       test('should fail if player does not own the teleport card', () async {
-        // Arrange - Player has no action cards
+        // Arrange - GamePlayer has no action cards
         repository.setupPlayerCards('player1', []);
 
         final targetData = {
@@ -279,15 +279,15 @@ void main() {
         expect(failure, isA<GameLogicFailure>());
         expect(
           failure.message,
-          contains('Player does not have this action card'),
+          contains('GamePlayer does not have this action card'),
         );
       });
 
       test('should fail if it is not the player\'s turn', () async {
         // Arrange
-        final otherPlayer = Player(
+        final otherPlayer = GamePlayer(
           id: 'player2',
-          name: 'Other Player',
+          name: 'Other GamePlayer',
           grid: PlayerGrid.empty(),
           actionCards: [],
         );
@@ -432,7 +432,7 @@ void main() {
           expect(failure, isA<GameLogicFailure>());
           expect(
             failure.message,
-            contains('Player does not have this action card'),
+            contains('GamePlayer does not have this action card'),
           );
         },
       );

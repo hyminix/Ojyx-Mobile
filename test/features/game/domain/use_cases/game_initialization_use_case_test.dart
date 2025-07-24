@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/domain/use_cases/game_initialization_use_case.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 
 void main() {
   late GameInitializationUseCase useCase;
@@ -89,8 +89,8 @@ void main() {
       );
 
       // Assert
-      expect(gameState.players[0].name, equals('Player player1'));
-      expect(gameState.players[1].name, equals('Player player2'));
+      expect(gameState.players[0].name, equals('GamePlayer player1'));
+      expect(gameState.players[1].name, equals('GamePlayer player2'));
     });
 
     test(

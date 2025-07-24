@@ -3,7 +3,7 @@ import 'package:ojyx/features/game/domain/use_cases/start_game.dart';
 import 'package:ojyx/features/game/domain/use_cases/distribute_cards.dart';
 import 'package:ojyx/features/game/domain/use_cases/reveal_initial_cards.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/core/utils/constants.dart';
 
@@ -24,13 +24,13 @@ void main() {
   group('StartGame UseCase', () {
     test('should start game with proper distribution', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
       ];
 
       final initialState = GameState.initial(
@@ -83,9 +83,9 @@ void main() {
 
     test('should fail if not enough players', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
@@ -110,13 +110,13 @@ void main() {
 
     test('should fail if game already started', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
       ];
 
       final initialState = GameState.initial(
@@ -139,13 +139,13 @@ void main() {
 
     test('should use default positions if not provided', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
       ];
 
       final initialState = GameState.initial(
@@ -178,9 +178,9 @@ void main() {
     test('should handle maximum players', () async {
       final players = List.generate(
         kMaxPlayers,
-        (index) => Player(
+        (index) => GamePlayer(
           id: 'player$index',
-          name: 'Player $index',
+          name: 'GamePlayer $index',
           grid: PlayerGrid.empty(),
           isHost: index == 0,
         ),

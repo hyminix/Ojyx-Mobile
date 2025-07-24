@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/game/presentation/providers/game_state_notifier.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/features/game/domain/use_cases/game_initialization_use_case.dart';
@@ -33,9 +33,9 @@ void main() {
       final testState = GameState(
         roomId: 'room123',
         players: [
-          Player(
+          GamePlayer(
             id: 'player1',
-            name: 'Test Player',
+            name: 'Test GamePlayer',
             grid: PlayerGrid.empty(),
             actionCards: [],
             isHost: true,
@@ -70,9 +70,9 @@ void main() {
       final initialState = GameState(
         roomId: 'room123',
         players: [
-          Player(
+          GamePlayer(
             id: 'player1',
-            name: 'Test Player',
+            name: 'Test GamePlayer',
             grid: PlayerGrid.empty(),
             actionCards: [],
             isHost: true,
@@ -128,16 +128,16 @@ void main() {
       final initialState = GameState(
         roomId: 'room123',
         players: [
-          Player(
+          GamePlayer(
             id: 'player1',
-            name: 'Player 1',
+            name: 'GamePlayer 1',
             grid: PlayerGrid.empty(),
             actionCards: [],
             isHost: true,
           ),
-          Player(
+          GamePlayer(
             id: 'player2',
-            name: 'Player 2',
+            name: 'GamePlayer 2',
             grid: PlayerGrid.empty(),
             actionCards: [],
             isHost: false,

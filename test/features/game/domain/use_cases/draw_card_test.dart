@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/domain/use_cases/draw_card.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/core/errors/failures.dart';
@@ -16,13 +16,13 @@ void main() {
   group('DrawCard UseCase', () {
     test('should draw card from deck successfully', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -47,7 +47,7 @@ void main() {
       expect(result.isRight(), true);
 
       result.fold((failure) => fail('Should not fail'), (newState) {
-        // Player should have drawn card in hand
+        // GamePlayer should have drawn card in hand
         expect(newState.drawnCard, isNotNull);
         expect(newState.drawnCard!.value, 5);
 
@@ -61,13 +61,13 @@ void main() {
 
     test('should draw card from discard pile successfully', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -91,7 +91,7 @@ void main() {
       expect(result.isRight(), true);
 
       result.fold((failure) => fail('Should not fail'), (newState) {
-        // Player should have drawn top card from discard
+        // GamePlayer should have drawn top card from discard
         expect(newState.drawnCard, isNotNull);
         expect(newState.drawnCard!.value, 8);
         expect(newState.drawnCard!.isRevealed, true);
@@ -104,13 +104,13 @@ void main() {
 
     test('should fail if not player turn', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
       ];
 
       final gameState = GameState.initial(
@@ -143,9 +143,9 @@ void main() {
 
     test('should fail if already drawn card', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
@@ -183,9 +183,9 @@ void main() {
 
     test('should fail if deck is empty', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
@@ -223,9 +223,9 @@ void main() {
 
     test('should fail if discard pile is empty', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
@@ -263,9 +263,9 @@ void main() {
 
     test('should reshuffle deck when empty except last discard', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),

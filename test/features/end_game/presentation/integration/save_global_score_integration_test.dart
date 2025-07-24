@@ -5,7 +5,7 @@ import 'package:ojyx/features/game/presentation/providers/game_state_notifier.da
 import 'package:riverpod/riverpod.dart';
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/global_scores/domain/entities/global_score.dart';
 import 'package:ojyx/features/global_scores/domain/repositories/global_score_repository.dart';
 import 'package:ojyx/features/global_scores/domain/use_cases/save_global_score.dart';
@@ -40,7 +40,7 @@ void main() {
     late MockGlobalScoreRepository mockRepository;
     late MockSaveGlobalScoreUseCase mockUseCase;
     late GameState testGameState;
-    late List<Player> testPlayers;
+    late List<GamePlayer> testPlayers;
 
     setUp(() {
       mockRepository = MockGlobalScoreRepository();
@@ -48,7 +48,7 @@ void main() {
 
       // Create test players with proper grids
       testPlayers = [
-        Player(
+        GamePlayer(
           id: 'player1',
           name: 'Alice',
           grid: PlayerGrid.fromCards(
@@ -60,7 +60,7 @@ void main() {
             ),
           ),
         ),
-        Player(
+        GamePlayer(
           id: 'player2',
           name: 'Bob',
           grid: PlayerGrid.fromCards(

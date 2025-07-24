@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/multiplayer/data/models/player_model.dart';
-import 'package:ojyx/features/multiplayer/domain/entities/player.dart';
+import 'package:ojyx/features/multiplayer/domain/entities/lobby_player.dart';
 
 void main() {
   group('PlayerModel', () {

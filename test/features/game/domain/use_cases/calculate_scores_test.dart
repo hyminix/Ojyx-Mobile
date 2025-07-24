@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/domain/use_cases/calculate_scores.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 
@@ -26,8 +26,8 @@ void main() {
           .placeCard(const Card(value: 7, isRevealed: true), 1, 0);
 
       final players = [
-        Player(id: 'player1', name: 'Player 1', grid: grid1, isHost: true),
-        Player(id: 'player2', name: 'Player 2', grid: grid2),
+        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players);
@@ -47,13 +47,13 @@ void main() {
 
     test('should handle empty grids', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players);
@@ -78,7 +78,7 @@ void main() {
           .placeCard(const Card(value: 3, isRevealed: true), 1, 1);
 
       final players = [
-        Player(id: 'player1', name: 'Player 1', grid: grid, isHost: true),
+        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players);
@@ -110,7 +110,7 @@ void main() {
           .placeCard(const Card(value: 2, isRevealed: true), 1, 1);
 
       final players = [
-        Player(id: 'player1', name: 'Player 1', grid: grid, isHost: true),
+        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players);
@@ -132,16 +132,16 @@ void main() {
           .placeCard(const Card(value: 3, isRevealed: true), 0, 1);
 
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: grid,
           isHost: true,
           scoreMultiplier: 2, // Double penalty
         ),
-        Player(
+        GamePlayer(
           id: 'player2',
-          name: 'Player 2',
+          name: 'GamePlayer 2',
           grid: grid,
           scoreMultiplier: 1, // Normal
         ),
@@ -181,9 +181,9 @@ void main() {
       );
 
       final players = [
-        Player(id: 'player1', name: 'Player 1', grid: grid1, isHost: true),
-        Player(id: 'player2', name: 'Player 2', grid: grid2),
-        Player(id: 'player3', name: 'Player 3', grid: grid3),
+        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
+        GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: grid3),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players);

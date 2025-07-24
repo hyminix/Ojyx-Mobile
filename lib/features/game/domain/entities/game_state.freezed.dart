@@ -22,7 +22,7 @@ GameState _$GameStateFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$GameState {
   String get roomId => throw _privateConstructorUsedError;
-  List<Player> get players => throw _privateConstructorUsedError;
+  List<GamePlayer> get players => throw _privateConstructorUsedError;
   int get currentPlayerIndex => throw _privateConstructorUsedError;
   List<Card> get deck => throw _privateConstructorUsedError;
   List<Card> get discardPile => throw _privateConstructorUsedError;
@@ -55,7 +55,7 @@ abstract class $GameStateCopyWith<$Res> {
   @useResult
   $Res call({
     String roomId,
-    List<Player> players,
+    List<GamePlayer> players,
     int currentPlayerIndex,
     List<Card> deck,
     List<Card> discardPile,
@@ -116,7 +116,7 @@ class _$GameStateCopyWithImpl<$Res, $Val extends GameState>
             players: null == players
                 ? _value.players
                 : players // ignore: cast_nullable_to_non_nullable
-                      as List<Player>,
+                      as List<GamePlayer>,
             currentPlayerIndex: null == currentPlayerIndex
                 ? _value.currentPlayerIndex
                 : currentPlayerIndex // ignore: cast_nullable_to_non_nullable
@@ -204,7 +204,7 @@ abstract class _$$GameStateImplCopyWith<$Res>
   @useResult
   $Res call({
     String roomId,
-    List<Player> players,
+    List<GamePlayer> players,
     int currentPlayerIndex,
     List<Card> deck,
     List<Card> discardPile,
@@ -265,7 +265,7 @@ class __$$GameStateImplCopyWithImpl<$Res>
         players: null == players
             ? _value._players
             : players // ignore: cast_nullable_to_non_nullable
-                  as List<Player>,
+                  as List<GamePlayer>,
         currentPlayerIndex: null == currentPlayerIndex
             ? _value.currentPlayerIndex
             : currentPlayerIndex // ignore: cast_nullable_to_non_nullable
@@ -332,7 +332,7 @@ class __$$GameStateImplCopyWithImpl<$Res>
 class _$GameStateImpl extends _GameState {
   const _$GameStateImpl({
     required this.roomId,
-    required final List<Player> players,
+    required final List<GamePlayer> players,
     required this.currentPlayerIndex,
     required final List<Card> deck,
     required final List<Card> discardPile,
@@ -359,9 +359,9 @@ class _$GameStateImpl extends _GameState {
 
   @override
   final String roomId;
-  final List<Player> _players;
+  final List<GamePlayer> _players;
   @override
-  List<Player> get players {
+  List<GamePlayer> get players {
     if (_players is EqualUnmodifiableListView) return _players;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_players);
@@ -505,7 +505,7 @@ class _$GameStateImpl extends _GameState {
 abstract class _GameState extends GameState {
   const factory _GameState({
     required final String roomId,
-    required final List<Player> players,
+    required final List<GamePlayer> players,
     required final int currentPlayerIndex,
     required final List<Card> deck,
     required final List<Card> discardPile,
@@ -529,7 +529,7 @@ abstract class _GameState extends GameState {
   @override
   String get roomId;
   @override
-  List<Player> get players;
+  List<GamePlayer> get players;
   @override
   int get currentPlayerIndex;
   @override

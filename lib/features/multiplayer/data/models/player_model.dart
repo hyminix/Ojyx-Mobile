@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../domain/entities/player.dart';
+import '../../domain/entities/lobby_player.dart';
 
 part 'player_model.freezed.dart';
 part 'player_model.g.dart';
@@ -21,7 +21,7 @@ class PlayerModel with _$PlayerModel {
 
   factory PlayerModel.fromJson(Map<String, dynamic> json) => _$PlayerModelFromJson(json);
 
-  factory PlayerModel.fromDomain(Player player) {
+  factory PlayerModel.fromDomain(LobbyPlayer player) {
     return PlayerModel(
       id: player.id,
       name: player.name,
@@ -34,8 +34,8 @@ class PlayerModel with _$PlayerModel {
     );
   }
 
-  Player toDomain() {
-    return Player(
+  LobbyPlayer toDomain() {
+    return LobbyPlayer(
       id: id,
       name: name,
       avatarUrl: avatarUrl,

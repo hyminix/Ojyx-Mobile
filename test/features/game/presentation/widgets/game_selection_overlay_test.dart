@@ -3,13 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/game/presentation/widgets/game_selection_overlay.dart';
 import 'package:ojyx/features/game/presentation/providers/card_selection_provider.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 
 void main() {
   group('SelectionOverlay', () {
-    late List<Player> testPlayers;
+    late List<GamePlayer> testPlayers;
     late PlayerGrid testGrid;
 
     setUp(() {
@@ -18,9 +18,9 @@ void main() {
       testGrid = PlayerGrid.fromCards(cards);
 
       testPlayers = [
-        Player(id: 'player-1', name: 'Alice', grid: testGrid),
-        Player(id: 'player-2', name: 'Bob', grid: testGrid),
-        Player(id: 'player-3', name: 'Charlie', grid: testGrid),
+        GamePlayer(id: 'player-1', name: 'Alice', grid: testGrid),
+        GamePlayer(id: 'player-2', name: 'Bob', grid: testGrid),
+        GamePlayer(id: 'player-3', name: 'Charlie', grid: testGrid),
       ];
     });
 

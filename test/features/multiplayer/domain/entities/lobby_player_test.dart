@@ -1,16 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ojyx/features/multiplayer/domain/entities/player.dart';
+import 'package:ojyx/features/multiplayer/domain/entities/lobby_player.dart';
 
 void main() {
-  group('Player Entity', () {
-    test('should create player with required fields', () {
+  group('LobbyPlayer Entity', () {
+    test('should create lobby player with required fields', () {
       // Given
       final createdAt = DateTime(2024, 1, 1);
       final updatedAt = DateTime(2024, 1, 1);
       final lastSeenAt = DateTime(2024, 1, 1);
 
       // When
-      final player = Player(
+      final player = LobbyPlayer(
         id: 'test-id',
         name: 'TestPlayer',
         avatarUrl: null,
@@ -42,7 +42,7 @@ void main() {
 
       // When & Then
       for (final status in expectedStatuses) {
-        final player = Player(
+        final player = LobbyPlayer(
           id: 'test-id',
           name: 'TestPlayer',
           avatarUrl: null,
@@ -59,7 +59,7 @@ void main() {
 
     test('should be immutable', () {
       // Given
-      final player = Player(
+      final player = LobbyPlayer(
         id: 'test-id',
         name: 'TestPlayer',
         avatarUrl: null,
@@ -84,7 +84,7 @@ void main() {
       final originalDate = DateTime(2024, 1, 1);
       final newDate = DateTime(2024, 1, 2);
       
-      final player = Player(
+      final player = LobbyPlayer(
         id: 'test-id',
         name: 'TestPlayer',
         avatarUrl: null,
@@ -120,7 +120,7 @@ void main() {
       // Given
       final date = DateTime(2024, 1, 1);
       
-      final player1 = Player(
+      final player1 = LobbyPlayer(
         id: 'test-id',
         name: 'TestPlayer',
         avatarUrl: 'avatar.png',
@@ -131,7 +131,7 @@ void main() {
         currentRoomId: 'room-id',
       );
 
-      final player2 = Player(
+      final player2 = LobbyPlayer(
         id: 'test-id',
         name: 'TestPlayer',
         avatarUrl: 'avatar.png',

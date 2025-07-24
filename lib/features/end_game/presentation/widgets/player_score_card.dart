@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 
 class PlayerScoreCard extends StatelessWidget {
-  final Player player;
+  final GamePlayer player;
   final int rank;
   final bool isPenalized;
   final bool hasVoted;
@@ -70,7 +70,7 @@ class PlayerScoreCard extends StatelessWidget {
             ),
             const SizedBox(width: 16),
 
-            // Player info
+            // GamePlayer info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

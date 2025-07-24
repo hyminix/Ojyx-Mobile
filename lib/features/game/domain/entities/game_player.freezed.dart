@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'player.dart';
+part of 'game_player.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,12 +15,12 @@ final _privateConstructorUsedError = UnsupportedError(
   'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
 );
 
-Player _$PlayerFromJson(Map<String, dynamic> json) {
-  return _Player.fromJson(json);
+GamePlayer _$GamePlayerFromJson(Map<String, dynamic> json) {
+  return _GamePlayer.fromJson(json);
 }
 
 /// @nodoc
-mixin _$Player {
+mixin _$GamePlayer {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   PlayerGrid get grid => throw _privateConstructorUsedError;
@@ -30,19 +30,22 @@ mixin _$Player {
   bool get hasFinishedRound => throw _privateConstructorUsedError;
   int get scoreMultiplier => throw _privateConstructorUsedError;
 
-  /// Serializes this Player to a JSON map.
+  /// Serializes this GamePlayer to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of Player
+  /// Create a copy of GamePlayer
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $PlayerCopyWith<Player> get copyWith => throw _privateConstructorUsedError;
+  $GamePlayerCopyWith<GamePlayer> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $PlayerCopyWith<$Res> {
-  factory $PlayerCopyWith(Player value, $Res Function(Player) then) =
-      _$PlayerCopyWithImpl<$Res, Player>;
+abstract class $GamePlayerCopyWith<$Res> {
+  factory $GamePlayerCopyWith(
+    GamePlayer value,
+    $Res Function(GamePlayer) then,
+  ) = _$GamePlayerCopyWithImpl<$Res, GamePlayer>;
   @useResult
   $Res call({
     String id,
@@ -59,16 +62,16 @@ abstract class $PlayerCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$PlayerCopyWithImpl<$Res, $Val extends Player>
-    implements $PlayerCopyWith<$Res> {
-  _$PlayerCopyWithImpl(this._value, this._then);
+class _$GamePlayerCopyWithImpl<$Res, $Val extends GamePlayer>
+    implements $GamePlayerCopyWith<$Res> {
+  _$GamePlayerCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of Player
+  /// Create a copy of GamePlayer
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -121,7 +124,7 @@ class _$PlayerCopyWithImpl<$Res, $Val extends Player>
     );
   }
 
-  /// Create a copy of Player
+  /// Create a copy of GamePlayer
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -133,11 +136,12 @@ class _$PlayerCopyWithImpl<$Res, $Val extends Player>
 }
 
 /// @nodoc
-abstract class _$$PlayerImplCopyWith<$Res> implements $PlayerCopyWith<$Res> {
-  factory _$$PlayerImplCopyWith(
-    _$PlayerImpl value,
-    $Res Function(_$PlayerImpl) then,
-  ) = __$$PlayerImplCopyWithImpl<$Res>;
+abstract class _$$GamePlayerImplCopyWith<$Res>
+    implements $GamePlayerCopyWith<$Res> {
+  factory _$$GamePlayerImplCopyWith(
+    _$GamePlayerImpl value,
+    $Res Function(_$GamePlayerImpl) then,
+  ) = __$$GamePlayerImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({
@@ -156,15 +160,15 @@ abstract class _$$PlayerImplCopyWith<$Res> implements $PlayerCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$PlayerImplCopyWithImpl<$Res>
-    extends _$PlayerCopyWithImpl<$Res, _$PlayerImpl>
-    implements _$$PlayerImplCopyWith<$Res> {
-  __$$PlayerImplCopyWithImpl(
-    _$PlayerImpl _value,
-    $Res Function(_$PlayerImpl) _then,
+class __$$GamePlayerImplCopyWithImpl<$Res>
+    extends _$GamePlayerCopyWithImpl<$Res, _$GamePlayerImpl>
+    implements _$$GamePlayerImplCopyWith<$Res> {
+  __$$GamePlayerImplCopyWithImpl(
+    _$GamePlayerImpl _value,
+    $Res Function(_$GamePlayerImpl) _then,
   ) : super(_value, _then);
 
-  /// Create a copy of Player
+  /// Create a copy of GamePlayer
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -179,7 +183,7 @@ class __$$PlayerImplCopyWithImpl<$Res>
     Object? scoreMultiplier = null,
   }) {
     return _then(
-      _$PlayerImpl(
+      _$GamePlayerImpl(
         id: null == id
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
@@ -219,8 +223,8 @@ class __$$PlayerImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$PlayerImpl extends _Player {
-  const _$PlayerImpl({
+class _$GamePlayerImpl extends _GamePlayer {
+  const _$GamePlayerImpl({
     required this.id,
     required this.name,
     required this.grid,
@@ -233,8 +237,8 @@ class _$PlayerImpl extends _Player {
        _actionCards = actionCards,
        super._();
 
-  factory _$PlayerImpl.fromJson(Map<String, dynamic> json) =>
-      _$$PlayerImplFromJson(json);
+  factory _$GamePlayerImpl.fromJson(Map<String, dynamic> json) =>
+      _$$GamePlayerImplFromJson(json);
 
   @override
   final String id;
@@ -266,14 +270,14 @@ class _$PlayerImpl extends _Player {
 
   @override
   String toString() {
-    return 'Player(id: $id, name: $name, grid: $grid, actionCards: $actionCards, isConnected: $isConnected, isHost: $isHost, hasFinishedRound: $hasFinishedRound, scoreMultiplier: $scoreMultiplier)';
+    return 'GamePlayer(id: $id, name: $name, grid: $grid, actionCards: $actionCards, isConnected: $isConnected, isHost: $isHost, hasFinishedRound: $hasFinishedRound, scoreMultiplier: $scoreMultiplier)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$PlayerImpl &&
+            other is _$GamePlayerImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.grid, grid) || other.grid == grid) &&
@@ -304,22 +308,22 @@ class _$PlayerImpl extends _Player {
     scoreMultiplier,
   );
 
-  /// Create a copy of Player
+  /// Create a copy of GamePlayer
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$PlayerImplCopyWith<_$PlayerImpl> get copyWith =>
-      __$$PlayerImplCopyWithImpl<_$PlayerImpl>(this, _$identity);
+  _$$GamePlayerImplCopyWith<_$GamePlayerImpl> get copyWith =>
+      __$$GamePlayerImplCopyWithImpl<_$GamePlayerImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$PlayerImplToJson(this);
+    return _$$GamePlayerImplToJson(this);
   }
 }
 
-abstract class _Player extends Player {
-  const factory _Player({
+abstract class _GamePlayer extends GamePlayer {
+  const factory _GamePlayer({
     required final String id,
     required final String name,
     required final PlayerGrid grid,
@@ -328,10 +332,11 @@ abstract class _Player extends Player {
     final bool isHost,
     final bool hasFinishedRound,
     final int scoreMultiplier,
-  }) = _$PlayerImpl;
-  const _Player._() : super._();
+  }) = _$GamePlayerImpl;
+  const _GamePlayer._() : super._();
 
-  factory _Player.fromJson(Map<String, dynamic> json) = _$PlayerImpl.fromJson;
+  factory _GamePlayer.fromJson(Map<String, dynamic> json) =
+      _$GamePlayerImpl.fromJson;
 
   @override
   String get id;
@@ -350,10 +355,10 @@ abstract class _Player extends Player {
   @override
   int get scoreMultiplier;
 
-  /// Create a copy of Player
+  /// Create a copy of GamePlayer
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$PlayerImplCopyWith<_$PlayerImpl> get copyWith =>
+  _$$GamePlayerImplCopyWith<_$GamePlayerImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

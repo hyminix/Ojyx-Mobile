@@ -6,7 +6,7 @@ import '../providers/card_selection_provider.dart';
 /// A reusable overlay widget for handling various selection modes
 /// Supports opponent selection, card selection from discard, and more
 class GameSelectionOverlay extends ConsumerStatefulWidget {
-  final List<Player> players;
+  final List<GamePlayer> players;
   final String currentPlayerId;
   final bool requiresConfirmation;
   final String? confirmationMessage;
@@ -144,7 +144,7 @@ class _GameSelectionOverlayState extends ConsumerState<GameSelectionOverlay>
             ),
             const SizedBox(height: 24),
 
-            // Player grid
+            // GamePlayer grid
             if (opponents.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(32),

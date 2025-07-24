@@ -30,7 +30,7 @@ class EndTurn implements UseCase<GameState, EndTurnParams> {
       }
 
       // Process end of turn validations
-      var updatedPlayers = List<Player>.from(gameState.players);
+      var updatedPlayers = List<GamePlayer>.from(gameState.players);
       var discardPile = List<Card>.from(gameState.discardPile);
 
       // Get current player index

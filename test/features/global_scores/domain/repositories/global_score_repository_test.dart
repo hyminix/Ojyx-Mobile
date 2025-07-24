@@ -236,7 +236,7 @@ void main() {
           5,
           (i) => PlayerStats(
             playerId: 'player$i',
-            playerName: 'Player $i',
+            playerName: 'GamePlayer $i',
             totalGamesPlayed: 10,
             totalWins: 10 - i,
             averageScore: 100 + i * 10,

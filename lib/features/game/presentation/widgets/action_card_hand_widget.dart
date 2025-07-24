@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/core/utils/constants.dart';
 import '../../domain/entities/action_card.dart';
-import '../../domain/entities/player.dart';
+import '../../domain/entities/game_player.dart';
 import 'action_card_widget.dart';
 
 class ActionCardHandWidget extends ConsumerStatefulWidget {
-  final Player player;
+  final GamePlayer player;
   final bool isCurrentPlayer;
   final void Function(ActionCard)? onCardTap;
   final void Function(ActionCard)? onCardDiscard;

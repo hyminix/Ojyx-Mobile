@@ -23,7 +23,7 @@ class DistributeCards implements UseCase<GameState, DistributeCardsParams> {
     try {
       final gameState = params.gameState;
       final deck = List<Card>.from(gameState.deck);
-      final updatedPlayers = <Player>[];
+      final updatedPlayers = <GamePlayer>[];
 
       // Verify we have enough cards
       final requiredCards =

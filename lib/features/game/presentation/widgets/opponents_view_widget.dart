@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/game_state.dart';
-import '../../domain/entities/player.dart';
+import '../../domain/entities/game_player.dart';
 import '../../domain/entities/player_state.dart';
 import '../../domain/entities/card.dart' as game_card;
 import 'opponent_grid_widget.dart';
@@ -18,7 +18,7 @@ class OpponentsViewWidget extends StatelessWidget {
     this.onPlayerTap,
   });
 
-  PlayerState _playerToPlayerState(Player player) {
+  PlayerState _playerToPlayerState(GamePlayer player) {
     // Flatten the 2D grid to 1D list
     final flatCards = <game_card.Card?>[];
     for (final row in player.grid.cards) {
@@ -131,7 +131,7 @@ class OpponentsGridViewWidget extends StatelessWidget {
     this.crossAxisCount = 2,
   });
 
-  PlayerState _playerToPlayerState(Player player) {
+  PlayerState _playerToPlayerState(GamePlayer player) {
     // Flatten the 2D grid to 1D list
     final flatCards = <game_card.Card?>[];
     for (final row in player.grid.cards) {

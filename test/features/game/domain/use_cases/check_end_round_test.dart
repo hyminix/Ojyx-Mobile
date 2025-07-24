@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/domain/use_cases/check_end_round.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 
@@ -31,14 +31,14 @@ void main() {
   group('CheckEndRound UseCase', () {
     test('should continue to next player when not in last round', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
-        Player(id: 'player3', name: 'Player 3', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: PlayerGrid.empty()),
       ];
 
       final gameState = GameState.initial(
@@ -117,9 +117,9 @@ void main() {
         }
 
         final players = [
-          Player(id: 'player1', name: 'Player 1', grid: grid1, isHost: true),
-          Player(id: 'player2', name: 'Player 2', grid: grid2),
-          Player(id: 'player3', name: 'Player 3', grid: grid3),
+          GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+          GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
+          GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: grid3),
         ];
 
         final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -140,7 +140,7 @@ void main() {
           expect(newState.status, GameStatus.finished);
 
           // Check scores are calculated
-          // Player 1 is initiator with score 6, player 3 has lowest (3)
+          // GamePlayer 1 is initiator with score 6, player 3 has lowest (3)
           // So player 1 gets double penalty
           expect(newState.players[0].currentScore, 12); // (5 + 3 + (-2)) * 2
           expect(newState.players[1].currentScore, 18); // 10 + 8 + 0s
@@ -189,8 +189,8 @@ void main() {
         }
 
         final players = [
-          Player(id: 'player1', name: 'Player 1', grid: grid1, isHost: true),
-          Player(id: 'player2', name: 'Player 2', grid: grid2),
+          GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+          GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
         ];
 
         final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -221,8 +221,8 @@ void main() {
       final grid2 = createFullGrid([10, 8]); // Score: 18
 
       final players = [
-        Player(id: 'player1', name: 'Player 1', grid: grid1, isHost: true),
-        Player(id: 'player2', name: 'Player 2', grid: grid2),
+        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -252,9 +252,9 @@ void main() {
       final grid3 = createFullGrid([10]); // Score: 10
 
       final players = [
-        Player(id: 'player1', name: 'Player 1', grid: grid1, isHost: true),
-        Player(id: 'player2', name: 'Player 2', grid: grid2),
-        Player(id: 'player3', name: 'Player 3', grid: grid3),
+        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
+        GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: grid3),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -280,13 +280,13 @@ void main() {
 
     test('should set finishedAt timestamp when round ends', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -312,14 +312,14 @@ void main() {
 
     test('should continue last round if not at last player', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
-        Player(id: 'player3', name: 'Player 3', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
+        GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: PlayerGrid.empty()),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)

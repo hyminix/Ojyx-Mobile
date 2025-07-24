@@ -140,7 +140,7 @@ void main() {
         final playerId = 'player1';
         when(
           () => mockDataSource.addActionCardToPlayer(playerId, testCard),
-        ).thenThrow(Exception('Player cannot have more than 3 action cards'));
+        ).thenThrow(Exception('GamePlayer cannot have more than 3 action cards'));
 
         // Act & Assert
         expect(
@@ -157,7 +157,7 @@ void main() {
         final playerId = 'player1';
         when(
           () => mockDataSource.removeActionCardFromPlayer(playerId, testCard),
-        ).thenThrow(Exception('Player does not have this action card'));
+        ).thenThrow(Exception('GamePlayer does not have this action card'));
 
         // Act & Assert
         expect(

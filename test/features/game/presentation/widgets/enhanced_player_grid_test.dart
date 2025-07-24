@@ -7,13 +7,13 @@ import 'package:ojyx/features/game/presentation/widgets/player_grid_widget.dart'
 import 'package:ojyx/features/game/presentation/widgets/card_widget.dart';
 import 'package:ojyx/features/game/presentation/widgets/visual_feedback_widget.dart';
 import 'package:ojyx/features/game/presentation/providers/card_selection_provider.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 
 void main() {
   group('EnhancedPlayerGrid', () {
-    late Player testPlayer;
+    late GamePlayer testPlayer;
     late PlayerGrid testGrid;
 
     setUp(() {
@@ -22,7 +22,7 @@ void main() {
         (index) => game.Card(value: index, isRevealed: index < 2),
       );
       testGrid = PlayerGrid.fromCards(cards);
-      testPlayer = Player(id: 'player-1', name: 'Test Player', grid: testGrid);
+      testPlayer = GamePlayer(id: 'player-1', name: 'Test GamePlayer', grid: testGrid);
     });
 
     testWidgets('should wrap PlayerGridWidget with enhanced features', (

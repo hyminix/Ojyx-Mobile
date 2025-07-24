@@ -4,7 +4,7 @@ import 'package:ojyx/core/usecases/usecase.dart';
 import 'package:ojyx/features/global_scores/domain/entities/global_score.dart';
 import 'package:ojyx/features/global_scores/domain/repositories/global_score_repository.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 
 class SaveGlobalScoreUseCase implements UseCase<List<GlobalScore>, SaveGlobalScoreParams> {
   final GlobalScoreRepository repository;
@@ -17,7 +17,7 @@ class SaveGlobalScoreUseCase implements UseCase<List<GlobalScore>, SaveGlobalSco
       final gameEndedAt = DateTime.now();
       
       // Sort players by score (ascending - lowest score first)
-      final sortedPlayers = List<Player>.from(params.gameState.players)
+      final sortedPlayers = List<GamePlayer>.from(params.gameState.players)
         ..sort((a, b) => a.currentScore.compareTo(b.currentScore));
 
       // Check if round initiator needs penalty

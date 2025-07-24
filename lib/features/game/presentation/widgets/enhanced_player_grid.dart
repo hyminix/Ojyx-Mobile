@@ -11,7 +11,7 @@ import 'visual_feedback_widget.dart';
 
 /// Enhanced player grid with animations and visual feedback
 class EnhancedPlayerGrid extends ConsumerStatefulWidget {
-  final Player player;
+  final GamePlayer player;
   final bool isCurrentPlayer;
   final Function(int position) onCardTap;
   final bool showSuccessFeedback;

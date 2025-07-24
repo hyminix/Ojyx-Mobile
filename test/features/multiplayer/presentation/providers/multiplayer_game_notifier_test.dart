@@ -8,7 +8,7 @@ import 'package:ojyx/features/multiplayer/presentation/providers/room_providers.
 import 'package:ojyx/features/multiplayer/domain/entities/room_event.dart';
 import 'package:ojyx/features/multiplayer/domain/use_cases/sync_game_state_use_case.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/presentation/providers/game_state_notifier.dart';
 
@@ -54,13 +54,13 @@ void main() {
       final initialState = GameState.initial(
         roomId: roomId,
         players: [
-          Player(
+          GamePlayer(
             id: 'user-123',
             name: 'John',
             grid: PlayerGrid.empty(),
             isHost: true,
           ),
-          Player(
+          GamePlayer(
             id: 'user-456',
             name: 'Jane',
             grid: PlayerGrid.empty(),
@@ -107,13 +107,13 @@ void main() {
       final updatedState = GameState.initial(
         roomId: roomId,
         players: [
-          Player(
+          GamePlayer(
             id: 'user-123',
             name: 'John',
             grid: PlayerGrid.empty(),
             isHost: true,
           ),
-          Player(
+          GamePlayer(
             id: 'user-456',
             name: 'Jane',
             grid: PlayerGrid.empty(),

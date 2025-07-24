@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 import 'package:ojyx/features/game/domain/repositories/action_card_repository.dart';
@@ -33,16 +33,16 @@ void main() {
     bool lastRound = false,
   }) {
     final players = [
-      Player(
+      GamePlayer(
         id: 'player1',
-        name: 'Player 1',
+        name: 'GamePlayer 1',
         grid: PlayerGrid.empty(),
         actionCards: [],
         hasFinishedRound: false,
       ),
-      Player(
+      GamePlayer(
         id: 'player2',
-        name: 'Player 2',
+        name: 'GamePlayer 2',
         grid: PlayerGrid.empty(),
         actionCards: [],
         hasFinishedRound: false,
@@ -130,7 +130,7 @@ void main() {
 
       when(
         () => mockRepository.getPlayerActionCards('player1'),
-      ).thenReturn([]); // Player has no cards
+      ).thenReturn([]); // GamePlayer has no cards
 
       // Act
       final result = await useCase(params);
@@ -306,16 +306,16 @@ void main() {
         final gameState = GameState(
           roomId: 'test-room',
           players: [
-            Player(
+            GamePlayer(
               id: 'player1',
-              name: 'Player 1',
+              name: 'GamePlayer 1',
               grid: grid,
               actionCards: [actionCard],
               hasFinishedRound: false,
             ),
-            Player(
+            GamePlayer(
               id: 'player2',
-              name: 'Player 2',
+              name: 'GamePlayer 2',
               grid: PlayerGrid.empty(),
               actionCards: [],
               hasFinishedRound: false,
@@ -383,9 +383,9 @@ void main() {
 
       final gameState = createTestGameState(
         currentPlayerIndex: 1,
-      ); // Player 2's turn
+      ); // GamePlayer 2's turn
       final params = UseActionCardParams(
-        playerId: 'player1', // Player 1 trying to play
+        playerId: 'player1', // GamePlayer 1 trying to play
         actionCard: actionCard,
         gameState: gameState,
         targetData: null,
@@ -419,9 +419,9 @@ void main() {
 
       final gameState = createTestGameState(
         currentPlayerIndex: 1,
-      ); // Player 2's turn
+      ); // GamePlayer 2's turn
       final params = UseActionCardParams(
-        playerId: 'player1', // Player 1 can play reaction
+        playerId: 'player1', // GamePlayer 1 can play reaction
         actionCard: actionCard,
         gameState: gameState,
         targetData: null,

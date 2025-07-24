@@ -50,7 +50,7 @@ class ServerActionCardRepository implements ActionCardRepository {
   @override
   List<ActionCard> getPlayerActionCards(String playerId) {
     // This should not be used in server-authoritative architecture
-    // Player action cards are now stored in player_grids table
+    // GamePlayer action cards are now stored in player_grids table
     throw UnsupportedError(
       'Use GameStateRepository.getPlayerGrid() to get player action cards'
     );

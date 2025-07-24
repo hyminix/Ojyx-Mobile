@@ -105,7 +105,7 @@ class SupabaseGameStateRepository implements GameStateRepository {
         .eq('game_state_id', gameStateId)
         .eq('player_id', playerId)
         .map((data) => data.isEmpty 
-            ? throw Exception('Player grid not found')
+            ? throw Exception('GamePlayer grid not found')
             : PlayerGridModel.fromJson(data.first).toDomain());
   }
 

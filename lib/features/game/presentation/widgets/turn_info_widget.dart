@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/game_state.dart';
-import '../../domain/entities/player.dart';
+import '../../domain/entities/game_player.dart';
 
 class TurnInfoWidget extends StatelessWidget {
   final GameState gameState;

@@ -4,7 +4,7 @@ import 'package:ojyx/features/multiplayer/domain/entities/room_event.dart';
 import 'package:ojyx/features/multiplayer/data/models/room_model.dart';
 import 'package:ojyx/features/multiplayer/data/models/room_model_extensions.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 
 void main() {
@@ -51,13 +51,13 @@ void main() {
     test('GameState can be created with players', () {
       // Arrange
       final players = [
-        Player(
+        GamePlayer(
           id: 'user-123',
           name: 'John',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(
+        GamePlayer(
           id: 'user-456',
           name: 'Jane',
           grid: PlayerGrid.empty(),

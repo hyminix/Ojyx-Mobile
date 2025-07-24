@@ -45,7 +45,7 @@ class RevealInitialCards
       if (playerIndex == -1) {
         return Left(
           Failure.gameLogic(
-            message: 'Player not found',
+            message: 'GamePlayer not found',
             code: 'PLAYER_NOT_FOUND',
           ),
         );
@@ -95,7 +95,7 @@ class RevealInitialCards
       final updatedPlayer = player.copyWith(grid: updatedGrid);
 
       // Update players list
-      final updatedPlayers = List<Player>.from(params.gameState.players);
+      final updatedPlayers = List<GamePlayer>.from(params.gameState.players);
       updatedPlayers[playerIndex] = updatedPlayer;
 
       // Return updated game state

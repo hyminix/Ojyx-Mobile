@@ -48,7 +48,7 @@ class EndGameScreen extends ConsumerWidget {
                     WinnerAnnouncement(winner: endGameState.winner),
                     const SizedBox(height: 32),
 
-                    // Player rankings
+                    // GamePlayer rankings
                     ...endGameState.rankedPlayers.asMap().entries.map((entry) {
                       final index = entry.key;
                       final player = entry.value;

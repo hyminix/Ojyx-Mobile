@@ -17,7 +17,7 @@ import '../widgets/action_card_draw_pile_widget.dart';
 import '../widgets/game_animation_overlay.dart';
 import '../providers/card_selection_provider.dart';
 import '../../domain/entities/game_state.dart';
-import '../../domain/entities/player.dart';
+import '../../domain/entities/game_player.dart';
 import '../../domain/entities/action_card.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
@@ -135,7 +135,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                             ),
                             const SizedBox(height: 24),
 
-                            // Player's grid
+                            // GamePlayer's grid
                             Consumer(
                               builder: (context, ref, child) {
                                 final selectionState = ref.watch(
@@ -195,7 +195,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     ),
                   ),
 
-                  // Player hand (drawn card)
+                  // GamePlayer hand (drawn card)
                   if (gameStateAsync.drawnCard != null && isMyTurn)
                     PlayerHandWidget(
                       drawnCard: gameStateAsync.drawnCard,
@@ -245,7 +245,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     );
   }
 
-  Player? _getCurrentPlayer(GameState gameState, String playerId) {
+  GamePlayer? _getCurrentPlayer(GameState gameState, String playerId) {
     try {
       return gameState.players.firstWhere((p) => p.id == playerId);
     } catch (e) {

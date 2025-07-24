@@ -31,7 +31,7 @@ class CheckEndRound implements UseCase<GameState, CheckEndRoundParams> {
       }
 
       // End of round - calculate final scores and apply penalty if needed
-      var updatedPlayers = List<Player>.from(gameState.players);
+      var updatedPlayers = List<GamePlayer>.from(gameState.players);
 
       // Find the lowest score
       final scores = updatedPlayers.map((p) => p.currentScore).toList();

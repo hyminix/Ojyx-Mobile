@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'player.freezed.dart';
+part 'lobby_player.freezed.dart';
+part 'lobby_player.g.dart';
 
 enum ConnectionStatus {
   online,
@@ -9,8 +10,8 @@ enum ConnectionStatus {
 }
 
 @freezed
-class Player with _$Player {
-  const factory Player({
+class LobbyPlayer with _$LobbyPlayer {
+  const factory LobbyPlayer({
     required String id,
     required String name,
     String? avatarUrl,
@@ -19,5 +20,7 @@ class Player with _$Player {
     required DateTime lastSeenAt,
     required ConnectionStatus connectionStatus,
     String? currentRoomId,
-  }) = _Player;
+  }) = _LobbyPlayer;
+
+  factory LobbyPlayer.fromJson(Map<String, dynamic> json) => _$LobbyPlayerFromJson(json);
 }

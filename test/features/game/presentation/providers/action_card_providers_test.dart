@@ -5,7 +5,7 @@ import 'package:ojyx/features/game/presentation/providers/action_card_providers.
 import 'package:ojyx/features/game/domain/repositories/action_card_repository.dart';
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/use_cases/use_action_card_use_case.dart';
 import 'package:fpdart/fpdart.dart';
@@ -127,7 +127,7 @@ void main() {
 
       when(
         () => mockRepository.getPlayerActionCards(playerId),
-      ).thenReturn([]); // Player has no cards
+      ).thenReturn([]); // GamePlayer has no cards
 
       // Act
       final canUse = container.read(canUseActionCardProvider(params));
@@ -151,7 +151,7 @@ void main() {
 
       when(
         () => mockRepository.getPlayerActionCards(playerId),
-      ).thenReturn([actionCard]); // Player has the card
+      ).thenReturn([actionCard]); // GamePlayer has the card
 
       // Act
       final canUse = container.read(canUseActionCardProvider(params));
@@ -176,15 +176,15 @@ void main() {
       final gameState = GameState(
         roomId: 'test-room',
         players: [
-          Player(
+          GamePlayer(
             id: 'player1',
-            name: 'Player 1',
+            name: 'GamePlayer 1',
             grid: PlayerGrid.empty(),
             actionCards: [actionCard],
           ),
-          Player(
+          GamePlayer(
             id: 'player2',
-            name: 'Player 2',
+            name: 'GamePlayer 2',
             grid: PlayerGrid.empty(),
             actionCards: [],
           ),

@@ -3,7 +3,7 @@ import 'package:ojyx/features/global_scores/domain/entities/global_score.dart';
 import 'package:ojyx/features/global_scores/domain/repositories/global_score_repository.dart';
 import 'package:ojyx/features/global_scores/domain/use_cases/save_global_score.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game_card;
 import 'package:ojyx/core/errors/failures.dart';
@@ -69,21 +69,21 @@ void main() {
     final charlieGrid = PlayerGrid.fromCards(charlieCards); // Score: 8*11 + 7 = 95
 
     final testPlayers = [
-      Player(
+      GamePlayer(
         id: 'player1',
         name: 'Alice',
         isHost: true,
         grid: aliceGrid,
         scoreMultiplier: 1, // To ensure score = 85 (close enough)
       ),
-      Player(
+      GamePlayer(
         id: 'player2',
         name: 'Bob',
         isHost: false,
         grid: bobGrid,
         scoreMultiplier: 1,
       ),
-      Player(
+      GamePlayer(
         id: 'player3',
         name: 'Charlie',
         isHost: false,

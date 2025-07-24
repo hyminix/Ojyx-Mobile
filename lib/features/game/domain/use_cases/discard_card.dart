@@ -63,7 +63,7 @@ class DiscardCard implements UseCase<GameState, DiscardCardParams> {
 
       final drawnCard = gameState.drawnCard!;
       var discardPile = List<Card>.from(gameState.discardPile);
-      var updatedPlayers = List<Player>.from(gameState.players);
+      var updatedPlayers = List<GamePlayer>.from(gameState.players);
       Card cardToDiscard = drawnCard;
 
       // If grid position provided, exchange with grid card

@@ -120,7 +120,7 @@ class _PlayerRankCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              // Player info
+              // GamePlayer info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -61,7 +61,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
       if (playerIndex == -1) {
         return Left(
           Failure.gameLogic(
-            message: 'Player not found',
+            message: 'GamePlayer not found',
             code: 'PLAYER_NOT_FOUND',
           ),
         );
@@ -96,7 +96,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
 
       // Update the player in game state
       final updatedPlayer = player.addActionCard(drawnCard);
-      final updatedPlayers = List<Player>.from(params.gameState.players);
+      final updatedPlayers = List<GamePlayer>.from(params.gameState.players);
       updatedPlayers[playerIndex] = updatedPlayer;
 
       // Create updated game state

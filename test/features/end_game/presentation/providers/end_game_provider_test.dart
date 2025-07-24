@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/end_game/presentation/providers/end_game_provider.dart';
 import 'package:ojyx/features/end_game/domain/entities/end_game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
@@ -29,7 +29,7 @@ void main() {
     late ProviderContainer container;
     late GameState mockGameState;
     late Room mockRoom;
-    late List<Player> testPlayers;
+    late List<GamePlayer> testPlayers;
 
     PlayerGrid createGridWithScore(int totalScore) {
       final cards = <Card>[];
@@ -61,19 +61,19 @@ void main() {
 
     setUp(() {
       testPlayers = [
-        Player(
+        GamePlayer(
           id: 'player1',
           name: 'Alice',
           grid: createGridWithScore(25),
           hasFinishedRound: true,
         ),
-        Player(
+        GamePlayer(
           id: 'player2',
           name: 'Bob',
           grid: createGridWithScore(30),
           hasFinishedRound: true,
         ),
-        Player(
+        GamePlayer(
           id: 'player3',
           name: 'Charlie',
           grid: createGridWithScore(20),

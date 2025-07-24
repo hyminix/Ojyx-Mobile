@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/features/multiplayer/domain/entities/room_event.dart';
@@ -32,9 +32,9 @@ void main() {
       final gameState = GameState(
         roomId: 'room123',
         players: [
-          Player(
+          GamePlayer(
             id: 'player1',
-            name: 'Player 1',
+            name: 'GamePlayer 1',
             grid: PlayerGrid.fromCards(
               List.generate(12, (_) => const Card(value: 5, isRevealed: false)),
             ),
@@ -119,7 +119,7 @@ void main() {
       final events = [
         const RoomEvent.playerJoined(
           playerId: 'player1',
-          playerName: 'Player 1',
+          playerName: 'GamePlayer 1',
         ),
         const RoomEvent.playerAction(
           playerId: 'player1',
