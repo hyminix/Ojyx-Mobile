@@ -1,39 +1,110 @@
 import '../../../game/domain/entities/game_state.dart';
-import '../entities/room_event.dart';
-import '../repositories/room_repository.dart';
+import '../../../game/domain/entities/db_player_grid.dart';
+import '../../../game/domain/repositories/game_state_repository.dart';
 
 class SyncGameStateUseCase {
-  final RoomRepository _repository;
+  final GameStateRepository _gameStateRepository;
 
-  SyncGameStateUseCase(this._repository);
+  SyncGameStateUseCase(this._gameStateRepository);
 
-  Future<void> syncGameState({
-    required String roomId,
-    required GameState gameState,
-  }) async {
-    await _repository.sendEvent(
-      roomId: roomId,
-      event: RoomEvent.gameStateUpdated(newState: gameState),
-    );
+  /// Watch game state changes in real-time (server-authoritative)
+  Stream<GameState> watchGameState(String gameStateId) {
+    return _gameStateRepository.watchGameState(gameStateId);
   }
 
-  Future<void> sendPlayerAction({
-    required String roomId,
+  /// Watch specific player grid changes
+  Stream<DbPlayerGrid> watchPlayerGrid({
+    required String gameStateId,
     required String playerId,
-    required PlayerActionType actionType,
-    Map<String, dynamic>? actionData,
-  }) async {
-    await _repository.sendEvent(
-      roomId: roomId,
-      event: RoomEvent.playerAction(
-        playerId: playerId,
-        actionType: actionType,
-        actionData: actionData,
-      ),
+  }) {
+    return _gameStateRepository.watchPlayerGrid(
+      gameStateId: gameStateId,
+      playerId: playerId,
     );
   }
 
-  Stream<RoomEvent> watchGameEvents(String roomId) {
-    return _repository.watchRoomEvents(roomId);
+  /// Watch all game actions for real-time updates
+  Stream<Map<String, dynamic>> watchGameActions(String gameStateId) {
+    return _gameStateRepository.watchGameActions(gameStateId);
+  }
+
+  /// Get current game state snapshot
+  Future<GameState?> getCurrentGameState(String gameStateId) async {
+    return await _gameStateRepository.getGameState(gameStateId);
+  }
+
+  /// Get current player grid snapshot
+  Future<DbPlayerGrid?> getCurrentPlayerGrid({
+    required String gameStateId,
+    required String playerId,
+  }) async {
+    return await _gameStateRepository.getPlayerGrid(
+      gameStateId: gameStateId,
+      playerId: playerId,
+    );
+  }
+
+  /// Get all player grids for the game (for spectating or game overview)
+  Future<List<DbPlayerGrid>> getAllPlayerGrids(String gameStateId) async {
+    return await _gameStateRepository.getAllPlayerGrids(gameStateId);
+  }
+
+  /// Perform a card reveal action (server-validated)
+  Future<Map<String, dynamic>> revealCard({
+    required String gameStateId,
+    required String playerId,
+    required int position,
+  }) async {
+    return await _gameStateRepository.revealCard(
+      gameStateId: gameStateId,
+      playerId: playerId,
+      position: position,
+    );
+  }
+
+  /// Advance to the next turn (server-managed)
+  Future<Map<String, dynamic>> advanceTurn({
+    required String gameStateId,
+  }) async {
+    return await _gameStateRepository.advanceTurn(
+      gameStateId: gameStateId,
+    );
+  }
+
+  /// Check for end game conditions (server-validated)
+  Future<Map<String, dynamic>> checkEndGameConditions({
+    required String gameStateId,
+  }) async {
+    return await _gameStateRepository.checkEndGameConditions(
+      gameStateId: gameStateId,
+    );
+  }
+
+  /// Get game action history for replay or debugging
+  Future<List<Map<String, dynamic>>> getGameActionHistory({
+    required String gameStateId,
+    int? limit,
+  }) async {
+    return await _gameStateRepository.getGameActions(
+      gameStateId: gameStateId,
+      limit: limit,
+    );
+  }
+
+  /// Validate if a player can perform an action (for UI feedback)
+  Future<bool> canPlayerAct({
+    required String gameStateId,
+    required String playerId,
+  }) async {
+    try {
+      final gameState = await getCurrentGameState(gameStateId);
+      if (gameState == null) return false;
+      
+      // Check if it's the player's turn and game is active
+      return gameState.currentPlayerId == playerId && 
+             gameState.status == GameStatus.active;
+    } catch (e) {
+      return false;
+    }
   }
 }

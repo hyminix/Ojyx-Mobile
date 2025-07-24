@@ -1,8 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/game_state.dart';
-import '../../domain/entities/player.dart';
-import '../../domain/entities/card.dart';
-import '../../domain/entities/action_card.dart';
 
 part 'game_state_model.freezed.dart';
 part 'game_state_model.g.dart';
@@ -10,69 +7,71 @@ part 'game_state_model.g.dart';
 @freezed
 class GameStateModel with _$GameStateModel {
   const factory GameStateModel({
-    required String roomId,
-    required List<Player> players,
-    required int currentPlayerIndex,
-    required List<Card> deck,
-    required List<Card> discardPile,
-    required List<ActionCard> actionDeck,
-    required List<ActionCard> actionDiscard,
-    required GameStatus status,
-    required TurnDirection turnDirection,
-    required bool lastRound,
-    String? initiatorPlayerId,
-    String? endRoundInitiator,
-    Card? drawnCard,
-    DateTime? createdAt,
-    DateTime? startedAt,
-    DateTime? finishedAt,
+    required String id,
+    @JsonKey(name: 'room_id') required String roomId,
+    required String status,
+    @JsonKey(name: 'current_player_id') required String currentPlayerId,
+    @JsonKey(name: 'turn_number') required int turnNumber,
+    @JsonKey(name: 'round_number') required int roundNumber,
+    @JsonKey(name: 'game_data') required Map<String, dynamic> gameData,
+    @JsonKey(name: 'winner_id') String? winnerId,
+    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
   }) = _GameStateModel;
 
   const GameStateModel._();
 
-  factory GameStateModel.fromJson(Map<String, dynamic> json) =>
-      _$GameStateModelFromJson(json);
+  factory GameStateModel.fromJson(Map<String, dynamic> json) => _$GameStateModelFromJson(json);
 
-  // Conversion methods
-  factory GameStateModel.fromDomain(GameState entity) {
+  factory GameStateModel.fromDomain(GameState gameState) {
     return GameStateModel(
-      roomId: entity.roomId,
-      players: entity.players,
-      currentPlayerIndex: entity.currentPlayerIndex,
-      deck: entity.deck,
-      discardPile: entity.discardPile,
-      actionDeck: entity.actionDeck,
-      actionDiscard: entity.actionDiscard,
-      status: entity.status,
-      turnDirection: entity.turnDirection,
-      lastRound: entity.lastRound,
-      initiatorPlayerId: entity.initiatorPlayerId,
-      endRoundInitiator: entity.endRoundInitiator,
-      drawnCard: entity.drawnCard,
-      createdAt: entity.createdAt,
-      startedAt: entity.startedAt,
-      finishedAt: entity.finishedAt,
+      id: gameState.id,
+      roomId: gameState.roomId,
+      status: gameState.status.name,
+      currentPlayerId: gameState.currentPlayerId,
+      turnNumber: gameState.turnNumber,
+      roundNumber: gameState.roundNumber,
+      gameData: gameState.gameData,
+      winnerId: gameState.winnerId,
+      endedAt: gameState.endedAt,
+      createdAt: gameState.createdAt,
+      updatedAt: gameState.updatedAt,
     );
   }
 
   GameState toDomain() {
     return GameState(
+      id: id,
       roomId: roomId,
-      players: players,
-      currentPlayerIndex: currentPlayerIndex,
-      deck: deck,
-      discardPile: discardPile,
-      actionDeck: actionDeck,
-      actionDiscard: actionDiscard,
-      status: status,
-      turnDirection: turnDirection,
-      lastRound: lastRound,
-      initiatorPlayerId: initiatorPlayerId,
-      endRoundInitiator: endRoundInitiator,
-      drawnCard: drawnCard,
+      status: GameStatus.values.firstWhere(
+        (status) => status.name == this.status,
+        orElse: () => GameStatus.waiting,
+      ),
+      currentPlayerId: currentPlayerId,
+      turnNumber: turnNumber,
+      roundNumber: roundNumber,
+      gameData: gameData,
+      winnerId: winnerId,
+      endedAt: endedAt,
       createdAt: createdAt,
-      startedAt: startedAt,
-      finishedAt: finishedAt,
+      updatedAt: updatedAt,
     );
+  }
+
+  Map<String, dynamic> toSupabaseJson() {
+    return {
+      'id': id,
+      'room_id': roomId,
+      'status': status,
+      'current_player_id': currentPlayerId,
+      'turn_number': turnNumber,
+      'round_number': roundNumber,
+      'game_data': gameData,
+      'winner_id': winnerId,
+      'ended_at': endedAt?.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
   }
 }

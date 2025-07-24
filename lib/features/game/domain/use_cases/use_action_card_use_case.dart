@@ -2,92 +2,129 @@ import 'package:fpdart/fpdart.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../entities/action_card.dart';
-import '../entities/game_state.dart';
-import '../entities/player.dart';
-import '../entities/player_grid.dart';
-import '../entities/card.dart' as game;
-import '../repositories/action_card_repository.dart';
+import '../repositories/game_state_repository.dart';
 
 class UseActionCardParams {
+  final String gameStateId;
   final String playerId;
-  final ActionCard actionCard;
-  final GameState gameState;
+  final ActionCardType actionCardType;
   final Map<String, dynamic>? targetData;
 
   UseActionCardParams({
+    required this.gameStateId,
     required this.playerId,
-    required this.actionCard,
-    required this.gameState,
+    required this.actionCardType,
     this.targetData,
   });
 }
 
-class UseActionCardUseCase extends UseCase<GameState, UseActionCardParams> {
-  final ActionCardRepository _repository;
+class UseActionCardUseCase extends UseCase<Map<String, dynamic>, UseActionCardParams> {
+  final GameStateRepository _gameStateRepository;
 
-  UseActionCardUseCase(this._repository);
+  UseActionCardUseCase(this._gameStateRepository);
 
   @override
-  Future<Either<Failure, GameState>> call(UseActionCardParams params) async {
+  Future<Either<Failure, Map<String, dynamic>>> call(UseActionCardParams params) async {
     try {
-      // Verify player has the action card
-      final playerCards = _repository.getPlayerActionCards(params.playerId);
-      if (!playerCards.contains(params.actionCard)) {
-        return Left(
-          Failure.gameLogic(
-            message: 'Player does not have this action card',
-            code: 'CARD_NOT_OWNED',
-          ),
-        );
-      }
-
-      // Check if it's the player's turn (except for reaction cards)
-      final currentPlayer = params.gameState.currentPlayer;
-      if (currentPlayer.id != params.playerId &&
-          params.actionCard.timing != ActionTiming.reactive) {
-        return Left(
-          Failure.gameLogic(
-            message: 'It is not your turn',
-            code: 'NOT_YOUR_TURN',
-          ),
-        );
-      }
-
-      // Validate target data if required
-      if (_requiresTargetData(params.actionCard) && params.targetData == null) {
-        return Left(
-          Failure.validation(
-            message: 'This action card requires target data',
-            errors: {'target': 'Target data is required'},
-          ),
-        );
-      }
-
-      // Apply the action card effect
-      final updatedGameState = _applyActionEffect(
-        params.actionCard,
-        params.gameState,
-        params.playerId,
-        params.targetData,
+      // Validate action card usage with server-side validation
+      final result = await _gameStateRepository.useActionCard(
+        gameStateId: params.gameStateId,
+        playerId: params.playerId,
+        actionCardType: params.actionCardType,
+        targetData: params.targetData,
       );
 
-      // Remove card from player and discard it
-      _repository.removeActionCardFromPlayer(
-        params.playerId,
-        params.actionCard,
-      );
-      _repository.discardActionCard(params.actionCard);
+      // Check if the server returned a valid result
+      if (result['valid'] != true) {
+        final errorMessage = result['error'] as String? ?? 'Unknown error';
+        return Left(_mapServerErrorToFailure(errorMessage, result));
+      }
 
-      return Right(updatedGameState);
+      return Right(result);
     } catch (e) {
       return Left(
-        Failure.unknown(message: 'Failed to use action card', error: e),
+        Failure.unknown(
+          message: 'Failed to use action card: ${e.toString()}',
+          error: e,
+        ),
       );
     }
   }
 
-  bool _requiresTargetData(ActionCard card) {
-    switch (card.type) {
+  /// Validate an action card use without applying it (for UI feedback)
+  Future<Either<Failure, Map<String, dynamic>>> validateOnly(
+    UseActionCardParams params,
+  ) async {
+    try {
+      // This would use a validate_action_card_use function without processing
+      final response = await _gameStateRepository.useActionCard(
+        gameStateId: params.gameStateId,
+        playerId: params.playerId,
+        actionCardType: params.actionCardType,
+        targetData: params.targetData,
+      );
+
+      if (response['valid'] != true) {
+        final errorMessage = response['error'] as String? ?? 'Unknown error';
+        return Left(_mapServerErrorToFailure(errorMessage, response));
+      }
+
+      return Right(response);
+    } catch (e) {
+      return Left(
+        Failure.unknown(
+          message: 'Failed to validate action card use: ${e.toString()}',
+          error: e,
+        ),
+      );
+    }
+  }
+
+  /// Map server error messages to appropriate Failure types
+  Failure _mapServerErrorToFailure(String errorMessage, Map<String, dynamic> response) {
+    switch (errorMessage.toLowerCase()) {
+      case 'game not found':
+      case 'game not active':
+        return Failure.gameLogic(
+          message: errorMessage,
+          code: 'GAME_STATE_INVALID',
+        );
+      
+      case 'not your turn':
+        return Failure.gameLogic(
+          message: errorMessage,
+          code: 'NOT_YOUR_TURN',
+        );
+      
+      case 'action card not available':
+        return Failure.gameLogic(
+          message: errorMessage,
+          code: 'CARD_NOT_OWNED',
+        );
+      
+      case 'invalid positions':
+      case 'cannot swap card with itself':
+      case 'cannot swap revealed card':
+        return Failure.validation(
+          message: errorMessage,
+          errors: {'target': errorMessage},
+        );
+      
+      case 'player not in game':
+        return Failure.authentication(message: errorMessage);
+      
+      default:
+        return Failure.server(
+          message: errorMessage,
+          statusCode: 400,
+          error: response,
+        );
+    }
+  }
+
+  /// Helper method to check if an action card requires target data
+  static bool requiresTargetData(ActionCardType cardType) {
+    switch (cardType) {
       case ActionCardType.teleport:
       case ActionCardType.swap:
       case ActionCardType.steal:
@@ -101,84 +138,16 @@ class UseActionCardUseCase extends UseCase<GameState, UseActionCardParams> {
     }
   }
 
-  GameState _applyActionEffect(
-    ActionCard card,
-    GameState gameState,
-    String playerId,
-    Map<String, dynamic>? targetData,
-  ) {
-    switch (card.type) {
+  /// Helper method to get action card timing for UI purposes
+  static ActionTiming getActionTiming(ActionCardType cardType) {
+    switch (cardType) {
       case ActionCardType.turnAround:
-        return gameState.copyWith(
-          turnDirection: gameState.turnDirection == TurnDirection.clockwise
-              ? TurnDirection.counterClockwise
-              : TurnDirection.clockwise,
-        );
-
-      case ActionCardType.teleport:
-        return _applyTeleportEffect(gameState, playerId, targetData!);
-
-      case ActionCardType.skip:
-        return _applySkipEffect(gameState);
-
+        return ActionTiming.immediate;
       case ActionCardType.shield:
-        // Shield effect would be handled when other players try to target this player
-        return gameState;
-
+      case ActionCardType.mirror:
+        return ActionTiming.reactive;
       default:
-        // For now, return unchanged state for unimplemented cards
-        return gameState;
+        return ActionTiming.optional;
     }
-  }
-
-  GameState _applyTeleportEffect(
-    GameState gameState,
-    String playerId,
-    Map<String, dynamic> targetData,
-  ) {
-    final position1 = targetData['position1'] as Map<String, dynamic>;
-    final position2 = targetData['position2'] as Map<String, dynamic>;
-
-    final row1 = position1['row'] as int;
-    final col1 = position1['col'] as int;
-    final row2 = position2['row'] as int;
-    final col2 = position2['col'] as int;
-
-    final playerIndex = gameState.players.indexWhere((p) => p.id == playerId);
-    if (playerIndex == -1) return gameState;
-
-    final player = gameState.players[playerIndex];
-    final grid = player.grid;
-
-    // Swap the cards
-    final card1 = grid.getCard(row1, col1);
-    final card2 = grid.getCard(row2, col2);
-
-    if (card1 == null || card2 == null) return gameState;
-
-    var updatedGrid = grid.setCard(row1, col1, card2);
-    updatedGrid = updatedGrid.setCard(row2, col2, card1);
-
-    final updatedPlayer = player.updateGrid(updatedGrid);
-    final updatedPlayers = List<Player>.from(gameState.players);
-    updatedPlayers[playerIndex] = updatedPlayer;
-
-    return gameState.copyWith(players: updatedPlayers);
-  }
-
-  GameState _applySkipEffect(GameState gameState) {
-    // Move to next player twice (skip one player)
-    var nextIndex = gameState.currentPlayerIndex;
-    for (int i = 0; i < 2; i++) {
-      if (gameState.turnDirection == TurnDirection.clockwise) {
-        nextIndex = (nextIndex + 1) % gameState.players.length;
-      } else {
-        nextIndex =
-            (nextIndex - 1 + gameState.players.length) %
-            gameState.players.length;
-      }
-    }
-
-    return gameState.copyWith(currentPlayerIndex: nextIndex);
   }
 }

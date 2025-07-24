@@ -10,8 +10,20 @@ void main() {
       // Given
       final cards = List.generate(12, (i) => Card(value: i, isRevealed: i < 2));
       final actionCards = [
-        ActionCard(id: '1', type: ActionCardType.demiTour, isObligatory: true),
-        ActionCard(id: '2', type: ActionCardType.teleportation),
+        ActionCard(
+          id: '1', 
+          type: ActionCardType.turnAround, 
+          name: 'Demi-tour', 
+          description: 'Tournez votre grille',
+          timing: ActionTiming.immediate,
+        ),
+        ActionCard(
+          id: '2', 
+          type: ActionCardType.teleport, 
+          name: 'Téléportation', 
+          description: 'Échangez deux cartes',
+          timing: ActionTiming.optional,
+        ),
       ];
 
       final playerGrid = DbPlayerGrid(
@@ -53,13 +65,21 @@ void main() {
       final actionCardsJson = [
         {
           'id': '1',
-          'type': 'demi_tour',
-          'is_obligatory': true,
+          'type': 'turnAround',
+          'timing': 'immediate',
+          'name': 'Demi-tour',
+          'description': 'Tournez votre grille',
+          'target': 'self',
+          'parameters': {},
         },
         {
           'id': '2', 
-          'type': 'teleportation',
-          'is_obligatory': false,
+          'type': 'teleport',
+          'timing': 'optional',
+          'name': 'Téléportation',
+          'description': 'Échangez deux cartes',
+          'target': 'none',
+          'parameters': {},
         }
       ];
 
@@ -99,7 +119,15 @@ void main() {
         gameStateId: 'game-id', 
         playerId: 'player-id',
         gridCards: [{'value': 5, 'is_revealed': true}],
-        actionCards: [{'id': '1', 'type': 'teleportation', 'is_obligatory': false}],
+        actionCards: [{
+          'id': '1', 
+          'type': 'teleport', 
+          'timing': 'optional',
+          'name': 'Téléportation',
+          'description': 'Échangez deux cartes',
+          'target': 'none',
+          'parameters': {},
+        }],
         score: 25,
         position: 2,
         isActive: false,

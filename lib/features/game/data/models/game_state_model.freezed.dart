@@ -21,22 +21,26 @@ GameStateModel _$GameStateModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$GameStateModel {
+  String get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'room_id')
   String get roomId => throw _privateConstructorUsedError;
-  List<Player> get players => throw _privateConstructorUsedError;
-  int get currentPlayerIndex => throw _privateConstructorUsedError;
-  List<Card> get deck => throw _privateConstructorUsedError;
-  List<Card> get discardPile => throw _privateConstructorUsedError;
-  List<ActionCard> get actionDeck => throw _privateConstructorUsedError;
-  List<ActionCard> get actionDiscard => throw _privateConstructorUsedError;
-  GameStatus get status => throw _privateConstructorUsedError;
-  TurnDirection get turnDirection => throw _privateConstructorUsedError;
-  bool get lastRound => throw _privateConstructorUsedError;
-  String? get initiatorPlayerId => throw _privateConstructorUsedError;
-  String? get endRoundInitiator => throw _privateConstructorUsedError;
-  Card? get drawnCard => throw _privateConstructorUsedError;
-  DateTime? get createdAt => throw _privateConstructorUsedError;
-  DateTime? get startedAt => throw _privateConstructorUsedError;
-  DateTime? get finishedAt => throw _privateConstructorUsedError;
+  String get status => throw _privateConstructorUsedError;
+  @JsonKey(name: 'current_player_id')
+  String get currentPlayerId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'turn_number')
+  int get turnNumber => throw _privateConstructorUsedError;
+  @JsonKey(name: 'round_number')
+  int get roundNumber => throw _privateConstructorUsedError;
+  @JsonKey(name: 'game_data')
+  Map<String, dynamic> get gameData => throw _privateConstructorUsedError;
+  @JsonKey(name: 'winner_id')
+  String? get winnerId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'ended_at')
+  DateTime? get endedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  DateTime get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this GameStateModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -56,25 +60,18 @@ abstract class $GameStateModelCopyWith<$Res> {
   ) = _$GameStateModelCopyWithImpl<$Res, GameStateModel>;
   @useResult
   $Res call({
-    String roomId,
-    List<Player> players,
-    int currentPlayerIndex,
-    List<Card> deck,
-    List<Card> discardPile,
-    List<ActionCard> actionDeck,
-    List<ActionCard> actionDiscard,
-    GameStatus status,
-    TurnDirection turnDirection,
-    bool lastRound,
-    String? initiatorPlayerId,
-    String? endRoundInitiator,
-    Card? drawnCard,
-    DateTime? createdAt,
-    DateTime? startedAt,
-    DateTime? finishedAt,
+    String id,
+    @JsonKey(name: 'room_id') String roomId,
+    String status,
+    @JsonKey(name: 'current_player_id') String currentPlayerId,
+    @JsonKey(name: 'turn_number') int turnNumber,
+    @JsonKey(name: 'round_number') int roundNumber,
+    @JsonKey(name: 'game_data') Map<String, dynamic> gameData,
+    @JsonKey(name: 'winner_id') String? winnerId,
+    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'created_at') DateTime createdAt,
+    @JsonKey(name: 'updated_at') DateTime updatedAt,
   });
-
-  $CardCopyWith<$Res>? get drawnCard;
 }
 
 /// @nodoc
@@ -92,106 +89,67 @@ class _$GameStateModelCopyWithImpl<$Res, $Val extends GameStateModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? roomId = null,
-    Object? players = null,
-    Object? currentPlayerIndex = null,
-    Object? deck = null,
-    Object? discardPile = null,
-    Object? actionDeck = null,
-    Object? actionDiscard = null,
     Object? status = null,
-    Object? turnDirection = null,
-    Object? lastRound = null,
-    Object? initiatorPlayerId = freezed,
-    Object? endRoundInitiator = freezed,
-    Object? drawnCard = freezed,
-    Object? createdAt = freezed,
-    Object? startedAt = freezed,
-    Object? finishedAt = freezed,
+    Object? currentPlayerId = null,
+    Object? turnNumber = null,
+    Object? roundNumber = null,
+    Object? gameData = null,
+    Object? winnerId = freezed,
+    Object? endedAt = freezed,
+    Object? createdAt = null,
+    Object? updatedAt = null,
   }) {
     return _then(
       _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
             roomId: null == roomId
                 ? _value.roomId
                 : roomId // ignore: cast_nullable_to_non_nullable
                       as String,
-            players: null == players
-                ? _value.players
-                : players // ignore: cast_nullable_to_non_nullable
-                      as List<Player>,
-            currentPlayerIndex: null == currentPlayerIndex
-                ? _value.currentPlayerIndex
-                : currentPlayerIndex // ignore: cast_nullable_to_non_nullable
-                      as int,
-            deck: null == deck
-                ? _value.deck
-                : deck // ignore: cast_nullable_to_non_nullable
-                      as List<Card>,
-            discardPile: null == discardPile
-                ? _value.discardPile
-                : discardPile // ignore: cast_nullable_to_non_nullable
-                      as List<Card>,
-            actionDeck: null == actionDeck
-                ? _value.actionDeck
-                : actionDeck // ignore: cast_nullable_to_non_nullable
-                      as List<ActionCard>,
-            actionDiscard: null == actionDiscard
-                ? _value.actionDiscard
-                : actionDiscard // ignore: cast_nullable_to_non_nullable
-                      as List<ActionCard>,
             status: null == status
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
-                      as GameStatus,
-            turnDirection: null == turnDirection
-                ? _value.turnDirection
-                : turnDirection // ignore: cast_nullable_to_non_nullable
-                      as TurnDirection,
-            lastRound: null == lastRound
-                ? _value.lastRound
-                : lastRound // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            initiatorPlayerId: freezed == initiatorPlayerId
-                ? _value.initiatorPlayerId
-                : initiatorPlayerId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            currentPlayerId: null == currentPlayerId
+                ? _value.currentPlayerId
+                : currentPlayerId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            turnNumber: null == turnNumber
+                ? _value.turnNumber
+                : turnNumber // ignore: cast_nullable_to_non_nullable
+                      as int,
+            roundNumber: null == roundNumber
+                ? _value.roundNumber
+                : roundNumber // ignore: cast_nullable_to_non_nullable
+                      as int,
+            gameData: null == gameData
+                ? _value.gameData
+                : gameData // ignore: cast_nullable_to_non_nullable
+                      as Map<String, dynamic>,
+            winnerId: freezed == winnerId
+                ? _value.winnerId
+                : winnerId // ignore: cast_nullable_to_non_nullable
                       as String?,
-            endRoundInitiator: freezed == endRoundInitiator
-                ? _value.endRoundInitiator
-                : endRoundInitiator // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            drawnCard: freezed == drawnCard
-                ? _value.drawnCard
-                : drawnCard // ignore: cast_nullable_to_non_nullable
-                      as Card?,
-            createdAt: freezed == createdAt
+            endedAt: freezed == endedAt
+                ? _value.endedAt
+                : endedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            createdAt: null == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
-            startedAt: freezed == startedAt
-                ? _value.startedAt
-                : startedAt // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
-            finishedAt: freezed == finishedAt
-                ? _value.finishedAt
-                : finishedAt // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
+                      as DateTime,
+            updatedAt: null == updatedAt
+                ? _value.updatedAt
+                : updatedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
           )
           as $Val,
     );
-  }
-
-  /// Create a copy of GameStateModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $CardCopyWith<$Res>? get drawnCard {
-    if (_value.drawnCard == null) {
-      return null;
-    }
-
-    return $CardCopyWith<$Res>(_value.drawnCard!, (value) {
-      return _then(_value.copyWith(drawnCard: value) as $Val);
-    });
   }
 }
 
@@ -205,26 +163,18 @@ abstract class _$$GameStateModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String roomId,
-    List<Player> players,
-    int currentPlayerIndex,
-    List<Card> deck,
-    List<Card> discardPile,
-    List<ActionCard> actionDeck,
-    List<ActionCard> actionDiscard,
-    GameStatus status,
-    TurnDirection turnDirection,
-    bool lastRound,
-    String? initiatorPlayerId,
-    String? endRoundInitiator,
-    Card? drawnCard,
-    DateTime? createdAt,
-    DateTime? startedAt,
-    DateTime? finishedAt,
+    String id,
+    @JsonKey(name: 'room_id') String roomId,
+    String status,
+    @JsonKey(name: 'current_player_id') String currentPlayerId,
+    @JsonKey(name: 'turn_number') int turnNumber,
+    @JsonKey(name: 'round_number') int roundNumber,
+    @JsonKey(name: 'game_data') Map<String, dynamic> gameData,
+    @JsonKey(name: 'winner_id') String? winnerId,
+    @JsonKey(name: 'ended_at') DateTime? endedAt,
+    @JsonKey(name: 'created_at') DateTime createdAt,
+    @JsonKey(name: 'updated_at') DateTime updatedAt,
   });
-
-  @override
-  $CardCopyWith<$Res>? get drawnCard;
 }
 
 /// @nodoc
@@ -241,89 +191,64 @@ class __$$GameStateModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? roomId = null,
-    Object? players = null,
-    Object? currentPlayerIndex = null,
-    Object? deck = null,
-    Object? discardPile = null,
-    Object? actionDeck = null,
-    Object? actionDiscard = null,
     Object? status = null,
-    Object? turnDirection = null,
-    Object? lastRound = null,
-    Object? initiatorPlayerId = freezed,
-    Object? endRoundInitiator = freezed,
-    Object? drawnCard = freezed,
-    Object? createdAt = freezed,
-    Object? startedAt = freezed,
-    Object? finishedAt = freezed,
+    Object? currentPlayerId = null,
+    Object? turnNumber = null,
+    Object? roundNumber = null,
+    Object? gameData = null,
+    Object? winnerId = freezed,
+    Object? endedAt = freezed,
+    Object? createdAt = null,
+    Object? updatedAt = null,
   }) {
     return _then(
       _$GameStateModelImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
         roomId: null == roomId
             ? _value.roomId
             : roomId // ignore: cast_nullable_to_non_nullable
                   as String,
-        players: null == players
-            ? _value._players
-            : players // ignore: cast_nullable_to_non_nullable
-                  as List<Player>,
-        currentPlayerIndex: null == currentPlayerIndex
-            ? _value.currentPlayerIndex
-            : currentPlayerIndex // ignore: cast_nullable_to_non_nullable
-                  as int,
-        deck: null == deck
-            ? _value._deck
-            : deck // ignore: cast_nullable_to_non_nullable
-                  as List<Card>,
-        discardPile: null == discardPile
-            ? _value._discardPile
-            : discardPile // ignore: cast_nullable_to_non_nullable
-                  as List<Card>,
-        actionDeck: null == actionDeck
-            ? _value._actionDeck
-            : actionDeck // ignore: cast_nullable_to_non_nullable
-                  as List<ActionCard>,
-        actionDiscard: null == actionDiscard
-            ? _value._actionDiscard
-            : actionDiscard // ignore: cast_nullable_to_non_nullable
-                  as List<ActionCard>,
         status: null == status
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
-                  as GameStatus,
-        turnDirection: null == turnDirection
-            ? _value.turnDirection
-            : turnDirection // ignore: cast_nullable_to_non_nullable
-                  as TurnDirection,
-        lastRound: null == lastRound
-            ? _value.lastRound
-            : lastRound // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        initiatorPlayerId: freezed == initiatorPlayerId
-            ? _value.initiatorPlayerId
-            : initiatorPlayerId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        currentPlayerId: null == currentPlayerId
+            ? _value.currentPlayerId
+            : currentPlayerId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        turnNumber: null == turnNumber
+            ? _value.turnNumber
+            : turnNumber // ignore: cast_nullable_to_non_nullable
+                  as int,
+        roundNumber: null == roundNumber
+            ? _value.roundNumber
+            : roundNumber // ignore: cast_nullable_to_non_nullable
+                  as int,
+        gameData: null == gameData
+            ? _value._gameData
+            : gameData // ignore: cast_nullable_to_non_nullable
+                  as Map<String, dynamic>,
+        winnerId: freezed == winnerId
+            ? _value.winnerId
+            : winnerId // ignore: cast_nullable_to_non_nullable
                   as String?,
-        endRoundInitiator: freezed == endRoundInitiator
-            ? _value.endRoundInitiator
-            : endRoundInitiator // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        drawnCard: freezed == drawnCard
-            ? _value.drawnCard
-            : drawnCard // ignore: cast_nullable_to_non_nullable
-                  as Card?,
-        createdAt: freezed == createdAt
+        endedAt: freezed == endedAt
+            ? _value.endedAt
+            : endedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        createdAt: null == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
-        startedAt: freezed == startedAt
-            ? _value.startedAt
-            : startedAt // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
-        finishedAt: freezed == finishedAt
-            ? _value.finishedAt
-            : finishedAt // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
+                  as DateTime,
+        updatedAt: null == updatedAt
+            ? _value.updatedAt
+            : updatedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
       ),
     );
   }
@@ -333,98 +258,64 @@ class __$$GameStateModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$GameStateModelImpl extends _GameStateModel {
   const _$GameStateModelImpl({
-    required this.roomId,
-    required final List<Player> players,
-    required this.currentPlayerIndex,
-    required final List<Card> deck,
-    required final List<Card> discardPile,
-    required final List<ActionCard> actionDeck,
-    required final List<ActionCard> actionDiscard,
+    required this.id,
+    @JsonKey(name: 'room_id') required this.roomId,
     required this.status,
-    required this.turnDirection,
-    required this.lastRound,
-    this.initiatorPlayerId,
-    this.endRoundInitiator,
-    this.drawnCard,
-    this.createdAt,
-    this.startedAt,
-    this.finishedAt,
-  }) : _players = players,
-       _deck = deck,
-       _discardPile = discardPile,
-       _actionDeck = actionDeck,
-       _actionDiscard = actionDiscard,
+    @JsonKey(name: 'current_player_id') required this.currentPlayerId,
+    @JsonKey(name: 'turn_number') required this.turnNumber,
+    @JsonKey(name: 'round_number') required this.roundNumber,
+    @JsonKey(name: 'game_data') required final Map<String, dynamic> gameData,
+    @JsonKey(name: 'winner_id') this.winnerId,
+    @JsonKey(name: 'ended_at') this.endedAt,
+    @JsonKey(name: 'created_at') required this.createdAt,
+    @JsonKey(name: 'updated_at') required this.updatedAt,
+  }) : _gameData = gameData,
        super._();
 
   factory _$GameStateModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$GameStateModelImplFromJson(json);
 
   @override
+  final String id;
+  @override
+  @JsonKey(name: 'room_id')
   final String roomId;
-  final List<Player> _players;
   @override
-  List<Player> get players {
-    if (_players is EqualUnmodifiableListView) return _players;
+  final String status;
+  @override
+  @JsonKey(name: 'current_player_id')
+  final String currentPlayerId;
+  @override
+  @JsonKey(name: 'turn_number')
+  final int turnNumber;
+  @override
+  @JsonKey(name: 'round_number')
+  final int roundNumber;
+  final Map<String, dynamic> _gameData;
+  @override
+  @JsonKey(name: 'game_data')
+  Map<String, dynamic> get gameData {
+    if (_gameData is EqualUnmodifiableMapView) return _gameData;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_players);
+    return EqualUnmodifiableMapView(_gameData);
   }
 
   @override
-  final int currentPlayerIndex;
-  final List<Card> _deck;
+  @JsonKey(name: 'winner_id')
+  final String? winnerId;
   @override
-  List<Card> get deck {
-    if (_deck is EqualUnmodifiableListView) return _deck;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_deck);
-  }
-
-  final List<Card> _discardPile;
+  @JsonKey(name: 'ended_at')
+  final DateTime? endedAt;
   @override
-  List<Card> get discardPile {
-    if (_discardPile is EqualUnmodifiableListView) return _discardPile;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_discardPile);
-  }
-
-  final List<ActionCard> _actionDeck;
+  @JsonKey(name: 'created_at')
+  final DateTime createdAt;
   @override
-  List<ActionCard> get actionDeck {
-    if (_actionDeck is EqualUnmodifiableListView) return _actionDeck;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_actionDeck);
-  }
-
-  final List<ActionCard> _actionDiscard;
-  @override
-  List<ActionCard> get actionDiscard {
-    if (_actionDiscard is EqualUnmodifiableListView) return _actionDiscard;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_actionDiscard);
-  }
-
-  @override
-  final GameStatus status;
-  @override
-  final TurnDirection turnDirection;
-  @override
-  final bool lastRound;
-  @override
-  final String? initiatorPlayerId;
-  @override
-  final String? endRoundInitiator;
-  @override
-  final Card? drawnCard;
-  @override
-  final DateTime? createdAt;
-  @override
-  final DateTime? startedAt;
-  @override
-  final DateTime? finishedAt;
+  @JsonKey(name: 'updated_at')
+  final DateTime updatedAt;
 
   @override
   String toString() {
-    return 'GameStateModel(roomId: $roomId, players: $players, currentPlayerIndex: $currentPlayerIndex, deck: $deck, discardPile: $discardPile, actionDeck: $actionDeck, actionDiscard: $actionDiscard, status: $status, turnDirection: $turnDirection, lastRound: $lastRound, initiatorPlayerId: $initiatorPlayerId, endRoundInitiator: $endRoundInitiator, drawnCard: $drawnCard, createdAt: $createdAt, startedAt: $startedAt, finishedAt: $finishedAt)';
+    return 'GameStateModel(id: $id, roomId: $roomId, status: $status, currentPlayerId: $currentPlayerId, turnNumber: $turnNumber, roundNumber: $roundNumber, gameData: $gameData, winnerId: $winnerId, endedAt: $endedAt, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -432,62 +323,40 @@ class _$GameStateModelImpl extends _GameStateModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$GameStateModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.roomId, roomId) || other.roomId == roomId) &&
-            const DeepCollectionEquality().equals(other._players, _players) &&
-            (identical(other.currentPlayerIndex, currentPlayerIndex) ||
-                other.currentPlayerIndex == currentPlayerIndex) &&
-            const DeepCollectionEquality().equals(other._deck, _deck) &&
-            const DeepCollectionEquality().equals(
-              other._discardPile,
-              _discardPile,
-            ) &&
-            const DeepCollectionEquality().equals(
-              other._actionDeck,
-              _actionDeck,
-            ) &&
-            const DeepCollectionEquality().equals(
-              other._actionDiscard,
-              _actionDiscard,
-            ) &&
             (identical(other.status, status) || other.status == status) &&
-            (identical(other.turnDirection, turnDirection) ||
-                other.turnDirection == turnDirection) &&
-            (identical(other.lastRound, lastRound) ||
-                other.lastRound == lastRound) &&
-            (identical(other.initiatorPlayerId, initiatorPlayerId) ||
-                other.initiatorPlayerId == initiatorPlayerId) &&
-            (identical(other.endRoundInitiator, endRoundInitiator) ||
-                other.endRoundInitiator == endRoundInitiator) &&
-            (identical(other.drawnCard, drawnCard) ||
-                other.drawnCard == drawnCard) &&
+            (identical(other.currentPlayerId, currentPlayerId) ||
+                other.currentPlayerId == currentPlayerId) &&
+            (identical(other.turnNumber, turnNumber) ||
+                other.turnNumber == turnNumber) &&
+            (identical(other.roundNumber, roundNumber) ||
+                other.roundNumber == roundNumber) &&
+            const DeepCollectionEquality().equals(other._gameData, _gameData) &&
+            (identical(other.winnerId, winnerId) ||
+                other.winnerId == winnerId) &&
+            (identical(other.endedAt, endedAt) || other.endedAt == endedAt) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
-            (identical(other.startedAt, startedAt) ||
-                other.startedAt == startedAt) &&
-            (identical(other.finishedAt, finishedAt) ||
-                other.finishedAt == finishedAt));
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
+    id,
     roomId,
-    const DeepCollectionEquality().hash(_players),
-    currentPlayerIndex,
-    const DeepCollectionEquality().hash(_deck),
-    const DeepCollectionEquality().hash(_discardPile),
-    const DeepCollectionEquality().hash(_actionDeck),
-    const DeepCollectionEquality().hash(_actionDiscard),
     status,
-    turnDirection,
-    lastRound,
-    initiatorPlayerId,
-    endRoundInitiator,
-    drawnCard,
+    currentPlayerId,
+    turnNumber,
+    roundNumber,
+    const DeepCollectionEquality().hash(_gameData),
+    winnerId,
+    endedAt,
     createdAt,
-    startedAt,
-    finishedAt,
+    updatedAt,
   );
 
   /// Create a copy of GameStateModel
@@ -509,22 +378,17 @@ class _$GameStateModelImpl extends _GameStateModel {
 
 abstract class _GameStateModel extends GameStateModel {
   const factory _GameStateModel({
-    required final String roomId,
-    required final List<Player> players,
-    required final int currentPlayerIndex,
-    required final List<Card> deck,
-    required final List<Card> discardPile,
-    required final List<ActionCard> actionDeck,
-    required final List<ActionCard> actionDiscard,
-    required final GameStatus status,
-    required final TurnDirection turnDirection,
-    required final bool lastRound,
-    final String? initiatorPlayerId,
-    final String? endRoundInitiator,
-    final Card? drawnCard,
-    final DateTime? createdAt,
-    final DateTime? startedAt,
-    final DateTime? finishedAt,
+    required final String id,
+    @JsonKey(name: 'room_id') required final String roomId,
+    required final String status,
+    @JsonKey(name: 'current_player_id') required final String currentPlayerId,
+    @JsonKey(name: 'turn_number') required final int turnNumber,
+    @JsonKey(name: 'round_number') required final int roundNumber,
+    @JsonKey(name: 'game_data') required final Map<String, dynamic> gameData,
+    @JsonKey(name: 'winner_id') final String? winnerId,
+    @JsonKey(name: 'ended_at') final DateTime? endedAt,
+    @JsonKey(name: 'created_at') required final DateTime createdAt,
+    @JsonKey(name: 'updated_at') required final DateTime updatedAt,
   }) = _$GameStateModelImpl;
   const _GameStateModel._() : super._();
 
@@ -532,37 +396,36 @@ abstract class _GameStateModel extends GameStateModel {
       _$GameStateModelImpl.fromJson;
 
   @override
+  String get id;
+  @override
+  @JsonKey(name: 'room_id')
   String get roomId;
   @override
-  List<Player> get players;
+  String get status;
   @override
-  int get currentPlayerIndex;
+  @JsonKey(name: 'current_player_id')
+  String get currentPlayerId;
   @override
-  List<Card> get deck;
+  @JsonKey(name: 'turn_number')
+  int get turnNumber;
   @override
-  List<Card> get discardPile;
+  @JsonKey(name: 'round_number')
+  int get roundNumber;
   @override
-  List<ActionCard> get actionDeck;
+  @JsonKey(name: 'game_data')
+  Map<String, dynamic> get gameData;
   @override
-  List<ActionCard> get actionDiscard;
+  @JsonKey(name: 'winner_id')
+  String? get winnerId;
   @override
-  GameStatus get status;
+  @JsonKey(name: 'ended_at')
+  DateTime? get endedAt;
   @override
-  TurnDirection get turnDirection;
+  @JsonKey(name: 'created_at')
+  DateTime get createdAt;
   @override
-  bool get lastRound;
-  @override
-  String? get initiatorPlayerId;
-  @override
-  String? get endRoundInitiator;
-  @override
-  Card? get drawnCard;
-  @override
-  DateTime? get createdAt;
-  @override
-  DateTime? get startedAt;
-  @override
-  DateTime? get finishedAt;
+  @JsonKey(name: 'updated_at')
+  DateTime get updatedAt;
 
   /// Create a copy of GameStateModel
   /// with the given fields replaced by the non-null parameter values.
