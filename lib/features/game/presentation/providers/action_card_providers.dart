@@ -10,6 +10,7 @@ import '../../domain/entities/action_card.dart';
 import '../../domain/entities/game_state.dart';
 import '../../domain/repositories/action_card_repository.dart';
 import '../../domain/use_cases/use_action_card_use_case.dart';
+import 'repository_providers.dart';
 
 part 'action_card_providers.g.dart';
 part 'action_card_providers.freezed.dart';
@@ -29,8 +30,8 @@ ActionCardRepository actionCardRepository(ActionCardRepositoryRef ref) {
 
 @riverpod
 UseActionCardUseCase useActionCardUseCase(UseActionCardUseCaseRef ref) {
-  final repository = ref.watch(actionCardRepositoryProvider);
-  return UseActionCardUseCase(repository);
+  final gameStateRepository = ref.watch(gameStateRepositoryProvider);
+  return UseActionCardUseCase(gameStateRepository);
 }
 
 @riverpod
@@ -57,10 +58,10 @@ class ActionCardNotifier extends _$ActionCardNotifier {
     return const AsyncData(null);
   }
 
-  Future<Either<Failure, GameState>> useActionCard({
+  Future<Either<Failure, Map<String, dynamic>>> useActionCard({
+    required String gameStateId,
     required String playerId,
-    required ActionCard actionCard,
-    required GameState gameState,
+    required ActionCardType actionCardType,
     Map<String, dynamic>? targetData,
   }) async {
     state = const AsyncLoading();
@@ -68,9 +69,9 @@ class ActionCardNotifier extends _$ActionCardNotifier {
     try {
       final useCase = ref.read(useActionCardUseCaseProvider);
       final params = UseActionCardParams(
+        gameStateId: gameStateId,
         playerId: playerId,
-        actionCard: actionCard,
-        gameState: gameState,
+        actionCardType: actionCardType,
         targetData: targetData,
       );
 

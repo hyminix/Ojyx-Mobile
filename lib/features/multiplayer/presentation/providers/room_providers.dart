@@ -13,6 +13,7 @@ import '../../domain/entities/room.dart';
 import '../../domain/entities/room_event.dart';
 import '../../../game/domain/use_cases/game_initialization_use_case.dart';
 import '../../../game/presentation/providers/game_state_notifier.dart';
+import '../../../game/presentation/providers/repository_providers.dart';
 import '../../../../core/providers/supabase_provider.dart';
 
 part 'room_providers.g.dart';
@@ -52,8 +53,8 @@ JoinRoomUseCase joinRoomUseCase(JoinRoomUseCaseRef ref) {
 
 @riverpod
 SyncGameStateUseCase syncGameStateUseCase(SyncGameStateUseCaseRef ref) {
-  final repository = ref.watch(roomRepositoryProvider);
-  return SyncGameStateUseCase(repository);
+  final gameStateRepository = ref.watch(gameStateRepositoryProvider);
+  return SyncGameStateUseCase(gameStateRepository);
 }
 
 @riverpod
