@@ -21,6 +21,13 @@ mixin _$CardSelectionState {
   CardSelectionType? get selectionType => throw _privateConstructorUsedError;
   CardPosition? get firstSelection => throw _privateConstructorUsedError;
   CardPosition? get secondSelection => throw _privateConstructorUsedError;
+  List<CardPosition> get selections =>
+      throw _privateConstructorUsedError; // For multi-select modes
+  int get maxSelections =>
+      throw _privateConstructorUsedError; // Max number of selections allowed
+  String? get selectedOpponentId =>
+      throw _privateConstructorUsedError; // For opponent selection
+  bool get requiresOpponent => throw _privateConstructorUsedError;
 
   /// Create a copy of CardSelectionState
   /// with the given fields replaced by the non-null parameter values.
@@ -41,6 +48,10 @@ abstract class $CardSelectionStateCopyWith<$Res> {
     CardSelectionType? selectionType,
     CardPosition? firstSelection,
     CardPosition? secondSelection,
+    List<CardPosition> selections,
+    int maxSelections,
+    String? selectedOpponentId,
+    bool requiresOpponent,
   });
 
   $CardPositionCopyWith<$Res>? get firstSelection;
@@ -66,6 +77,10 @@ class _$CardSelectionStateCopyWithImpl<$Res, $Val extends CardSelectionState>
     Object? selectionType = freezed,
     Object? firstSelection = freezed,
     Object? secondSelection = freezed,
+    Object? selections = null,
+    Object? maxSelections = null,
+    Object? selectedOpponentId = freezed,
+    Object? requiresOpponent = null,
   }) {
     return _then(
       _value.copyWith(
@@ -85,6 +100,22 @@ class _$CardSelectionStateCopyWithImpl<$Res, $Val extends CardSelectionState>
                 ? _value.secondSelection
                 : secondSelection // ignore: cast_nullable_to_non_nullable
                       as CardPosition?,
+            selections: null == selections
+                ? _value.selections
+                : selections // ignore: cast_nullable_to_non_nullable
+                      as List<CardPosition>,
+            maxSelections: null == maxSelections
+                ? _value.maxSelections
+                : maxSelections // ignore: cast_nullable_to_non_nullable
+                      as int,
+            selectedOpponentId: freezed == selectedOpponentId
+                ? _value.selectedOpponentId
+                : selectedOpponentId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            requiresOpponent: null == requiresOpponent
+                ? _value.requiresOpponent
+                : requiresOpponent // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -133,6 +164,10 @@ abstract class _$$CardSelectionStateImplCopyWith<$Res>
     CardSelectionType? selectionType,
     CardPosition? firstSelection,
     CardPosition? secondSelection,
+    List<CardPosition> selections,
+    int maxSelections,
+    String? selectedOpponentId,
+    bool requiresOpponent,
   });
 
   @override
@@ -159,6 +194,10 @@ class __$$CardSelectionStateImplCopyWithImpl<$Res>
     Object? selectionType = freezed,
     Object? firstSelection = freezed,
     Object? secondSelection = freezed,
+    Object? selections = null,
+    Object? maxSelections = null,
+    Object? selectedOpponentId = freezed,
+    Object? requiresOpponent = null,
   }) {
     return _then(
       _$CardSelectionStateImpl(
@@ -178,6 +217,22 @@ class __$$CardSelectionStateImplCopyWithImpl<$Res>
             ? _value.secondSelection
             : secondSelection // ignore: cast_nullable_to_non_nullable
                   as CardPosition?,
+        selections: null == selections
+            ? _value._selections
+            : selections // ignore: cast_nullable_to_non_nullable
+                  as List<CardPosition>,
+        maxSelections: null == maxSelections
+            ? _value.maxSelections
+            : maxSelections // ignore: cast_nullable_to_non_nullable
+                  as int,
+        selectedOpponentId: freezed == selectedOpponentId
+            ? _value.selectedOpponentId
+            : selectedOpponentId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        requiresOpponent: null == requiresOpponent
+            ? _value.requiresOpponent
+            : requiresOpponent // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -191,7 +246,12 @@ class _$CardSelectionStateImpl extends _CardSelectionState {
     this.selectionType,
     this.firstSelection,
     this.secondSelection,
-  }) : super._();
+    final List<CardPosition> selections = const [],
+    this.maxSelections = 1,
+    this.selectedOpponentId,
+    this.requiresOpponent = false,
+  }) : _selections = selections,
+       super._();
 
   @override
   @JsonKey()
@@ -202,10 +262,30 @@ class _$CardSelectionStateImpl extends _CardSelectionState {
   final CardPosition? firstSelection;
   @override
   final CardPosition? secondSelection;
+  final List<CardPosition> _selections;
+  @override
+  @JsonKey()
+  List<CardPosition> get selections {
+    if (_selections is EqualUnmodifiableListView) return _selections;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_selections);
+  }
+
+  // For multi-select modes
+  @override
+  @JsonKey()
+  final int maxSelections;
+  // Max number of selections allowed
+  @override
+  final String? selectedOpponentId;
+  // For opponent selection
+  @override
+  @JsonKey()
+  final bool requiresOpponent;
 
   @override
   String toString() {
-    return 'CardSelectionState(isSelecting: $isSelecting, selectionType: $selectionType, firstSelection: $firstSelection, secondSelection: $secondSelection)';
+    return 'CardSelectionState(isSelecting: $isSelecting, selectionType: $selectionType, firstSelection: $firstSelection, secondSelection: $secondSelection, selections: $selections, maxSelections: $maxSelections, selectedOpponentId: $selectedOpponentId, requiresOpponent: $requiresOpponent)';
   }
 
   @override
@@ -220,7 +300,17 @@ class _$CardSelectionStateImpl extends _CardSelectionState {
             (identical(other.firstSelection, firstSelection) ||
                 other.firstSelection == firstSelection) &&
             (identical(other.secondSelection, secondSelection) ||
-                other.secondSelection == secondSelection));
+                other.secondSelection == secondSelection) &&
+            const DeepCollectionEquality().equals(
+              other._selections,
+              _selections,
+            ) &&
+            (identical(other.maxSelections, maxSelections) ||
+                other.maxSelections == maxSelections) &&
+            (identical(other.selectedOpponentId, selectedOpponentId) ||
+                other.selectedOpponentId == selectedOpponentId) &&
+            (identical(other.requiresOpponent, requiresOpponent) ||
+                other.requiresOpponent == requiresOpponent));
   }
 
   @override
@@ -230,6 +320,10 @@ class _$CardSelectionStateImpl extends _CardSelectionState {
     selectionType,
     firstSelection,
     secondSelection,
+    const DeepCollectionEquality().hash(_selections),
+    maxSelections,
+    selectedOpponentId,
+    requiresOpponent,
   );
 
   /// Create a copy of CardSelectionState
@@ -250,6 +344,10 @@ abstract class _CardSelectionState extends CardSelectionState {
     final CardSelectionType? selectionType,
     final CardPosition? firstSelection,
     final CardPosition? secondSelection,
+    final List<CardPosition> selections,
+    final int maxSelections,
+    final String? selectedOpponentId,
+    final bool requiresOpponent,
   }) = _$CardSelectionStateImpl;
   const _CardSelectionState._() : super._();
 
@@ -261,6 +359,14 @@ abstract class _CardSelectionState extends CardSelectionState {
   CardPosition? get firstSelection;
   @override
   CardPosition? get secondSelection;
+  @override
+  List<CardPosition> get selections; // For multi-select modes
+  @override
+  int get maxSelections; // Max number of selections allowed
+  @override
+  String? get selectedOpponentId; // For opponent selection
+  @override
+  bool get requiresOpponent;
 
   /// Create a copy of CardSelectionState
   /// with the given fields replaced by the non-null parameter values.

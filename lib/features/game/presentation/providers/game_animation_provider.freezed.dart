@@ -51,17 +51,14 @@ class _$GameAnimationStateCopyWithImpl<$Res, $Val extends GameAnimationState>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? showingDirectionChange = null,
-    Object? direction = freezed,
-  }) {
+  $Res call({Object? showingDirectionChange = null, Object? direction = null}) {
     return _then(
       _value.copyWith(
             showingDirectionChange: null == showingDirectionChange
                 ? _value.showingDirectionChange
                 : showingDirectionChange // ignore: cast_nullable_to_non_nullable
                       as bool,
-            direction: freezed == direction
+            direction: null == direction
                 ? _value.direction
                 : direction // ignore: cast_nullable_to_non_nullable
                       as PlayDirection,
@@ -96,17 +93,14 @@ class __$$GameAnimationStateImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? showingDirectionChange = null,
-    Object? direction = freezed,
-  }) {
+  $Res call({Object? showingDirectionChange = null, Object? direction = null}) {
     return _then(
       _$GameAnimationStateImpl(
         showingDirectionChange: null == showingDirectionChange
             ? _value.showingDirectionChange
             : showingDirectionChange // ignore: cast_nullable_to_non_nullable
                   as bool,
-        direction: freezed == direction
+        direction: null == direction
             ? _value.direction
             : direction // ignore: cast_nullable_to_non_nullable
                   as PlayDirection,
@@ -142,15 +136,13 @@ class _$GameAnimationStateImpl implements _GameAnimationState {
             other is _$GameAnimationStateImpl &&
             (identical(other.showingDirectionChange, showingDirectionChange) ||
                 other.showingDirectionChange == showingDirectionChange) &&
-            const DeepCollectionEquality().equals(other.direction, direction));
+            (identical(other.direction, direction) ||
+                other.direction == direction));
   }
 
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    showingDirectionChange,
-    const DeepCollectionEquality().hash(direction),
-  );
+  int get hashCode =>
+      Object.hash(runtimeType, showingDirectionChange, direction);
 
   /// Create a copy of GameAnimationState
   /// with the given fields replaced by the non-null parameter values.

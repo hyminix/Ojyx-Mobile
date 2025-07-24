@@ -105,11 +105,49 @@ class PlayerGridWithSelection extends ConsumerWidget {
         }
         break;
       case CardSelectionType.swap:
-        instructionText = 'Sélectionnez deux cartes à échanger';
-        instructionIcon = Icons.swap_horiz;
+        if (!selectionState.hasFirstSelection) {
+          instructionText = 'Sélectionnez la première carte à échanger';
+          instructionIcon = Icons.touch_app;
+        } else if (!selectionState.hasSecondSelection) {
+          instructionText = 'Sélectionnez la deuxième carte à échanger';
+          instructionIcon = Icons.touch_app;
+        } else {
+          instructionText = 'Cartes sélectionnées - confirmez l\'échange';
+          instructionIcon = Icons.swap_vert;
+        }
+        break;
+      case CardSelectionType.peek:
+      case CardSelectionType.scout:
+        instructionText = 'Sélectionnez jusqu\'à ${selectionState.maxSelections} cartes à révéler';
+        instructionIcon = Icons.visibility;
+        break;
+      case CardSelectionType.bomb:
+        instructionText = 'Sélectionnez une carte à détruire';
+        instructionIcon = Icons.delete_forever;
+        break;
+      case CardSelectionType.mirror:
+        instructionText = 'Sélectionnez une carte à copier';
+        instructionIcon = Icons.content_copy;
+        break;
+      case CardSelectionType.gift:
+        instructionText = 'Sélectionnez une carte à offrir';
+        instructionIcon = Icons.card_giftcard;
+        break;
+      case CardSelectionType.selectOpponent:
+        instructionText = 'Sélectionnez un adversaire';
+        instructionIcon = Icons.person;
+        break;
+      case CardSelectionType.steal:
+        if (selectionState.selectedOpponentId == null) {
+          instructionText = 'Sélectionnez d\'abord un adversaire';
+          instructionIcon = Icons.person;
+        } else {
+          instructionText = 'Sélectionnez une carte à voler';
+          instructionIcon = Icons.pan_tool;
+        }
         break;
       case null:
-        instructionText = 'Sélectionnez deux cartes à échanger';
+        instructionText = 'Sélection en cours...';
         instructionIcon = Icons.touch_app;
         break;
     }
