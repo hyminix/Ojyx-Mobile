@@ -23,9 +23,9 @@
 12. **Implémentation Téléportation** ✅ COMPLÉTÉE
 13. **UI Sélecteurs et Feedback** ✅ COMPLÉTÉE
 
-### Phase 5 : Fin de Partie (Tâches 14-15) ❌ NON COMMENCÉES
-14. **Écran de Fin de Partie** - Récapitulatif et scores
-15. **Système de Points Globaux** - Suivi entre manches
+### Phase 5 : Fin de Partie (Tâches 14-15) 🟡 EN COURS
+14. **Écran de Fin de Partie** ✅ COMPLÉTÉE
+15. **Système de Points Globaux** ❌ NON COMMENCÉE
 
 ### Phase 6 : Production (Tâches 16-19) ❌ NON COMMENCÉES
 16. **Animations et Polish** - Amélioration UX
@@ -161,7 +161,17 @@
 - ✅ `EnhancedPlayerGrid` : Intégration complète animations + feedback
 - ✅ Tests d'intégration pour tous les sélecteurs
 
-### État actuel : 779 tests, 0 échecs ✅
+### Tâche 14 : Écran de Fin de Partie
+- ✅ `EndGameState` : Entité avec scores, classement et votes
+- ✅ Système de pénalité pour l'initiateur (score x2)
+- ✅ `EndGameScreen` : Interface avec animations
+- ✅ `WinnerAnnouncement` : Annonce du gagnant
+- ✅ `PlayerScoreCard` : Affichage des scores
+- ✅ `VoteSection` : Système de vote
+- ✅ `EndGameProvider` : Gestion d'état
+- ✅ Tests unitaires et widgets complets
+
+### État actuel : 790 tests, 0 échecs ✅
 
 ## 📝 Ce qui reste à faire
 

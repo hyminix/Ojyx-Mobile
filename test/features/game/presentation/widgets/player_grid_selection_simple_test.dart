@@ -18,7 +18,7 @@ void main() {
 
     testWidgets('should integrate with CardSelectionProvider', (tester) async {
       late ProviderContainer container;
-      
+
       await tester.pumpWidget(
         ProviderScope(
           child: Builder(
@@ -49,12 +49,15 @@ void main() {
 
       // Should be in selection mode
       expect(container.read(cardSelectionProvider).isSelecting, isTrue);
-      expect(container.read(cardSelectionProvider).selectionType, 
-             equals(CardSelectionType.teleport));
+      expect(
+        container.read(cardSelectionProvider).selectionType,
+        equals(CardSelectionType.teleport),
+      );
     });
 
-    testWidgets('should show selection instructions when in teleport mode', 
-        (tester) async {
+    testWidgets('should show selection instructions when in teleport mode', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -76,17 +79,21 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(PlayerGridWithSelection)),
       );
-      
+
       // Start teleport selection
       container.read(cardSelectionProvider.notifier).startTeleportSelection();
       await tester.pump();
 
       // Should show first selection instruction
-      expect(find.text('Sélectionnez la première carte à échanger'), findsOneWidget);
+      expect(
+        find.text('Sélectionnez la première carte à échanger'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('should update instruction text as selection progresses', 
-        (tester) async {
+    testWidgets('should update instruction text as selection progresses', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -108,7 +115,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(PlayerGridWithSelection)),
       );
-      
+
       // Start teleport selection
       final notifier = container.read(cardSelectionProvider.notifier);
       notifier.startTeleportSelection();
@@ -119,18 +126,25 @@ void main() {
       await tester.pump();
 
       // Should show second selection instruction
-      expect(find.text('Sélectionnez la deuxième carte à échanger'), findsOneWidget);
+      expect(
+        find.text('Sélectionnez la deuxième carte à échanger'),
+        findsOneWidget,
+      );
 
       // Select second card
       notifier.selectCard(0, 1);
       await tester.pump();
 
       // Should show confirmation instruction
-      expect(find.text('Cartes sélectionnées - confirmez l\'échange'), findsOneWidget);
+      expect(
+        find.text('Cartes sélectionnées - confirmez l\'échange'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('should call onTeleportComplete when selection is confirmed', 
-        (tester) async {
+    testWidgets('should call onTeleportComplete when selection is confirmed', (
+      tester,
+    ) async {
       Map<String, dynamic>? receivedTargetData;
 
       await tester.pumpWidget(
@@ -157,7 +171,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(PlayerGridWithSelection)),
       );
-      
+
       // Complete selection
       final notifier = container.read(cardSelectionProvider.notifier);
       notifier.startTeleportSelection();
@@ -177,8 +191,9 @@ void main() {
       expect(receivedTargetData!['position2']['col'], equals(2));
     });
 
-    testWidgets('should cancel selection when cancel button is tapped', 
-        (tester) async {
+    testWidgets('should cancel selection when cancel button is tapped', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -200,7 +215,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(PlayerGridWithSelection)),
       );
-      
+
       // Start selection and select a card
       final notifier = container.read(cardSelectionProvider.notifier);
       notifier.startTeleportSelection();
@@ -216,19 +231,22 @@ void main() {
       final selectionState = container.read(cardSelectionProvider);
       expect(selectionState.isSelecting, isFalse);
       expect(selectionState.firstSelection, isNull);
-      expect(find.text('Sélectionnez la première carte à échanger'), findsNothing);
+      expect(
+        find.text('Sélectionnez la première carte à échanger'),
+        findsNothing,
+      );
     });
 
     test('should provide correct selected positions from selection state', () {
       // This is a unit test for the positioning logic
       const firstSelection = (0, 0);
       const secondSelection = (1, 2);
-      
+
       // Simulate what the widget does
       final selectedPositions = <(int, int)>{};
       selectedPositions.add(firstSelection);
       selectedPositions.add(secondSelection);
-      
+
       expect(selectedPositions.contains((0, 0)), isTrue);
       expect(selectedPositions.contains((1, 2)), isTrue);
       expect(selectedPositions.length, equals(2));

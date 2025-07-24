@@ -71,7 +71,9 @@ class OpponentsViewWidget extends StatelessWidget {
             itemBuilder: (context, index) {
               final opponent = opponents[index];
               final playerState = _playerToPlayerState(opponent);
-              final isCurrentTurn = gameState.players[gameState.currentPlayerIndex].id == opponent.id;
+              final isCurrentTurn =
+                  gameState.players[gameState.currentPlayerIndex].id ==
+                  opponent.id;
 
               return Padding(
                 padding: EdgeInsets.only(
@@ -189,7 +191,9 @@ class OpponentsGridViewWidget extends StatelessWidget {
               itemBuilder: (context, index) {
                 final opponent = opponents[index];
                 final playerState = _playerToPlayerState(opponent);
-                final isCurrentTurn = gameState.players[gameState.currentPlayerIndex].id == opponent.id;
+                final isCurrentTurn =
+                    gameState.players[gameState.currentPlayerIndex].id ==
+                    opponent.id;
 
                 return OpponentGridWidget(
                   playerState: playerState,

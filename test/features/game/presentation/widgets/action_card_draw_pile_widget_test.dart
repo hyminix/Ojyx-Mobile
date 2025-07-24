@@ -5,8 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:ojyx/features/game/presentation/widgets/action_card_draw_pile_widget.dart';
 import 'package:ojyx/features/game/presentation/providers/action_card_providers.dart';
 
-class MockActionCardStateNotifier extends ActionCardStateNotifier
-    with Mock {
+class MockActionCardStateNotifier extends ActionCardStateNotifier with Mock {
   MockActionCardStateNotifier(ActionCardState initialState) {
     state = initialState;
   }
@@ -26,23 +25,15 @@ void main() {
       );
     });
 
-    Widget createTestWidget({
-      bool canDraw = true,
-      VoidCallback? onDraw,
-    }) {
+    Widget createTestWidget({bool canDraw = true, VoidCallback? onDraw}) {
       return ProviderScope(
         overrides: [
-          actionCardStateNotifierProvider.overrideWith(
-            (ref) => mockNotifier,
-          ),
+          actionCardStateNotifierProvider.overrideWith((ref) => mockNotifier),
         ],
         child: MaterialApp(
           home: Scaffold(
             body: Center(
-              child: ActionCardDrawPileWidget(
-                canDraw: canDraw,
-                onDraw: onDraw,
-              ),
+              child: ActionCardDrawPileWidget(canDraw: canDraw, onDraw: onDraw),
             ),
           ),
         ),
@@ -80,10 +71,9 @@ void main() {
       var wasTapped = false;
 
       // Act
-      await tester.pumpWidget(createTestWidget(
-        canDraw: true,
-        onDraw: () => wasTapped = true,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(canDraw: true, onDraw: () => wasTapped = true),
+      );
 
       await tester.tap(find.byType(ActionCardDrawPileWidget));
       await tester.pump();
@@ -97,10 +87,9 @@ void main() {
       var wasTapped = false;
 
       // Act
-      await tester.pumpWidget(createTestWidget(
-        canDraw: false,
-        onDraw: () => wasTapped = true,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(canDraw: false, onDraw: () => wasTapped = true),
+      );
 
       await tester.tap(find.byType(ActionCardDrawPileWidget));
       await tester.pump();
@@ -109,16 +98,17 @@ void main() {
       expect(wasTapped, isFalse);
     });
 
-    testWidgets('should show disabled state when canDraw is false', (tester) async {
+    testWidgets('should show disabled state when canDraw is false', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(createTestWidget(canDraw: false));
 
       // Assert
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(Card),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(of: find.byType(Card), matching: find.byType(Container))
+            .first,
       );
       final decoration = container.decoration as BoxDecoration;
       final gradient = decoration.gradient as LinearGradient;
@@ -147,12 +137,17 @@ void main() {
 
       // Assert
       final stack = tester.widget<Stack>(
-        find.descendant(
-          of: find.byType(ActionCardDrawPileWidget),
-          matching: find.byType(Stack),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(ActionCardDrawPileWidget),
+              matching: find.byType(Stack),
+            )
+            .first,
       );
-      expect(stack.children.length, greaterThanOrEqualTo(2)); // Background + content
+      expect(
+        stack.children.length,
+        greaterThanOrEqualTo(2),
+      ); // Background + content
     });
 
     testWidgets('should animate on tap when enabled', (tester) async {
@@ -160,10 +155,9 @@ void main() {
       var tapCount = 0;
 
       // Act
-      await tester.pumpWidget(createTestWidget(
-        canDraw: true,
-        onDraw: () => tapCount++,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(canDraw: true, onDraw: () => tapCount++),
+      );
 
       // First tap
       await tester.tap(find.byType(ActionCardDrawPileWidget));
@@ -172,13 +166,15 @@ void main() {
 
       // Assert
       expect(tapCount, equals(1));
-      
+
       // Should show some visual feedback
       final inkWell = tester.widget<InkWell>(
-        find.descendant(
-          of: find.byType(ActionCardDrawPileWidget),
-          matching: find.byType(InkWell),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(ActionCardDrawPileWidget),
+              matching: find.byType(InkWell),
+            )
+            .first,
       );
       expect(inkWell.onTap, isNotNull);
     });
@@ -189,10 +185,9 @@ void main() {
 
       // Assert
       final sizedBox = tester.widget<SizedBox>(
-        find.ancestor(
-          of: find.byType(Stack),
-          matching: find.byType(SizedBox),
-        ).first,
+        find
+            .ancestor(of: find.byType(Stack), matching: find.byType(SizedBox))
+            .first,
       );
       expect(sizedBox.width, equals(100));
       expect(sizedBox.height, equals(140));
@@ -201,7 +196,7 @@ void main() {
     testWidgets('should show tooltip on long press', (tester) async {
       // Act
       await tester.pumpWidget(createTestWidget());
-      
+
       await tester.longPress(find.byType(ActionCardDrawPileWidget));
       await tester.pumpAndSettle();
 
@@ -232,9 +227,7 @@ void main() {
       await tester.pumpWidget(createTestWidget());
 
       // Assert
-      final card = tester.widget<Card>(
-        find.byType(Card).first,
-      );
+      final card = tester.widget<Card>(find.byType(Card).first);
       expect(card.elevation, greaterThan(0));
     });
 
@@ -263,10 +256,9 @@ void main() {
 
       // Assert - The widget should use theme colors
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(Card),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(of: find.byType(Card), matching: find.byType(Container))
+            .first,
       );
       expect(container.decoration, isA<BoxDecoration>());
     });

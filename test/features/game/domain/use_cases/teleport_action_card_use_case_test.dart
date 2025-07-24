@@ -71,17 +71,17 @@ void main() {
 
       // Create test cards for grid using fromCards constructor
       final testCards = [
-        Card(value: 5),  // (0,0)
-        Card(value: 8),  // (0,1)
-        Card(value: 1),  // (0,2)
-        Card(value: 9),  // (0,3)
-        Card(value: 2),  // (1,0)
+        Card(value: 5), // (0,0)
+        Card(value: 8), // (0,1)
+        Card(value: 1), // (0,2)
+        Card(value: 9), // (0,3)
+        Card(value: 2), // (1,0)
         Card(value: -1), // (1,1)
-        Card(value: 3),  // (1,2)
-        Card(value: 7),  // (1,3)
-        Card(value: 0),  // (2,0)
-        Card(value: 6),  // (2,1)
-        Card(value: 4),  // (2,2)
+        Card(value: 3), // (1,2)
+        Card(value: 7), // (1,3)
+        Card(value: 0), // (2,0)
+        Card(value: 6), // (2,1)
+        Card(value: 4), // (2,2)
         Card(value: 10), // (2,3)
       ];
 
@@ -140,7 +140,7 @@ void main() {
         expect(result.isRight(), isTrue);
         final updatedState = result.getRight().getOrElse(() => gameState);
         final updatedPlayer = updatedState.players.first;
-        
+
         // Card that was at (0,0) should now be at (0,1)
         expect(updatedPlayer.grid.getCard(0, 1)?.value, equals(5));
         // Card that was at (0,1) should now be at (0,0)
@@ -172,7 +172,7 @@ void main() {
         expect(result.isRight(), isTrue);
         final updatedState = result.getRight().getOrElse(() => gameState);
         final updatedPlayer = updatedState.players.first;
-        
+
         expect(updatedPlayer.grid.getCard(1, 1)?.value, equals(2));
         expect(updatedPlayer.grid.getCard(1, 0)?.value, equals(-1));
       });
@@ -198,7 +198,7 @@ void main() {
         expect(result.isRight(), isTrue);
         final updatedState = result.getRight().getOrElse(() => gameState);
         final updatedPlayer = updatedState.players.first;
-        
+
         expect(updatedPlayer.grid.getCard(2, 3)?.value, equals(5));
         expect(updatedPlayer.grid.getCard(0, 0)?.value, equals(10));
       });
@@ -207,11 +207,11 @@ void main() {
         // Arrange - Create cards with different reveal status
         final revealedCard = Card(value: 7, isRevealed: true);
         final hiddenCard = Card(value: 3, isRevealed: false);
-        
+
         final mixedCards = List.generate(12, (index) => Card(value: index));
         mixedCards[0] = revealedCard; // Position (0,0)
-        mixedCards[1] = hiddenCard;   // Position (0,1)
-        
+        mixedCards[1] = hiddenCard; // Position (0,1)
+
         final gridWithMixedCards = PlayerGrid.fromCards(mixedCards);
         final playerWithMixedCards = player.updateGrid(gridWithMixedCards);
         final stateWithMixedCards = gameState.copyWith(
@@ -235,13 +235,15 @@ void main() {
 
         // Assert
         expect(result.isRight(), isTrue);
-        final updatedState = result.getRight().getOrElse(() => stateWithMixedCards);
+        final updatedState = result.getRight().getOrElse(
+          () => stateWithMixedCards,
+        );
         final updatedPlayer = updatedState.players.first;
-        
+
         // Cards should be swapped but maintain their reveal status
         final cardAt00 = updatedPlayer.grid.getCard(0, 0);
         final cardAt01 = updatedPlayer.grid.getCard(0, 1);
-        
+
         expect(cardAt00?.value, equals(3));
         expect(cardAt00?.isRevealed, isFalse); // Hidden card moved here
         expect(cardAt01?.value, equals(7));
@@ -271,9 +273,14 @@ void main() {
 
         // Assert
         expect(result.isLeft(), isTrue);
-        final failure = result.getLeft().getOrElse(() => Failure.unknown(message: 'test'));
+        final failure = result.getLeft().getOrElse(
+          () => Failure.unknown(message: 'test'),
+        );
         expect(failure, isA<GameLogicFailure>());
-        expect(failure.message, contains('Player does not have this action card'));
+        expect(
+          failure.message,
+          contains('Player does not have this action card'),
+        );
       });
 
       test('should fail if it is not the player\'s turn', () async {
@@ -284,7 +291,7 @@ void main() {
           grid: PlayerGrid.empty(),
           actionCards: [],
         );
-        
+
         final gameStateNotMyTurn = gameState.copyWith(
           players: [player, otherPlayer],
           currentPlayerIndex: 1, // Other player's turn
@@ -307,7 +314,9 @@ void main() {
 
         // Assert
         expect(result.isLeft(), isTrue);
-        final failure = result.getLeft().getOrElse(() => Failure.unknown(message: 'test'));
+        final failure = result.getLeft().getOrElse(
+          () => Failure.unknown(message: 'test'),
+        );
         expect(failure, isA<GameLogicFailure>());
         expect(failure.message, contains('It is not your turn'));
       });
@@ -326,9 +335,14 @@ void main() {
 
         // Assert
         expect(result.isLeft(), isTrue);
-        final failure = result.getLeft().getOrElse(() => Failure.unknown(message: 'test'));
+        final failure = result.getLeft().getOrElse(
+          () => Failure.unknown(message: 'test'),
+        );
         expect(failure, isA<ValidationFailure>());
-        expect(failure.message, contains('This action card requires target data'));
+        expect(
+          failure.message,
+          contains('This action card requires target data'),
+        );
       });
     });
 
@@ -354,7 +368,7 @@ void main() {
         expect(result.isRight(), isTrue);
         final updatedState = result.getRight().getOrElse(() => gameState);
         final updatedPlayer = updatedState.players.first;
-        
+
         // Card should remain the same
         expect(updatedPlayer.grid.getCard(0, 0)?.value, equals(5));
       });
@@ -380,34 +394,48 @@ void main() {
         expect(result.isRight(), isTrue);
         final updatedState = result.getRight().getOrElse(() => gameState);
         final updatedPlayer = updatedState.players.first;
-        
-        expect(updatedPlayer.grid.getCard(0, 0)?.value, equals(10)); // Card from (2,3)
-        expect(updatedPlayer.grid.getCard(2, 3)?.value, equals(5));  // Card from (0,0)
+
+        expect(
+          updatedPlayer.grid.getCard(0, 0)?.value,
+          equals(10),
+        ); // Card from (2,3)
+        expect(
+          updatedPlayer.grid.getCard(2, 3)?.value,
+          equals(5),
+        ); // Card from (0,0)
       });
 
-      test('should fail with non-existent player who doesn\'t have the card', () async {
-        // Arrange - Don't setup any cards for nonexistent player
-        final targetData = {
-          'position1': {'row': 0, 'col': 0},
-          'position2': {'row': 0, 'col': 1},
-        };
+      test(
+        'should fail with non-existent player who doesn\'t have the card',
+        () async {
+          // Arrange - Don't setup any cards for nonexistent player
+          final targetData = {
+            'position1': {'row': 0, 'col': 0},
+            'position2': {'row': 0, 'col': 1},
+          };
 
-        final params = UseActionCardParams(
-          playerId: 'nonexistent',
-          actionCard: teleportCard,
-          gameState: gameState,
-          targetData: targetData,
-        );
+          final params = UseActionCardParams(
+            playerId: 'nonexistent',
+            actionCard: teleportCard,
+            gameState: gameState,
+            targetData: targetData,
+          );
 
-        // Act
-        final result = await useCase.call(params);
+          // Act
+          final result = await useCase.call(params);
 
-        // Assert - Should fail because player doesn't have the card
-        expect(result.isLeft(), isTrue);
-        final failure = result.getLeft().getOrElse(() => Failure.unknown(message: 'test'));
-        expect(failure, isA<GameLogicFailure>());
-        expect(failure.message, contains('Player does not have this action card'));
-      });
+          // Assert - Should fail because player doesn't have the card
+          expect(result.isLeft(), isTrue);
+          final failure = result.getLeft().getOrElse(
+            () => Failure.unknown(message: 'test'),
+          );
+          expect(failure, isA<GameLogicFailure>());
+          expect(
+            failure.message,
+            contains('Player does not have this action card'),
+          );
+        },
+      );
 
       test('should return unchanged state if one card is null', () async {
         // Arrange - Create grid with empty position
@@ -434,11 +462,15 @@ void main() {
 
         // Assert
         expect(result.isRight(), isTrue);
-        final updatedState = result.getRight().getOrElse(() => stateWithEmptyGrid);
+        final updatedState = result.getRight().getOrElse(
+          () => stateWithEmptyGrid,
+        );
         // State should be unchanged due to null cards
-        expect(updatedState.players.first.grid.cards, 
-               equals(stateWithEmptyGrid.players.first.grid.cards));
-        
+        expect(
+          updatedState.players.first.grid.cards,
+          equals(stateWithEmptyGrid.players.first.grid.cards),
+        );
+
         // Card should still be removed and discarded
         expect(repository.doesPlayerHaveCard('player1', teleportCard), isFalse);
         expect(repository.wasCardDiscarded(teleportCard), isTrue);

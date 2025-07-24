@@ -12,10 +12,7 @@ class DrawActionCardParams {
   final String playerId;
   final GameState gameState;
 
-  DrawActionCardParams({
-    required this.playerId,
-    required this.gameState,
-  });
+  DrawActionCardParams({required this.playerId, required this.gameState});
 }
 
 class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
@@ -76,7 +73,8 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
       if (player.actionCards.length >= kMaxActionCardsInHand) {
         return Left(
           Failure.gameLogic(
-            message: 'You cannot draw more action cards (max $kMaxActionCardsInHand)',
+            message:
+                'You cannot draw more action cards (max $kMaxActionCardsInHand)',
             code: 'ACTION_CARDS_FULL',
           ),
         );
@@ -95,7 +93,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
 
       // Add the card to the player's hand
       _repository.addActionCardToPlayer(params.playerId, drawnCard);
-      
+
       // Update the player in game state
       final updatedPlayer = player.addActionCard(drawnCard);
       final updatedPlayers = List<Player>.from(params.gameState.players);
@@ -114,10 +112,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
       return Right(updatedGameState);
     } catch (e) {
       return Left(
-        Failure.unknown(
-          message: 'Failed to draw action card',
-          error: e,
-        ),
+        Failure.unknown(message: 'Failed to draw action card', error: e),
       );
     }
   }

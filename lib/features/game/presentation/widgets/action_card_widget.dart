@@ -38,7 +38,9 @@ class ActionCardWidget extends ConsumerWidget {
               borderRadius: BorderRadius.circular(4),
             ),
             padding: EdgeInsets.all(isCompact ? 4 : 8),
-            child: isCompact ? _buildCompactContent(context) : _buildFullContent(context),
+            child: isCompact
+                ? _buildCompactContent(context)
+                : _buildFullContent(context),
           ),
         ),
       ),
@@ -53,29 +55,21 @@ class ActionCardWidget extends ConsumerWidget {
         Text(
           card.name,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 11,
-              ),
+            fontWeight: FontWeight.bold,
+            fontSize: 11,
+          ),
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 4),
-        
+
         // Card type icon
-        Icon(
-          _getTypeIcon(),
-          size: 24,
-          color: _getIconColor(),
-        ),
+        Icon(_getTypeIcon(), size: 24, color: _getIconColor()),
         const SizedBox(height: 4),
-        
+
         // Timing icon only
-        Icon(
-          _getTimingIcon(),
-          size: 12,
-          color: _getTimingColor(),
-        ),
+        Icon(_getTimingIcon(), size: 12, color: _getTimingColor()),
       ],
     );
   }
@@ -87,50 +81,38 @@ class ActionCardWidget extends ConsumerWidget {
         // Card name
         Text(
           card.name,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
-        
+
         // Card type icon
-        Icon(
-          _getTypeIcon(),
-          size: 32,
-          color: _getIconColor(),
-        ),
-        
+        Icon(_getTypeIcon(), size: 32, color: _getIconColor()),
+
         // Timing indicator
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              _getTimingIcon(),
-              size: 14,
-              color: _getTimingColor(),
-            ),
+            Icon(_getTimingIcon(), size: 14, color: _getTimingColor()),
             const SizedBox(width: 2),
             Flexible(
               child: Text(
                 _getTimingText(),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontSize: 10,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(fontSize: 10),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
-        
+
         // Target indicator
         if (card.target != ActionTarget.none)
-          Icon(
-            _getTargetIcon(),
-            size: 16,
-            color: Colors.grey,
-          ),
+          Icon(_getTargetIcon(), size: 16, color: Colors.grey),
       ],
     );
   }
@@ -141,31 +123,31 @@ class ActionCardWidget extends ConsumerWidget {
       case ActionCardType.teleport:
       case ActionCardType.swap:
         return Colors.blue.shade50;
-      
+
       // Attack cards
       case ActionCardType.steal:
       case ActionCardType.curse:
       case ActionCardType.bomb:
         return Colors.red.shade50;
-      
+
       // Defense cards
       case ActionCardType.shield:
       case ActionCardType.heal:
         return Colors.purple.shade50;
-      
+
       // Information cards
       case ActionCardType.peek:
       case ActionCardType.reveal:
       case ActionCardType.scout:
         return Colors.orange.shade50;
-      
+
       // Turn manipulation
       case ActionCardType.turnAround:
       case ActionCardType.skip:
       case ActionCardType.reverse:
       case ActionCardType.freeze:
         return Colors.amber.shade50;
-      
+
       // Utility cards
       case ActionCardType.draw:
       case ActionCardType.shuffle:
@@ -232,17 +214,17 @@ class ActionCardWidget extends ConsumerWidget {
       case ActionCardType.curse:
       case ActionCardType.bomb:
         return Colors.red.shade700;
-      
+
       // Defense cards
       case ActionCardType.shield:
       case ActionCardType.heal:
         return Colors.purple.shade700;
-      
+
       // Movement cards
       case ActionCardType.teleport:
       case ActionCardType.swap:
         return Colors.blue.shade700;
-      
+
       default:
         return Colors.grey.shade700;
     }

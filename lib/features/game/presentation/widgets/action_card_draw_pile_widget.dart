@@ -6,11 +6,7 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
   final bool canDraw;
   final VoidCallback? onDraw;
 
-  const ActionCardDrawPileWidget({
-    super.key,
-    this.canDraw = true,
-    this.onDraw,
-  });
+  const ActionCardDrawPileWidget({super.key, this.canDraw = true, this.onDraw});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,7 +36,9 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
                   end: Alignment.bottomRight,
                   colors: [
                     colorScheme.primary.withOpacity(canDraw ? 1.0 : 0.5),
-                    colorScheme.primaryContainer.withOpacity(canDraw ? 1.0 : 0.5),
+                    colorScheme.primaryContainer.withOpacity(
+                      canDraw ? 1.0 : 0.5,
+                    ),
                   ],
                 ),
               ),
@@ -48,13 +46,11 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
                 children: [
                   // Card back pattern
                   _buildCardBackPattern(context),
-                  
+
                   // Main content
                   if (state.isLoading)
                     const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
+                      child: CircularProgressIndicator(color: Colors.white),
                     )
                   else
                     Column(
@@ -69,7 +65,9 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
                         Text(
                           'Cartes Actions',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.white.withOpacity(canDraw ? 1.0 : 0.6),
+                            color: Colors.white.withOpacity(
+                              canDraw ? 1.0 : 0.6,
+                            ),
                             fontWeight: FontWeight.bold,
                             fontSize: 11,
                           ),
@@ -140,7 +138,7 @@ class _CardBackPatternPainter extends CustomPainter {
       for (int col = 0; col < cols; col++) {
         final x = col * patternSize;
         final y = row * patternSize;
-        
+
         // Draw diagonal lines
         canvas.drawLine(
           Offset(x, y),

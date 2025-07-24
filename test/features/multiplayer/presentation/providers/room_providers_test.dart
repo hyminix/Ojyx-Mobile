@@ -206,7 +206,9 @@ void main() {
       );
 
       // Act
-      final asyncValue = await container.read(currentRoomProvider(roomId).future);
+      final asyncValue = await container.read(
+        currentRoomProvider(roomId).future,
+      );
 
       // Assert
       expect(asyncValue, equals(expectedRoom));
@@ -265,7 +267,10 @@ void main() {
     test('should watch room events stream', () async {
       // Arrange
       const roomId = 'room123';
-      final expectedEvent = RoomEvent.playerJoined(playerId: 'player456', playerName: 'Player 456');
+      final expectedEvent = RoomEvent.playerJoined(
+        playerId: 'player456',
+        playerName: 'Player 456',
+      );
       final eventStream = Stream<RoomEvent>.value(expectedEvent);
 
       when(

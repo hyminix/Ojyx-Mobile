@@ -11,14 +11,12 @@ void main() {
     late game.Card testCard;
 
     setUp(() {
-      testCard = const game.Card(
-        value: 7,
-        isRevealed: true,
-      );
+      testCard = const game.Card(value: 7, isRevealed: true);
     });
 
-    testWidgets('should wrap CardWidget with animation and feedback widgets',
-        (tester) async {
+    testWidgets('should wrap CardWidget with animation and feedback widgets', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -41,14 +39,14 @@ void main() {
 
       // Should have animation wrapper
       expect(find.byType(CardAnimationWidget), findsOneWidget);
-      
+
       // Should have feedback wrapper
       expect(find.byType(VisualFeedbackWidget), findsOneWidget);
     });
 
     testWidgets('should show highlight on selection', (tester) async {
       final feedbackKey = GlobalKey<VisualFeedbackWidgetState>();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -57,10 +55,7 @@ void main() {
                 key: feedbackKey,
                 child: CardAnimationWidget(
                   card: testCard,
-                  child: CardWidget(
-                    card: testCard,
-                    isSelected: true,
-                  ),
+                  child: CardWidget(card: testCard, isSelected: true),
                 ),
               ),
             ),
@@ -79,11 +74,8 @@ void main() {
 
     testWidgets('should animate card reveal', (tester) async {
       final animationKey = GlobalKey<CardAnimationWidgetState>();
-      final unrevealedCard = const game.Card(
-        value: 7,
-        isRevealed: false,
-      );
-      
+      final unrevealedCard = const game.Card(value: 7, isRevealed: false);
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -110,7 +102,7 @@ void main() {
 
     testWidgets('should show success feedback when valid move', (tester) async {
       final feedbackKey = GlobalKey<VisualFeedbackWidgetState>();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -143,7 +135,7 @@ void main() {
 
     testWidgets('should show error feedback when invalid move', (tester) async {
       final feedbackKey = GlobalKey<VisualFeedbackWidgetState>();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -176,7 +168,7 @@ void main() {
 
     testWidgets('should show ripple effect at tap position', (tester) async {
       final feedbackKey = GlobalKey<VisualFeedbackWidgetState>();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -188,8 +180,9 @@ void main() {
                   child: CardWidget(
                     card: testCard,
                     onTap: () {
-                      final RenderBox box = feedbackKey.currentContext!
-                          .findRenderObject() as RenderBox;
+                      final RenderBox box =
+                          feedbackKey.currentContext!.findRenderObject()
+                              as RenderBox;
                       final center = box.size.center(Offset.zero);
                       feedbackKey.currentState!.showRipple(center);
                     },
@@ -211,7 +204,7 @@ void main() {
 
     testWidgets('should animate teleport effect', (tester) async {
       final animationKey = GlobalKey<CardAnimationWidgetState>();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -240,7 +233,7 @@ void main() {
 
     testWidgets('should show pulse effect on hover', (tester) async {
       final feedbackKey = GlobalKey<VisualFeedbackWidgetState>();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -279,10 +272,7 @@ void main() {
                     return VisualFeedbackWidget(
                       child: CardAnimationWidget(
                         card: testCard,
-                        child: CardWidget(
-                          card: testCard,
-                          isHighlighted: true,
-                        ),
+                        child: CardWidget(card: testCard, isHighlighted: true),
                       ),
                     );
                   },
@@ -301,7 +291,7 @@ void main() {
     testWidgets('should chain multiple animations', (tester) async {
       final animationKey = GlobalKey<CardAnimationWidgetState>();
       final feedbackKey = GlobalKey<VisualFeedbackWidgetState>();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

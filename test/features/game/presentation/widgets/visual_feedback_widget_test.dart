@@ -5,18 +5,15 @@ import 'package:ojyx/features/game/presentation/widgets/visual_feedback_widget.d
 
 void main() {
   group('VisualFeedbackWidget', () {
-    testWidgets('should wrap child without any visual changes initially',
-        (tester) async {
+    testWidgets('should wrap child without any visual changes initially', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Center(
               child: VisualFeedbackWidget(
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.blue,
-                ),
+                child: Container(width: 100, height: 100, color: Colors.blue),
               ),
             ),
           ),
@@ -37,11 +34,7 @@ void main() {
             body: Center(
               child: VisualFeedbackWidget(
                 key: feedbackKey,
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.blue,
-                ),
+                child: Container(width: 100, height: 100, color: Colors.blue),
               ),
             ),
           ),
@@ -68,11 +61,7 @@ void main() {
             body: Center(
               child: VisualFeedbackWidget(
                 key: feedbackKey,
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.blue,
-                ),
+                child: Container(width: 100, height: 100, color: Colors.blue),
               ),
             ),
           ),
@@ -90,8 +79,9 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('should show ripple effect at specific position',
-        (tester) async {
+    testWidgets('should show ripple effect at specific position', (
+      tester,
+    ) async {
       final feedbackKey = GlobalKey<VisualFeedbackWidgetState>();
 
       await tester.pumpWidget(
@@ -100,11 +90,7 @@ void main() {
             body: Center(
               child: VisualFeedbackWidget(
                 key: feedbackKey,
-                child: Container(
-                  width: 200,
-                  height: 200,
-                  color: Colors.blue,
-                ),
+                child: Container(width: 200, height: 200, color: Colors.blue),
               ),
             ),
           ),
@@ -131,11 +117,7 @@ void main() {
             body: Center(
               child: VisualFeedbackWidget(
                 key: feedbackKey,
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.blue,
-                ),
+                child: Container(width: 100, height: 100, color: Colors.blue),
               ),
             ),
           ),
@@ -169,11 +151,7 @@ void main() {
             body: Center(
               child: VisualFeedbackWidget(
                 key: feedbackKey,
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.blue,
-                ),
+                child: Container(width: 100, height: 100, color: Colors.blue),
               ),
             ),
           ),
@@ -205,11 +183,7 @@ void main() {
               child: VisualFeedbackWidget(
                 key: feedbackKey,
                 tooltip: 'This is a helpful tooltip',
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.blue,
-                ),
+                child: Container(width: 100, height: 100, color: Colors.blue),
               ),
             ),
           ),
@@ -242,11 +216,7 @@ void main() {
             body: Center(
               child: VisualFeedbackWidget(
                 key: feedbackKey,
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.blue,
-                ),
+                child: Container(width: 100, height: 100, color: Colors.blue),
               ),
             ),
           ),
@@ -276,11 +246,7 @@ void main() {
               child: VisualFeedbackWidget(
                 key: feedbackKey,
                 animationDuration: const Duration(milliseconds: 100),
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.blue,
-                ),
+                child: Container(width: 100, height: 100, color: Colors.blue),
               ),
             ),
           ),
@@ -313,11 +279,7 @@ void main() {
                 onFeedbackComplete: () {
                   feedbackCompleted = true;
                 },
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.blue,
-                ),
+                child: Container(width: 100, height: 100, color: Colors.blue),
               ),
             ),
           ),
@@ -342,11 +304,7 @@ void main() {
             body: Center(
               child: VisualFeedbackWidget(
                 key: feedbackKey,
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.blue,
-                ),
+                child: Container(width: 100, height: 100, color: Colors.blue),
               ),
             ),
           ),

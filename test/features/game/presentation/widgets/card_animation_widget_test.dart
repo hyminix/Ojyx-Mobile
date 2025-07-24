@@ -10,10 +10,7 @@ void main() {
     late game.Card testCard;
 
     setUp(() {
-      testCard = const game.Card(
-        value: 5,
-        isRevealed: true,
-      );
+      testCard = const game.Card(value: 5, isRevealed: true);
     });
 
     testWidgets('should show card without animation initially', (tester) async {
@@ -36,7 +33,7 @@ void main() {
 
     testWidgets('should animate teleport effect', (tester) async {
       final animationKey = GlobalKey<CardAnimationWidgetState>();
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -243,7 +240,9 @@ void main() {
       expect(find.byIcon(Icons.question_mark), findsOneWidget);
     });
 
-    testWidgets('should handle multiple animations in sequence', (tester) async {
+    testWidgets('should handle multiple animations in sequence', (
+      tester,
+    ) async {
       final animationKey = GlobalKey<CardAnimationWidgetState>();
 
       await tester.pumpWidget(

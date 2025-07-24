@@ -89,7 +89,7 @@ void main() {
   group('JoinRoomScreen', () {
     testWidgets('should display app bar', (WidgetTester tester) async {
       setLargeScreenSize(tester);
-      
+
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
@@ -104,7 +104,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Act
       await tester.pumpWidget(createWidgetUnderTest(isLoading: true));
       await tester.pump(); // Don't use pumpAndSettle for loading state
@@ -117,7 +117,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Act
       await tester.pumpWidget(createWidgetUnderTest(rooms: []));
       await tester.pumpAndSettle();
@@ -138,11 +138,11 @@ void main() {
       'should navigate to create room when button pressed in empty state',
       (WidgetTester tester) async {
         setLargeScreenSize(tester);
-        
+
         // Arrange
         await tester.pumpWidget(createWidgetUnderTest(rooms: []));
         await tester.pumpAndSettle();
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
         // Act
         await tester.tap(find.text('Créer une partie'));
@@ -157,7 +157,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       const errorMessage = 'Network error';
 
@@ -179,7 +179,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final rooms = [
         createTestRoom(id: 'room1234567890', playerIds: ['creator1']),
@@ -206,7 +206,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(
         id: 'room123456789',
@@ -233,7 +233,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(playerIds: ['creator1'], maxPlayers: 4);
 
@@ -252,7 +252,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(
         playerIds: ['creator1', 'player2', 'player3', 'player4'],
@@ -277,7 +277,7 @@ void main() {
 
     testWidgets('should join room successfully', (WidgetTester tester) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       const userId = 'user123';
       const roomId = 'room12345678';
@@ -319,7 +319,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       const userId = 'user123';
       const roomId = 'room12345678';
@@ -362,7 +362,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(playerIds: ['creator1'], maxPlayers: 4);
 
@@ -388,7 +388,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       const userId = 'user123';
       const roomId = 'room12345678';
@@ -422,7 +422,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       const userId = 'user123';
       const roomId = 'room12345678';
@@ -458,7 +458,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange - Test various time formats
       final rooms = [
         createTestRoom(
@@ -493,7 +493,7 @@ void main() {
 
     testWidgets('should handle null created time', (WidgetTester tester) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(id: 'room12345678', createdAt: null);
 
@@ -508,7 +508,7 @@ void main() {
 
     testWidgets('should support pull to refresh', (WidgetTester tester) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final rooms = [createTestRoom(id: 'room12345678')];
 
@@ -527,7 +527,7 @@ void main() {
 
     testWidgets('should apply correct styling', (WidgetTester tester) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(id: 'room12345678');
 

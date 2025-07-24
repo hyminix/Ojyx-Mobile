@@ -27,7 +27,8 @@ class PlayerGridWidget extends StatelessWidget {
       builder: (context, constraints) {
         // Calculate card dimensions with a slightly smaller size to prevent overflow
         final totalPadding = 32 + (4 * 8); // Container padding + card paddings
-        final availableWidth = constraints.maxWidth - totalPadding - 8; // Extra margin for safety
+        final availableWidth =
+            constraints.maxWidth - totalPadding - 8; // Extra margin for safety
         final cardWidth = availableWidth / 4;
         final cardHeight = cardWidth / 0.7; // Ratio carte
 
@@ -51,46 +52,50 @@ class PlayerGridWidget extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-              if (isCurrentPlayer)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.person,
-                        size: 20,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Votre grille',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(3, (row) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                if (isCurrentPlayer)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(4, (col) {
+                      children: [
+                        Icon(
+                          Icons.person,
+                          size: 20,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Votre grille',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(3, (row) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(4, (col) {
                           final card = grid.getCard(row, col);
                           final position = (row, col);
                           final isHighlighted = highlightedPositions.contains(
                             position,
                           );
-                          final isSelected = selectedPositions.contains(position);
+                          final isSelected = selectedPositions.contains(
+                            position,
+                          );
 
                           return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4.0,
+                            ),
                             child: SizedBox(
                               width: cardWidth,
                               height: cardHeight,
@@ -106,17 +111,17 @@ class PlayerGridWidget extends StatelessWidget {
                             ),
                           );
                         }),
-                    ),
-                  );
-                }),
-              ),
-              if (isCurrentPlayer)
-                Padding(
-                  padding: const EdgeInsets.only(top: 12.0),
-                  child: _buildGridStats(context),
+                      ),
+                    );
+                  }),
                 ),
-            ],
-          ),
+                if (isCurrentPlayer)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: _buildGridStats(context),
+                  ),
+              ],
+            ),
           ),
         );
       },

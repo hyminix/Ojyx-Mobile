@@ -24,7 +24,8 @@ class GameSelectionOverlay extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<GameSelectionOverlay> createState() => _GameSelectionOverlayState();
+  ConsumerState<GameSelectionOverlay> createState() =>
+      _GameSelectionOverlayState();
 }
 
 class _GameSelectionOverlayState extends ConsumerState<GameSelectionOverlay>
@@ -39,13 +40,9 @@ class _GameSelectionOverlayState extends ConsumerState<GameSelectionOverlay>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -101,7 +98,8 @@ class _GameSelectionOverlayState extends ConsumerState<GameSelectionOverlay>
   ) {
     switch (selectionState.selectionType) {
       case CardSelectionType.selectOpponent:
-      case CardSelectionType.steal when selectionState.selectedOpponentId == null:
+      case CardSelectionType.steal
+          when selectionState.selectedOpponentId == null:
         return _buildOpponentSelection(context, selectionState);
       default:
         return const SizedBox.shrink();
@@ -120,10 +118,7 @@ class _GameSelectionOverlayState extends ConsumerState<GameSelectionOverlay>
     return Card(
       elevation: 8,
       child: Container(
-        constraints: const BoxConstraints(
-          maxWidth: 400,
-          maxHeight: 500,
-        ),
+        constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -141,8 +136,9 @@ class _GameSelectionOverlayState extends ConsumerState<GameSelectionOverlay>
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
-                  onPressed: () =>
-                      ref.read(cardSelectionProvider.notifier).cancelSelection(),
+                  onPressed: () => ref
+                      .read(cardSelectionProvider.notifier)
+                      .cancelSelection(),
                 ),
               ],
             ),

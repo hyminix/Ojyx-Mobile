@@ -24,7 +24,7 @@ class FakeGameStateNotifier extends GameStateNotifier {
 
   @override
   GameState? build() => _gameState;
-  
+
   void setGameState(GameState state) {
     _gameState = state;
     this.state = state;
@@ -49,7 +49,7 @@ void main() {
         // Place revealed cards based on player index
         // Player 0: 1 revealed card
         // Player 1: 2 revealed cards
-        // Player 2: 3 revealed cards  
+        // Player 2: 3 revealed cards
         // Player 3: 4 revealed cards
         for (int i = 0; i < index + 1; i++) {
           final row = i ~/ 4;
@@ -149,7 +149,7 @@ void main() {
     ) async {
       // Create a notifier that we can update
       final notifier = FakeGameStateNotifier(gameState);
-      
+
       // Initial render
       await tester.pumpWidget(
         ProviderScope(
@@ -224,11 +224,20 @@ void main() {
       // Assert
       // Use keys to find specific counts
       // Player 1 has 2 revealed cards
-      expect(find.byKey(const ValueKey('revealed_count_player-1')), findsOneWidget);
-      // Player 2 has 3 revealed cards  
-      expect(find.byKey(const ValueKey('revealed_count_player-2')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('revealed_count_player-1')),
+        findsOneWidget,
+      );
+      // Player 2 has 3 revealed cards
+      expect(
+        find.byKey(const ValueKey('revealed_count_player-2')),
+        findsOneWidget,
+      );
       // Player 3 has 4 revealed cards
-      expect(find.byKey(const ValueKey('revealed_count_player-3')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('revealed_count_player-3')),
+        findsOneWidget,
+      );
     });
 
     testWidgets('should handle different screen sizes', (tester) async {
@@ -268,7 +277,7 @@ void main() {
       for (int row = 0; row < 3; row++) {
         grid.placeCard(game.Card(value: 5, isRevealed: true), row, 0);
       }
-      
+
       final playerWithColumns = Player(
         id: 'player-columns',
         name: 'Columns Player',

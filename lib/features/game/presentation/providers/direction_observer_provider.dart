@@ -13,16 +13,18 @@ final directionObserverProvider = Provider<void>((ref) {
       // Check if direction has changed
       final prevDir = previous.turnDirection;
       final nextDir = next.turnDirection;
-      
+
       if (prevDir != nextDir && previousDirection != null) {
         // Direction has changed - trigger animation
         // Convert TurnDirection to PlayDirection
         final playDirection = nextDir == TurnDirection.clockwise
             ? PlayDirection.forward
             : PlayDirection.backward;
-        ref.read(gameAnimationProvider.notifier).showDirectionChange(playDirection);
+        ref
+            .read(gameAnimationProvider.notifier)
+            .showDirectionChange(playDirection);
       }
-      
+
       previousDirection = nextDir;
     }
   });

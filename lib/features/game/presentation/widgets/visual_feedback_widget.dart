@@ -69,45 +69,30 @@ class VisualFeedbackWidgetState extends State<VisualFeedbackWidget>
       vsync: this,
     );
 
-    _pulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
 
-    _highlightAnimation = ColorTween(
-      begin: Colors.transparent,
-      end: Colors.transparent,
-    ).animate(CurvedAnimation(
-      parent: _highlightController,
-      curve: Curves.easeInOut,
-    ));
+    _highlightAnimation =
+        ColorTween(begin: Colors.transparent, end: Colors.transparent).animate(
+          CurvedAnimation(
+            parent: _highlightController,
+            curve: Curves.easeInOut,
+          ),
+        );
 
-    _rippleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _rippleController,
-      curve: Curves.easeOut,
-    ));
+    _rippleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _rippleController, curve: Curves.easeOut),
+    );
 
-    _shakeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 10.0,
-    ).animate(CurvedAnimation(
-      parent: _shakeController,
-      curve: Curves.elasticIn,
-    ));
+    _shakeAnimation = Tween<double>(begin: 0.0, end: 10.0).animate(
+      CurvedAnimation(parent: _shakeController, curve: Curves.elasticIn),
+    );
 
     _iconAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _iconController,
-      curve: Curves.easeIn,
-    ));
+    ).animate(CurvedAnimation(parent: _iconController, curve: Curves.easeIn));
   }
 
   @override
@@ -123,13 +108,10 @@ class VisualFeedbackWidgetState extends State<VisualFeedbackWidget>
   /// Show a pulse effect
   void showPulse({double intensity = 1.0}) {
     _pulseIntensity = intensity;
-    _pulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.0 + (0.1 * intensity),
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.0 + (0.1 * intensity))
+        .animate(
+          CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+        );
 
     _pulseController.forward().then((_) {
       _pulseController.reverse().then((_) {
@@ -141,13 +123,16 @@ class VisualFeedbackWidgetState extends State<VisualFeedbackWidget>
   /// Show a highlight effect
   void showHighlight(Color color) {
     _highlightColor = color;
-    _highlightAnimation = ColorTween(
-      begin: Colors.transparent,
-      end: color.withOpacity(0.3),
-    ).animate(CurvedAnimation(
-      parent: _highlightController,
-      curve: Curves.easeInOut,
-    ));
+    _highlightAnimation =
+        ColorTween(
+          begin: Colors.transparent,
+          end: color.withOpacity(0.3),
+        ).animate(
+          CurvedAnimation(
+            parent: _highlightController,
+            curve: Curves.easeInOut,
+          ),
+        );
 
     _highlightController.forward().then((_) {
       Future.delayed(const Duration(milliseconds: 200), () {
@@ -189,7 +174,7 @@ class VisualFeedbackWidgetState extends State<VisualFeedbackWidget>
   void showError() {
     _feedbackIcon = Icons.error;
     _feedbackIconColor = Colors.red;
-    
+
     Future.wait([
       _iconController.forward(),
       _shakeController.forward().then((_) => _shakeController.reverse()),
@@ -212,10 +197,7 @@ class VisualFeedbackWidgetState extends State<VisualFeedbackWidget>
 
     // Wrap with tooltip if provided
     if (widget.tooltip != null) {
-      result = Tooltip(
-        message: widget.tooltip!,
-        child: result,
-      );
+      result = Tooltip(message: widget.tooltip!, child: result);
     }
 
     // Apply animations
@@ -241,7 +223,11 @@ class VisualFeedbackWidgetState extends State<VisualFeedbackWidget>
         // Apply shake effect
         if (_shakeAnimation.value != 0.0) {
           animatedChild = Transform.translate(
-            offset: Offset(_shakeAnimation.value * math.sin(_shakeController.value * math.pi * 4), 0),
+            offset: Offset(
+              _shakeAnimation.value *
+                  math.sin(_shakeController.value * math.pi * 4),
+              0,
+            ),
             child: animatedChild,
           );
         }

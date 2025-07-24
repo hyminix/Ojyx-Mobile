@@ -8,8 +8,9 @@ import 'package:ojyx/features/game/presentation/providers/game_animation_provide
 
 void main() {
   group('GameAnimationOverlay', () {
-    testWidgets('should show direction change animation when triggered',
-        (tester) async {
+    testWidgets('should show direction change animation when triggered', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         ProviderScope(
@@ -32,9 +33,9 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameAnimationOverlay)),
       );
-      container.read(gameAnimationProvider.notifier).showDirectionChange(
-            PlayDirection.forward,
-          );
+      container
+          .read(gameAnimationProvider.notifier)
+          .showDirectionChange(PlayDirection.forward);
       await tester.pump();
 
       // Assert
@@ -86,9 +87,9 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameAnimationOverlay)),
       );
-      container.read(gameAnimationProvider.notifier).showDirectionChange(
-            PlayDirection.backward,
-          );
+      container
+          .read(gameAnimationProvider.notifier)
+          .showDirectionChange(PlayDirection.backward);
       await tester.pump();
 
       // Animation should be visible
@@ -122,26 +123,25 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameAnimationOverlay)),
       );
-      container.read(gameAnimationProvider.notifier).showDirectionChange(
-            PlayDirection.forward,
-          );
+      container
+          .read(gameAnimationProvider.notifier)
+          .showDirectionChange(PlayDirection.forward);
       await tester.pump();
 
       // Assert - Both content and animation should be visible
       expect(find.text('Game Content'), findsOneWidget);
       expect(find.byType(DirectionChangeAnimation), findsOneWidget);
-      
+
       // Animation should be on top (later in the widget tree)
-      final stack = tester.widget<Stack>(
-        find.byType(Stack).first,
-      );
+      final stack = tester.widget<Stack>(find.byType(Stack).first);
       expect(stack.children.length, equals(2));
       expect(stack.children.first, isA<Container>());
       expect(stack.children.last, isA<Positioned>());
     });
 
-    testWidgets('should handle multiple animation requests gracefully',
-        (tester) async {
+    testWidgets('should handle multiple animation requests gracefully', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         ProviderScope(
@@ -158,16 +158,16 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameAnimationOverlay)),
       );
-      
+
       // Trigger multiple animations quickly
-      container.read(gameAnimationProvider.notifier).showDirectionChange(
-            PlayDirection.forward,
-          );
+      container
+          .read(gameAnimationProvider.notifier)
+          .showDirectionChange(PlayDirection.forward);
       await tester.pump();
-      
-      container.read(gameAnimationProvider.notifier).showDirectionChange(
-            PlayDirection.backward,
-          );
+
+      container
+          .read(gameAnimationProvider.notifier)
+          .showDirectionChange(PlayDirection.backward);
       await tester.pump();
 
       // Should still only show one animation
@@ -191,11 +191,11 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameAnimationOverlay)),
       );
-      
+
       // Trigger with backward direction
-      container.read(gameAnimationProvider.notifier).showDirectionChange(
-            PlayDirection.backward,
-          );
+      container
+          .read(gameAnimationProvider.notifier)
+          .showDirectionChange(PlayDirection.backward);
       await tester.pump();
 
       // Check the animation has correct direction

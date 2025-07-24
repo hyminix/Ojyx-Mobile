@@ -76,7 +76,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
 
@@ -92,7 +92,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
 
@@ -112,7 +112,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
 
@@ -136,7 +136,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
 
@@ -158,7 +158,7 @@ void main() {
 
     testWidgets('should create room successfully', (WidgetTester tester) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       const userId = 'user123';
       const roomId = 'room456';
@@ -194,7 +194,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       const userId = 'user123';
       final expectedRoom = Room(
@@ -231,7 +231,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(userId: null));
 
@@ -252,7 +252,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       const userId = 'user123';
       const errorMessage = 'Network error';
@@ -277,7 +277,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       const userId = 'user123';
       final expectedRoom = Room(
@@ -324,7 +324,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       const userId = 'user123';
       const selectedPlayers = 6;
@@ -368,13 +368,16 @@ void main() {
 
     testWidgets('should apply correct styling', (WidgetTester tester) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
 
       // Assert
       expect(find.byType(Card), findsOneWidget);
-      expect(find.byType(ConstrainedBox), findsWidgets); // Multiple ConstrainedBox is fine
+      expect(
+        find.byType(ConstrainedBox),
+        findsWidgets,
+      ); // Multiple ConstrainedBox is fine
       expect(find.byType(SafeArea), findsWidgets); // Multiple SafeArea is fine
 
       // Check that player count is displayed in a circular container
