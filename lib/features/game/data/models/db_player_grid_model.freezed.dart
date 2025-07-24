@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'db_player_grid.dart';
+part of 'db_player_grid_model.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,60 +15,75 @@ final _privateConstructorUsedError = UnsupportedError(
   'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
 );
 
+DbPlayerGridModel _$DbPlayerGridModelFromJson(Map<String, dynamic> json) {
+  return _DbPlayerGridModel.fromJson(json);
+}
+
 /// @nodoc
-mixin _$DbPlayerGrid {
+mixin _$DbPlayerGridModel {
   String get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'game_state_id')
   String get gameStateId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'player_id')
   String get playerId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'grid_cards')
   List<Card> get gridCards => throw _privateConstructorUsedError;
+  @JsonKey(name: 'action_cards')
   List<ActionCard> get actionCards => throw _privateConstructorUsedError;
   int get score => throw _privateConstructorUsedError;
   int get position => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_active')
   bool get isActive => throw _privateConstructorUsedError;
+  @JsonKey(name: 'has_revealed_all')
   bool get hasRevealedAll => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
-  /// Create a copy of DbPlayerGrid
+  /// Serializes this DbPlayerGridModel to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of DbPlayerGridModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $DbPlayerGridCopyWith<DbPlayerGrid> get copyWith =>
+  $DbPlayerGridModelCopyWith<DbPlayerGridModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $DbPlayerGridCopyWith<$Res> {
-  factory $DbPlayerGridCopyWith(
-    DbPlayerGrid value,
-    $Res Function(DbPlayerGrid) then,
-  ) = _$DbPlayerGridCopyWithImpl<$Res, DbPlayerGrid>;
+abstract class $DbPlayerGridModelCopyWith<$Res> {
+  factory $DbPlayerGridModelCopyWith(
+    DbPlayerGridModel value,
+    $Res Function(DbPlayerGridModel) then,
+  ) = _$DbPlayerGridModelCopyWithImpl<$Res, DbPlayerGridModel>;
   @useResult
   $Res call({
     String id,
-    String gameStateId,
-    String playerId,
-    List<Card> gridCards,
-    List<ActionCard> actionCards,
+    @JsonKey(name: 'game_state_id') String gameStateId,
+    @JsonKey(name: 'player_id') String playerId,
+    @JsonKey(name: 'grid_cards') List<Card> gridCards,
+    @JsonKey(name: 'action_cards') List<ActionCard> actionCards,
     int score,
     int position,
-    bool isActive,
-    bool hasRevealedAll,
-    DateTime createdAt,
-    DateTime updatedAt,
+    @JsonKey(name: 'is_active') bool isActive,
+    @JsonKey(name: 'has_revealed_all') bool hasRevealedAll,
+    @JsonKey(name: 'created_at') DateTime createdAt,
+    @JsonKey(name: 'updated_at') DateTime updatedAt,
   });
 }
 
 /// @nodoc
-class _$DbPlayerGridCopyWithImpl<$Res, $Val extends DbPlayerGrid>
-    implements $DbPlayerGridCopyWith<$Res> {
-  _$DbPlayerGridCopyWithImpl(this._value, this._then);
+class _$DbPlayerGridModelCopyWithImpl<$Res, $Val extends DbPlayerGridModel>
+    implements $DbPlayerGridModelCopyWith<$Res> {
+  _$DbPlayerGridModelCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of DbPlayerGrid
+  /// Create a copy of DbPlayerGridModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -138,39 +153,39 @@ class _$DbPlayerGridCopyWithImpl<$Res, $Val extends DbPlayerGrid>
 }
 
 /// @nodoc
-abstract class _$$DbPlayerGridImplCopyWith<$Res>
-    implements $DbPlayerGridCopyWith<$Res> {
-  factory _$$DbPlayerGridImplCopyWith(
-    _$DbPlayerGridImpl value,
-    $Res Function(_$DbPlayerGridImpl) then,
-  ) = __$$DbPlayerGridImplCopyWithImpl<$Res>;
+abstract class _$$DbPlayerGridModelImplCopyWith<$Res>
+    implements $DbPlayerGridModelCopyWith<$Res> {
+  factory _$$DbPlayerGridModelImplCopyWith(
+    _$DbPlayerGridModelImpl value,
+    $Res Function(_$DbPlayerGridModelImpl) then,
+  ) = __$$DbPlayerGridModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({
     String id,
-    String gameStateId,
-    String playerId,
-    List<Card> gridCards,
-    List<ActionCard> actionCards,
+    @JsonKey(name: 'game_state_id') String gameStateId,
+    @JsonKey(name: 'player_id') String playerId,
+    @JsonKey(name: 'grid_cards') List<Card> gridCards,
+    @JsonKey(name: 'action_cards') List<ActionCard> actionCards,
     int score,
     int position,
-    bool isActive,
-    bool hasRevealedAll,
-    DateTime createdAt,
-    DateTime updatedAt,
+    @JsonKey(name: 'is_active') bool isActive,
+    @JsonKey(name: 'has_revealed_all') bool hasRevealedAll,
+    @JsonKey(name: 'created_at') DateTime createdAt,
+    @JsonKey(name: 'updated_at') DateTime updatedAt,
   });
 }
 
 /// @nodoc
-class __$$DbPlayerGridImplCopyWithImpl<$Res>
-    extends _$DbPlayerGridCopyWithImpl<$Res, _$DbPlayerGridImpl>
-    implements _$$DbPlayerGridImplCopyWith<$Res> {
-  __$$DbPlayerGridImplCopyWithImpl(
-    _$DbPlayerGridImpl _value,
-    $Res Function(_$DbPlayerGridImpl) _then,
+class __$$DbPlayerGridModelImplCopyWithImpl<$Res>
+    extends _$DbPlayerGridModelCopyWithImpl<$Res, _$DbPlayerGridModelImpl>
+    implements _$$DbPlayerGridModelImplCopyWith<$Res> {
+  __$$DbPlayerGridModelImplCopyWithImpl(
+    _$DbPlayerGridModelImpl _value,
+    $Res Function(_$DbPlayerGridModelImpl) _then,
   ) : super(_value, _then);
 
-  /// Create a copy of DbPlayerGrid
+  /// Create a copy of DbPlayerGridModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -188,7 +203,7 @@ class __$$DbPlayerGridImplCopyWithImpl<$Res>
     Object? updatedAt = null,
   }) {
     return _then(
-      _$DbPlayerGridImpl(
+      _$DbPlayerGridModelImpl(
         id: null == id
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
@@ -239,31 +254,38 @@ class __$$DbPlayerGridImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-class _$DbPlayerGridImpl implements _DbPlayerGrid {
-  const _$DbPlayerGridImpl({
+@JsonSerializable()
+class _$DbPlayerGridModelImpl extends _DbPlayerGridModel {
+  const _$DbPlayerGridModelImpl({
     required this.id,
-    required this.gameStateId,
-    required this.playerId,
-    required final List<Card> gridCards,
-    required final List<ActionCard> actionCards,
+    @JsonKey(name: 'game_state_id') required this.gameStateId,
+    @JsonKey(name: 'player_id') required this.playerId,
+    @JsonKey(name: 'grid_cards') required final List<Card> gridCards,
+    @JsonKey(name: 'action_cards') required final List<ActionCard> actionCards,
     required this.score,
     required this.position,
-    required this.isActive,
-    required this.hasRevealedAll,
-    required this.createdAt,
-    required this.updatedAt,
+    @JsonKey(name: 'is_active') required this.isActive,
+    @JsonKey(name: 'has_revealed_all') required this.hasRevealedAll,
+    @JsonKey(name: 'created_at') required this.createdAt,
+    @JsonKey(name: 'updated_at') required this.updatedAt,
   }) : _gridCards = gridCards,
-       _actionCards = actionCards;
+       _actionCards = actionCards,
+       super._();
+
+  factory _$DbPlayerGridModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DbPlayerGridModelImplFromJson(json);
 
   @override
   final String id;
   @override
+  @JsonKey(name: 'game_state_id')
   final String gameStateId;
   @override
+  @JsonKey(name: 'player_id')
   final String playerId;
   final List<Card> _gridCards;
   @override
+  @JsonKey(name: 'grid_cards')
   List<Card> get gridCards {
     if (_gridCards is EqualUnmodifiableListView) return _gridCards;
     // ignore: implicit_dynamic_type
@@ -272,6 +294,7 @@ class _$DbPlayerGridImpl implements _DbPlayerGrid {
 
   final List<ActionCard> _actionCards;
   @override
+  @JsonKey(name: 'action_cards')
   List<ActionCard> get actionCards {
     if (_actionCards is EqualUnmodifiableListView) return _actionCards;
     // ignore: implicit_dynamic_type
@@ -283,24 +306,28 @@ class _$DbPlayerGridImpl implements _DbPlayerGrid {
   @override
   final int position;
   @override
+  @JsonKey(name: 'is_active')
   final bool isActive;
   @override
+  @JsonKey(name: 'has_revealed_all')
   final bool hasRevealedAll;
   @override
+  @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
 
   @override
   String toString() {
-    return 'DbPlayerGrid(id: $id, gameStateId: $gameStateId, playerId: $playerId, gridCards: $gridCards, actionCards: $actionCards, score: $score, position: $position, isActive: $isActive, hasRevealedAll: $hasRevealedAll, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'DbPlayerGridModel(id: $id, gameStateId: $gameStateId, playerId: $playerId, gridCards: $gridCards, actionCards: $actionCards, score: $score, position: $position, isActive: $isActive, hasRevealedAll: $hasRevealedAll, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DbPlayerGridImpl &&
+            other is _$DbPlayerGridModelImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.gameStateId, gameStateId) ||
                 other.gameStateId == gameStateId) &&
@@ -327,6 +354,7 @@ class _$DbPlayerGridImpl implements _DbPlayerGrid {
                 other.updatedAt == updatedAt));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
@@ -343,57 +371,77 @@ class _$DbPlayerGridImpl implements _DbPlayerGrid {
     updatedAt,
   );
 
-  /// Create a copy of DbPlayerGrid
+  /// Create a copy of DbPlayerGridModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$DbPlayerGridImplCopyWith<_$DbPlayerGridImpl> get copyWith =>
-      __$$DbPlayerGridImplCopyWithImpl<_$DbPlayerGridImpl>(this, _$identity);
+  _$$DbPlayerGridModelImplCopyWith<_$DbPlayerGridModelImpl> get copyWith =>
+      __$$DbPlayerGridModelImplCopyWithImpl<_$DbPlayerGridModelImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DbPlayerGridModelImplToJson(this);
+  }
 }
 
-abstract class _DbPlayerGrid implements DbPlayerGrid {
-  const factory _DbPlayerGrid({
+abstract class _DbPlayerGridModel extends DbPlayerGridModel {
+  const factory _DbPlayerGridModel({
     required final String id,
-    required final String gameStateId,
-    required final String playerId,
-    required final List<Card> gridCards,
-    required final List<ActionCard> actionCards,
+    @JsonKey(name: 'game_state_id') required final String gameStateId,
+    @JsonKey(name: 'player_id') required final String playerId,
+    @JsonKey(name: 'grid_cards') required final List<Card> gridCards,
+    @JsonKey(name: 'action_cards') required final List<ActionCard> actionCards,
     required final int score,
     required final int position,
-    required final bool isActive,
-    required final bool hasRevealedAll,
-    required final DateTime createdAt,
-    required final DateTime updatedAt,
-  }) = _$DbPlayerGridImpl;
+    @JsonKey(name: 'is_active') required final bool isActive,
+    @JsonKey(name: 'has_revealed_all') required final bool hasRevealedAll,
+    @JsonKey(name: 'created_at') required final DateTime createdAt,
+    @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+  }) = _$DbPlayerGridModelImpl;
+  const _DbPlayerGridModel._() : super._();
+
+  factory _DbPlayerGridModel.fromJson(Map<String, dynamic> json) =
+      _$DbPlayerGridModelImpl.fromJson;
 
   @override
   String get id;
   @override
+  @JsonKey(name: 'game_state_id')
   String get gameStateId;
   @override
+  @JsonKey(name: 'player_id')
   String get playerId;
   @override
+  @JsonKey(name: 'grid_cards')
   List<Card> get gridCards;
   @override
+  @JsonKey(name: 'action_cards')
   List<ActionCard> get actionCards;
   @override
   int get score;
   @override
   int get position;
   @override
+  @JsonKey(name: 'is_active')
   bool get isActive;
   @override
+  @JsonKey(name: 'has_revealed_all')
   bool get hasRevealedAll;
   @override
+  @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   DateTime get updatedAt;
 
-  /// Create a copy of DbPlayerGrid
+  /// Create a copy of DbPlayerGridModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$DbPlayerGridImplCopyWith<_$DbPlayerGridImpl> get copyWith =>
+  _$$DbPlayerGridModelImplCopyWith<_$DbPlayerGridModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

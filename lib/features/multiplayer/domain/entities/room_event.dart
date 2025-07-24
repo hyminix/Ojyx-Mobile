@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../game/domain/entities/game_state.dart';
 import '../../../game/domain/entities/card.dart';
+import '../../data/converters/game_state_converter.dart';
 
 part 'room_event.freezed.dart';
 part 'room_event.g.dart';
@@ -16,11 +17,12 @@ class RoomEvent with _$RoomEvent {
 
   const factory RoomEvent.gameStarted({
     required String gameId,
-    required GameState initialState,
+    @GameStateConverter() required GameState initialState,
   }) = GameStarted;
 
-  const factory RoomEvent.gameStateUpdated({required GameState newState}) =
-      GameStateUpdated;
+  const factory RoomEvent.gameStateUpdated({
+    @GameStateConverter() required GameState newState,
+  }) = GameStateUpdated;
 
   const factory RoomEvent.playerAction({
     required String playerId,

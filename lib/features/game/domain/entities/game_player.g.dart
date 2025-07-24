@@ -7,18 +7,48 @@ part of 'game_player.dart';
 // **************************************************************************
 
 _$GamePlayerImpl _$$GamePlayerImplFromJson(Map<String, dynamic> json) =>
-    _$GamePlayerImpl(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      grid: PlayerGrid.fromJson(json['grid'] as Map<String, dynamic>),
-      actionCards: (json['action_cards'] as List<dynamic>?)
-              ?.map((e) => ActionCard.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      isConnected: json['is_connected'] as bool? ?? true,
-      isHost: json['is_host'] as bool? ?? false,
-      hasFinishedRound: json['has_finished_round'] as bool? ?? false,
-      scoreMultiplier: (json['score_multiplier'] as num?)?.toInt() ?? 1,
+    $checkedCreate(
+      r'_$GamePlayerImpl',
+      json,
+      ($checkedConvert) {
+        final val = _$GamePlayerImpl(
+          id: $checkedConvert('id', (v) => v as String),
+          name: $checkedConvert('name', (v) => v as String),
+          grid: $checkedConvert(
+            'grid',
+            (v) => PlayerGrid.fromJson(v as Map<String, dynamic>),
+          ),
+          actionCards: $checkedConvert(
+            'action_cards',
+            (v) =>
+                (v as List<dynamic>?)
+                    ?.map((e) => ActionCard.fromJson(e as Map<String, dynamic>))
+                    .toList() ??
+                const [],
+          ),
+          isConnected: $checkedConvert(
+            'is_connected',
+            (v) => v as bool? ?? true,
+          ),
+          isHost: $checkedConvert('is_host', (v) => v as bool? ?? false),
+          hasFinishedRound: $checkedConvert(
+            'has_finished_round',
+            (v) => v as bool? ?? false,
+          ),
+          scoreMultiplier: $checkedConvert(
+            'score_multiplier',
+            (v) => (v as num?)?.toInt() ?? 1,
+          ),
+        );
+        return val;
+      },
+      fieldKeyMap: const {
+        'actionCards': 'action_cards',
+        'isConnected': 'is_connected',
+        'isHost': 'is_host',
+        'hasFinishedRound': 'has_finished_round',
+        'scoreMultiplier': 'score_multiplier',
+      },
     );
 
 Map<String, dynamic> _$$GamePlayerImplToJson(_$GamePlayerImpl instance) =>

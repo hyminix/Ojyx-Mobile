@@ -6,7 +6,6 @@ import 'card.dart';
 import 'action_card.dart';
 
 part 'game_state.freezed.dart';
-part 'game_state.g.dart';
 
 enum GameStatus {
   waitingToStart,
@@ -64,8 +63,6 @@ class GameState with _$GameState {
     );
   }
 
-  factory GameState.fromJson(Map<String, dynamic> json) =>
-      _$GameStateFromJson(json);
 
   GamePlayer get currentPlayer => players[currentPlayerIndex];
 

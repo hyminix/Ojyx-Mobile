@@ -15,10 +15,6 @@ final _privateConstructorUsedError = UnsupportedError(
   'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
 );
 
-GameState _$GameStateFromJson(Map<String, dynamic> json) {
-  return _GameState.fromJson(json);
-}
-
 /// @nodoc
 mixin _$GameState {
   String get roomId => throw _privateConstructorUsedError;
@@ -37,9 +33,6 @@ mixin _$GameState {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get startedAt => throw _privateConstructorUsedError;
   DateTime? get finishedAt => throw _privateConstructorUsedError;
-
-  /// Serializes this GameState to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of GameState
   /// with the given fields replaced by the non-null parameter values.
@@ -328,7 +321,7 @@ class __$$GameStateImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$GameStateImpl extends _GameState {
   const _$GameStateImpl({
     required this.roomId,
@@ -353,9 +346,6 @@ class _$GameStateImpl extends _GameState {
        _actionDeck = actionDeck,
        _actionDiscard = actionDiscard,
        super._();
-
-  factory _$GameStateImpl.fromJson(Map<String, dynamic> json) =>
-      _$$GameStateImplFromJson(json);
 
   @override
   final String roomId;
@@ -466,7 +456,6 @@ class _$GameStateImpl extends _GameState {
                 other.finishedAt == finishedAt));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
@@ -495,11 +484,6 @@ class _$GameStateImpl extends _GameState {
   @pragma('vm:prefer-inline')
   _$$GameStateImplCopyWith<_$GameStateImpl> get copyWith =>
       __$$GameStateImplCopyWithImpl<_$GameStateImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$GameStateImplToJson(this);
-  }
 }
 
 abstract class _GameState extends GameState {
@@ -522,9 +506,6 @@ abstract class _GameState extends GameState {
     final DateTime? finishedAt,
   }) = _$GameStateImpl;
   const _GameState._() : super._();
-
-  factory _GameState.fromJson(Map<String, dynamic> json) =
-      _$GameStateImpl.fromJson;
 
   @override
   String get roomId;
