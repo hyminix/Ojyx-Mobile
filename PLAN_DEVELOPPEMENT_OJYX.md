@@ -18,10 +18,10 @@
 9. **Zones de Pioche et Défausse** ✅ COMPLÉTÉE
 10. **Infrastructure Cartes Actions** ✅ COMPLÉTÉE
 
-### Phase 4 : Cartes Actions (Tâches 11-13) ❌ NON COMMENCÉES
-11. **Implémentation Demi-tour** - Première carte action
-12. **Implémentation Téléportation** - Carte avec sélection
-13. **UI Sélecteurs et Feedback** - Interfaces dynamiques
+### Phase 4 : Cartes Actions (Tâches 11-13) ✅ COMPLÉTÉES
+11. **Implémentation Demi-tour** ✅ COMPLÉTÉE
+12. **Implémentation Téléportation** ✅ COMPLÉTÉE
+13. **UI Sélecteurs et Feedback** ✅ COMPLÉTÉE
 
 ### Phase 5 : Fin de Partie (Tâches 14-15) ❌ NON COMMENCÉES
 14. **Écran de Fin de Partie** - Récapitulatif et scores
@@ -129,30 +129,59 @@
    - Ajout vérifications conditionnelles
    - Mise à jour calculs de score
 
-### État actuel : 242 tests, 0 échecs ✅
+### Tâche 11 : Implémentation Demi-tour
+- ✅ `DrawActionCardUseCase` : Piocher une carte action
+- ✅ `UseActionCardUseCase` : Utiliser carte Demi-tour (obligatoire)
+- ✅ Inversion automatique de la direction du jeu
+- ✅ `ActionCardWidget` : Affichage des cartes actions
+- ✅ `ActionCardHandWidget` : Main du joueur (max 3 cartes)
+- ✅ `ActionCardDrawPileWidget` : Pile de pioche des cartes actions
+- ✅ Animation de changement de direction dans GameScreen
+- ✅ Tests unitaires et widgets complets
+
+### Tâche 12 : Implémentation Téléportation
+- ✅ `TeleportActionCardUseCase` : Échanger deux cartes révélées
+- ✅ `CardSelectionProvider` : État de sélection des cartes
+- ✅ Mode sélection dans PlayerGridWidget
+- ✅ Interface de sélection 2 cartes avec feedback visuel
+- ✅ Validation des cartes sélectionnées (révélées uniquement)
+- ✅ Animation de téléportation
+- ✅ Tests unitaires complets
+
+### Tâche 13 : UI Sélecteurs et Feedback
+- ✅ `CardSelectionProvider` généralisé pour tous types de sélection
+- ✅ Support pour : teleport, swap, peek, bomb, mirror, gift, steal, scout
+- ✅ `GameSelectionOverlay` : Modal réutilisable pour sélection d'adversaire
+- ✅ Sélection en deux phases pour "steal" (adversaire puis carte)
+- ✅ Multi-sélection pour peek/scout avec limite max
+- ✅ `CardAnimationWidget` : Animations fluides (fade, scale, slide, swap)
+- ✅ `VisualFeedbackWidget` : Feedback en temps réel
+- ✅ Effets visuels : pulse, ripple, highlight, success/error
+- ✅ Tooltips sur hover pour cartes révélées
+- ✅ `EnhancedPlayerGrid` : Intégration complète animations + feedback
+- ✅ Tests d'intégration pour tous les sélecteurs
+
+### État actuel : 779 tests, 0 échecs ✅
 
 ## 📝 Ce qui reste à faire
 
-### Phase 4 : Cartes Actions (Prochaine étape)
-**Tâche 11 : Implémentation Demi-tour**
-- Carte obligatoire (activation immédiate)
-- Inverser direction du tour
-- UI feedback animation
+### Phase 5 : Fin de Partie (Prochaine étape)
+**Tâche 14 : Écran de Fin de Partie**
+- Écran récapitulatif avec scores finaux
+- Classement des joueurs
+- Options : Nouvelle manche / Quitter
+- Animations de victoire
 - Tests complets
 
-**Tâche 12 : Implémentation Téléportation**
-- Carte optionnelle (stockable)
-- UI sélection 2 cartes
-- Échange de positions
+**Tâche 15 : Système de Points Globaux**
+- Persistance des scores entre manches
+- Historique des parties
+- Statistiques par joueur
+- Système de progression
 - Tests complets
 
-**Tâche 13 : UI Sélecteurs et Feedback**
-- Overlay de sélection
-- Animations d'actions
-- Feedback visuel temps réel
-- Tests complets
-
-**Tâches 14-19 : À détailler lors de l'implémentation**
+### Phase 6 : Production
+**Tâches 16-19 : À détailler lors de l'implémentation**
 
 ## 🔧 Configuration technique actuelle
 
@@ -187,31 +216,31 @@ dart format .
 
 ## 🎯 Prochaines étapes recommandées
 
-1. **Phase 4 - Tâche 11 : Implémentation Demi-tour** (3-4h)
-   - TDD : Tests d'abord pour le use case
-   - Implémenter l'action obligatoire
-   - Inverser la direction du tour
-   - UI feedback avec animation
+1. **Phase 5 - Tâche 14 : Écran de Fin de Partie** (4-5h)
+   - TDD : Tests pour l'écran de fin
+   - Affichage des scores finaux et classement
+   - Animations de victoire/défaite
+   - Options navigation (nouvelle manche/quitter)
    - Tests d'intégration complets
 
-2. **Phase 4 - Tâche 12 : Implémentation Téléportation** (4-5h)
-   - TDD : Tests pour la sélection
-   - Carte stockable (max 3)
-   - UI overlay de sélection
-   - Échange de positions
+2. **Phase 5 - Tâche 15 : Système de Points Globaux** (3-4h)
+   - TDD : Tests pour la persistance
+   - Accumulation des points entre manches
+   - Historique des parties dans Supabase
+   - Statistiques et progression
    - Tests complets
 
-3. **Phase 4 - Tâche 13 : UI Sélecteurs et Feedback** (3-4h)
-   - Overlay de sélection généralisé
-   - Animations d'actions fluides
-   - Feedback visuel temps réel
-   - Tests d'intégration
+3. **Phase 6 - Tâche 16 : Animations et Polish** (4-5h)
+   - Transitions fluides entre écrans
+   - Animations de cartes améliorées
+   - Sons et feedback haptique
+   - Optimisation performances
 
-4. **Phase 5 : Fin de partie et scores** (6-8h)
-   - Écran de fin de manche
-   - Système de points cumulés
-   - Persistance des scores
-   - Navigation entre manches
+4. **Phase 6 - Tâches 17-19 : Production** (8-10h)
+   - Mode hors-ligne avec synchronisation
+   - Tests d'intégration end-to-end
+   - Configuration CI/CD complète
+   - Déploiement sur stores
 
 ## 📌 Notes importantes
 
@@ -223,4 +252,4 @@ dart format .
 
 ---
 
-*Document mis à jour le 2025-07-23 - Phase 3 complétée avec succès, tous les tests passent (242/242).*
+*Document mis à jour le 2025-07-24 - Phase 4 complétée avec succès, tous les tests passent (779/779).*
