@@ -13,7 +13,7 @@ class ActionCardLocalDataSourceImpl implements ActionCardLocalDataSource {
   }
 
   @override
-  void initializeDeck() {
+  Future<void> initializeDeck() async {
     _drawPile.clear();
 
     // Create a balanced deck of action cards
@@ -150,17 +150,17 @@ class ActionCardLocalDataSourceImpl implements ActionCardLocalDataSource {
   }
 
   @override
-  List<ActionCard> getAvailableActionCards() {
+  Future<List<ActionCard>> getAvailableActionCards() async {
     return List.unmodifiable(_drawPile);
   }
 
   @override
-  List<ActionCard> getPlayerActionCards(String playerId) {
+  Future<List<ActionCard>> getPlayerActionCards(String playerId) async {
     return List.unmodifiable(_playerCards[playerId] ?? []);
   }
 
   @override
-  void addActionCardToPlayer(String playerId, ActionCard card) {
+  Future<void> addActionCardToPlayer(String playerId, ActionCard card) async {
     _playerCards.putIfAbsent(playerId, () => []);
     final playerCards = _playerCards[playerId]!;
 
@@ -174,7 +174,7 @@ class ActionCardLocalDataSourceImpl implements ActionCardLocalDataSource {
   }
 
   @override
-  void removeActionCardFromPlayer(String playerId, ActionCard card) {
+  Future<void> removeActionCardFromPlayer(String playerId, ActionCard card) async {
     final playerCards = _playerCards[playerId];
     if (playerCards == null || !playerCards.contains(card)) {
       throw Exception('GamePlayer does not have this action card');
@@ -184,7 +184,7 @@ class ActionCardLocalDataSourceImpl implements ActionCardLocalDataSource {
   }
 
   @override
-  ActionCard? drawActionCard() {
+  Future<ActionCard?> drawActionCard() async {
     if (_drawPile.isEmpty) {
       return null;
     }
@@ -193,13 +193,13 @@ class ActionCardLocalDataSourceImpl implements ActionCardLocalDataSource {
   }
 
   @override
-  void discardActionCard(ActionCard card) {
+  Future<void> discardActionCard(ActionCard card) async {
     // Add the card back to the bottom of the draw pile
     _drawPile.add(card);
   }
 
   @override
-  void shuffleActionCards() {
+  Future<void> shuffleActionCards() async {
     _drawPile.shuffle(_random);
   }
 }

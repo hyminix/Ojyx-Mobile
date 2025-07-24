@@ -1,5 +1,5 @@
 import '../../../game/domain/entities/game_state.dart';
-import '../../../game/domain/entities/db_player_grid.dart';
+// DbPlayerGrid is now in data layer, using Map<String, dynamic> for data transfer
 import '../../../game/domain/repositories/game_state_repository.dart';
 
 class SyncGameStateUseCase {

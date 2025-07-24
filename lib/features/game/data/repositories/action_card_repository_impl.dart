@@ -8,37 +8,37 @@ class ActionCardRepositoryImpl implements ActionCardRepository {
   ActionCardRepositoryImpl(this._localDataSource);
 
   @override
-  List<ActionCard> getAvailableActionCards() {
+  Future<List<ActionCard>> getAvailableActionCards() {
     return _localDataSource.getAvailableActionCards();
   }
 
   @override
-  List<ActionCard> getPlayerActionCards(String playerId) {
+  Future<List<ActionCard>> getPlayerActionCards(String playerId) {
     return _localDataSource.getPlayerActionCards(playerId);
   }
 
   @override
-  void addActionCardToPlayer(String playerId, ActionCard card) {
+  Future<void> addActionCardToPlayer(String playerId, ActionCard card) {
     _localDataSource.addActionCardToPlayer(playerId, card);
   }
 
   @override
-  void removeActionCardFromPlayer(String playerId, ActionCard card) {
+  Future<void> removeActionCardFromPlayer(String playerId, ActionCard card) {
     _localDataSource.removeActionCardFromPlayer(playerId, card);
   }
 
   @override
-  ActionCard? drawActionCard() {
+  Future<ActionCard?> drawActionCard() {
     return _localDataSource.drawActionCard();
   }
 
   @override
-  void discardActionCard(ActionCard card) {
+  Future<void> discardActionCard(ActionCard card) {
     _localDataSource.discardActionCard(card);
   }
 
   @override
-  void shuffleActionCards() {
+  Future<void> shuffleActionCards() {
     _localDataSource.shuffleActionCards();
   }
 }

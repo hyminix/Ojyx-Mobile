@@ -1,5 +1,5 @@
 import '../entities/game_state.dart';
-import '../entities/db_player_grid.dart';
+// DbPlayerGrid is now in data layer
 import '../entities/action_card.dart';
 
 abstract class GameStateRepository {
