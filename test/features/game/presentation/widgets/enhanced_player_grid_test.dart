@@ -92,10 +92,20 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: EnhancedPlayerGrid(
-                player: testPlayer,
-                isCurrentPlayer: true,
-                onCardTap: (position) {},
+              body: Builder(
+                builder: (context) {
+                  // Start selection after build
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    final container = ProviderScope.containerOf(context);
+                    container.read(cardSelectionProvider.notifier).startTeleportSelection();
+                  });
+                  
+                  return EnhancedPlayerGrid(
+                    player: testPlayer,
+                    isCurrentPlayer: true,
+                    onCardTap: (position) {},
+                  );
+                },
               ),
             ),
           ),
@@ -104,10 +114,10 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Should highlight selectable cards
+      // Should highlight selectable cards (only revealed cards for teleport)
       final cardWidgets = tester.widgetList<CardWidget>(find.byType(CardWidget));
       final highlightedCards = cardWidgets.where((card) => card.isHighlighted);
-      expect(highlightedCards, isNotEmpty);
+      expect(highlightedCards.length, equals(2)); // Only 2 cards are revealed
     });
 
     testWidgets('should animate card interactions', (tester) async {

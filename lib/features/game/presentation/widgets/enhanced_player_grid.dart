@@ -139,6 +139,13 @@ class _EnhancedPlayerGridState extends ConsumerState<EnhancedPlayerGrid> {
       }
     }
 
+    // Show immediate feedback for demo/test purposes
+    if (widget.showSuccessFeedback && !widget.showErrorFeedback) {
+      _feedbackKeys[position]?.currentState?.showSuccess();
+    } else if (widget.showErrorFeedback) {
+      _feedbackKeys[position]?.currentState?.showError();
+    }
+
     // Handle selection logic
     if (selectionState.isSelecting) {
       final isValid = _isCardSelectable(position, selectionState);
@@ -148,10 +155,6 @@ class _EnhancedPlayerGridState extends ConsumerState<EnhancedPlayerGrid> {
           position,
           position, // Using position as playerId for now
         );
-        
-        if (widget.showSuccessFeedback) {
-          _feedbackKeys[position]?.currentState?.showSuccess();
-        }
 
         // Animate swap if needed
         if (widget.animateSwap && 
@@ -161,8 +164,6 @@ class _EnhancedPlayerGridState extends ConsumerState<EnhancedPlayerGrid> {
           final firstIndex = firstPos.row * 4 + firstPos.col;
           _animateSwap(firstIndex, position);
         }
-      } else if (widget.showErrorFeedback) {
-        _feedbackKeys[position]?.currentState?.showError();
       }
     }
 
