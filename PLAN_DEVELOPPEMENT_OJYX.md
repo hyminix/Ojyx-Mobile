@@ -23,9 +23,9 @@
 12. **Implémentation Téléportation** ✅ COMPLÉTÉE
 13. **UI Sélecteurs et Feedback** ✅ COMPLÉTÉE
 
-### Phase 5 : Fin de Partie (Tâches 14-15) 🟡 EN COURS
+### Phase 5 : Fin de Partie (Tâches 14-15) ✅ COMPLÉTÉES
 14. **Écran de Fin de Partie** ✅ COMPLÉTÉE
-15. **Système de Points Globaux** ❌ NON COMMENCÉE
+15. **Système de Points Globaux** ✅ COMPLÉTÉE
 
 ### Phase 6 : Production (Tâches 16-19) ❌ NON COMMENCÉES
 16. **Animations et Polish** - Amélioration UX
@@ -171,24 +171,21 @@
 - ✅ `EndGameProvider` : Gestion d'état
 - ✅ Tests unitaires et widgets complets
 
-### État actuel : 790 tests, 0 échecs ✅
+### Tâche 15 : Système de Points Globaux
+- ✅ `GlobalScore` : Entité avec historique des parties
+- ✅ `GlobalScoreRepository` : Interface avec datasource abstraction
+- ✅ `SupabaseGlobalScoreRepository` : Implémentation concrète
+- ✅ `SaveGlobalScoreUseCase` : Sauvegarde automatique des scores
+- ✅ `GetPlayerStatsUseCase` : Statistiques par joueur
+- ✅ `GetTopPlayersUseCase` : Classement global
+- ✅ `GameHistoryScreen` : Historique des parties
+- ✅ `LeaderboardScreen` : Tableau des leaders
+- ✅ Intégration dans EndGameScreen
+- ✅ 91 tests unitaires et d'intégration complets
+
+### État actuel : 906 tests, 0 échecs ✅
 
 ## 📝 Ce qui reste à faire
-
-### Phase 5 : Fin de Partie (Prochaine étape)
-**Tâche 14 : Écran de Fin de Partie**
-- Écran récapitulatif avec scores finaux
-- Classement des joueurs
-- Options : Nouvelle manche / Quitter
-- Animations de victoire
-- Tests complets
-
-**Tâche 15 : Système de Points Globaux**
-- Persistance des scores entre manches
-- Historique des parties
-- Statistiques par joueur
-- Système de progression
-- Tests complets
 
 ### Phase 6 : Production
 **Tâches 16-19 : À détailler lors de l'implémentation**
@@ -226,27 +223,13 @@ dart format .
 
 ## 🎯 Prochaines étapes recommandées
 
-1. **Phase 5 - Tâche 14 : Écran de Fin de Partie** (4-5h)
-   - TDD : Tests pour l'écran de fin
-   - Affichage des scores finaux et classement
-   - Animations de victoire/défaite
-   - Options navigation (nouvelle manche/quitter)
-   - Tests d'intégration complets
-
-2. **Phase 5 - Tâche 15 : Système de Points Globaux** (3-4h)
-   - TDD : Tests pour la persistance
-   - Accumulation des points entre manches
-   - Historique des parties dans Supabase
-   - Statistiques et progression
-   - Tests complets
-
-3. **Phase 6 - Tâche 16 : Animations et Polish** (4-5h)
+1. **Phase 6 - Tâche 16 : Animations et Polish** (4-5h)
    - Transitions fluides entre écrans
    - Animations de cartes améliorées
    - Sons et feedback haptique
    - Optimisation performances
 
-4. **Phase 6 - Tâches 17-19 : Production** (8-10h)
+2. **Phase 6 - Tâches 17-19 : Production** (8-10h)
    - Mode hors-ligne avec synchronisation
    - Tests d'intégration end-to-end
    - Configuration CI/CD complète
@@ -262,4 +245,4 @@ dart format .
 
 ---
 
-*Document mis à jour le 2025-07-24 - Phase 4 complétée avec succès, tous les tests passent (779/779).*
+*Document mis à jour le 2025-07-24 - Phase 5 complétée avec succès, tous les tests passent (906/906).*

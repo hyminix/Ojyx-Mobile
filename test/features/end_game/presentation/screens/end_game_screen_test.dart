@@ -190,6 +190,10 @@ void main() {
         ),
       );
 
+      // Scroll to make the button visible
+      await tester.ensureVisible(find.text('Vote to Continue'));
+      await tester.pumpAndSettle();
+      
       await tester.tap(find.text('Vote to Continue'));
       await tester.pumpAndSettle();
 
@@ -212,6 +216,10 @@ void main() {
         ),
       );
 
+      // Scroll to make the button visible
+      await tester.ensureVisible(find.text('End Game'));
+      await tester.pumpAndSettle();
+      
       await tester.tap(find.text('End Game'));
       await tester.pumpAndSettle();
 
