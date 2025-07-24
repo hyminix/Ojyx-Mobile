@@ -1,5 +1,5 @@
 import '../../../game/domain/entities/game_state.dart';
-// DbPlayerGrid is now in data layer, using Map<String, dynamic> for data transfer
+import '../../../game/domain/entities/player_grid.dart';
 import '../../../game/domain/repositories/game_state_repository.dart';
 
 class SyncGameStateUseCase {
@@ -13,7 +13,7 @@ class SyncGameStateUseCase {
   }
 
   /// Watch specific player grid changes
-  Stream<DbPlayerGrid> watchPlayerGrid({
+  Stream<PlayerGrid> watchPlayerGrid({
     required String gameStateId,
     required String playerId,
   }) {
@@ -34,7 +34,7 @@ class SyncGameStateUseCase {
   }
 
   /// Get current player grid snapshot
-  Future<DbPlayerGrid?> getCurrentPlayerGrid({
+  Future<PlayerGrid?> getCurrentPlayerGrid({
     required String gameStateId,
     required String playerId,
   }) async {
@@ -45,7 +45,7 @@ class SyncGameStateUseCase {
   }
 
   /// Get all player grids for the game (for spectating or game overview)
-  Future<List<DbPlayerGrid>> getAllPlayerGrids(String gameStateId) async {
+  Future<List<PlayerGrid>> getAllPlayerGrids(String gameStateId) async {
     return await _gameStateRepository.getAllPlayerGrids(gameStateId);
   }
 
@@ -100,9 +100,9 @@ class SyncGameStateUseCase {
       final gameState = await getCurrentGameState(gameStateId);
       if (gameState == null) return false;
       
-      // Check if it's the player's turn and game is active
-      return gameState.currentPlayerId == playerId && 
-             gameState.status == GameStatus.active;
+      // Check if it's the player's turn and game is playing
+      return gameState.currentPlayer.id == playerId && 
+             gameState.status == GameStatus.playing;
     } catch (e) {
       return false;
     }

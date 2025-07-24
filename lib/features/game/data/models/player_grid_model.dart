@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/card.dart';
 import '../../domain/entities/action_card.dart';
+import '../../domain/entities/player_grid.dart';
 import '../models/db_player_grid_model.dart';
 
 part 'player_grid_model.freezed.dart';
@@ -43,7 +44,17 @@ class PlayerGridModel with _$PlayerGridModel {
     };
   }
 
-  DbPlayerGrid toDomain() {
+  PlayerGrid toDomain() {
+    // Convert the gridCards data to Card entities and create PlayerGrid
+    final cards = gridCards.map((cardData) => Card(
+      value: cardData['value'] as int,
+      isRevealed: cardData['is_revealed'] as bool? ?? false,
+    )).toList();
+    
+    return PlayerGrid.fromCards(cards);
+  }
+  
+  DbPlayerGrid toDbPlayerGrid() {
     return DbPlayerGridModel(
       id: id,
       gameStateId: gameStateId,

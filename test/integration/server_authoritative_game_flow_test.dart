@@ -5,6 +5,8 @@ import 'package:ojyx/features/game/domain/use_cases/game_initialization_use_case
 import 'package:ojyx/features/game/domain/use_cases/use_action_card_use_case.dart';
 import 'package:ojyx/features/multiplayer/domain/use_cases/sync_game_state_use_case.dart';
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
+import 'package:ojyx/features/game/domain/entities/player_grid.dart';
+import 'package:ojyx/features/game/domain/entities/game_state.dart';
 
 // Mock Supabase client for testing
 class MockSupabaseClient extends Mock {
@@ -308,7 +310,7 @@ void main() {
         );
 
         // Then
-        expect(stream, isA<Stream<DbPlayerGrid>>());
+        expect(stream, isA<Stream<PlayerGrid>>());
       });
 
       test('should provide game actions stream', () async {

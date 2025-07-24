@@ -152,11 +152,23 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
       gameStarted: (gameId, initialState) => {
         'type': 'game_started',
         'game_id': gameId,
-        'initial_state': GameStateModel.fromDomain(initialState).toJson(),
+        'initial_state': GameStateModel.fromDomainComplete(
+          initialState,
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          turnNumber: 1,
+          roundNumber: 1,
+          updatedAt: DateTime.now(),
+        ).toJson(),
       },
       gameStateUpdated: (newState) => {
         'type': 'game_state_updated',
-        'new_state': GameStateModel.fromDomain(newState).toJson(),
+        'new_state': GameStateModel.fromDomainComplete(
+          newState,
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          turnNumber: 1,
+          roundNumber: 1,
+          updatedAt: DateTime.now(),
+        ).toJson(),
       },
       playerAction: (playerId, actionType, actionData) => {
         'type': 'player_action',
@@ -183,11 +195,11 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
           gameId: data['game_id'],
           initialState: GameStateModel.fromJson(
             data['initial_state'],
-          ).toDomain(),
+          ).toDomainComplete(),
         );
       case 'game_state_updated':
         return RoomEvent.gameStateUpdated(
-          newState: GameStateModel.fromJson(data['new_state']).toDomain(),
+          newState: GameStateModel.fromJson(data['new_state']).toDomainComplete(),
         );
       case 'player_action':
         return RoomEvent.playerAction(

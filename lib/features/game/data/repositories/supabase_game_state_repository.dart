@@ -85,8 +85,7 @@ class SupabaseGameStateRepository implements GameStateRepository {
           .eq('player_id', playerId)
           .single();
 
-      final dbGrid = PlayerGridModel.fromJson(response).toDomain();
-      return dbGrid.toPlayerGrid();
+      return PlayerGridModel.fromJson(response).toDomain();
     } catch (e) {
       if (e.toString().contains('No rows found')) {
         return null;
@@ -106,7 +105,7 @@ class SupabaseGameStateRepository implements GameStateRepository {
         .eq('game_state_id', gameStateId)
         .map((data) => data.isEmpty 
             ? throw Exception('GamePlayer grid not found')
-            : PlayerGridModel.fromJson(data.first).toDomain().toPlayerGrid());
+            : PlayerGridModel.fromJson(data.first).toDomain());
   }
 
   @override
@@ -203,7 +202,7 @@ class SupabaseGameStateRepository implements GameStateRepository {
           .order('position');
 
       return response
-          .map<PlayerGrid>((json) => PlayerGridModel.fromJson(json).toDomain().toPlayerGrid())
+          .map<PlayerGrid>((json) => PlayerGridModel.fromJson(json).toDomain())
           .toList();
     } catch (e) {
       throw Exception('Failed to get all player grids: $e');

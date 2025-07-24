@@ -1,37 +1,46 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/data/models/player_grid_model.dart';
-import 'package:ojyx/features/game/domain/entities/db_player_grid.dart';
+import 'package:ojyx/features/game/data/models/db_player_grid_model.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
+import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 
 void main() {
   group('PlayerGridModel', () {
-    test('should create from domain entity', () {
+    test('should convert to domain entity (PlayerGrid)', () {
       // Given
-      final cards = List.generate(12, (i) => Card(value: i, isRevealed: i < 2));
-      final actionCards = [
-        ActionCard(
-          id: '1', 
-          type: ActionCardType.turnAround, 
-          name: 'Demi-tour', 
-          description: 'Tournez votre grille',
-          timing: ActionTiming.immediate,
-        ),
-        ActionCard(
-          id: '2', 
-          type: ActionCardType.teleport, 
-          name: 'Téléportation', 
-          description: 'Échangez deux cartes',
-          timing: ActionTiming.optional,
-        ),
+      final gridCardsJson = List.generate(12, (i) => {
+        'value': i,
+        'is_revealed': i < 2,
+      });
+      
+      final actionCardsJson = [
+        {
+          'id': '1',
+          'type': 'turnAround',
+          'name': 'Demi-tour',
+          'description': 'Tournez votre grille',
+          'timing': 'immediate',
+          'target': 'self',
+          'parameters': {},
+        },
+        {
+          'id': '2',
+          'type': 'teleport',
+          'name': 'Téléportation',
+          'description': 'Échangez deux cartes',
+          'timing': 'optional',
+          'target': 'self',
+          'parameters': {},
+        },
       ];
 
-      final playerGrid = DbPlayerGrid(
+      final model = PlayerGridModel(
         id: 'grid-id',
         gameStateId: 'game-id',
         playerId: 'player-id',
-        gridCards: cards,
-        actionCards: actionCards,
+        gridCards: gridCardsJson,
+        actionCards: actionCardsJson,
         score: 42,
         position: 1,
         isActive: true,
@@ -41,21 +50,16 @@ void main() {
       );
 
       // When
-      final model = PlayerGridModel.fromDomain(playerGrid);
+      final playerGrid = model.toDomain();
 
       // Then
-      expect(model.id, equals('grid-id'));
-      expect(model.gameStateId, equals('game-id'));
-      expect(model.playerId, equals('player-id'));
-      expect(model.gridCards, hasLength(12));
-      expect(model.actionCards, hasLength(2));
-      expect(model.score, equals(42));
-      expect(model.position, equals(1));
-      expect(model.isActive, isTrue);
-      expect(model.hasRevealedAll, isFalse);
+      expect(playerGrid, isA<PlayerGrid>());
+      expect(playerGrid.cards, hasLength(3)); // 3 rows
+      expect(playerGrid.cards[0], hasLength(4)); // 4 columns
+      expect(playerGrid.cards.expand((row) => row).where((card) => card != null), hasLength(12));
     });
 
-    test('should convert to domain entity', () {
+    test('should convert to DbPlayerGrid', () {
       // Given
       final gridCardsJson = List.generate(12, (i) => {
         'value': i,
@@ -98,18 +102,18 @@ void main() {
       );
 
       // When
-      final playerGrid = model.toDomain();
+      final dbPlayerGrid = model.toDbPlayerGrid();
 
       // Then
-      expect(playerGrid.id, equals('grid-id'));
-      expect(playerGrid.gameStateId, equals('game-id'));
-      expect(playerGrid.playerId, equals('player-id'));
-      expect(playerGrid.gridCards, hasLength(12));
-      expect(playerGrid.actionCards, hasLength(2));
-      expect(playerGrid.score, equals(42));
-      expect(playerGrid.position, equals(1));
-      expect(playerGrid.isActive, isTrue);
-      expect(playerGrid.hasRevealedAll, isFalse);
+      expect(dbPlayerGrid.id, equals('grid-id'));
+      expect(dbPlayerGrid.gameStateId, equals('game-id'));
+      expect(dbPlayerGrid.playerId, equals('player-id'));
+      expect(dbPlayerGrid.gridCards, hasLength(12));
+      expect(dbPlayerGrid.actionCards, hasLength(2));
+      expect(dbPlayerGrid.score, equals(42));
+      expect(dbPlayerGrid.position, equals(1));
+      expect(dbPlayerGrid.isActive, isTrue);
+      expect(dbPlayerGrid.hasRevealedAll, isFalse);
     });
 
     test('should serialize to JSON', () {
