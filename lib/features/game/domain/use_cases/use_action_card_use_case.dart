@@ -116,7 +116,6 @@ class UseActionCardUseCase extends UseCase<Map<String, dynamic>, UseActionCardPa
       default:
         return Failure.server(
           message: errorMessage,
-          statusCode: 400,
           error: response,
         );
     }

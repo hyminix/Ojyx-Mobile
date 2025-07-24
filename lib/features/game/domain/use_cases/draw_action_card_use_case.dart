@@ -4,7 +4,7 @@ import '../../../../core/usecases/usecase.dart';
 import '../../../../core/utils/constants.dart';
 import '../entities/action_card.dart';
 import '../entities/game_state.dart';
-import '../entities/player.dart';
+import '../entities/game_player.dart';
 import '../entities/card.dart' as game_card;
 import '../repositories/action_card_repository.dart';
 
@@ -81,7 +81,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
       }
 
       // Draw an action card from the repository
-      final drawnCard = _repository.drawActionCard();
+      final drawnCard = await _repository.drawActionCard();
       if (drawnCard == null) {
         return Left(
           Failure.gameLogic(
@@ -92,7 +92,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
       }
 
       // Add the card to the player's hand
-      _repository.addActionCardToPlayer(params.playerId, drawnCard);
+      await _repository.addActionCardToPlayer(params.playerId, drawnCard);
 
       // Update the player in game state
       final updatedPlayer = player.addActionCard(drawnCard);

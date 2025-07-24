@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:ojyx/core/errors/failures.dart';
 import 'package:ojyx/core/usecases/usecase.dart';
 import '../entities/game_state.dart';
-import '../entities/player.dart';
+import '../entities/game_player.dart';
 
 class CheckEndRoundParams {
   final GameState gameState;

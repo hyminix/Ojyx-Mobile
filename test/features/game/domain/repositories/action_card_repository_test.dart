@@ -8,17 +8,17 @@ class TestActionCardRepository implements ActionCardRepository {
   final Map<String, List<ActionCard>> _playerActionCards = {};
 
   @override
-  List<ActionCard> getAvailableActionCards() {
+  Future<List<ActionCard>> getAvailableActionCards() async {
     return List.unmodifiable(_actionCards);
   }
 
   @override
-  List<ActionCard> getPlayerActionCards(String playerId) {
+  Future<List<ActionCard>> getPlayerActionCards(String playerId) async {
     return List.unmodifiable(_playerActionCards[playerId] ?? []);
   }
 
   @override
-  void addActionCardToPlayer(String playerId, ActionCard card) {
+  Future<void> addActionCardToPlayer(String playerId, ActionCard card) async {
     _playerActionCards.putIfAbsent(playerId, () => []);
     final playerCards = _playerActionCards[playerId]!;
 
@@ -30,7 +30,7 @@ class TestActionCardRepository implements ActionCardRepository {
   }
 
   @override
-  void removeActionCardFromPlayer(String playerId, ActionCard card) {
+  Future<void> removeActionCardFromPlayer(String playerId, ActionCard card) async {
     final playerCards = _playerActionCards[playerId];
     if (playerCards == null || !playerCards.contains(card)) {
       throw Exception('GamePlayer does not have this action card');
@@ -40,7 +40,7 @@ class TestActionCardRepository implements ActionCardRepository {
   }
 
   @override
-  ActionCard? drawActionCard() {
+  Future<ActionCard?> drawActionCard() async {
     if (_actionCards.isEmpty) {
       return null;
     }
@@ -49,12 +49,12 @@ class TestActionCardRepository implements ActionCardRepository {
   }
 
   @override
-  void discardActionCard(ActionCard card) {
+  Future<void> discardActionCard(ActionCard card) async {
     _actionCards.add(card);
   }
 
   @override
-  void shuffleActionCards() {
+  Future<void> shuffleActionCards() async {
     _actionCards.shuffle();
   }
 
@@ -77,15 +77,15 @@ void main() {
       repository = TestActionCardRepository();
     });
 
-    test('should get empty list when no action cards available', () {
+    test('should get empty list when no action cards available', () async {
       // Act
-      final cards = repository.getAvailableActionCards();
+      final cards = await repository.getAvailableActionCards();
 
       // Assert
       expect(cards, isEmpty);
     });
 
-    test('should get available action cards', () {
+    test('should get available action cards', () async {
       // Arrange
       final card1 = ActionCard(
         id: '1',
@@ -108,7 +108,7 @@ void main() {
       repository.addToDrawPile(card2);
 
       // Act
-      final cards = repository.getAvailableActionCards();
+      final cards = await repository.getAvailableActionCards();
 
       // Assert
       expect(cards.length, equals(2));
@@ -116,15 +116,15 @@ void main() {
       expect(cards, contains(card2));
     });
 
-    test('should get player action cards when empty', () {
+    test('should get player action cards when empty', () async {
       // Act
-      final cards = repository.getPlayerActionCards('player1');
+      final cards = await repository.getPlayerActionCards('player1');
 
       // Assert
       expect(cards, isEmpty);
     });
 
-    test('should add action card to player', () {
+    test('should add action card to player', () async {
       // Arrange
       final card = ActionCard(
         id: '1',
@@ -136,15 +136,15 @@ void main() {
       );
 
       // Act
-      repository.addActionCardToPlayer('player1', card);
+      await repository.addActionCardToPlayer('player1', card);
 
       // Assert
-      final playerCards = repository.getPlayerActionCards('player1');
+      final playerCards = await repository.getPlayerActionCards('player1');
       expect(playerCards.length, equals(1));
       expect(playerCards.first, equals(card));
     });
 
-    test('should prevent adding more than 3 action cards', () {
+    test('should prevent adding more than 3 action cards', () async {
       // Arrange
       final cards = List.generate(
         3,
@@ -158,7 +158,7 @@ void main() {
       );
 
       for (final card in cards) {
-        repository.addActionCardToPlayer('player1', card);
+        await repository.addActionCardToPlayer('player1', card);
       }
 
       final extraCard = ActionCard(
@@ -176,7 +176,7 @@ void main() {
       );
     });
 
-    test('should remove action card from player', () {
+    test('should remove action card from player', () async {
       // Arrange
       final card = ActionCard(
         id: '1',
@@ -187,13 +187,13 @@ void main() {
         target: ActionTarget.self,
       );
 
-      repository.addActionCardToPlayer('player1', card);
+      await repository.addActionCardToPlayer('player1', card);
 
       // Act
-      repository.removeActionCardFromPlayer('player1', card);
+      await repository.removeActionCardFromPlayer('player1', card);
 
       // Assert
-      final playerCards = repository.getPlayerActionCards('player1');
+      final playerCards = await repository.getPlayerActionCards('player1');
       expect(playerCards, isEmpty);
     });
 
@@ -215,7 +215,7 @@ void main() {
       );
     });
 
-    test('should draw action card from pile', () {
+    test('should draw action card from pile', () async {
       // Arrange
       final card = ActionCard(
         id: '1',
@@ -229,22 +229,22 @@ void main() {
       repository.addToDrawPile(card);
 
       // Act
-      final drawnCard = repository.drawActionCard();
+      final drawnCard = await repository.drawActionCard();
 
       // Assert
       expect(drawnCard, equals(card));
-      expect(repository.getAvailableActionCards(), isEmpty);
+      expect(await repository.getAvailableActionCards(), isEmpty);
     });
 
-    test('should return null when drawing from empty pile', () {
+    test('should return null when drawing from empty pile', () async {
       // Act
-      final drawnCard = repository.drawActionCard();
+      final drawnCard = await repository.drawActionCard();
 
       // Assert
       expect(drawnCard, isNull);
     });
 
-    test('should discard action card', () {
+    test('should discard action card', () async {
       // Arrange
       final card = ActionCard(
         id: '1',
@@ -256,13 +256,13 @@ void main() {
       );
 
       // Act
-      repository.discardActionCard(card);
+      await repository.discardActionCard(card);
 
       // Assert
-      expect(repository.getAvailableActionCards(), contains(card));
+      expect(await repository.getAvailableActionCards(), contains(card));
     });
 
-    test('should shuffle action cards', () {
+    test('should shuffle action cards', () async {
       // Arrange
       final cards = List.generate(
         10,
@@ -279,20 +279,20 @@ void main() {
         repository.addToDrawPile(card);
       }
 
-      final originalOrder = List.from(repository.getAvailableActionCards());
+      final originalOrder = List.from(await repository.getAvailableActionCards());
 
       // Act
-      repository.shuffleActionCards();
+      await repository.shuffleActionCards();
 
       // Assert
-      final newOrder = repository.getAvailableActionCards();
+      final newOrder = await repository.getAvailableActionCards();
       expect(newOrder.length, equals(originalOrder.length));
       expect(newOrder.toSet(), equals(originalOrder.toSet()));
       // Note: We can't guarantee the order will be different after shuffle
       // but all cards should still be present
     });
 
-    test('should handle multiple players independently', () {
+    test('should handle multiple players independently', () async {
       // Arrange
       final card1 = ActionCard(
         id: '1',
@@ -310,18 +310,18 @@ void main() {
       );
 
       // Act
-      repository.addActionCardToPlayer('player1', card1);
-      repository.addActionCardToPlayer('player2', card2);
+      await repository.addActionCardToPlayer('player1', card1);
+      await repository.addActionCardToPlayer('player2', card2);
 
       // Assert
-      expect(repository.getPlayerActionCards('player1'), contains(card1));
+      expect(await repository.getPlayerActionCards('player1'), contains(card1));
       expect(
-        repository.getPlayerActionCards('player1'),
+        await repository.getPlayerActionCards('player1'),
         isNot(contains(card2)),
       );
-      expect(repository.getPlayerActionCards('player2'), contains(card2));
+      expect(await repository.getPlayerActionCards('player2'), contains(card2));
       expect(
-        repository.getPlayerActionCards('player2'),
+        await repository.getPlayerActionCards('player2'),
         isNot(contains(card1)),
       );
     });

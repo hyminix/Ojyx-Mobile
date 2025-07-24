@@ -4,7 +4,7 @@ import 'package:ojyx/core/usecases/usecase.dart';
 import 'package:ojyx/core/utils/constants.dart';
 import '../entities/game_state.dart';
 import '../entities/card.dart';
-import '../entities/player.dart';
+import '../entities/game_player.dart';
 import '../entities/player_grid.dart';
 
 class GridPosition {

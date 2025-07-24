@@ -1,5 +1,5 @@
 import '../entities/game_state.dart';
-// DbPlayerGrid is now in data layer
+import '../entities/player_grid.dart';
 import '../entities/action_card.dart';
 
 abstract class GameStateRepository {
@@ -17,13 +17,13 @@ abstract class GameStateRepository {
   Stream<GameState> watchGameState(String gameStateId);
 
   /// Get player grid for a specific player in a game
-  Future<DbPlayerGrid?> getPlayerGrid({
+  Future<PlayerGrid?> getPlayerGrid({
     required String gameStateId,
     required String playerId,
   });
 
   /// Watch player grid changes
-  Stream<DbPlayerGrid> watchPlayerGrid({
+  Stream<PlayerGrid> watchPlayerGrid({
     required String gameStateId,
     required String playerId,
   });
@@ -54,7 +54,7 @@ abstract class GameStateRepository {
   });
 
   /// Get all player grids for a game (for spectating/admin)
-  Future<List<DbPlayerGrid>> getAllPlayerGrids(String gameStateId);
+  Future<List<PlayerGrid>> getAllPlayerGrids(String gameStateId);
 
   /// Get game action history
   Future<List<Map<String, dynamic>>> getGameActions({

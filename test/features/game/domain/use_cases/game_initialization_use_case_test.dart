@@ -1,185 +1,261 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:ojyx/features/game/domain/use_cases/game_initialization_use_case.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
+import 'package:ojyx/features/game/domain/entities/player_grid.dart';
+import 'package:ojyx/features/game/domain/repositories/game_state_repository.dart';
+
+class MockGameStateRepository extends Mock implements GameStateRepository {}
 
 void main() {
   late GameInitializationUseCase useCase;
+  late MockGameStateRepository mockRepository;
 
   setUp(() {
-    useCase = GameInitializationUseCase();
+    mockRepository = MockGameStateRepository();
+    useCase = GameInitializationUseCase(mockRepository);
   });
 
   group('GameInitializationUseCase', () {
-    test('should initialize game with correct number of players', () {
-      // Arrange
-      final playerIds = ['player1', 'player2', 'player3'];
-      const roomId = 'room123';
+    final testPlayers = [
+      GamePlayer(
+        id: 'player1',
+        name: 'Player 1',
+        grid: PlayerGrid.empty(),
+        isHost: true,
+      ),
+      GamePlayer(
+        id: 'player2',
+        name: 'Player 2',
+        grid: PlayerGrid.empty(),
+        isHost: false,
+      ),
+    ];
 
-      // Act
-      final gameState = useCase.initializeGame(
-        playerIds: playerIds,
-        roomId: roomId,
-      );
-
-      // Assert
-      expect(gameState.players.length, equals(3));
-      expect(gameState.roomId, equals(roomId));
-    });
-
-    test('should set first player as host', () {
-      // Arrange
-      final playerIds = ['player1', 'player2', 'player3'];
-      const roomId = 'room123';
-
-      // Act
-      final gameState = useCase.initializeGame(
-        playerIds: playerIds,
-        roomId: roomId,
-      );
-
-      // Assert
-      expect(gameState.players[0].isHost, isTrue);
-      expect(gameState.players[1].isHost, isFalse);
-      expect(gameState.players[2].isHost, isFalse);
-    });
-
-    test('should initialize players with empty grids and no action cards', () {
-      // Arrange
-      final playerIds = ['player1', 'player2'];
-      const roomId = 'room123';
-
-      // Act
-      final gameState = useCase.initializeGame(
-        playerIds: playerIds,
-        roomId: roomId,
-      );
-
-      // Assert
-      for (final player in gameState.players) {
-        // PlayerGrid has a 2D structure (3 rows x 4 columns = 12 cards)
-        expect(player.grid.cards.length, equals(3)); // 3 rows
-        expect(player.grid.cards[0].length, equals(4)); // 4 columns
-
-        // Check that all cards are initially null (empty grid)
-        bool allCardsNull = true;
-        for (final row in player.grid.cards) {
-          for (final card in row) {
-            if (card != null) {
-              allCardsNull = false;
-              break;
-            }
-          }
-          if (!allCardsNull) break;
-        }
-        expect(allCardsNull, isTrue);
-        expect(player.actionCards, isEmpty);
-      }
-    });
-
-    test('should set player names correctly', () {
-      // Arrange
-      final playerIds = ['player1', 'player2'];
-      const roomId = 'room123';
-
-      // Act
-      final gameState = useCase.initializeGame(
-        playerIds: playerIds,
-        roomId: roomId,
-      );
-
-      // Assert
-      expect(gameState.players[0].name, equals('GamePlayer player1'));
-      expect(gameState.players[1].name, equals('GamePlayer player2'));
-    });
-
-    test(
-      'should start with first player when no starting player specified',
-      () {
-        // Arrange
-        final playerIds = ['player1', 'player2', 'player3'];
-        const roomId = 'room123';
-
-        // Act
-        final gameState = useCase.initializeGame(
-          playerIds: playerIds,
-          roomId: roomId,
-        );
-
-        // Assert
-        expect(gameState.currentPlayerIndex, equals(0));
-      },
+    final testGameState = GameState(
+      roomId: 'room123',
+      players: testPlayers,
+      currentPlayerIndex: 0,
+      deck: [],
+      discardPile: [],
+      actionDeck: [],
+      actionDiscard: [],
+      status: GameStatus.waitingToStart,
+      turnDirection: TurnDirection.clockwise,
+      lastRound: false,
     );
 
-    test(
-      'should start with specified player when startingPlayerId is provided',
-      () {
-        // Arrange
-        final playerIds = ['player1', 'player2', 'player3'];
-        const roomId = 'room123';
-        const startingPlayerId = 'player2';
-
-        // Act
-        final gameState = useCase.initializeGame(
-          playerIds: playerIds,
-          roomId: roomId,
-          startingPlayerId: startingPlayerId,
-        );
-
-        // Assert
-        expect(gameState.currentPlayerIndex, equals(1));
-      },
-    );
-
-    test('should default to first player if startingPlayerId not found', () {
+    test('should initialize game with correct number of players', () async {
       // Arrange
       final playerIds = ['player1', 'player2', 'player3'];
       const roomId = 'room123';
-      const startingPlayerId = 'invalid_player_id';
+      const creatorId = 'player1';
+
+      when(() => mockRepository.initializeGame(
+        roomId: roomId,
+        playerIds: playerIds,
+        creatorId: creatorId,
+      )).thenAnswer((_) async => testGameState.copyWith(
+        players: playerIds.map((id) => GamePlayer(
+          id: id,
+          name: 'Player $id',
+          grid: PlayerGrid.empty(),
+          isHost: id == creatorId,
+        )).toList(),
+      ));
 
       // Act
-      final gameState = useCase.initializeGame(
+      final result = await useCase.execute(
         playerIds: playerIds,
         roomId: roomId,
-        startingPlayerId: startingPlayerId,
+        creatorId: creatorId,
       );
 
       // Assert
-      expect(gameState.currentPlayerIndex, equals(-1));
+      expect(result.players.length, equals(3));
+      expect(result.roomId, equals(roomId));
+      verify(() => mockRepository.initializeGame(
+        roomId: roomId,
+        playerIds: playerIds,
+        creatorId: creatorId,
+      )).called(1);
     });
 
-    test('should handle single player game', () {
+    test('should set creator as host', () async {
+      // Arrange
+      final playerIds = ['player1', 'player2', 'player3'];
+      const roomId = 'room123';
+      const creatorId = 'player2';
+
+      final expectedGameState = testGameState.copyWith(
+        players: playerIds.map((id) => GamePlayer(
+          id: id,
+          name: 'Player $id',
+          grid: PlayerGrid.empty(),
+          isHost: id == creatorId,
+        )).toList(),
+      );
+
+      when(() => mockRepository.initializeGame(
+        roomId: roomId,
+        playerIds: playerIds,
+        creatorId: creatorId,
+      )).thenAnswer((_) async => expectedGameState);
+
+      // Act
+      final result = await useCase.execute(
+        playerIds: playerIds,
+        roomId: roomId,
+        creatorId: creatorId,
+      );
+
+      // Assert
+      expect(result.players[0].isHost, isFalse);
+      expect(result.players[1].isHost, isTrue);
+      expect(result.players[2].isHost, isFalse);
+    });
+
+    test('should throw exception when no players provided', () async {
+      // Arrange
+      final playerIds = <String>[];
+      const roomId = 'room123';
+      const creatorId = 'player1';
+
+      // Act & Assert
+      expect(
+        () => useCase.execute(
+          playerIds: playerIds,
+          roomId: roomId,
+          creatorId: creatorId,
+        ),
+        throwsA(isA<Exception>().having(
+          (e) => e.toString(),
+          'message',
+          contains('Cannot initialize game with no players'),
+        )),
+      );
+    });
+
+    test('should throw exception when less than 2 players', () async {
       // Arrange
       final playerIds = ['player1'];
       const roomId = 'room123';
+      const creatorId = 'player1';
 
-      // Act
-      final gameState = useCase.initializeGame(
-        playerIds: playerIds,
-        roomId: roomId,
+      // Act & Assert
+      expect(
+        () => useCase.execute(
+          playerIds: playerIds,
+          roomId: roomId,
+          creatorId: creatorId,
+        ),
+        throwsA(isA<Exception>().having(
+          (e) => e.toString(),
+          'message',
+          contains('Game requires 2-8 players'),
+        )),
       );
-
-      // Assert
-      expect(gameState.players.length, equals(1));
-      expect(gameState.players[0].isHost, isTrue);
-      expect(gameState.currentPlayerIndex, equals(0));
     });
 
-    test('should create players with correct IDs', () {
+    test('should throw exception when more than 8 players', () async {
       // Arrange
-      final playerIds = ['player1', 'player2', 'player3'];
+      final playerIds = List.generate(9, (i) => 'player${i + 1}');
       const roomId = 'room123';
+      const creatorId = 'player1';
+
+      // Act & Assert
+      expect(
+        () => useCase.execute(
+          playerIds: playerIds,
+          roomId: roomId,
+          creatorId: creatorId,
+        ),
+        throwsA(isA<Exception>().having(
+          (e) => e.toString(),
+          'message',
+          contains('Game requires 2-8 players'),
+        )),
+      );
+    });
+
+    test('should throw exception when creator not in player list', () async {
+      // Arrange
+      final playerIds = ['player1', 'player2'];
+      const roomId = 'room123';
+      const creatorId = 'player3'; // Not in playerIds
+
+      // Act & Assert
+      expect(
+        () => useCase.execute(
+          playerIds: playerIds,
+          roomId: roomId,
+          creatorId: creatorId,
+        ),
+        throwsA(isA<Exception>().having(
+          (e) => e.toString(),
+          'message',
+          contains('Creator must be included in player list'),
+        )),
+      );
+    });
+
+    test('should handle repository exceptions gracefully', () async {
+      // Arrange
+      final playerIds = ['player1', 'player2'];
+      const roomId = 'room123';
+      const creatorId = 'player1';
+
+      when(() => mockRepository.initializeGame(
+        roomId: roomId,
+        playerIds: playerIds,
+        creatorId: creatorId,
+      )).thenThrow(Exception('Database error'));
+
+      // Act & Assert
+      expect(
+        () => useCase.execute(
+          playerIds: playerIds,
+          roomId: roomId,
+          creatorId: creatorId,
+        ),
+        throwsA(isA<Exception>().having(
+          (e) => e.toString(),
+          'message',
+          contains('Failed to initialize game'),
+        )),
+      );
+    });
+
+    test('should get game state', () async {
+      // Arrange
+      const gameStateId = 'game123';
+
+      when(() => mockRepository.getGameState(gameStateId))
+          .thenAnswer((_) async => testGameState);
 
       // Act
-      final gameState = useCase.initializeGame(
-        playerIds: playerIds,
-        roomId: roomId,
-      );
+      final result = await useCase.getGameState(gameStateId);
 
       // Assert
-      for (int i = 0; i < playerIds.length; i++) {
-        expect(gameState.players[i].id, equals(playerIds[i]));
-      }
+      expect(result, equals(testGameState));
+      verify(() => mockRepository.getGameState(gameStateId)).called(1);
+    });
+
+    test('should watch game state changes', () async {
+      // Arrange
+      const gameStateId = 'game123';
+      final gameStateStream = Stream.value(testGameState);
+
+      when(() => mockRepository.watchGameState(gameStateId))
+          .thenAnswer((_) => gameStateStream);
+
+      // Act
+      final stream = useCase.watchGameState(gameStateId);
+
+      // Assert
+      expect(stream, emits(testGameState));
+      verify(() => mockRepository.watchGameState(gameStateId)).called(1);
     });
   });
 }

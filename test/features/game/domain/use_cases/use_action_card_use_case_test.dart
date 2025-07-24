@@ -5,25 +5,19 @@ import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
-import 'package:ojyx/features/game/domain/repositories/action_card_repository.dart';
+import 'package:ojyx/features/game/domain/repositories/game_state_repository.dart';
 import 'package:ojyx/features/game/domain/use_cases/use_action_card_use_case.dart';
 import 'package:ojyx/core/errors/failures.dart';
 import 'package:fpdart/fpdart.dart';
 
-class MockActionCardRepository extends Mock implements ActionCardRepository {}
-
-class FakeActionCard extends Fake implements ActionCard {}
+class MockGameStateRepository extends Mock implements GameStateRepository {}
 
 void main() {
   late UseActionCardUseCase useCase;
-  late MockActionCardRepository mockRepository;
-
-  setUpAll(() {
-    registerFallbackValue(FakeActionCard());
-  });
+  late MockGameStateRepository mockRepository;
 
   setUp(() {
-    mockRepository = MockActionCardRepository();
+    mockRepository = MockGameStateRepository();
     useCase = UseActionCardUseCase(mockRepository);
   });
 
@@ -67,70 +61,75 @@ void main() {
   group('UseActionCardUseCase', () {
     test('should use optional action card successfully', () async {
       // Arrange
-      final actionCard = const ActionCard(
-        id: 'card1',
-        type: ActionCardType.skip,
-        name: 'Saut',
-        description: 'Sautez le tour du prochain joueur',
-        timing: ActionTiming.optional,
-        target: ActionTarget.none,
-      );
-
-      final gameState = createTestGameState();
+      const gameStateId = 'test-game-id';
+      const playerId = 'player1';
+      const actionCardType = ActionCardType.skip;
+      
       final params = UseActionCardParams(
-        playerId: 'player1',
-        actionCard: actionCard,
-        gameState: gameState,
+        gameStateId: gameStateId,
+        playerId: playerId,
+        actionCardType: actionCardType,
         targetData: null,
       );
 
+      final expectedResponse = {
+        'valid': true,
+        'gameState': {}, // Server response format
+      };
+
       when(
-        () => mockRepository.getPlayerActionCards('player1'),
-      ).thenReturn([actionCard]);
-      when(
-        () => mockRepository.removeActionCardFromPlayer('player1', actionCard),
-      ).thenAnswer((_) {});
-      when(
-        () => mockRepository.discardActionCard(actionCard),
-      ).thenAnswer((_) {});
+        () => mockRepository.useActionCard(
+          gameStateId: gameStateId,
+          playerId: playerId,
+          actionCardType: actionCardType,
+          targetData: null,
+        ),
+      ).thenAnswer((_) async => expectedResponse);
 
       // Act
       final result = await useCase(params);
 
       // Assert
       expect(result.isRight(), isTrue);
-      result.fold((failure) => fail('Should not fail'), (updatedState) {
-        expect(updatedState, isNotNull);
+      result.fold((failure) => fail('Should not fail'), (response) {
+        expect(response['valid'], isTrue);
         verify(
-          () =>
-              mockRepository.removeActionCardFromPlayer('player1', actionCard),
+          () => mockRepository.useActionCard(
+            gameStateId: gameStateId,
+            playerId: playerId,
+            actionCardType: actionCardType,
+            targetData: null,
+          ),
         ).called(1);
-        verify(() => mockRepository.discardActionCard(actionCard)).called(1);
       });
     });
 
     test('should fail if player does not have the action card', () async {
       // Arrange
-      final actionCard = const ActionCard(
-        id: 'card1',
-        type: ActionCardType.teleport,
-        name: 'Téléportation',
-        description: 'Échangez deux cartes',
-        timing: ActionTiming.optional,
-        target: ActionTarget.self,
-      );
-
-      final gameState = createTestGameState();
+      const gameStateId = 'test-game-id';
+      const playerId = 'player1';
+      const actionCardType = ActionCardType.teleport;
+      
       final params = UseActionCardParams(
-        playerId: 'player1',
-        actionCard: actionCard,
-        gameState: gameState,
+        gameStateId: gameStateId,
+        playerId: playerId,
+        actionCardType: actionCardType,
         targetData: null,
       );
 
+      final expectedResponse = {
+        'valid': false,
+        'error': 'action card not available',
+      };
+
       when(
-        () => mockRepository.getPlayerActionCards('player1'),
-      ).thenReturn([]); // GamePlayer has no cards
+        () => mockRepository.useActionCard(
+          gameStateId: gameStateId,
+          playerId: playerId,
+          actionCardType: actionCardType,
+          targetData: null,
+        ),
+      ).thenAnswer((_) async => expectedResponse);
 
       // Act
       final result = await useCase(params);
@@ -138,55 +137,48 @@ void main() {
       // Assert
       expect(result.isLeft(), isTrue);
       result.fold((failure) {
-        expect(failure, isA<GameLogicFailure>());
-        expect(failure.message, contains('does not have this action card'));
+        expect(failure, isA<Failure>());
+        expect(failure.message, contains('action card not available'));
       }, (_) => fail('Should not succeed'));
     });
 
     test('should use mandatory action card immediately', () async {
       // Arrange
-      final actionCard = const ActionCard(
-        id: 'card1',
-        type: ActionCardType.turnAround,
-        name: 'Demi-tour',
-        description: 'Inversez le sens du jeu',
-        timing: ActionTiming.immediate,
-        target: ActionTarget.none,
-      );
-
-      final gameState = createTestGameState();
+      const gameStateId = 'test-game-id';
+      const playerId = 'player1';
+      const actionCardType = ActionCardType.turnAround;
+      
       final params = UseActionCardParams(
-        playerId: 'player1',
-        actionCard: actionCard,
-        gameState: gameState,
+        gameStateId: gameStateId,
+        playerId: playerId,
+        actionCardType: actionCardType,
         targetData: null,
       );
 
+      final expectedResponse = {
+        'valid': true,
+        'gameState': {
+          'turnDirection': 'counterClockwise', // Reversed from clockwise
+        },
+      };
+
       when(
-        () => mockRepository.getPlayerActionCards('player1'),
-      ).thenReturn([actionCard]);
-      when(
-        () => mockRepository.removeActionCardFromPlayer('player1', actionCard),
-      ).thenAnswer((_) {});
-      when(
-        () => mockRepository.discardActionCard(actionCard),
-      ).thenAnswer((_) {});
+        () => mockRepository.useActionCard(
+          gameStateId: gameStateId,
+          playerId: playerId,
+          actionCardType: actionCardType,
+          targetData: null,
+        ),
+      ).thenAnswer((_) async => expectedResponse);
 
       // Act
       final result = await useCase(params);
 
       // Assert
       expect(result.isRight(), isTrue);
-      result.fold((failure) => fail('Should not fail'), (updatedState) {
-        // For Demi-tour, the direction should be reversed
-        expect(
-          updatedState.turnDirection,
-          equals(
-            gameState.turnDirection == TurnDirection.clockwise
-                ? TurnDirection.counterClockwise
-                : TurnDirection.clockwise,
-          ),
-        );
+      result.fold((failure) => fail('Should not fail'), (response) {
+        expect(response['valid'], isTrue);
+        expect(response['gameState']['turnDirection'], equals('counterClockwise'));
       });
     });
 
@@ -194,71 +186,71 @@ void main() {
       'should reverse turn direction multiple times with Demi-tour',
       () async {
         // Arrange
-        final actionCard = const ActionCard(
-          id: 'card1',
-          type: ActionCardType.turnAround,
-          name: 'Demi-tour',
-          description: 'Inversez le sens du jeu',
-          timing: ActionTiming.immediate,
-          target: ActionTarget.none,
-        );
-
-        // Start with counter-clockwise
-        final gameState = createTestGameState(
-          turnDirection: TurnDirection.counterClockwise,
-        );
+        const gameStateId = 'test-game-id';
+        const playerId = 'player1';
+        const actionCardType = ActionCardType.turnAround;
+        
         final params = UseActionCardParams(
-          playerId: 'player1',
-          actionCard: actionCard,
-          gameState: gameState,
+          gameStateId: gameStateId,
+          playerId: playerId,
+          actionCardType: actionCardType,
           targetData: null,
         );
 
+        final expectedResponse = {
+          'valid': true,
+          'gameState': {
+            'turnDirection': 'clockwise', // Reversed from counterClockwise
+          },
+        };
+
         when(
-          () => mockRepository.getPlayerActionCards('player1'),
-        ).thenReturn([actionCard]);
-        when(
-          () =>
-              mockRepository.removeActionCardFromPlayer('player1', actionCard),
-        ).thenAnswer((_) {});
-        when(
-          () => mockRepository.discardActionCard(actionCard),
-        ).thenAnswer((_) {});
+          () => mockRepository.useActionCard(
+            gameStateId: gameStateId,
+            playerId: playerId,
+            actionCardType: actionCardType,
+            targetData: null,
+          ),
+        ).thenAnswer((_) async => expectedResponse);
 
         // Act
         final result = await useCase(params);
 
         // Assert
         expect(result.isRight(), isTrue);
-        result.fold((failure) => fail('Should not fail'), (updatedState) {
-          // Direction should be reversed to clockwise
-          expect(updatedState.turnDirection, equals(TurnDirection.clockwise));
+        result.fold((failure) => fail('Should not fail'), (response) {
+          expect(response['valid'], isTrue);
+          expect(response['gameState']['turnDirection'], equals('clockwise'));
         });
       },
     );
 
     test('should validate target data for cards that require it', () async {
       // Arrange
-      final actionCard = const ActionCard(
-        id: 'card1',
-        type: ActionCardType.teleport,
-        name: 'Téléportation',
-        description: 'Échangez deux cartes',
-        timing: ActionTiming.optional,
-        target: ActionTarget.self,
-      );
-
-      final gameState = createTestGameState();
+      const gameStateId = 'test-game-id';
+      const playerId = 'player1';
+      const actionCardType = ActionCardType.teleport;
+      
       final params = UseActionCardParams(
-        playerId: 'player1',
-        actionCard: actionCard,
-        gameState: gameState,
+        gameStateId: gameStateId,
+        playerId: playerId,
+        actionCardType: actionCardType,
         targetData: null, // Missing required target data
       );
 
+      final expectedResponse = {
+        'valid': false,
+        'error': 'invalid positions',
+      };
+
       when(
-        () => mockRepository.getPlayerActionCards('player1'),
-      ).thenReturn([actionCard]);
+        () => mockRepository.useActionCard(
+          gameStateId: gameStateId,
+          playerId: playerId,
+          actionCardType: actionCardType,
+          targetData: null,
+        ),
+      ).thenAnswer((_) async => expectedResponse);
 
       // Act
       final result = await useCase(params);
@@ -266,8 +258,8 @@ void main() {
       // Assert
       expect(result.isLeft(), isTrue);
       result.fold((failure) {
-        expect(failure, isA<ValidationFailure>());
-        expect(failure.message, contains('requires target data'));
+        expect(failure, isA<Failure>());
+        expect(failure.message, contains('invalid positions'));
       }, (_) => fail('Should not succeed'));
     });
 
@@ -275,125 +267,76 @@ void main() {
       'should handle teleportation action card with valid targets',
       () async {
         // Arrange
-        final actionCard = const ActionCard(
-          id: 'card1',
-          type: ActionCardType.teleport,
-          name: 'Téléportation',
-          description: 'Échangez deux cartes',
-          timing: ActionTiming.optional,
-          target: ActionTarget.self,
-        );
-
-        // Grid layout (3 rows x 4 columns):
-        // Row 0: [5, 10, 3, 7]
-        // Row 1: [2, 8, 4, 9]
-        // Row 2: [1, 6, 11, 12]
-        final grid = PlayerGrid.fromCards([
-          const game.Card(value: 5, isRevealed: true), // (0,0)
-          const game.Card(value: 10, isRevealed: false), // (0,1)
-          const game.Card(value: 3, isRevealed: true), // (0,2)
-          const game.Card(value: 7, isRevealed: false), // (0,3)
-          const game.Card(value: 2, isRevealed: true), // (1,0)
-          const game.Card(value: 8, isRevealed: false), // (1,1)
-          const game.Card(value: 4, isRevealed: true), // (1,2)
-          const game.Card(value: 9, isRevealed: false), // (1,3)
-          const game.Card(value: 1, isRevealed: true), // (2,0)
-          const game.Card(value: 6, isRevealed: false), // (2,1)
-          const game.Card(value: 11, isRevealed: true), // (2,2)
-          const game.Card(value: 12, isRevealed: false), // (2,3)
-        ]);
-
-        final gameState = GameState(
-          roomId: 'test-room',
-          players: [
-            GamePlayer(
-              id: 'player1',
-              name: 'GamePlayer 1',
-              grid: grid,
-              actionCards: [actionCard],
-              hasFinishedRound: false,
-            ),
-            GamePlayer(
-              id: 'player2',
-              name: 'GamePlayer 2',
-              grid: PlayerGrid.empty(),
-              actionCards: [],
-              hasFinishedRound: false,
-            ),
-          ],
-          currentPlayerIndex: 0,
-          deck: [],
-          discardPile: [],
-          actionDeck: [],
-          actionDiscard: [],
-          status: GameStatus.playing,
-          turnDirection: TurnDirection.clockwise,
-          lastRound: false,
-          createdAt: DateTime.now(),
-        );
-
+        const gameStateId = 'test-game-id';
+        const playerId = 'player1';
+        const actionCardType = ActionCardType.teleport;
+        
         final targetData = {
           'position1': {'row': 0, 'col': 0},
           'position2': {'row': 1, 'col': 1},
         };
 
         final params = UseActionCardParams(
-          playerId: 'player1',
-          actionCard: actionCard,
-          gameState: gameState,
+          gameStateId: gameStateId,
+          playerId: playerId,
+          actionCardType: actionCardType,
           targetData: targetData,
         );
 
+        final expectedResponse = {
+          'valid': true,
+          'gameState': {
+            'cards_swapped': true,
+          },
+        };
+
         when(
-          () => mockRepository.getPlayerActionCards('player1'),
-        ).thenReturn([actionCard]);
-        when(
-          () =>
-              mockRepository.removeActionCardFromPlayer('player1', actionCard),
-        ).thenAnswer((_) {});
-        when(
-          () => mockRepository.discardActionCard(actionCard),
-        ).thenAnswer((_) {});
+          () => mockRepository.useActionCard(
+            gameStateId: gameStateId,
+            playerId: playerId,
+            actionCardType: actionCardType,
+            targetData: targetData,
+          ),
+        ).thenAnswer((_) async => expectedResponse);
 
         // Act
         final result = await useCase(params);
 
         // Assert
         expect(result.isRight(), isTrue);
-        result.fold((failure) => fail('Should not fail'), (updatedState) {
-          // Verify cards were swapped
-          // (0,0) had 5, (1,1) had 8, after swap:
-          final updatedGrid = updatedState.players[0].grid;
-          expect(updatedGrid.getCard(0, 0)?.value, equals(8)); // Was 5, now 8
-          expect(updatedGrid.getCard(1, 1)?.value, equals(5)); // Was 8, now 5
+        result.fold((failure) => fail('Should not fail'), (response) {
+          expect(response['valid'], isTrue);
+          expect(response['gameState']['cards_swapped'], isTrue);
         });
       },
     );
 
     test('should not allow using action card when not player turn', () async {
       // Arrange
-      final actionCard = const ActionCard(
-        id: 'card1',
-        type: ActionCardType.teleport,
-        name: 'Téléportation',
-        description: 'Échangez deux cartes',
-        timing: ActionTiming.optional,
-        target: ActionTarget.self,
-      );
-
-      final gameState = createTestGameState(
-        currentPlayerIndex: 1,
-      ); // GamePlayer 2's turn
+      const gameStateId = 'test-game-id';
+      const playerId = 'player1';
+      const actionCardType = ActionCardType.teleport;
+      
       final params = UseActionCardParams(
-        playerId: 'player1', // GamePlayer 1 trying to play
-        actionCard: actionCard,
-        gameState: gameState,
+        gameStateId: gameStateId,
+        playerId: playerId,
+        actionCardType: actionCardType,
         targetData: null,
       );
 
+      final expectedResponse = {
+        'valid': false,
+        'error': 'not your turn',
+      };
+
       when(
-        () => mockRepository.getPlayerActionCards('player1'),
-      ).thenReturn([actionCard]);
+        () => mockRepository.useActionCard(
+          gameStateId: gameStateId,
+          playerId: playerId,
+          actionCardType: actionCardType,
+          targetData: null,
+        ),
+      ).thenAnswer((_) async => expectedResponse);
 
       // Act
       final result = await useCase(params);
@@ -401,47 +344,49 @@ void main() {
       // Assert
       expect(result.isLeft(), isTrue);
       result.fold((failure) {
-        expect(failure, isA<GameLogicFailure>());
+        expect(failure, isA<Failure>());
         expect(failure.message, contains('not your turn'));
       }, (_) => fail('Should not succeed'));
     });
 
     test('should allow reaction cards outside of turn', () async {
       // Arrange
-      final actionCard = const ActionCard(
-        id: 'card1',
-        type: ActionCardType.shield,
-        name: 'Bouclier',
-        description: 'Protégez-vous des attaques',
-        timing: ActionTiming.reactive,
-        target: ActionTarget.self,
-      );
-
-      final gameState = createTestGameState(
-        currentPlayerIndex: 1,
-      ); // GamePlayer 2's turn
+      const gameStateId = 'test-game-id';
+      const playerId = 'player1';
+      const actionCardType = ActionCardType.shield;
+      
       final params = UseActionCardParams(
-        playerId: 'player1', // GamePlayer 1 can play reaction
-        actionCard: actionCard,
-        gameState: gameState,
+        gameStateId: gameStateId,
+        playerId: playerId,
+        actionCardType: actionCardType,
         targetData: null,
       );
 
+      final expectedResponse = {
+        'valid': true,
+        'gameState': {
+          'shield_activated': true,
+        },
+      };
+
       when(
-        () => mockRepository.getPlayerActionCards('player1'),
-      ).thenReturn([actionCard]);
-      when(
-        () => mockRepository.removeActionCardFromPlayer('player1', actionCard),
-      ).thenAnswer((_) {});
-      when(
-        () => mockRepository.discardActionCard(actionCard),
-      ).thenAnswer((_) {});
+        () => mockRepository.useActionCard(
+          gameStateId: gameStateId,
+          playerId: playerId,
+          actionCardType: actionCardType,
+          targetData: null,
+        ),
+      ).thenAnswer((_) async => expectedResponse);
 
       // Act
       final result = await useCase(params);
 
       // Assert
       expect(result.isRight(), isTrue);
+      result.fold((failure) => fail('Should not fail'), (response) {
+        expect(response['valid'], isTrue);
+        expect(response['gameState']['shield_activated'], isTrue);
+      });
     });
   });
 }
