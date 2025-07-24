@@ -107,7 +107,7 @@ void main() {
           worst_score INTEGER,
           average_position NUMERIC,
           total_rounds INTEGER
-        ) AS $$
+        ) AS \$\$
         BEGIN
           RETURN QUERY
           SELECT 
@@ -125,7 +125,7 @@ void main() {
           ORDER BY average_score ASC
           LIMIT limit_count;
         END;
-        $$ LANGUAGE plpgsql;
+        \$\$ LANGUAGE plpgsql;
       ''';
 
       expect(functionSQL, contains('CREATE OR REPLACE FUNCTION'));

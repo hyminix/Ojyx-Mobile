@@ -110,7 +110,7 @@ void main() {
 
       // Each table should have RLS enabled
       for (final table in tables) {
-        const checkSQL = 'ALTER TABLE public.$table ENABLE ROW LEVEL SECURITY;';
+        final checkSQL = 'ALTER TABLE public.$table ENABLE ROW LEVEL SECURITY;';
         expect(checkSQL, contains('ENABLE ROW LEVEL SECURITY'));
         expect(checkSQL, contains(table));
       }
