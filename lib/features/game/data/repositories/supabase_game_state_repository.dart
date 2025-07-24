@@ -5,6 +5,7 @@ import '../models/db_player_grid_model.dart';
 import '../../domain/entities/action_card.dart';
 import '../models/game_state_model.dart';
 import '../models/player_grid_model.dart';
+import '../../domain/entities/player_grid.dart';
 
 class SupabaseGameStateRepository implements GameStateRepository {
   final SupabaseClient _supabase;
@@ -52,7 +53,7 @@ class SupabaseGameStateRepository implements GameStateRepository {
           .eq('id', gameStateId)
           .single();
 
-      return GameStateModel.fromJson(response).toDomain();
+      return GameStateModel.fromJson(response).toDomainComplete();
     } catch (e) {
       if (e.toString().contains('No rows found')) {
         return null;
@@ -69,11 +70,11 @@ class SupabaseGameStateRepository implements GameStateRepository {
         .eq('id', gameStateId)
         .map((data) => data.isEmpty 
             ? throw Exception('Game state not found')
-            : GameStateModel.fromJson(data.first).toDomain());
+            : GameStateModel.fromJson(data.first).toDomainComplete());
   }
 
   @override
-  Future<DbPlayerGrid?> getPlayerGrid({
+  Future<PlayerGrid?> getPlayerGrid({
     required String gameStateId,
     required String playerId,
   }) async {
@@ -85,7 +86,8 @@ class SupabaseGameStateRepository implements GameStateRepository {
           .eq('player_id', playerId)
           .single();
 
-      return PlayerGridModel.fromJson(response).toDomain();
+      final dbGrid = PlayerGridModel.fromJson(response).toDomain();
+      return dbGrid.toPlayerGrid();
     } catch (e) {
       if (e.toString().contains('No rows found')) {
         return null;
@@ -95,7 +97,7 @@ class SupabaseGameStateRepository implements GameStateRepository {
   }
 
   @override
-  Stream<DbPlayerGrid> watchPlayerGrid({
+  Stream<PlayerGrid> watchPlayerGrid({
     required String gameStateId,
     required String playerId,
   }) {
@@ -103,10 +105,9 @@ class SupabaseGameStateRepository implements GameStateRepository {
         .from('player_grids')
         .stream(primaryKey: ['id'])
         .eq('game_state_id', gameStateId)
-        .eq('player_id', playerId)
         .map((data) => data.isEmpty 
             ? throw Exception('GamePlayer grid not found')
-            : PlayerGridModel.fromJson(data.first).toDomain());
+            : PlayerGridModel.fromJson(data.first).toDomain().toPlayerGrid());
   }
 
   @override
@@ -194,7 +195,7 @@ class SupabaseGameStateRepository implements GameStateRepository {
   }
 
   @override
-  Future<List<DbPlayerGrid>> getAllPlayerGrids(String gameStateId) async {
+  Future<List<PlayerGrid>> getAllPlayerGrids(String gameStateId) async {
     try {
       final response = await _supabase
           .from('player_grids')
@@ -203,7 +204,7 @@ class SupabaseGameStateRepository implements GameStateRepository {
           .order('position');
 
       return response
-          .map<DbPlayerGrid>((json) => PlayerGridModel.fromJson(json).toDomain())
+          .map<PlayerGrid>((json) => PlayerGridModel.fromJson(json).toDomain().toPlayerGrid())
           .toList();
     } catch (e) {
       throw Exception('Failed to get all player grids: $e');

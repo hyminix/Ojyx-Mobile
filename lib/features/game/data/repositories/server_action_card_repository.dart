@@ -8,7 +8,7 @@ class ServerActionCardRepository implements ActionCardRepository {
   ServerActionCardRepository(this._supabase);
 
   @override
-  List<ActionCard> getAvailableActionCards() {
+  Future<List<ActionCard>> getAvailableActionCards() async {
     // This method should be replaced with server-side logic
     // For now, return the standard set of action cards
     return [
@@ -48,7 +48,7 @@ class ServerActionCardRepository implements ActionCardRepository {
   }
 
   @override
-  List<ActionCard> getPlayerActionCards(String playerId) {
+  Future<List<ActionCard>> getPlayerActionCards(String playerId) async {
     // This should not be used in server-authoritative architecture
     // GamePlayer action cards are now stored in player_grids table
     throw UnsupportedError(
@@ -57,7 +57,7 @@ class ServerActionCardRepository implements ActionCardRepository {
   }
 
   @override
-  void addActionCardToPlayer(String playerId, ActionCard card) {
+  Future<void> addActionCardToPlayer(String playerId, ActionCard card) async {
     // This should not be used in server-authoritative architecture
     throw UnsupportedError(
       'Action cards are managed server-side through PostgreSQL functions'
@@ -65,7 +65,7 @@ class ServerActionCardRepository implements ActionCardRepository {
   }
 
   @override
-  void removeActionCardFromPlayer(String playerId, ActionCard card) {
+  Future<void> removeActionCardFromPlayer(String playerId, ActionCard card) async {
     // This should not be used in server-authoritative architecture
     throw UnsupportedError(
       'Action cards are managed server-side through PostgreSQL functions'
@@ -73,7 +73,7 @@ class ServerActionCardRepository implements ActionCardRepository {
   }
 
   @override
-  ActionCard? drawActionCard() {
+  Future<ActionCard?> drawActionCard() async {
     // This should not be used in server-authoritative architecture
     throw UnsupportedError(
       'Card drawing is managed server-side through PostgreSQL functions'
@@ -81,7 +81,7 @@ class ServerActionCardRepository implements ActionCardRepository {
   }
 
   @override
-  void discardActionCard(ActionCard card) {
+  Future<void> discardActionCard(ActionCard card) async {
     // This should not be used in server-authoritative architecture
     throw UnsupportedError(
       'Card discarding is managed server-side through PostgreSQL functions'
@@ -89,7 +89,7 @@ class ServerActionCardRepository implements ActionCardRepository {
   }
 
   @override
-  void shuffleActionCards() {
+  Future<void> shuffleActionCards() async {
     // This should not be used in server-authoritative architecture
     throw UnsupportedError(
       'Card shuffling is managed server-side through PostgreSQL functions'
@@ -164,8 +164,9 @@ class ServerActionCardRepository implements ActionCardRepository {
   }
 
   /// Get action card definition by type
-  ActionCard? getActionCardByType(ActionCardType type) {
-    return getAvailableActionCards()
+  Future<ActionCard?> getActionCardByType(ActionCardType type) async {
+    final cards = await getAvailableActionCards();
+    return cards
         .where((card) => card.type == type)
         .firstOrNull;
   }

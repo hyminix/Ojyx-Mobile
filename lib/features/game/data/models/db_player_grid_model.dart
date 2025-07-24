@@ -1,9 +1,14 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/card.dart';
 import '../../domain/entities/action_card.dart';
+import '../../domain/entities/player_grid.dart';
+import '../../domain/entities/grid_card.dart';
 
 part 'db_player_grid_model.freezed.dart';
 part 'db_player_grid_model.g.dart';
+
+// Type alias for the model
+typedef DbPlayerGrid = DbPlayerGridModel;
 
 @freezed
 class DbPlayerGridModel with _$DbPlayerGridModel {
@@ -51,5 +56,15 @@ class DbPlayerGridModel with _$DbPlayerGridModel {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
+  }
+
+  PlayerGrid toPlayerGrid() {
+    // Convert flat list of cards to grid structure
+    return PlayerGrid.fromCards(
+      gridCards.map((card) => GridCard(
+        value: card.value,
+        isRevealed: card.isRevealed,
+      )).toList(),
+    );
   }
 }

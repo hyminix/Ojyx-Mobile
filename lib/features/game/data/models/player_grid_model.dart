@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/card.dart';
 import '../../domain/entities/action_card.dart';
+import '../models/db_player_grid_model.dart';
 
 part 'player_grid_model.freezed.dart';
 part 'player_grid_model.g.dart';
@@ -40,5 +41,38 @@ class PlayerGridModel with _$PlayerGridModel {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
+  }
+
+  DbPlayerGrid toDomain() {
+    return DbPlayerGridModel(
+      id: id,
+      gameStateId: gameStateId,
+      playerId: playerId,
+      gridCards: gridCards.map((cardData) => Card(
+        value: cardData['value'] as int,
+        isRevealed: cardData['is_revealed'] as bool? ?? false,
+      )).toList(),
+      actionCards: actionCards.map((cardData) => ActionCard(
+        id: cardData['id'] as String,
+        type: ActionCardType.values.firstWhere(
+          (e) => e.name == cardData['type'],
+        ),
+        name: cardData['name'] as String,
+        description: cardData['description'] as String,
+        timing: ActionTiming.values.firstWhere(
+          (e) => e.name == cardData['timing'],
+        ),
+        target: ActionTarget.values.firstWhere(
+          (e) => e.name == cardData['target'],
+        ),
+        parameters: cardData['parameters'] as Map<String, dynamic>? ?? {},
+      )).toList(),
+      score: score,
+      position: position,
+      isActive: isActive,
+      hasRevealedAll: hasRevealedAll,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
   }
 }
