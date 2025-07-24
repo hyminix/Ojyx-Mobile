@@ -35,7 +35,7 @@ class DiscardCard implements UseCase<GameState, DiscardCardParams> {
 
       // Validate it's player's turn
       final currentPlayer = gameState.currentPlayer;
-      if (currentPlayer == null || currentPlayer.id != playerId) {
+      if (currentPlayer.id != playerId) {
         return Left(
           Failure.gameLogic(message: 'Not your turn', code: 'NOT_YOUR_TURN'),
         );
@@ -53,7 +53,7 @@ class DiscardCard implements UseCase<GameState, DiscardCardParams> {
 
       // Validate game status
       if (gameState.status != GameStatus.drawPhase) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'Must draw a card first',
             code: 'INVALID_STATUS',

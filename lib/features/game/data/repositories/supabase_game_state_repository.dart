@@ -1,7 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/repositories/game_state_repository.dart';
 import '../../domain/entities/game_state.dart';
-import '../models/db_player_grid_model.dart';
 import '../../domain/entities/action_card.dart';
 import '../models/game_state_model.dart';
 import '../models/player_grid_model.dart';
@@ -243,6 +242,6 @@ class SupabaseGameStateRepository implements GameStateRepository {
         .order('created_at', ascending: false)
         .map((data) => data.isEmpty 
             ? <String, dynamic>{}
-            : data.first as Map<String, dynamic>);
+            : data.first);
   }
 }

@@ -19,12 +19,12 @@ class ActionCardRepositoryImpl implements ActionCardRepository {
 
   @override
   Future<void> addActionCardToPlayer(String playerId, ActionCard card) {
-    _localDataSource.addActionCardToPlayer(playerId, card);
+    return _localDataSource.addActionCardToPlayer(playerId, card);
   }
 
   @override
   Future<void> removeActionCardFromPlayer(String playerId, ActionCard card) {
-    _localDataSource.removeActionCardFromPlayer(playerId, card);
+    return _localDataSource.removeActionCardFromPlayer(playerId, card);
   }
 
   @override
@@ -34,11 +34,11 @@ class ActionCardRepositoryImpl implements ActionCardRepository {
 
   @override
   Future<void> discardActionCard(ActionCard card) {
-    _localDataSource.discardActionCard(card);
+    return _localDataSource.discardActionCard(card);
   }
 
   @override
   Future<void> shuffleActionCards() {
-    _localDataSource.shuffleActionCards();
+    return _localDataSource.shuffleActionCards();
   }
 }

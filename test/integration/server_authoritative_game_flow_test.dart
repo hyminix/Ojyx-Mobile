@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:ojyx/features/game/data/repositories/supabase_game_state_repository.dart';
 import 'package:ojyx/features/game/domain/use_cases/game_initialization_use_case.dart';
 import 'package:ojyx/features/game/domain/use_cases/use_action_card_use_case.dart';
