@@ -16,7 +16,7 @@ void main() {
       // Create a test grid with 12 cards
       final cards = List.generate(12, (index) => game.Card(value: index));
       testGrid = PlayerGrid.fromCards(cards);
-      
+
       testPlayers = [
         Player(id: 'player-1', name: 'Alice', grid: testGrid),
         Player(id: 'player-2', name: 'Bob', grid: testGrid),
@@ -49,8 +49,9 @@ void main() {
       expect(find.byType(AnimatedContainer), findsNothing);
     });
 
-    testWidgets('should show modal overlay when selecting opponents', 
-        (tester) async {
+    testWidgets('should show modal overlay when selecting opponents', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -78,10 +79,10 @@ void main() {
 
       // Wait for animation
       await tester.pumpAndSettle();
-      
+
       // Should show overlay with fade effect
       expect(find.byType(AnimatedOpacity), findsOneWidget);
-      
+
       // Should show opponent selection UI
       expect(find.text('Sélectionnez un adversaire'), findsOneWidget);
       expect(find.text('Bob'), findsOneWidget);
@@ -111,7 +112,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameSelectionOverlay)),
       );
-      
+
       // Start opponent selection
       container.read(cardSelectionProvider.notifier).startOpponentSelection();
       await tester.pump();
@@ -149,7 +150,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameSelectionOverlay)),
       );
-      
+
       // Start opponent selection
       container.read(cardSelectionProvider.notifier).startOpponentSelection();
       await tester.pump();
@@ -157,7 +158,7 @@ void main() {
 
       // Should show cancel button
       expect(find.byIcon(Icons.close), findsOneWidget);
-      
+
       // Tap cancel
       await tester.tap(find.byIcon(Icons.close));
       await tester.pump();
@@ -167,8 +168,9 @@ void main() {
       expect(state.isSelecting, isFalse);
     });
 
-    testWidgets('should show contextual modal for card selection from discard', 
-        (tester) async {
+    testWidgets('should show contextual modal for card selection from discard', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -213,7 +215,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameSelectionOverlay)),
       );
-      
+
       // Start selection
       container.read(cardSelectionProvider.notifier).startOpponentSelection();
       await tester.pump();
@@ -222,7 +224,7 @@ void main() {
       final opacityBefore = tester.widget<AnimatedOpacity>(
         find.byType(AnimatedOpacity),
       );
-      
+
       // Animate to full opacity
       await tester.pumpAndSettle();
 
@@ -255,7 +257,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameSelectionOverlay)),
       );
-      
+
       // Start opponent selection
       container.read(cardSelectionProvider.notifier).startOpponentSelection();
       await tester.pump();
@@ -289,7 +291,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameSelectionOverlay)),
       );
-      
+
       // Start opponent selection and select Bob
       container.read(cardSelectionProvider.notifier).startOpponentSelection();
       await tester.pump();
@@ -301,7 +303,7 @@ void main() {
       // Should show highlight on selected player
       // Find the card that contains Bob text directly (not the outer container card)
       final cards = find.byType(Card);
-      
+
       // Find the specific card containing Bob
       Card? bobCard;
       for (var i = 0; i < tester.widgetList(cards).length; i++) {
@@ -316,7 +318,7 @@ void main() {
           break;
         }
       }
-      
+
       expect(bobCard, isNotNull);
       // The selected card should have different styling
       expect(bobCard!.elevation, greaterThan(1));
@@ -344,7 +346,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameSelectionOverlay)),
       );
-      
+
       // Start opponent selection
       container.read(cardSelectionProvider.notifier).startOpponentSelection();
       await tester.pump();
@@ -376,7 +378,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameSelectionOverlay)),
       );
-      
+
       // Start opponent selection
       container.read(cardSelectionProvider.notifier).startOpponentSelection();
       await tester.pump();
@@ -392,8 +394,9 @@ void main() {
       expect(state.isSelecting, isFalse);
     });
 
-    testWidgets('should show confirmation dialog for dangerous actions', 
-        (tester) async {
+    testWidgets('should show confirmation dialog for dangerous actions', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -405,7 +408,8 @@ void main() {
                     players: testPlayers,
                     currentPlayerId: 'player-1',
                     requiresConfirmation: true,
-                    confirmationMessage: 'Êtes-vous sûr de vouloir détruire cette carte ?',
+                    confirmationMessage:
+                        'Êtes-vous sûr de vouloir détruire cette carte ?',
                   ),
                 ],
               ),

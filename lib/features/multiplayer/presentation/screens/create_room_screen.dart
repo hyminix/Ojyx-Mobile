@@ -63,113 +63,117 @@ class _CreateRoomScreenState extends ConsumerState<CreateRoomScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                  // Title
-                  Icon(
-                    Icons.group_add,
-                    size: 64,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Configuration de la partie',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 48),
+                    // Title
+                    Icon(
+                      Icons.group_add,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Configuration de la partie',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 48),
 
-                  // Number of players selector
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Nombre de joueurs',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              IconButton(
-                                onPressed: _selectedPlayers > 2 && !_isCreating
-                                    ? () => setState(() => _selectedPlayers--)
-                                    : null,
-                                icon: const Icon(Icons.remove_circle_outline),
-                                iconSize: 32,
-                              ),
-                              Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.primaryContainer,
-                                  shape: BoxShape.circle,
+                    // Number of players selector
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Nombre de joueurs',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  onPressed:
+                                      _selectedPlayers > 2 && !_isCreating
+                                      ? () => setState(() => _selectedPlayers--)
+                                      : null,
+                                  icon: const Icon(Icons.remove_circle_outline),
+                                  iconSize: 32,
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    '$_selectedPlayers',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .displaySmall
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onPrimaryContainer,
-                                        ),
+                                Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primaryContainer,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '$_selectedPlayers',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displaySmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimaryContainer,
+                                          ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              IconButton(
-                                onPressed: _selectedPlayers < 8 && !_isCreating
-                                    ? () => setState(() => _selectedPlayers++)
-                                    : null,
-                                icon: const Icon(Icons.add_circle_outline),
-                                iconSize: 32,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '2 à 8 joueurs',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.6),
+                                IconButton(
+                                  onPressed:
+                                      _selectedPlayers < 8 && !_isCreating
+                                      ? () => setState(() => _selectedPlayers++)
+                                      : null,
+                                  icon: const Icon(Icons.add_circle_outline),
+                                  iconSize: 32,
                                 ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 48),
-
-                  // Create button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: _isCreating ? null : _createRoom,
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '2 à 8 joueurs',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.6),
+                                  ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: _isCreating
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text('Créer la partie'),
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(height: 48),
+
+                    // Create button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: _isCreating ? null : _createRoom,
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: _isCreating
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text('Créer la partie'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

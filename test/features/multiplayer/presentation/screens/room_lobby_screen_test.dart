@@ -95,9 +95,9 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom();
 
@@ -119,9 +119,9 @@ void main() {
 
     testWidgets('should show loading state', (WidgetTester tester) async {
       setLargeScreenSize(tester);
-      
+
       setLargeScreenSize(tester);
-      
+
       // Act
       await tester.pumpWidget(
         createWidgetUnderTest(
@@ -138,9 +138,9 @@ void main() {
 
     testWidgets('should show error state', (WidgetTester tester) async {
       setLargeScreenSize(tester);
-      
+
       setLargeScreenSize(tester);
-      
+
       // Arrange
       const errorMessage = 'Room not found';
 
@@ -164,7 +164,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(
         id: 'room123456789',
@@ -195,7 +195,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(
         creatorId: 'creator1',
@@ -231,7 +231,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(
         creatorId: 'creator1',
@@ -248,35 +248,44 @@ void main() {
           currentUserId: 'creator1',
         ),
       );
-      
+
       // Multiple pumps to ensure Stream is processed
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
       await tester.pump();
-      
+
       // Debug: Check what's actually rendered
       // First check if we're in the right state
       expect(find.byType(RoomLobbyScreen), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsNothing,
-          reason: 'Should not be loading');
-      
+      expect(
+        find.byType(CircularProgressIndicator),
+        findsNothing,
+        reason: 'Should not be loading',
+      );
+
       // Check if the room info is displayed
-      expect(find.text('Partie #${testRoomId.substring(0, 8)}'), findsOneWidget,
-          reason: 'Room ID should be displayed');
-      
+      expect(
+        find.text('Partie #${testRoomId.substring(0, 8)}'),
+        findsOneWidget,
+        reason: 'Room ID should be displayed',
+      );
+
       // Check player count
-      expect(find.text('2/4'), findsOneWidget,
-          reason: 'Player count should be displayed');
+      expect(
+        find.text('2/4'),
+        findsOneWidget,
+        reason: 'Player count should be displayed',
+      );
 
       // Assert
       expect(find.text('Lancer la partie'), findsOneWidget);
       expect(find.byIcon(Icons.play_arrow), findsOneWidget);
-      
+
       // Instead of looking for the button itself, verify the text is in the correct state
       // and that it's tappable (which means the button is enabled)
       final launcherTextFinder = find.text('Lancer la partie');
       expect(launcherTextFinder, findsOneWidget);
-      
+
       // Try to tap it to verify it's enabled
       await tester.tap(launcherTextFinder);
       await tester.pump();
@@ -287,7 +296,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(
         creatorId: 'creator1',
@@ -308,7 +317,7 @@ void main() {
 
       // Assert
       expect(find.text('En attente de joueurs (minimum 2)'), findsOneWidget);
-      
+
       // The button should be present but disabled
       // We know it's disabled if we see the "En attente de joueurs" text
       // which only appears when canStart is false
@@ -318,7 +327,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(
         creatorId: 'creator1',
@@ -347,7 +356,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(
         creatorId: 'creator1',
@@ -377,7 +386,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       const currentUserId = 'player2';
       final room = createTestRoom(
@@ -421,7 +430,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom();
 
@@ -453,7 +462,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Test different room statuses
       final statusTests = [
         (RoomStatus.waiting, 'En attente'),
@@ -472,7 +481,7 @@ void main() {
             currentUserId: 'creator1',
           ),
         );
-      await tester.pump();
+        await tester.pump();
 
         expect(find.text(expectedText), findsOneWidget);
 
@@ -485,7 +494,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(
         creatorId: 'creator1',
@@ -512,7 +521,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(
         creatorId: 'creator1',
@@ -550,7 +559,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom(
         playerIds: ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'],
@@ -575,7 +584,7 @@ void main() {
 
     testWidgets('should apply correct styling', (WidgetTester tester) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       final room = createTestRoom();
 
@@ -604,7 +613,9 @@ void main() {
           matching: find.byType(Padding),
         ),
       );
-      final hasPadding24 = paddings.any((p) => p.padding == const EdgeInsets.all(24.0));
+      final hasPadding24 = paddings.any(
+        (p) => p.padding == const EdgeInsets.all(24.0),
+      );
       expect(hasPadding24, isTrue);
     });
 
@@ -612,7 +623,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange
       await tester.pumpWidget(
         createWidgetUnderTest(
@@ -635,7 +646,7 @@ void main() {
       WidgetTester tester,
     ) async {
       setLargeScreenSize(tester);
-      
+
       // Arrange - Test with 9 players (over the limit of 8)
       final room = createTestRoom(
         creatorId: 'creator1',
@@ -657,7 +668,7 @@ void main() {
       // Assert - should be disabled due to too many players (>8)
       // With 9 players (>8), canStart is false, so the button shows disabled message
       expect(find.text('En attente de joueurs (minimum 2)'), findsOneWidget);
-      
+
       // The button should be present but disabled
       // We know it's disabled if we see the "En attente de joueurs" text
     });

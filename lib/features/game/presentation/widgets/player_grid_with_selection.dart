@@ -70,7 +70,8 @@ class PlayerGridWithSelection extends ConsumerWidget {
             canInteract: canInteract,
             highlightedPositions: highlightedPositions,
             selectedPositions: selectedPositions,
-            onCardTap: (row, col) => _handleSelectionTap(selectionNotifier, row, col),
+            onCardTap: (row, col) =>
+                _handleSelectionTap(selectionNotifier, row, col),
           ),
 
           // Selection controls
@@ -87,10 +88,10 @@ class PlayerGridWithSelection extends ConsumerWidget {
     CardSelectionNotifier selectionNotifier,
   ) {
     final theme = Theme.of(context);
-    
+
     String instructionText;
     IconData instructionIcon;
-    
+
     switch (selectionState.selectionType) {
       case CardSelectionType.teleport:
         if (!selectionState.hasFirstSelection) {
@@ -118,7 +119,8 @@ class PlayerGridWithSelection extends ConsumerWidget {
         break;
       case CardSelectionType.peek:
       case CardSelectionType.scout:
-        instructionText = 'Sélectionnez jusqu\'à ${selectionState.maxSelections} cartes à révéler';
+        instructionText =
+            'Sélectionnez jusqu\'à ${selectionState.maxSelections} cartes à révéler';
         instructionIcon = Icons.visibility;
         break;
       case CardSelectionType.bomb:
@@ -164,11 +166,7 @@ class PlayerGridWithSelection extends ConsumerWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            instructionIcon,
-            color: theme.colorScheme.primary,
-            size: 20,
-          ),
+          Icon(instructionIcon, color: theme.colorScheme.primary, size: 20),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
@@ -191,7 +189,7 @@ class PlayerGridWithSelection extends ConsumerWidget {
     CardSelectionNotifier selectionNotifier,
   ) {
     final theme = Theme.of(context);
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -205,9 +203,9 @@ class PlayerGridWithSelection extends ConsumerWidget {
             side: BorderSide(color: theme.colorScheme.error),
           ),
         ),
-        
+
         const SizedBox(width: 16),
-        
+
         // Confirm button
         FilledButton.icon(
           onPressed: selectionState.canCompleteSelection

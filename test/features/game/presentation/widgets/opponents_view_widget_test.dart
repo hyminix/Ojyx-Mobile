@@ -29,7 +29,7 @@ void main() {
       var grid1 = PlayerGrid.empty();
       grid1 = grid1.placeCard(game.Card(value: 5, isRevealed: false), 0, 0);
       grid1 = grid1.revealCard(0, 0);
-      
+
       opponent1 = Player(
         id: 'opponent-1-id',
         name: 'Opponent 1',
@@ -43,7 +43,7 @@ void main() {
       var grid2 = PlayerGrid.empty();
       grid2 = grid2.placeCard(game.Card(value: 8, isRevealed: false), 1, 1);
       grid2 = grid2.revealCard(1, 1);
-      
+
       opponent2 = Player(
         id: 'opponent-2-id',
         name: 'Opponent 2',
@@ -215,7 +215,10 @@ void main() {
       );
 
       expect(opponentWidget.playerState.playerId, equals('opponent-1-id'));
-      expect(opponentWidget.playerState.currentScore, equals(5)); // Score from one card with value 5
+      expect(
+        opponentWidget.playerState.currentScore,
+        equals(5),
+      ); // Score from one card with value 5
       expect(opponentWidget.playerState.revealedCount, equals(1));
     });
 

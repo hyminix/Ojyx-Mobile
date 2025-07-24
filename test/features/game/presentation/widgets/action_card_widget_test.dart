@@ -28,7 +28,9 @@ void main() {
       );
     }
 
-    testWidgets('should display action card with name and type', (tester) async {
+    testWidgets('should display action card with name and type', (
+      tester,
+    ) async {
       // Arrange
       const card = ActionCard(
         id: 'test-card',
@@ -47,7 +49,9 @@ void main() {
       expect(find.byType(Card), findsOneWidget);
     });
 
-    testWidgets('should show timing indicator for immediate cards', (tester) async {
+    testWidgets('should show timing indicator for immediate cards', (
+      tester,
+    ) async {
       // Arrange
       const immediateCard = ActionCard(
         id: 'test-card',
@@ -62,11 +66,16 @@ void main() {
       await tester.pumpWidget(createTestWidget(immediateCard));
 
       // Assert
-      expect(find.byIcon(Icons.flash_on), findsOneWidget); // Immediate indicator
+      expect(
+        find.byIcon(Icons.flash_on),
+        findsOneWidget,
+      ); // Immediate indicator
       expect(find.text('Immédiate'), findsOneWidget);
     });
 
-    testWidgets('should show timing indicator for optional cards', (tester) async {
+    testWidgets('should show timing indicator for optional cards', (
+      tester,
+    ) async {
       // Arrange
       const optionalCard = ActionCard(
         id: 'test-card',
@@ -85,7 +94,9 @@ void main() {
       expect(find.text('Optionnelle'), findsOneWidget);
     });
 
-    testWidgets('should show timing indicator for reactive cards', (tester) async {
+    testWidgets('should show timing indicator for reactive cards', (
+      tester,
+    ) async {
       // Arrange
       const reactiveCard = ActionCard(
         id: 'test-card',
@@ -117,10 +128,9 @@ void main() {
       );
 
       // Act
-      await tester.pumpWidget(createTestWidget(
-        card,
-        onTap: () => wasTapped = true,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(card, onTap: () => wasTapped = true),
+      );
       await tester.tap(find.byType(ActionCardWidget));
       await tester.pump();
 
@@ -141,11 +151,13 @@ void main() {
       );
 
       // Act
-      await tester.pumpWidget(createTestWidget(
-        card,
-        isSelectable: false,
-        onTap: () => wasTapped = true,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(
+          card,
+          isSelectable: false,
+          onTap: () => wasTapped = true,
+        ),
+      );
       await tester.tap(find.byType(ActionCardWidget));
       await tester.pump();
 
@@ -165,10 +177,7 @@ void main() {
       );
 
       // Act
-      await tester.pumpWidget(createTestWidget(
-        card,
-        isHighlighted: true,
-      ));
+      await tester.pumpWidget(createTestWidget(card, isHighlighted: true));
 
       // Assert
       final cardWidget = tester.widget<Card>(find.byType(Card));
@@ -196,7 +205,9 @@ void main() {
       expect(find.byType(SnackBar), findsOneWidget);
     });
 
-    testWidgets('should use correct color for different card types', (tester) async {
+    testWidgets('should use correct color for different card types', (
+      tester,
+    ) async {
       // Test movement card (teleport)
       const teleportCard = ActionCard(
         id: 'test-card-1',
@@ -214,7 +225,10 @@ void main() {
           matching: find.byType(Container).first,
         ),
       );
-      expect((container.decoration as BoxDecoration).color, equals(Colors.blue.shade50));
+      expect(
+        (container.decoration as BoxDecoration).color,
+        equals(Colors.blue.shade50),
+      );
 
       // Test attack card (steal)
       const stealCard = ActionCard(
@@ -233,7 +247,10 @@ void main() {
           matching: find.byType(Container).first,
         ),
       );
-      expect((container.decoration as BoxDecoration).color, equals(Colors.red.shade50));
+      expect(
+        (container.decoration as BoxDecoration).color,
+        equals(Colors.red.shade50),
+      );
 
       // Test utility card (draw)
       const drawCard = ActionCard(
@@ -252,7 +269,10 @@ void main() {
           matching: find.byType(Container).first,
         ),
       );
-      expect((container.decoration as BoxDecoration).color, equals(Colors.green.shade50));
+      expect(
+        (container.decoration as BoxDecoration).color,
+        equals(Colors.green.shade50),
+      );
     });
 
     testWidgets('should show target icon based on target type', (tester) async {
@@ -312,10 +332,9 @@ void main() {
 
       // Assert
       final sizedBox = tester.widget<SizedBox>(
-        find.ancestor(
-          of: find.byType(Card),
-          matching: find.byType(SizedBox),
-        ).first,
+        find
+            .ancestor(of: find.byType(Card), matching: find.byType(SizedBox))
+            .first,
       );
       expect(sizedBox.width, equals(100));
       expect(sizedBox.height, equals(140));

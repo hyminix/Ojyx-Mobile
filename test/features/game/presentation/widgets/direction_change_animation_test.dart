@@ -6,8 +6,9 @@ import 'package:ojyx/features/game/domain/entities/play_direction.dart';
 
 void main() {
   group('DirectionChangeAnimation', () {
-    testWidgets('should display rotation animation when direction changes',
-        (tester) async {
+    testWidgets('should display rotation animation when direction changes', (
+      tester,
+    ) async {
       // Arrange
       var animationCompleted = false;
 
@@ -34,8 +35,9 @@ void main() {
       expect(animationCompleted, isTrue);
     });
 
-    testWidgets('should show clockwise arrow for forward direction',
-        (tester) async {
+    testWidgets('should show clockwise arrow for forward direction', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -50,13 +52,14 @@ void main() {
 
       // Assert
       expect(find.byIcon(Icons.u_turn_left), findsOneWidget);
-      
+
       // Dispose properly
       await tester.pumpWidget(Container());
     });
 
-    testWidgets('should show counter-clockwise arrow for backward direction',
-        (tester) async {
+    testWidgets('should show counter-clockwise arrow for backward direction', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -71,13 +74,14 @@ void main() {
 
       // Assert
       expect(find.byIcon(Icons.u_turn_right), findsOneWidget);
-      
+
       // Dispose properly
       await tester.pumpWidget(Container());
     });
 
-    testWidgets('should display text indicating direction change',
-        (tester) async {
+    testWidgets('should display text indicating direction change', (
+      tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -92,7 +96,7 @@ void main() {
 
       // Assert
       expect(find.text('Changement de direction !'), findsOneWidget);
-      
+
       // Dispose properly
       await tester.pumpWidget(Container());
     });
@@ -175,7 +179,7 @@ void main() {
         ),
         findsWidgets,
       );
-      
+
       // Dispose properly
       await tester.pumpWidget(Container());
     });
@@ -199,16 +203,18 @@ void main() {
 
       // Assert - Check container decoration
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(DirectionChangeAnimation),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(DirectionChangeAnimation),
+              matching: find.byType(Container),
+            )
+            .first,
       );
-      
+
       final decoration = container.decoration as BoxDecoration;
       expect(decoration.shape, equals(BoxShape.circle));
       expect(decoration.color, isNotNull);
-      
+
       // Dispose properly
       await tester.pumpWidget(Container());
     });
@@ -234,7 +240,7 @@ void main() {
 
       // Assert
       expect(callCount, equals(1));
-      
+
       // Dispose properly
       await tester.pumpWidget(Container());
     });
@@ -254,15 +260,17 @@ void main() {
 
       // Assert
       final sizedBox = tester.widget<SizedBox>(
-        find.descendant(
-          of: find.byType(DirectionChangeAnimation),
-          matching: find.byType(SizedBox),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(DirectionChangeAnimation),
+              matching: find.byType(SizedBox),
+            )
+            .first,
       );
-      
+
       expect(sizedBox.width, equals(200));
       expect(sizedBox.height, equals(200));
-      
+
       // Dispose properly
       await tester.pumpWidget(Container());
     });

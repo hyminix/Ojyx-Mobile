@@ -26,7 +26,8 @@ class CardSelectionState with _$CardSelectionState {
     @Default([]) List<CardPosition> selections, // For multi-select modes
     @Default(1) int maxSelections, // Max number of selections allowed
     String? selectedOpponentId, // For opponent selection
-    @Default(false) bool requiresOpponent, // If true, need opponent before cards
+    @Default(false)
+    bool requiresOpponent, // If true, need opponent before cards
   }) = _CardSelectionState;
 
   const CardSelectionState._();
@@ -40,7 +41,7 @@ class CardSelectionState with _$CardSelectionState {
   /// Check if selection is complete based on selection type
   bool get isSelectionComplete {
     if (!isSelecting) return false;
-    
+
     switch (selectionType) {
       case CardSelectionType.teleport:
       case CardSelectionType.swap:
@@ -133,15 +134,17 @@ class CardSelectionNotifier extends StateNotifier<CardSelectionState> {
     if (state.selectionType == CardSelectionType.peek ||
         state.selectionType == CardSelectionType.scout) {
       final currentSelections = List<CardPosition>.from(state.selections);
-      
+
       // Toggle selection if already selected
-      final existingIndex = currentSelections.indexWhere((s) => s.equals(row, col));
+      final existingIndex = currentSelections.indexWhere(
+        (s) => s.equals(row, col),
+      );
       if (existingIndex != -1) {
         currentSelections.removeAt(existingIndex);
         state = state.copyWith(selections: currentSelections);
         return;
       }
-      
+
       // Add new selection if under max
       if (currentSelections.length < state.maxSelections) {
         currentSelections.add(position);
@@ -189,16 +192,13 @@ class CardSelectionNotifier extends StateNotifier<CardSelectionState> {
     }
 
     // Replace first with new selection
-    state = state.copyWith(
-      firstSelection: position,
-      secondSelection: null,
-    );
+    state = state.copyWith(firstSelection: position, secondSelection: null);
   }
 
   /// Select an opponent
   void selectOpponent(String opponentId) {
     if (!state.isSelecting) return;
-    
+
     state = state.copyWith(selectedOpponentId: opponentId);
   }
 
@@ -227,7 +227,7 @@ class CardSelectionNotifier extends StateNotifier<CardSelectionState> {
     if (!state.canCompleteSelection) return null;
 
     Map<String, dynamic> targetData;
-    
+
     switch (state.selectionType) {
       case CardSelectionType.teleport:
       case CardSelectionType.swap:
@@ -247,14 +247,10 @@ class CardSelectionNotifier extends StateNotifier<CardSelectionState> {
       case CardSelectionType.bomb:
       case CardSelectionType.mirror:
       case CardSelectionType.gift:
-        targetData = {
-          'position': state.firstSelection!.toTargetData(),
-        };
+        targetData = {'position': state.firstSelection!.toTargetData()};
         break;
       case CardSelectionType.selectOpponent:
-        targetData = {
-          'opponentId': state.selectedOpponentId!,
-        };
+        targetData = {'opponentId': state.selectedOpponentId!};
         break;
       case CardSelectionType.steal:
         targetData = {
@@ -275,5 +271,5 @@ class CardSelectionNotifier extends StateNotifier<CardSelectionState> {
 
 final cardSelectionProvider =
     StateNotifierProvider<CardSelectionNotifier, CardSelectionState>(
-  (ref) => CardSelectionNotifier(),
-);
+      (ref) => CardSelectionNotifier(),
+    );

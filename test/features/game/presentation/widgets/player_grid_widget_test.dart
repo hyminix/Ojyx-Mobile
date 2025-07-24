@@ -17,13 +17,7 @@ void main() {
     Widget wrapWithConstraints(Widget child) {
       return MaterialApp(
         home: Scaffold(
-          body: Center(
-            child: SizedBox(
-              width: 400,
-              height: 600,
-              child: child,
-            ),
-          ),
+          body: Center(child: SizedBox(width: 400, height: 600, child: child)),
         ),
       );
     }
@@ -64,8 +58,14 @@ void main() {
             home: Scaffold(
               body: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
-                  child: PlayerGridWidget(grid: testGrid, isCurrentPlayer: false),
+                  constraints: const BoxConstraints(
+                    maxWidth: 400,
+                    maxHeight: 600,
+                  ),
+                  child: PlayerGridWidget(
+                    grid: testGrid,
+                    isCurrentPlayer: false,
+                  ),
                 ),
               ),
             ),
@@ -114,14 +114,14 @@ void main() {
       await tester.pumpWidget(
         wrapWithConstraints(
           PlayerGridWidget(
-              grid: testGrid,
-              isCurrentPlayer: true,
-              canInteract: true,
-              onCardTap: (row, col) {
-                tappedRow = row;
-                tappedCol = col;
-              },
-            ),
+            grid: testGrid,
+            isCurrentPlayer: true,
+            canInteract: true,
+            onCardTap: (row, col) {
+              tappedRow = row;
+              tappedCol = col;
+            },
+          ),
         ),
       );
 
@@ -144,11 +144,11 @@ void main() {
       await tester.pumpWidget(
         wrapWithConstraints(
           PlayerGridWidget(
-              grid: testGrid,
-              isCurrentPlayer: true,
-              canInteract: false,
-              onCardTap: (row, col) => tapped = true,
-            ),
+            grid: testGrid,
+            isCurrentPlayer: true,
+            canInteract: false,
+            onCardTap: (row, col) => tapped = true,
+          ),
         ),
       );
 
@@ -168,10 +168,10 @@ void main() {
       await tester.pumpWidget(
         wrapWithConstraints(
           PlayerGridWidget(
-              grid: testGrid,
-              isCurrentPlayer: true,
-              highlightedPositions: highlightedPositions,
-            ),
+            grid: testGrid,
+            isCurrentPlayer: true,
+            highlightedPositions: highlightedPositions,
+          ),
         ),
       );
 
@@ -198,10 +198,10 @@ void main() {
       await tester.pumpWidget(
         wrapWithConstraints(
           PlayerGridWidget(
-              grid: testGrid,
-              isCurrentPlayer: true,
-              selectedPositions: selectedPositions,
-            ),
+            grid: testGrid,
+            isCurrentPlayer: true,
+            selectedPositions: selectedPositions,
+          ),
         ),
       );
 
@@ -239,7 +239,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.textContaining('1 col'), findsOneWidget); // 1 identical column
+      expect(
+        find.textContaining('1 col'),
+        findsOneWidget,
+      ); // 1 identical column
       expect(find.byIcon(Icons.done_all), findsOneWidget);
     });
 
@@ -268,10 +271,10 @@ void main() {
       await tester.pumpWidget(
         wrapWithConstraints(
           PlayerGridWidget(
-              grid: testGrid,
-              isCurrentPlayer: true,
-              canInteract: true,
-            ),
+            grid: testGrid,
+            isCurrentPlayer: true,
+            canInteract: true,
+          ),
         ),
       );
 

@@ -46,26 +46,28 @@ void main() {
       // Assert
       expect(find.text('Joueur test-p'), findsOneWidget); // Truncated player ID
       expect(find.text('15 pts'), findsOneWidget); // Score
-      
+
       // Find revealed count in the stats section specifically
       final revealedCountFinder = find.descendant(
-        of: find.byWidgetPredicate((widget) =>
-          widget is Container && 
-          widget.decoration is BoxDecoration &&
-          (widget.decoration as BoxDecoration).borderRadius == 
-            const BorderRadius.vertical(bottom: Radius.circular(12))
+        of: find.byWidgetPredicate(
+          (widget) =>
+              widget is Container &&
+              widget.decoration is BoxDecoration &&
+              (widget.decoration as BoxDecoration).borderRadius ==
+                  const BorderRadius.vertical(bottom: Radius.circular(12)),
         ),
         matching: find.text('4'),
       );
       expect(revealedCountFinder, findsOneWidget);
-      
+
       // Find identical columns count in the stats section
       final columnsCountFinder = find.descendant(
-        of: find.byWidgetPredicate((widget) =>
-          widget is Container && 
-          widget.decoration is BoxDecoration &&
-          (widget.decoration as BoxDecoration).borderRadius == 
-            const BorderRadius.vertical(bottom: Radius.circular(12))
+        of: find.byWidgetPredicate(
+          (widget) =>
+              widget is Container &&
+              widget.decoration is BoxDecoration &&
+              (widget.decoration as BoxDecoration).borderRadius ==
+                  const BorderRadius.vertical(bottom: Radius.circular(12)),
         ),
         matching: find.text('1'),
       );
@@ -136,10 +138,22 @@ void main() {
       // First 4 cards are revealed with values 1-4
       // Find card values within the mini grid (not in stats)
       final gridFinder = find.byType(AspectRatio);
-      expect(find.descendant(of: gridFinder, matching: find.text('1')), findsOneWidget);
-      expect(find.descendant(of: gridFinder, matching: find.text('2')), findsOneWidget);
-      expect(find.descendant(of: gridFinder, matching: find.text('3')), findsOneWidget);
-      expect(find.descendant(of: gridFinder, matching: find.text('4')), findsOneWidget);
+      expect(
+        find.descendant(of: gridFinder, matching: find.text('1')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: gridFinder, matching: find.text('2')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: gridFinder, matching: find.text('3')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: gridFinder, matching: find.text('4')),
+        findsOneWidget,
+      );
     });
 
     testWidgets('should handle tap when onTap is provided', (tester) async {
@@ -238,14 +252,15 @@ void main() {
 
       // Assert
       expect(find.text('0 pts'), findsOneWidget);
-      
+
       // Find the two '0' texts in the stats section
       final zeroTextsInStats = find.descendant(
-        of: find.byWidgetPredicate((widget) =>
-          widget is Container && 
-          widget.decoration is BoxDecoration &&
-          (widget.decoration as BoxDecoration).borderRadius == 
-            const BorderRadius.vertical(bottom: Radius.circular(12))
+        of: find.byWidgetPredicate(
+          (widget) =>
+              widget is Container &&
+              widget.decoration is BoxDecoration &&
+              (widget.decoration as BoxDecoration).borderRadius ==
+                  const BorderRadius.vertical(bottom: Radius.circular(12)),
         ),
         matching: find.text('0'),
       );
@@ -282,10 +297,22 @@ void main() {
       // All revealed cards should be displayed
       // Find card values within the mini grid (not in stats)
       final gridFinder = find.byType(AspectRatio);
-      expect(find.descendant(of: gridFinder, matching: find.text('1')), findsOneWidget);
-      expect(find.descendant(of: gridFinder, matching: find.text('2')), findsOneWidget);
-      expect(find.descendant(of: gridFinder, matching: find.text('3')), findsOneWidget);
-      expect(find.descendant(of: gridFinder, matching: find.text('4')), findsOneWidget);
+      expect(
+        find.descendant(of: gridFinder, matching: find.text('1')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: gridFinder, matching: find.text('2')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: gridFinder, matching: find.text('3')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: gridFinder, matching: find.text('4')),
+        findsOneWidget,
+      );
     });
 
     testWidgets('should animate container when properties change', (

@@ -31,5 +31,5 @@ class GameAnimationNotifier extends StateNotifier<GameAnimationState> {
 
 final gameAnimationProvider =
     StateNotifierProvider<GameAnimationNotifier, GameAnimationState>(
-  (ref) => GameAnimationNotifier(),
-);
+      (ref) => GameAnimationNotifier(),
+    );

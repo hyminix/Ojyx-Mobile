@@ -19,21 +19,15 @@ void main() {
     setUp(() {
       final cards = List.generate(
         12,
-        (index) => game.Card(
-          value: index,
-          isRevealed: index < 2,
-        ),
+        (index) => game.Card(value: index, isRevealed: index < 2),
       );
       testGrid = PlayerGrid.fromCards(cards);
-      testPlayer = Player(
-        id: 'player-1',
-        name: 'Test Player',
-        grid: testGrid,
-      );
+      testPlayer = Player(id: 'player-1', name: 'Test Player', grid: testGrid);
     });
 
-    testWidgets('should wrap PlayerGridWidget with enhanced features',
-        (tester) async {
+    testWidgets('should wrap PlayerGridWidget with enhanced features', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -50,13 +44,14 @@ void main() {
 
       // Should show the grid
       expect(find.byType(GridView), findsOneWidget);
-      
+
       // Should have visual feedback wrappers for each card
       expect(find.byType(VisualFeedbackWidget), findsNWidgets(12));
     });
 
-    testWidgets('should show tooltips with card values on hover',
-        (tester) async {
+    testWidgets('should show tooltips with card values on hover', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -74,7 +69,7 @@ void main() {
       // Hover over a revealed card
       final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
       await gesture.addPointer();
-      
+
       // Find the first revealed card
       final firstCard = find.byType(CardWidget).first;
       await gesture.moveTo(tester.getCenter(firstCard));
@@ -97,9 +92,11 @@ void main() {
                   // Start selection after build
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     final container = ProviderScope.containerOf(context);
-                    container.read(cardSelectionProvider.notifier).startTeleportSelection();
+                    container
+                        .read(cardSelectionProvider.notifier)
+                        .startTeleportSelection();
                   });
-                  
+
                   return EnhancedPlayerGrid(
                     player: testPlayer,
                     isCurrentPlayer: true,
@@ -115,14 +112,16 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should highlight selectable cards (only revealed cards for teleport)
-      final cardWidgets = tester.widgetList<CardWidget>(find.byType(CardWidget));
+      final cardWidgets = tester.widgetList<CardWidget>(
+        find.byType(CardWidget),
+      );
       final highlightedCards = cardWidgets.where((card) => card.isHighlighted);
       expect(highlightedCards.length, equals(2)); // Only 2 cards are revealed
     });
 
     testWidgets('should animate card interactions', (tester) async {
       int tappedPosition = -1;
-      
+
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -204,8 +203,9 @@ void main() {
       expect(find.byIcon(Icons.error), findsWidgets);
     });
 
-    testWidgets('should pulse highlighted cards during selection',
-        (tester) async {
+    testWidgets('should pulse highlighted cards during selection', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -251,8 +251,9 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('should disable interactions for non-current player',
-        (tester) async {
+    testWidgets('should disable interactions for non-current player', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -325,7 +326,7 @@ void main() {
 
       // Should show multiple animations
       expect(find.byType(AnimatedBuilder), findsWidgets);
-      
+
       await tester.pumpAndSettle();
     });
   });

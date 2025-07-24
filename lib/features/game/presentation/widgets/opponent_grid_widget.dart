@@ -43,165 +43,172 @@ class OpponentGridWidget extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-            // Header avec info joueur
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: isCurrentPlayer
-                    ? Theme.of(context).colorScheme.primaryContainer
-                    : Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
+              // Header avec info joueur
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: isCurrentPlayer
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(12),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    // Avatar/Icon
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor: isCurrentPlayer
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.secondary,
+                      child: Text(
+                        playerState.playerId.substring(0, 2).toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: isCurrentPlayer
+                              ? Theme.of(context).colorScheme.onPrimary
+                              : Theme.of(context).colorScheme.onSecondary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Nom du joueur
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Joueur ${playerState.playerId.substring(0, 6)}',
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (isCurrentPlayer)
+                            Text(
+                              'En train de jouer',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    // Score
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.tertiaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${playerState.currentScore} pts',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onTertiaryContainer,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              child: Row(
-                children: [
-                  // Avatar/Icon
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundColor: isCurrentPlayer
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.secondary,
-                    child: Text(
-                      playerState.playerId.substring(0, 2).toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: isCurrentPlayer
-                            ? Theme.of(context).colorScheme.onPrimary
-                            : Theme.of(context).colorScheme.onSecondary,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Nom du joueur
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Joueur ${playerState.playerId.substring(0, 6)}',
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (isCurrentPlayer)
-                          Text(
-                            'En train de jouer',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  // Score
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.tertiaryContainer,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${playerState.currentScore} pts',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onTertiaryContainer,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
 
-            // Mini grille
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: AspectRatio(
-                aspectRatio: kGridColumns / kGridRows,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final cardWidth = constraints.maxWidth / kGridColumns;
-                    final cardHeight = constraints.maxHeight / kGridRows;
+              // Mini grille
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: AspectRatio(
+                  aspectRatio: kGridColumns / kGridRows,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final cardWidth = constraints.maxWidth / kGridColumns;
+                      final cardHeight = constraints.maxHeight / kGridRows;
 
-                    return Stack(
-                      children: [
-                        // Grille de cartes
-                        for (int row = 0; row < kGridRows; row++)
-                          for (int col = 0; col < kGridColumns; col++)
-                            Positioned(
-                              left: col * cardWidth,
-                              top: row * cardHeight,
-                              width: cardWidth,
-                              height: cardHeight,
-                              child: Padding(
-                                padding: const EdgeInsets.all(2),
-                                child: _buildMiniCard(
-                                  context,
-                                  playerState.cards[row * kGridColumns + col],
+                      return Stack(
+                        children: [
+                          // Grille de cartes
+                          for (int row = 0; row < kGridRows; row++)
+                            for (int col = 0; col < kGridColumns; col++)
+                              Positioned(
+                                left: col * cardWidth,
+                                top: row * cardHeight,
+                                width: cardWidth,
+                                height: cardHeight,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2),
+                                  child: _buildMiniCard(
+                                    context,
+                                    playerState.cards[row * kGridColumns + col],
+                                  ),
                                 ),
                               ),
-                            ),
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
 
-            // Stats footer
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(12),
+              // Stats footer
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(12),
+                  ),
                 ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Expanded(
-                    child: _buildStat(
-                      context,
-                      Icons.visibility,
-                      '${playerState.revealedCount}',
-                      'Révélées',
-                      key: ValueKey('revealed_count_${playerState.playerId}'),
-                    ),
-                  ),
-                  Expanded(
-                    child: _buildStat(
-                      context,
-                      Icons.grid_on,
-                      '${playerState.identicalColumns.length}',
-                      'Colonnes',
-                      key: ValueKey('identical_columns_${playerState.playerId}'),
-                    ),
-                  ),
-                  if (playerState.hasFinished)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Icon(
-                        Icons.flag,
-                        size: 20,
-                        color: Theme.of(context).colorScheme.primary,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: _buildStat(
+                        context,
+                        Icons.visibility,
+                        '${playerState.revealedCount}',
+                        'Révélées',
+                        key: ValueKey('revealed_count_${playerState.playerId}'),
                       ),
                     ),
-                ],
+                    Expanded(
+                      child: _buildStat(
+                        context,
+                        Icons.grid_on,
+                        '${playerState.identicalColumns.length}',
+                        'Colonnes',
+                        key: ValueKey(
+                          'identical_columns_${playerState.playerId}',
+                        ),
+                      ),
+                    ),
+                    if (playerState.hasFinished)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Icon(
+                          Icons.flag,
+                          size: 20,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
         ),
       ),
     );

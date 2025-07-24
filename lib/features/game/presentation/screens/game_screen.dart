@@ -45,7 +45,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   Widget build(BuildContext context) {
     // Watch the direction observer to trigger animations
     ref.watch(directionObserverProvider);
-    
+
     final currentUserId = ref.watch(currentUserIdProvider);
     final gameStateAsync = ref.watch(gameStateNotifierProvider);
     final roomAsync = ref.watch(currentRoomProvider(widget.roomId));
@@ -91,118 +91,133 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             child: SafeArea(
               child: Column(
                 children: [
-                // Turn info
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Center(
-                    child: TurnInfoWidget(
-                      gameState: gameStateAsync,
-                      currentPlayerId: currentUserId,
-                    ),
-                  ),
-                ),
-
-                // Main game area
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Column(
-                        children: [
-                          // Deck and discard piles with action card draw pile
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: DeckAndDiscardWidget(
-                                  gameState: gameStateAsync,
-                                  canDraw:
-                                      isMyTurn && gameStateAsync.drawnCard == null,
-                                  onDrawFromDeck: () => _drawFromDeck(ref),
-                                  onDrawFromDiscard: () => _drawFromDiscard(ref),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              ActionCardDrawPileWidget(
-                                canDraw: isMyTurn && 
-                                    currentPlayer.actionCards.length < 3,
-                                onDraw: () => _drawActionCard(ref),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-
-                          // Player's grid
-                          Consumer(
-                            builder: (context, ref, child) {
-                              final selectionState = ref.watch(cardSelectionProvider);
-                              
-                              if (selectionState.isSelecting && 
-                                  selectionState.selectionType == CardSelectionType.teleport) {
-                                return PlayerGridWithSelection(
-                                  grid: currentPlayer.grid,
-                                  isCurrentPlayer: true,
-                                  canInteract: isMyTurn,
-                                  onCardTap: (row, col) => _handleCardTap(ref, row, col),
-                                  onTeleportComplete: (targetData) =>
-                                      _handleTeleportComplete(ref, targetData),
-                                );
-                              }
-                              
-                              return PlayerGridWidget(
-                                grid: currentPlayer.grid,
-                                isCurrentPlayer: true,
-                                canInteract:
-                                    isMyTurn && gameStateAsync.drawnCard != null,
-                                onCardTap: (row, col) =>
-                                    _handleCardTap(ref, row, col),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Other players' grids
-                          if (gameStateAsync.players.length > 1) ...[
-                            const SizedBox(height: 24),
-                            OpponentsViewWidget(
-                              gameState: gameStateAsync,
-                              currentPlayerId: currentUserId,
-                              onPlayerTap: (playerId) {
-                                // Pour le moment, on affiche juste un message
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Vue du joueur $playerId'),
-                                    duration: const Duration(seconds: 1),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ],
+                  // Turn info
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Center(
+                      child: TurnInfoWidget(
+                        gameState: gameStateAsync,
+                        currentPlayerId: currentUserId,
                       ),
                     ),
                   ),
-                ),
 
-                // Player hand (drawn card)
-                if (gameStateAsync.drawnCard != null && isMyTurn)
-                  PlayerHandWidget(
-                    drawnCard: gameStateAsync.drawnCard,
-                    canDiscard: true,
-                    onDiscard: () => _discardDirectly(ref),
-                    isCurrentPlayer: true,
+                  // Main game area
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Column(
+                          children: [
+                            // Deck and discard piles with action card draw pile
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: DeckAndDiscardWidget(
+                                    gameState: gameStateAsync,
+                                    canDraw:
+                                        isMyTurn &&
+                                        gameStateAsync.drawnCard == null,
+                                    onDrawFromDeck: () => _drawFromDeck(ref),
+                                    onDrawFromDiscard: () =>
+                                        _drawFromDiscard(ref),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                ActionCardDrawPileWidget(
+                                  canDraw:
+                                      isMyTurn &&
+                                      currentPlayer.actionCards.length < 3,
+                                  onDraw: () => _drawActionCard(ref),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+
+                            // Player's grid
+                            Consumer(
+                              builder: (context, ref, child) {
+                                final selectionState = ref.watch(
+                                  cardSelectionProvider,
+                                );
+
+                                if (selectionState.isSelecting &&
+                                    selectionState.selectionType ==
+                                        CardSelectionType.teleport) {
+                                  return PlayerGridWithSelection(
+                                    grid: currentPlayer.grid,
+                                    isCurrentPlayer: true,
+                                    canInteract: isMyTurn,
+                                    onCardTap: (row, col) =>
+                                        _handleCardTap(ref, row, col),
+                                    onTeleportComplete: (targetData) =>
+                                        _handleTeleportComplete(
+                                          ref,
+                                          targetData,
+                                        ),
+                                  );
+                                }
+
+                                return PlayerGridWidget(
+                                  grid: currentPlayer.grid,
+                                  isCurrentPlayer: true,
+                                  canInteract:
+                                      isMyTurn &&
+                                      gameStateAsync.drawnCard != null,
+                                  onCardTap: (row, col) =>
+                                      _handleCardTap(ref, row, col),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Other players' grids
+                            if (gameStateAsync.players.length > 1) ...[
+                              const SizedBox(height: 24),
+                              OpponentsViewWidget(
+                                gameState: gameStateAsync,
+                                currentPlayerId: currentUserId,
+                                onPlayerTap: (playerId) {
+                                  // Pour le moment, on affiche juste un message
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Vue du joueur $playerId'),
+                                      duration: const Duration(seconds: 1),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                
-                // Action cards hand
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ActionCardHandWidget(
-                    player: currentPlayer,
-                    isCurrentPlayer: true,
-                    onCardTap: isMyTurn ? (card) => _useActionCard(ref, card) : null,
-                    onCardDiscard: isMyTurn ? (card) => _discardActionCard(ref, card) : null,
+
+                  // Player hand (drawn card)
+                  if (gameStateAsync.drawnCard != null && isMyTurn)
+                    PlayerHandWidget(
+                      drawnCard: gameStateAsync.drawnCard,
+                      canDiscard: true,
+                      onDiscard: () => _discardDirectly(ref),
+                      isCurrentPlayer: true,
+                    ),
+
+                  // Action cards hand
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ActionCardHandWidget(
+                      player: currentPlayer,
+                      isCurrentPlayer: true,
+                      onCardTap: isMyTurn
+                          ? (card) => _useActionCard(ref, card)
+                          : null,
+                      onCardDiscard: isMyTurn
+                          ? (card) => _discardActionCard(ref, card)
+                          : null,
+                    ),
                   ),
-                ),
                 ],
               ),
             ),
@@ -323,20 +338,20 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   void _handleTeleportComplete(WidgetRef ref, Map<String, dynamic> targetData) {
     if (_pendingTeleportCard == null) return;
-    
+
     final notifier = ref.read(
       multiplayerGameNotifierProvider(widget.roomId).notifier,
     );
     final currentUserId = ref.read(currentUserIdProvider);
-    
+
     if (currentUserId != null) {
       notifier.useActionCard(
-        currentUserId, 
+        currentUserId,
         _pendingTeleportCard!,
         targetData: targetData,
       );
     }
-    
+
     // Clear the pending card
     _pendingTeleportCard = null;
   }

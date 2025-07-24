@@ -1,4 +1,1 @@
-enum PlayDirection {
-  forward,
-  backward,
-}
+enum PlayDirection { forward, backward }

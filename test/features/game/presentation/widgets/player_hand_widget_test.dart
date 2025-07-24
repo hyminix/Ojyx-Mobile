@@ -177,9 +177,10 @@ void main() {
       // Find the main container with decoration
       final containers = tester.widgetList<Container>(find.byType(Container));
       final decoratedContainer = containers.firstWhere(
-        (container) => container.decoration != null && 
-                       container.decoration is BoxDecoration &&
-                       (container.decoration as BoxDecoration).borderRadius != null,
+        (container) =>
+            container.decoration != null &&
+            container.decoration is BoxDecoration &&
+            (container.decoration as BoxDecoration).borderRadius != null,
       );
       final decoration = decoratedContainer.decoration as BoxDecoration;
       expect(decoration.borderRadius, BorderRadius.circular(16));
@@ -212,15 +213,23 @@ void main() {
       final sizedBoxes = tester.widgetList<SizedBox>(find.byType(SizedBox));
 
       // Find the SizedBox with height 140
-      final heightSizedBoxes = sizedBoxes.where((widget) => widget.height == 140);
-      expect(heightSizedBoxes.isNotEmpty, isTrue, 
-        reason: 'SizedBox with height 140 not found');
+      final heightSizedBoxes = sizedBoxes.where(
+        (widget) => widget.height == 140,
+      );
+      expect(
+        heightSizedBoxes.isNotEmpty,
+        isTrue,
+        reason: 'SizedBox with height 140 not found',
+      );
       expect(heightSizedBoxes.first.height, equals(140));
 
       // Find the SizedBox with width 100
       final widthSizedBoxes = sizedBoxes.where((widget) => widget.width == 100);
-      expect(widthSizedBoxes.isNotEmpty, isTrue,
-        reason: 'SizedBox with width 100 not found');
+      expect(
+        widthSizedBoxes.isNotEmpty,
+        isTrue,
+        reason: 'SizedBox with width 100 not found',
+      );
       expect(widthSizedBoxes.first.width, equals(100));
     });
 
@@ -269,7 +278,7 @@ void main() {
       // Assert - Verify the button is displayed but disabled
       expect(find.text('Défausser'), findsOneWidget);
       expect(find.byIcon(Icons.delete_outline), findsOneWidget);
-      
+
       // The fact that the button is rendered with null onDiscard callback is the test
       // We verify the UI elements are present, which means the widget handles null correctly
       // without causing any errors

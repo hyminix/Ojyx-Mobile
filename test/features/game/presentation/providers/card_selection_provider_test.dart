@@ -294,10 +294,30 @@ void main() {
         notifier.selectCard(1, 2);
 
         // Act & Assert
-        expect(container.read(cardSelectionProvider.notifier).isPositionSelected(0, 1), isTrue);
-        expect(container.read(cardSelectionProvider.notifier).isPositionSelected(1, 2), isTrue);
-        expect(container.read(cardSelectionProvider.notifier).isPositionSelected(0, 0), isFalse);
-        expect(container.read(cardSelectionProvider.notifier).isPositionSelected(2, 3), isFalse);
+        expect(
+          container
+              .read(cardSelectionProvider.notifier)
+              .isPositionSelected(0, 1),
+          isTrue,
+        );
+        expect(
+          container
+              .read(cardSelectionProvider.notifier)
+              .isPositionSelected(1, 2),
+          isTrue,
+        );
+        expect(
+          container
+              .read(cardSelectionProvider.notifier)
+              .isPositionSelected(0, 0),
+          isFalse,
+        );
+        expect(
+          container
+              .read(cardSelectionProvider.notifier)
+              .isPositionSelected(2, 3),
+          isFalse,
+        );
       });
 
       test('should identify first selection position', () {
@@ -308,9 +328,18 @@ void main() {
         notifier.selectCard(1, 2);
 
         // Act & Assert
-        expect(container.read(cardSelectionProvider.notifier).isFirstSelection(0, 1), isTrue);
-        expect(container.read(cardSelectionProvider.notifier).isFirstSelection(1, 2), isFalse);
-        expect(container.read(cardSelectionProvider.notifier).isFirstSelection(0, 0), isFalse);
+        expect(
+          container.read(cardSelectionProvider.notifier).isFirstSelection(0, 1),
+          isTrue,
+        );
+        expect(
+          container.read(cardSelectionProvider.notifier).isFirstSelection(1, 2),
+          isFalse,
+        );
+        expect(
+          container.read(cardSelectionProvider.notifier).isFirstSelection(0, 0),
+          isFalse,
+        );
       });
 
       test('should identify second selection position', () {
@@ -321,9 +350,24 @@ void main() {
         notifier.selectCard(1, 2);
 
         // Act & Assert
-        expect(container.read(cardSelectionProvider.notifier).isSecondSelection(1, 2), isTrue);
-        expect(container.read(cardSelectionProvider.notifier).isSecondSelection(0, 1), isFalse);
-        expect(container.read(cardSelectionProvider.notifier).isSecondSelection(0, 0), isFalse);
+        expect(
+          container
+              .read(cardSelectionProvider.notifier)
+              .isSecondSelection(1, 2),
+          isTrue,
+        );
+        expect(
+          container
+              .read(cardSelectionProvider.notifier)
+              .isSecondSelection(0, 1),
+          isFalse,
+        );
+        expect(
+          container
+              .read(cardSelectionProvider.notifier)
+              .isSecondSelection(0, 0),
+          isFalse,
+        );
       });
     });
 
@@ -355,7 +399,7 @@ void main() {
 
         // Act & Assert - Should not throw
         expect(() => notifier.cancelSelection(), returnsNormally);
-        
+
         final state = container.read(cardSelectionProvider);
         expect(state.isSelecting, isFalse);
       });
@@ -467,7 +511,7 @@ void main() {
 
         // Assert
         expect(targetData, isNull);
-        
+
         // State should remain unchanged
         final state = container.read(cardSelectionProvider);
         expect(state.isSelecting, isTrue);
@@ -492,7 +536,10 @@ void main() {
         // Arrange
         final notifier = container.read(cardSelectionProvider.notifier);
         var callCount = 0;
-        final subscription = container.listen(cardSelectionProvider, (previous, next) {
+        final subscription = container.listen(cardSelectionProvider, (
+          previous,
+          next,
+        ) {
           callCount++;
         });
 
@@ -513,7 +560,10 @@ void main() {
         // Arrange
         final notifier = container.read(cardSelectionProvider.notifier);
         final states = <CardSelectionState>[];
-        final subscription = container.listen(cardSelectionProvider, (previous, next) {
+        final subscription = container.listen(cardSelectionProvider, (
+          previous,
+          next,
+        ) {
           states.add(next);
         });
 
@@ -524,15 +574,15 @@ void main() {
 
         // Assert
         expect(states.length, equals(3));
-        
+
         // After start
         expect(states[0].isSelecting, isTrue);
         expect(states[0].canCompleteSelection, isFalse);
-        
+
         // After first selection
         expect(states[1].hasFirstSelection, isTrue);
         expect(states[1].canCompleteSelection, isFalse);
-        
+
         // After second selection
         expect(states[2].isSelectionComplete, isTrue);
         expect(states[2].canCompleteSelection, isTrue);
@@ -558,7 +608,10 @@ void main() {
         // Assert
         final state = container.read(cardSelectionProvider);
         expect(state.hasFirstSelection, isTrue);
-        expect(state.hasSecondSelection, isFalse); // Second should be null after last replacement
+        expect(
+          state.hasSecondSelection,
+          isFalse,
+        ); // Second should be null after last replacement
         expect(state.firstSelection?.row, equals(1));
         expect(state.firstSelection?.col, equals(1));
         expect(state.secondSelection, isNull);

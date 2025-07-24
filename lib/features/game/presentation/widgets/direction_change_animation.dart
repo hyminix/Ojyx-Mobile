@@ -13,7 +13,8 @@ class DirectionChangeAnimation extends StatefulWidget {
   });
 
   @override
-  State<DirectionChangeAnimation> createState() => _DirectionChangeAnimationState();
+  State<DirectionChangeAnimation> createState() =>
+      _DirectionChangeAnimationState();
 }
 
 class _DirectionChangeAnimationState extends State<DirectionChangeAnimation>
@@ -21,11 +22,11 @@ class _DirectionChangeAnimationState extends State<DirectionChangeAnimation>
   late AnimationController _fadeController;
   late AnimationController _scaleController;
   late AnimationController _rotationController;
-  
+
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _rotationAnimation;
-  
+
   Timer? _scaleTimer;
   Timer? _rotationTimer;
   Timer? _fadeOutTimer;
@@ -50,26 +51,22 @@ class _DirectionChangeAnimationState extends State<DirectionChangeAnimation>
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(
-      begin: 0.5,
-      end: 1.2,
-    ).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.elasticOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.2).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut),
+    );
 
     // Rotation animation
     _rotationController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    _rotationAnimation = Tween<double>(
-      begin: 0,
-      end: widget.direction == PlayDirection.forward ? 2 : -2,
-    ).animate(CurvedAnimation(
-      parent: _rotationController,
-      curve: Curves.easeInOut,
-    ));
+    _rotationAnimation =
+        Tween<double>(
+          begin: 0,
+          end: widget.direction == PlayDirection.forward ? 2 : -2,
+        ).animate(
+          CurvedAnimation(parent: _rotationController, curve: Curves.easeInOut),
+        );
 
     // Start animations
     _startAnimation();
@@ -78,7 +75,7 @@ class _DirectionChangeAnimationState extends State<DirectionChangeAnimation>
   void _startAnimation() {
     // Fade in immediately
     _fadeController.forward();
-    
+
     // Start scale and rotation after short delay
     _scaleTimer = Timer(const Duration(milliseconds: 100), () {
       if (mounted) {
@@ -86,7 +83,7 @@ class _DirectionChangeAnimationState extends State<DirectionChangeAnimation>
         _rotationController.forward();
       }
     });
-    
+
     // Start fade out after animation peak
     _fadeOutTimer = Timer(const Duration(milliseconds: 1300), () {
       if (mounted) {

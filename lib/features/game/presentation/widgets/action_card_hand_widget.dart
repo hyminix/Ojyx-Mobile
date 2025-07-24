@@ -20,7 +20,8 @@ class ActionCardHandWidget extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ActionCardHandWidget> createState() => _ActionCardHandWidgetState();
+  ConsumerState<ActionCardHandWidget> createState() =>
+      _ActionCardHandWidgetState();
 }
 
 class _ActionCardHandWidgetState extends ConsumerState<ActionCardHandWidget> {
@@ -42,7 +43,7 @@ class _ActionCardHandWidgetState extends ConsumerState<ActionCardHandWidget> {
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
-          
+
           // Cards display
           Expanded(
             child: actionCards.isEmpty
@@ -59,17 +60,13 @@ class _ActionCardHandWidgetState extends ConsumerState<ActionCardHandWidget> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.do_not_disturb,
-            size: 48,
-            color: Colors.grey.shade400,
-          ),
+          Icon(Icons.do_not_disturb, size: 48, color: Colors.grey.shade400),
           const SizedBox(height: 8),
           Text(
             'Aucune carte action',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey.shade600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
           ),
         ],
       ),
@@ -132,11 +129,15 @@ class _ActionCardHandWidgetState extends ConsumerState<ActionCardHandWidget> {
 
   void _showDiscardMenu(ActionCard card) {
     final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
     final position = RelativeRect.fromRect(
       Rect.fromPoints(
         button.localToGlobal(Offset.zero, ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
+        button.localToGlobal(
+          button.size.bottomRight(Offset.zero),
+          ancestor: overlay,
+        ),
       ),
       Offset.zero & overlay.size,
     );

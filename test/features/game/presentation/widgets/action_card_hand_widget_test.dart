@@ -105,20 +105,22 @@ void main() {
     testWidgets('should handle card tap for current player', (tester) async {
       // Arrange
       ActionCard? tappedCard;
-      
+
       // Act
-      await tester.pumpWidget(createTestWidget(
-        player: testPlayer,
-        isCurrentPlayer: true,
-        onCardTap: (card) => tappedCard = card,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(
+          player: testPlayer,
+          isCurrentPlayer: true,
+          onCardTap: (card) => tappedCard = card,
+        ),
+      );
 
       await tester.tap(find.byType(ActionCardWidget).first);
       await tester.pump();
 
       // Assert
       expect(tappedCard, equals(testCards[0]));
-      
+
       // Clean up the timer
       await tester.pump(const Duration(milliseconds: 300));
     });
@@ -126,13 +128,15 @@ void main() {
     testWidgets('should not allow card tap for other players', (tester) async {
       // Arrange
       ActionCard? tappedCard;
-      
+
       // Act
-      await tester.pumpWidget(createTestWidget(
-        player: testPlayer,
-        isCurrentPlayer: false,
-        onCardTap: (card) => tappedCard = card,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(
+          player: testPlayer,
+          isCurrentPlayer: false,
+          onCardTap: (card) => tappedCard = card,
+        ),
+      );
 
       await tester.tap(find.byType(ActionCardWidget).first);
       await tester.pump();
@@ -141,12 +145,13 @@ void main() {
       expect(tappedCard, isNull);
     });
 
-    testWidgets('should highlight immediate cards that must be played', (tester) async {
+    testWidgets('should highlight immediate cards that must be played', (
+      tester,
+    ) async {
       // Act
-      await tester.pumpWidget(createTestWidget(
-        player: testPlayer,
-        isCurrentPlayer: true,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(player: testPlayer, isCurrentPlayer: true),
+      );
 
       // Assert
       // The Demi-tour card (immediate) should be highlighted
@@ -156,28 +161,34 @@ void main() {
       expect(immediateCardWidget.isHighlighted, isTrue);
     });
 
-    testWidgets('should trigger discard callback on long press', (tester) async {
+    testWidgets('should trigger discard callback on long press', (
+      tester,
+    ) async {
       // For simplicity, we'll test that long press works without testing the actual menu
       // since menus can be tricky to test in Flutter
-      
+
       // Arrange
       var longPressDetected = false;
-      
+
       // Act
-      await tester.pumpWidget(createTestWidget(
-        player: testPlayer,
-        isCurrentPlayer: true,
-        onCardDiscard: (card) => longPressDetected = true,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(
+          player: testPlayer,
+          isCurrentPlayer: true,
+          onCardDiscard: (card) => longPressDetected = true,
+        ),
+      );
 
       // Verify that long press gesture is set up
       final gesture = tester.widget<GestureDetector>(
-        find.descendant(
-          of: find.byType(ActionCardHandWidget),
-          matching: find.byType(GestureDetector),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(ActionCardHandWidget),
+              matching: find.byType(GestureDetector),
+            )
+            .first,
       );
-      
+
       // Assert - The gesture detector should have onLongPress callback
       expect(gesture.onLongPress, isNotNull);
     });
@@ -192,7 +203,7 @@ void main() {
         find.byType(SingleChildScrollView),
       );
       expect(scrollView.scrollDirection, equals(Axis.horizontal));
-      
+
       // Check that all 3 cards are displayed
       expect(find.byType(ActionCardWidget), findsNWidgets(3));
     });
@@ -223,12 +234,13 @@ void main() {
       expect(scrollView.scrollDirection, equals(Axis.horizontal));
     });
 
-    testWidgets('should show reactive cards with special indicator', (tester) async {
+    testWidgets('should show reactive cards with special indicator', (
+      tester,
+    ) async {
       // Act
-      await tester.pumpWidget(createTestWidget(
-        player: testPlayer,
-        isCurrentPlayer: true,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(player: testPlayer, isCurrentPlayer: true),
+      );
 
       // Assert
       // The Shield card (reactive) should have a special indicator
@@ -241,13 +253,15 @@ void main() {
     testWidgets('should disable interaction during animations', (tester) async {
       // Arrange
       var tapCount = 0;
-      
+
       // Act
-      await tester.pumpWidget(createTestWidget(
-        player: testPlayer,
-        isCurrentPlayer: true,
-        onCardTap: (card) => tapCount++,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(
+          player: testPlayer,
+          isCurrentPlayer: true,
+          onCardTap: (card) => tapCount++,
+        ),
+      );
 
       // Simulate animation in progress by quickly tapping multiple times
       await tester.tap(find.byType(ActionCardWidget).first);
@@ -257,41 +271,45 @@ void main() {
 
       // Assert - Only first tap should register
       expect(tapCount, equals(1));
-      
+
       // Clean up the timer
       await tester.pump(const Duration(milliseconds: 300));
     });
 
-    testWidgets('should show proper layout for current player view', (tester) async {
+    testWidgets('should show proper layout for current player view', (
+      tester,
+    ) async {
       // Act
-      await tester.pumpWidget(createTestWidget(
-        player: testPlayer,
-        isCurrentPlayer: true,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(player: testPlayer, isCurrentPlayer: true),
+      );
 
       // Assert
       final container = tester.widget<Container>(
-        find.ancestor(
-          of: find.text('Cartes Actions (3/3)'),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .ancestor(
+              of: find.text('Cartes Actions (3/3)'),
+              matching: find.byType(Container),
+            )
+            .first,
       );
       expect(container.constraints?.maxHeight, equals(180));
     });
 
     testWidgets('should show compact layout for opponent view', (tester) async {
       // Act
-      await tester.pumpWidget(createTestWidget(
-        player: testPlayer,
-        isCurrentPlayer: false,
-      ));
+      await tester.pumpWidget(
+        createTestWidget(player: testPlayer, isCurrentPlayer: false),
+      );
 
       // Assert
       final container = tester.widget<Container>(
-        find.ancestor(
-          of: find.text('Cartes Actions (3/3)'),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .ancestor(
+              of: find.text('Cartes Actions (3/3)'),
+              matching: find.byType(Container),
+            )
+            .first,
       );
       expect(container.constraints?.maxHeight, equals(120));
     });

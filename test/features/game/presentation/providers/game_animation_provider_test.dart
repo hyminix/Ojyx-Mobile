@@ -91,7 +91,7 @@ void main() {
       // Hide and show different direction
       notifier.hideDirectionChange();
       notifier.showDirectionChange(PlayDirection.backward);
-      
+
       state = container.read(gameAnimationProvider);
       expect(state.direction, equals(PlayDirection.backward));
       expect(state.showingDirectionChange, isTrue);
@@ -101,7 +101,10 @@ void main() {
       // Arrange
       final notifier = container.read(gameAnimationProvider.notifier);
       var callCount = 0;
-      final subscription = container.listen(gameAnimationProvider, (previous, next) {
+      final subscription = container.listen(gameAnimationProvider, (
+        previous,
+        next,
+      ) {
         callCount++;
       });
 

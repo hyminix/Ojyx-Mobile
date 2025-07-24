@@ -103,11 +103,13 @@ class ActionCardState with _$ActionCardState {
 
 class ActionCardStateNotifier extends StateNotifier<ActionCardState> {
   ActionCardStateNotifier()
-      : super(const ActionCardState(
+    : super(
+        const ActionCardState(
           drawPileCount: 37, // Initial deck size
           discardPileCount: 0,
           isLoading: false,
-        ));
+        ),
+      );
 
   void updateCounts({int? drawPileCount, int? discardPileCount}) {
     state = state.copyWith(
@@ -124,10 +126,10 @@ class ActionCardStateNotifier extends StateNotifier<ActionCardState> {
     if (state.drawPileCount <= 0) return;
 
     setLoading(true);
-    
+
     // Simulate drawing a card
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     state = state.copyWith(
       drawPileCount: state.drawPileCount - 1,
       isLoading: false,
@@ -137,5 +139,5 @@ class ActionCardStateNotifier extends StateNotifier<ActionCardState> {
 
 final actionCardStateNotifierProvider =
     StateNotifierProvider<ActionCardStateNotifier, ActionCardState>(
-  (ref) => ActionCardStateNotifier(),
-);
+      (ref) => ActionCardStateNotifier(),
+    );

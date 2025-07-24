@@ -16,7 +16,7 @@ class MockActionCardRepository extends Mock implements ActionCardRepository {}
 void main() {
   late DrawActionCardUseCase useCase;
   late MockActionCardRepository mockRepository;
-  
+
   setUp(() {
     mockRepository = MockActionCardRepository();
     useCase = DrawActionCardUseCase(mockRepository);
@@ -47,7 +47,10 @@ void main() {
       roomId: 'room1',
       players: [testPlayer],
       currentPlayerIndex: 0,
-      deck: List.generate(10, (i) => game_card.Card(value: i, isRevealed: false)),
+      deck: List.generate(
+        10,
+        (i) => game_card.Card(value: i, isRevealed: false),
+      ),
       discardPile: [],
       actionDeck: [],
       actionDiscard: [],
@@ -56,34 +59,39 @@ void main() {
       lastRound: false,
     );
 
-    test('should draw an action card when player has less than 3 cards', () async {
-      // Arrange
-      when(() => mockRepository.drawActionCard()).thenReturn(testActionCard);
-      when(() => mockRepository.addActionCardToPlayer('player1', testActionCard))
-          .thenAnswer((_) async {});
+    test(
+      'should draw an action card when player has less than 3 cards',
+      () async {
+        // Arrange
+        when(() => mockRepository.drawActionCard()).thenReturn(testActionCard);
+        when(
+          () => mockRepository.addActionCardToPlayer('player1', testActionCard),
+        ).thenAnswer((_) async {});
 
-      final params = DrawActionCardParams(
-        playerId: 'player1',
-        gameState: testGameState,
-      );
+        final params = DrawActionCardParams(
+          playerId: 'player1',
+          gameState: testGameState,
+        );
 
-      // Act
-      final result = await useCase(params);
+        // Act
+        final result = await useCase(params);
 
-      // Assert
-      expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Should not return failure'),
-        (updatedState) {
+        // Assert
+        expect(result.isRight(), true);
+        result.fold((failure) => fail('Should not return failure'), (
+          updatedState,
+        ) {
           final updatedPlayer = updatedState.players.first;
           expect(updatedPlayer.actionCards.length, 1);
           expect(updatedPlayer.actionCards.first, testActionCard);
-        },
-      );
-      
-      verify(() => mockRepository.drawActionCard()).called(1);
-      verify(() => mockRepository.addActionCardToPlayer('player1', testActionCard)).called(1);
-    });
+        });
+
+        verify(() => mockRepository.drawActionCard()).called(1);
+        verify(
+          () => mockRepository.addActionCardToPlayer('player1', testActionCard),
+        ).called(1);
+      },
+    );
 
     test('should fail when player already has 3 action cards', () async {
       // Arrange
@@ -115,14 +123,11 @@ void main() {
 
       // Assert
       expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
-          expect(failure, isA<GameLogicFailure>());
-          expect(failure.message, contains('cannot draw more'));
-        },
-        (_) => fail('Should return failure'),
-      );
-      
+      result.fold((failure) {
+        expect(failure, isA<GameLogicFailure>());
+        expect(failure.message, contains('cannot draw more'));
+      }, (_) => fail('Should return failure'));
+
       verifyNever(() => mockRepository.drawActionCard());
     });
 
@@ -150,43 +155,40 @@ void main() {
 
       // Assert
       expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
-          expect(failure, isA<GameLogicFailure>());
-          expect(failure.message, contains('not your turn'));
-        },
-        (_) => fail('Should return failure'),
-      );
-      
+      result.fold((failure) {
+        expect(failure, isA<GameLogicFailure>());
+        expect(failure.message, contains('not your turn'));
+      }, (_) => fail('Should return failure'));
+
       verifyNever(() => mockRepository.drawActionCard());
     });
 
-    test('should fail when player has already drawn a card this turn', () async {
-      // Arrange
-      final gameStateWithDrawnCard = testGameState.copyWith(
-        drawnCard: game_card.Card(value: 5, isRevealed: true),
-      );
+    test(
+      'should fail when player has already drawn a card this turn',
+      () async {
+        // Arrange
+        final gameStateWithDrawnCard = testGameState.copyWith(
+          drawnCard: game_card.Card(value: 5, isRevealed: true),
+        );
 
-      final params = DrawActionCardParams(
-        playerId: 'player1',
-        gameState: gameStateWithDrawnCard,
-      );
+        final params = DrawActionCardParams(
+          playerId: 'player1',
+          gameState: gameStateWithDrawnCard,
+        );
 
-      // Act
-      final result = await useCase(params);
+        // Act
+        final result = await useCase(params);
 
-      // Assert
-      expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
+        // Assert
+        expect(result.isLeft(), true);
+        result.fold((failure) {
           expect(failure, isA<GameLogicFailure>());
           expect(failure.message, contains('already drawn'));
-        },
-        (_) => fail('Should return failure'),
-      );
-      
-      verifyNever(() => mockRepository.drawActionCard());
-    });
+        }, (_) => fail('Should return failure'));
+
+        verifyNever(() => mockRepository.drawActionCard());
+      },
+    );
 
     test('should fail when action card deck is empty', () async {
       // Arrange
@@ -202,14 +204,11 @@ void main() {
 
       // Assert
       expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
-          expect(failure, isA<GameLogicFailure>());
-          expect(failure.message, contains('No action cards available'));
-        },
-        (_) => fail('Should return failure'),
-      );
-      
+      result.fold((failure) {
+        expect(failure, isA<GameLogicFailure>());
+        expect(failure.message, contains('No action cards available'));
+      }, (_) => fail('Should return failure'));
+
       verify(() => mockRepository.drawActionCard()).called(1);
     });
 
@@ -229,14 +228,11 @@ void main() {
 
       // Assert
       expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
-          expect(failure, isA<GameLogicFailure>());
-          expect(failure.message, contains('not in progress'));
-        },
-        (_) => fail('Should return failure'),
-      );
-      
+      result.fold((failure) {
+        expect(failure, isA<GameLogicFailure>());
+        expect(failure.message, contains('not in progress'));
+      }, (_) => fail('Should return failure'));
+
       verifyNever(() => mockRepository.drawActionCard());
     });
 
@@ -252,8 +248,9 @@ void main() {
       );
 
       when(() => mockRepository.drawActionCard()).thenReturn(immediateCard);
-      when(() => mockRepository.addActionCardToPlayer('player1', immediateCard))
-          .thenAnswer((_) async {});
+      when(
+        () => mockRepository.addActionCardToPlayer('player1', immediateCard),
+      ).thenAnswer((_) async {});
 
       final params = DrawActionCardParams(
         playerId: 'player1',
@@ -265,16 +262,15 @@ void main() {
 
       // Assert
       expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Should not return failure'),
-        (updatedState) {
-          // For immediate cards, we just verify the card was added
-          final updatedPlayer = updatedState.players.first;
-          expect(updatedPlayer.actionCards.length, 1);
-          expect(updatedPlayer.actionCards.first.timing, ActionTiming.immediate);
-          // The actual immediate action handling will be done in a separate flow
-        },
-      );
+      result.fold((failure) => fail('Should not return failure'), (
+        updatedState,
+      ) {
+        // For immediate cards, we just verify the card was added
+        final updatedPlayer = updatedState.players.first;
+        expect(updatedPlayer.actionCards.length, 1);
+        expect(updatedPlayer.actionCards.first.timing, ActionTiming.immediate);
+        // The actual immediate action handling will be done in a separate flow
+      });
     });
 
     test('should update game state to indicate card was drawn', () async {
@@ -289,8 +285,9 @@ void main() {
       );
 
       when(() => mockRepository.drawActionCard()).thenReturn(optionalCard);
-      when(() => mockRepository.addActionCardToPlayer('player1', optionalCard))
-          .thenAnswer((_) async {});
+      when(
+        () => mockRepository.addActionCardToPlayer('player1', optionalCard),
+      ).thenAnswer((_) async {});
 
       final params = DrawActionCardParams(
         playerId: 'player1',
@@ -302,21 +299,21 @@ void main() {
 
       // Assert
       expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Should not return failure'),
-        (updatedState) {
-          // For now, we mark that a card was drawn by setting a marker card
-          // This prevents drawing multiple cards in the same turn
-          expect(updatedState.drawnCard, isNotNull);
-          expect(updatedState.drawnCard!.value, 0); // Using 0 as a valid marker
-        },
-      );
+      result.fold((failure) => fail('Should not return failure'), (
+        updatedState,
+      ) {
+        // For now, we mark that a card was drawn by setting a marker card
+        // This prevents drawing multiple cards in the same turn
+        expect(updatedState.drawnCard, isNotNull);
+        expect(updatedState.drawnCard!.value, 0); // Using 0 as a valid marker
+      });
     });
 
     test('should handle repository exceptions gracefully', () async {
       // Arrange
-      when(() => mockRepository.drawActionCard())
-          .thenThrow(Exception('Repository error'));
+      when(
+        () => mockRepository.drawActionCard(),
+      ).thenThrow(Exception('Repository error'));
 
       final params = DrawActionCardParams(
         playerId: 'player1',
@@ -328,13 +325,10 @@ void main() {
 
       // Assert
       expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
-          expect(failure, isA<UnknownFailure>());
-          expect(failure.message, contains('Failed to draw action card'));
-        },
-        (_) => fail('Should return failure'),
-      );
+      result.fold((failure) {
+        expect(failure, isA<UnknownFailure>());
+        expect(failure.message, contains('Failed to draw action card'));
+      }, (_) => fail('Should return failure'));
     });
   });
 }

@@ -23,15 +23,15 @@ class MockAuthResponse extends Mock implements AuthResponse {
   final User? user;
   @override
   final Session? session;
-  
+
   MockAuthResponse({this.user, this.session});
 }
 
 class TestAuthNotifier extends AuthNotifier {
   final User? testUser;
-  
+
   TestAuthNotifier(this.testUser);
-  
+
   @override
   Future<User?> build() async => testUser;
 }
@@ -48,9 +48,9 @@ class TestAuthLoadingNotifier extends AuthNotifier {
 
 class TestAuthErrorNotifier extends AuthNotifier {
   final Object error;
-  
+
   TestAuthErrorNotifier(this.error);
-  
+
   @override
   Future<User?> build() async {
     throw error;
@@ -69,13 +69,11 @@ void main() {
 
     router = GoRouter(
       routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const HomeScreen(),
-        ),
+        GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
         GoRoute(
           path: '/create-room',
-          builder: (context, state) => const Scaffold(body: Text('Create Room')),
+          builder: (context, state) =>
+              const Scaffold(body: Text('Create Room')),
         ),
         GoRoute(
           path: '/join-room',
@@ -91,10 +89,7 @@ void main() {
       when(() => mockAuth.currentUser).thenReturn(null);
       when(() => mockAuth.signInAnonymously()).thenAnswer((_) async {
         final mockUser = MockUser();
-        final response = MockAuthResponse(
-          user: mockUser,
-          session: null,
-        );
+        final response = MockAuthResponse(user: mockUser, session: null);
         return response;
       });
 
@@ -104,9 +99,7 @@ void main() {
           overrides: [
             supabaseClientProvider.overrideWithValue(mockSupabaseClient),
           ],
-          child: MaterialApp.router(
-            routerConfig: router,
-          ),
+          child: MaterialApp.router(routerConfig: router),
         ),
       );
       await tester.pump();
@@ -126,9 +119,7 @@ void main() {
           overrides: [
             authNotifierProvider.overrideWith(() => TestAuthLoadingNotifier()),
           ],
-          child: MaterialApp.router(
-            routerConfig: router,
-          ),
+          child: MaterialApp.router(routerConfig: router),
         ),
       );
       await tester.pump();
@@ -137,9 +128,7 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('should display user info when authenticated', (
-      tester,
-    ) async {
+    testWidgets('should display user info when authenticated', (tester) async {
       // Arrange
       final mockUser = MockUser();
 
@@ -150,9 +139,7 @@ void main() {
             supabaseClientProvider.overrideWithValue(mockSupabaseClient),
             authNotifierProvider.overrideWith(() => TestAuthNotifier(mockUser)),
           ],
-          child: MaterialApp.router(
-            routerConfig: router,
-          ),
+          child: MaterialApp.router(routerConfig: router),
         ),
       );
       await tester.pumpAndSettle();
@@ -175,9 +162,7 @@ void main() {
             supabaseClientProvider.overrideWithValue(mockSupabaseClient),
             authNotifierProvider.overrideWith(() => TestAuthNotifier(mockUser)),
           ],
-          child: MaterialApp.router(
-            routerConfig: router,
-          ),
+          child: MaterialApp.router(routerConfig: router),
         ),
       );
       await tester.pumpAndSettle();
@@ -196,9 +181,7 @@ void main() {
           overrides: [
             authNotifierProvider.overrideWith(() => TestAuthNotifier(null)),
           ],
-          child: MaterialApp.router(
-            routerConfig: router,
-          ),
+          child: MaterialApp.router(routerConfig: router),
         ),
       );
       await tester.pump();
@@ -219,9 +202,7 @@ void main() {
             supabaseClientProvider.overrideWithValue(mockSupabaseClient),
             authNotifierProvider.overrideWith(() => TestAuthNotifier(mockUser)),
           ],
-          child: MaterialApp.router(
-            routerConfig: router,
-          ),
+          child: MaterialApp.router(routerConfig: router),
         ),
       );
       await tester.pumpAndSettle();
@@ -246,9 +227,7 @@ void main() {
             supabaseClientProvider.overrideWithValue(mockSupabaseClient),
             authNotifierProvider.overrideWith(() => TestAuthNotifier(mockUser)),
           ],
-          child: MaterialApp.router(
-            routerConfig: router,
-          ),
+          child: MaterialApp.router(routerConfig: router),
         ),
       );
       await tester.pumpAndSettle();
@@ -266,20 +245,21 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            authNotifierProvider.overrideWith(() => TestAuthErrorNotifier(
-              Exception('Connection failed'),
-            )),
+            authNotifierProvider.overrideWith(
+              () => TestAuthErrorNotifier(Exception('Connection failed')),
+            ),
           ],
-          child: MaterialApp.router(
-            routerConfig: router,
-          ),
+          child: MaterialApp.router(routerConfig: router),
         ),
       );
       await tester.pumpAndSettle();
 
       // Assert
       expect(find.text('Erreur de connexion'), findsOneWidget);
-      expect(find.textContaining('Exception: Connection failed'), findsOneWidget);
+      expect(
+        find.textContaining('Exception: Connection failed'),
+        findsOneWidget,
+      );
       expect(find.text('Réessayer'), findsOneWidget);
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
     });

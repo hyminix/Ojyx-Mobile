@@ -17,7 +17,9 @@ import 'package:ojyx/features/game/presentation/providers/game_state_notifier.da
 import '../../../../helpers/test_helpers.dart';
 
 class MockRoom extends Mock implements Room {}
+
 class MockGameState extends Mock implements GameState {}
+
 class MockPlayer extends Mock implements Player {}
 
 class FakeGameStateNotifier extends GameStateNotifier {
@@ -71,7 +73,9 @@ void main() {
 
       when(() => mockRoom.id).thenReturn('test-room-id');
       when(() => mockRoom.status).thenReturn(RoomStatus.inGame);
-      when(() => mockRoom.playerIds).thenReturn(['current-user-id', 'opponent-id']);
+      when(
+        () => mockRoom.playerIds,
+      ).thenReturn(['current-user-id', 'opponent-id']);
     });
 
     Widget createWidgetUnderTest({
@@ -98,38 +102,41 @@ void main() {
             return Stream.value(mockRoom);
           }),
         ],
-        child: createTestApp(
-          child: const GameScreen(roomId: 'test-room-id'),
-        ),
+        child: createTestApp(child: const GameScreen(roomId: 'test-room-id')),
       );
     }
 
-    testWidgets('should show PlayerGridWithSelection when teleport mode is active', 
-        (tester) async {
-      // Arrange
-      await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
-      await tester.pumpAndSettle();
+    testWidgets(
+      'should show PlayerGridWithSelection when teleport mode is active',
+      (tester) async {
+        // Arrange
+        await tester.pumpWidget(
+          createWidgetUnderTest(gameState: mockGameState),
+        );
+        await tester.pumpAndSettle();
 
-      // Initially should show normal PlayerGridWidget (not in selection mode)
-      expect(find.byType(PlayerGridWidget), findsOneWidget);
-      expect(find.byType(PlayerGridWithSelection), findsNothing);
+        // Initially should show normal PlayerGridWidget (not in selection mode)
+        expect(find.byType(PlayerGridWidget), findsOneWidget);
+        expect(find.byType(PlayerGridWithSelection), findsNothing);
 
-      // Get the provider container
-      final container = ProviderScope.containerOf(
-        tester.element(find.byType(GameScreen)),
-      );
+        // Get the provider container
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(GameScreen)),
+        );
 
-      // Start teleportation selection
-      container.read(cardSelectionProvider.notifier).startTeleportSelection();
-      await tester.pump();
+        // Start teleportation selection
+        container.read(cardSelectionProvider.notifier).startTeleportSelection();
+        await tester.pump();
 
-      // Now it should show PlayerGridWithSelection which contains PlayerGridWidget
-      expect(find.byType(PlayerGridWithSelection), findsOneWidget);
-      expect(find.byType(PlayerGridWidget), findsOneWidget);
-    });
+        // Now it should show PlayerGridWithSelection which contains PlayerGridWidget
+        expect(find.byType(PlayerGridWithSelection), findsOneWidget);
+        expect(find.byType(PlayerGridWidget), findsOneWidget);
+      },
+    );
 
-    testWidgets('should show selection instructions during teleportation', 
-        (tester) async {
+    testWidgets('should show selection instructions during teleportation', (
+      tester,
+    ) async {
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
       await tester.pumpAndSettle();
@@ -143,11 +150,15 @@ void main() {
       await tester.pump();
 
       // Assert
-      expect(find.text('Sélectionnez la première carte à échanger'), findsOneWidget);
+      expect(
+        find.text('Sélectionnez la première carte à échanger'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('should handle complete teleportation selection flow', 
-        (tester) async {
+    testWidgets('should handle complete teleportation selection flow', (
+      tester,
+    ) async {
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
       await tester.pumpAndSettle();
@@ -155,7 +166,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameScreen)),
       );
-      
+
       // Start teleportation
       container.read(cardSelectionProvider.notifier).startTeleportSelection();
       await tester.pump();
@@ -165,20 +176,27 @@ void main() {
       await tester.pump();
 
       // Should update instruction
-      expect(find.text('Sélectionnez la deuxième carte à échanger'), findsOneWidget);
+      expect(
+        find.text('Sélectionnez la deuxième carte à échanger'),
+        findsOneWidget,
+      );
 
       // Select second card
       container.read(cardSelectionProvider.notifier).selectCard(1, 2);
       await tester.pump();
 
       // Should show confirmation
-      expect(find.text('Cartes sélectionnées - confirmez l\'échange'), findsOneWidget);
+      expect(
+        find.text('Cartes sélectionnées - confirmez l\'échange'),
+        findsOneWidget,
+      );
       expect(find.text('Confirmer'), findsOneWidget);
       expect(find.text('Annuler'), findsOneWidget);
     });
 
-    testWidgets('should cancel teleportation when cancel is pressed', 
-        (tester) async {
+    testWidgets('should cancel teleportation when cancel is pressed', (
+      tester,
+    ) async {
       // Arrange
       await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
       await tester.pumpAndSettle();
@@ -186,7 +204,7 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameScreen)),
       );
-      
+
       // Start selection
       container.read(cardSelectionProvider.notifier).startTeleportSelection();
       container.read(cardSelectionProvider.notifier).selectCard(0, 0);
@@ -203,18 +221,17 @@ void main() {
       expect(find.byType(PlayerGridWithSelection), findsNothing);
     });
 
-    testWidgets('should handle teleportation callback', 
-        (tester) async {
+    testWidgets('should handle teleportation callback', (tester) async {
       // Arrange
       Map<String, dynamic>? receivedData;
-      
+
       await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
       await tester.pumpAndSettle();
 
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameScreen)),
       );
-      
+
       // Complete selection
       container.read(cardSelectionProvider.notifier).startTeleportSelection();
       container.read(cardSelectionProvider.notifier).selectCard(0, 0);

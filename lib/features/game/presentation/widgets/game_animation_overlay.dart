@@ -6,10 +6,7 @@ import 'direction_change_animation.dart';
 class GameAnimationOverlay extends ConsumerWidget {
   final Widget child;
 
-  const GameAnimationOverlay({
-    super.key,
-    required this.child,
-  });
+  const GameAnimationOverlay({super.key, required this.child});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

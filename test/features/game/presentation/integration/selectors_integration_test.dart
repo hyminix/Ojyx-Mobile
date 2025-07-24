@@ -6,8 +6,9 @@ import 'package:ojyx/features/game/domain/entities/card_position.dart';
 
 void main() {
   group('Selectors Integration Tests', () {
-    testWidgets('CardSelectionProvider integration - Teleport selection',
-        (tester) async {
+    testWidgets('CardSelectionProvider integration - Teleport selection', (
+      tester,
+    ) async {
       CardSelectionState? capturedState;
 
       await tester.pumpWidget(
@@ -23,30 +24,40 @@ void main() {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text('Selecting: ${state.isSelecting}'),
-                      Text('Type: ${state.selectionType?.toString() ?? "none"}'),
+                      Text(
+                        'Type: ${state.selectionType?.toString() ?? "none"}',
+                      ),
                       Text('First: ${state.firstSelection != null}'),
                       Text('Second: ${state.secondSelection != null}'),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).startTeleportSelection();
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .startTeleportSelection();
                         },
                         child: const Text('Start Teleport'),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectCard(0, 0);
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .selectCard(0, 0);
                         },
                         child: const Text('Select 0,0'),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectCard(1, 1);
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .selectCard(1, 1);
                         },
                         child: const Text('Select 1,1'),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).completeSelection();
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .completeSelection();
                         },
                         child: const Text('Complete'),
                       ),
@@ -95,8 +106,9 @@ void main() {
       expect(capturedState!.isSelecting, isFalse);
     });
 
-    testWidgets('CardSelectionProvider integration - Peek multi-selection',
-        (tester) async {
+    testWidgets('CardSelectionProvider integration - Peek multi-selection', (
+      tester,
+    ) async {
       List<CardPosition> selections = [];
 
       await tester.pumpWidget(
@@ -114,14 +126,18 @@ void main() {
                       Text('Selections: ${state.selections.length}'),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).startPeekSelection(maxCards: 3);
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .startPeekSelection(maxCards: 3);
                         },
                         child: const Text('Start Peek'),
                       ),
                       for (int i = 0; i < 5; i++)
                         ElevatedButton(
                           onPressed: () {
-                            ref.read(cardSelectionProvider.notifier).selectCard(i ~/ 2, i % 2);
+                            ref
+                                .read(cardSelectionProvider.notifier)
+                                .selectCard(i ~/ 2, i % 2);
                           },
                           child: Text('Select $i'),
                         ),
@@ -162,8 +178,9 @@ void main() {
       expect(selections.length, equals(2));
     });
 
-    testWidgets('CardSelectionProvider integration - Opponent selection',
-        (tester) async {
+    testWidgets('CardSelectionProvider integration - Opponent selection', (
+      tester,
+    ) async {
       String? selectedOpponentId;
       bool isComplete = false;
 
@@ -184,19 +201,25 @@ void main() {
                       Text('Complete: $isComplete'),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).startOpponentSelection();
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .startOpponentSelection();
                         },
                         child: const Text('Start Opponent Selection'),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectOpponent('player-2');
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .selectOpponent('player-2');
                         },
                         child: const Text('Select Player 2'),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).cancelSelection();
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .cancelSelection();
                         },
                         child: const Text('Cancel'),
                       ),
@@ -230,8 +253,9 @@ void main() {
       expect(selectedOpponentId, isNull);
     });
 
-    testWidgets('CardSelectionProvider integration - Steal two-phase',
-        (tester) async {
+    testWidgets('CardSelectionProvider integration - Steal two-phase', (
+      tester,
+    ) async {
       Map<String, dynamic>? completedData;
 
       await tester.pumpWidget(
@@ -245,29 +269,39 @@ void main() {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Phase: ${state.selectedOpponentId == null ? "opponent" : "card"}'),
+                      Text(
+                        'Phase: ${state.selectedOpponentId == null ? "opponent" : "card"}',
+                      ),
                       Text('Requires opponent: ${state.requiresOpponent}'),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).startStealSelection();
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .startStealSelection();
                         },
                         child: const Text('Start Steal'),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectOpponent('player-3');
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .selectOpponent('player-3');
                         },
                         child: const Text('Select Opponent'),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectCard(2, 2);
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .selectCard(2, 2);
                         },
                         child: const Text('Select Card'),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          completedData = ref.read(cardSelectionProvider.notifier).completeSelection();
+                          completedData = ref
+                              .read(cardSelectionProvider.notifier)
+                              .completeSelection();
                         },
                         child: const Text('Complete Steal'),
                       ),
@@ -306,8 +340,9 @@ void main() {
       expect(completedData!['position'], isNotNull);
     });
 
-    testWidgets('CardSelectionProvider integration - Single card selections',
-        (tester) async {
+    testWidgets('CardSelectionProvider integration - Single card selections', (
+      tester,
+    ) async {
       CardSelectionType? currentType;
       CardPosition? selectedPosition;
 
@@ -328,23 +363,25 @@ void main() {
                       Text('Selected: ${selectedPosition != null}'),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).startSingleSelection(
-                            CardSelectionType.bomb,
-                          );
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .startSingleSelection(CardSelectionType.bomb);
                         },
                         child: const Text('Bomb'),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).startSingleSelection(
-                            CardSelectionType.mirror,
-                          );
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .startSingleSelection(CardSelectionType.mirror);
                         },
                         child: const Text('Mirror'),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectCard(1, 2);
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .selectCard(1, 2);
                         },
                         child: const Text('Select Card'),
                       ),
@@ -378,8 +415,9 @@ void main() {
       expect(selectedPosition, isNull); // Should reset
     });
 
-    testWidgets('Complete selection returns correct data structure',
-        (tester) async {
+    testWidgets('Complete selection returns correct data structure', (
+      tester,
+    ) async {
       Map<String, dynamic>? result;
 
       await tester.pumpWidget(
@@ -394,31 +432,51 @@ void main() {
                       // Teleport test
                       ElevatedButton(
                         onPressed: () async {
-                          ref.read(cardSelectionProvider.notifier).startTeleportSelection();
-                          ref.read(cardSelectionProvider.notifier).selectCard(0, 0);
-                          ref.read(cardSelectionProvider.notifier).selectCard(1, 1);
-                          result = ref.read(cardSelectionProvider.notifier).completeSelection();
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .startTeleportSelection();
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .selectCard(0, 0);
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .selectCard(1, 1);
+                          result = ref
+                              .read(cardSelectionProvider.notifier)
+                              .completeSelection();
                         },
                         child: const Text('Test Teleport'),
                       ),
                       // Bomb test
                       ElevatedButton(
                         onPressed: () async {
-                          ref.read(cardSelectionProvider.notifier).startSingleSelection(
-                            CardSelectionType.bomb,
-                          );
-                          ref.read(cardSelectionProvider.notifier).selectCard(2, 3);
-                          result = ref.read(cardSelectionProvider.notifier).completeSelection();
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .startSingleSelection(CardSelectionType.bomb);
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .selectCard(2, 3);
+                          result = ref
+                              .read(cardSelectionProvider.notifier)
+                              .completeSelection();
                         },
                         child: const Text('Test Bomb'),
                       ),
                       // Peek test
                       ElevatedButton(
                         onPressed: () async {
-                          ref.read(cardSelectionProvider.notifier).startPeekSelection(maxCards: 2);
-                          ref.read(cardSelectionProvider.notifier).selectCard(0, 1);
-                          ref.read(cardSelectionProvider.notifier).selectCard(1, 0);
-                          result = ref.read(cardSelectionProvider.notifier).completeSelection();
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .startPeekSelection(maxCards: 2);
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .selectCard(0, 1);
+                          ref
+                              .read(cardSelectionProvider.notifier)
+                              .selectCard(1, 0);
+                          result = ref
+                              .read(cardSelectionProvider.notifier)
+                              .completeSelection();
                         },
                         child: const Text('Test Peek'),
                       ),

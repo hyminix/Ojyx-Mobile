@@ -74,8 +74,10 @@ class _EnhancedPlayerGridState extends ConsumerState<EnhancedPlayerGrid> {
         final card = widget.player.grid.getCard(row, col);
         final isSelectable = _isCardSelectable(position, selectionState);
         // final cardPosition = CardPosition(row: row, col: col);  // CardPosition doesn't have playerId
-        final isSelected = selectionState.selections.any((s) => s.row == row && s.col == col);
-        
+        final isSelected = selectionState.selections.any(
+          (s) => s.row == row && s.col == col,
+        );
+
         return VisualFeedbackWidget(
           key: _feedbackKeys[position],
           tooltip: widget.isCurrentPlayer && card?.isRevealed == true
@@ -128,11 +130,12 @@ class _EnhancedPlayerGridState extends ConsumerState<EnhancedPlayerGrid> {
 
   void _handleCardTap(int position) {
     final selectionState = ref.read(cardSelectionProvider);
-    
+
     // Show feedback animations
     if (widget.enableRippleEffect) {
-      final RenderBox? box = _feedbackKeys[position]?.currentContext
-          ?.findRenderObject() as RenderBox?;
+      final RenderBox? box =
+          _feedbackKeys[position]?.currentContext?.findRenderObject()
+              as RenderBox?;
       if (box != null) {
         final localPosition = box.size.center(Offset.zero);
         _feedbackKeys[position]?.currentState?.showRipple(localPosition);
@@ -149,15 +152,17 @@ class _EnhancedPlayerGridState extends ConsumerState<EnhancedPlayerGrid> {
     // Handle selection logic
     if (selectionState.isSelecting) {
       final isValid = _isCardSelectable(position, selectionState);
-      
+
       if (isValid) {
-        ref.read(cardSelectionProvider.notifier).selectCard(
-          position,
-          position, // Using position as playerId for now
-        );
+        ref
+            .read(cardSelectionProvider.notifier)
+            .selectCard(
+              position,
+              position, // Using position as playerId for now
+            );
 
         // Animate swap if needed
-        if (widget.animateSwap && 
+        if (widget.animateSwap &&
             selectionState.selections.isNotEmpty &&
             selectionState.selectionType == CardSelectionType.swap) {
           final firstPos = selectionState.selections.first;
@@ -168,7 +173,8 @@ class _EnhancedPlayerGridState extends ConsumerState<EnhancedPlayerGrid> {
     }
 
     // Pulse animation for highlighted cards
-    if (widget.enablePulseAnimation && _isCardSelectable(position, selectionState)) {
+    if (widget.enablePulseAnimation &&
+        _isCardSelectable(position, selectionState)) {
       _feedbackKeys[position]?.currentState?.showPulse(intensity: 1.2);
     }
 
@@ -177,10 +183,10 @@ class _EnhancedPlayerGridState extends ConsumerState<EnhancedPlayerGrid> {
   }
 
   void _animateSwap(int from, int to) {
-    final fromBox = _animationKeys[from]?.currentContext
-        ?.findRenderObject() as RenderBox?;
-    final toBox = _animationKeys[to]?.currentContext
-        ?.findRenderObject() as RenderBox?;
+    final fromBox =
+        _animationKeys[from]?.currentContext?.findRenderObject() as RenderBox?;
+    final toBox =
+        _animationKeys[to]?.currentContext?.findRenderObject() as RenderBox?;
 
     if (fromBox != null && toBox != null) {
       final fromPosition = fromBox.localToGlobal(Offset.zero);
@@ -201,7 +207,7 @@ class _EnhancedPlayerGridState extends ConsumerState<EnhancedPlayerGrid> {
   @override
   void didUpdateWidget(EnhancedPlayerGrid oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // Start pulse animations for highlighted cards
     if (widget.enablePulseAnimation && !oldWidget.enablePulseAnimation) {
       final selectionState = ref.read(cardSelectionProvider);
