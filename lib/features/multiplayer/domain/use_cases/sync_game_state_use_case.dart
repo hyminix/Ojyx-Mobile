@@ -1,5 +1,6 @@
 import '../../../game/domain/entities/game_state.dart';
 import '../../../game/domain/entities/player_grid.dart';
+import '../../../game/domain/entities/game_player.dart';
 import '../../../game/domain/repositories/game_state_repository.dart';
 
 class SyncGameStateUseCase {
