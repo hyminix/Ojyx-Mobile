@@ -76,7 +76,7 @@ class PlayerGridModel with _$PlayerGridModel {
         target: ActionTarget.values.firstWhere(
           (e) => e.name == cardData['target'],
         ),
-        parameters: cardData['parameters'] as Map<String, dynamic>? ?? {},
+        parameters: (cardData['parameters'] as Map<dynamic, dynamic>?)?.cast<String, dynamic>() ?? {},
       )).toList(),
       score: score,
       position: position,

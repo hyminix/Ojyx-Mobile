@@ -8,20 +8,36 @@ import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/use_cases/use_action_card_use_case.dart';
+import 'package:ojyx/features/game/domain/repositories/game_state_repository.dart';
+import 'package:ojyx/features/game/presentation/providers/repository_providers.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:ojyx/core/errors/failures.dart';
 
 class MockActionCardRepository extends Mock implements ActionCardRepository {}
+class MockGameStateRepository extends Mock implements GameStateRepository {}
+class MockUseActionCardUseCase extends Mock implements UseActionCardUseCase {}
+
+class FakeUseActionCardParams extends Fake implements UseActionCardParams {}
 
 void main() {
   late ProviderContainer container;
   late MockActionCardRepository mockRepository;
+  late MockGameStateRepository mockGameStateRepository;
+  late MockUseActionCardUseCase mockUseCase;
+
+  setUpAll(() {
+    registerFallbackValue(FakeUseActionCardParams());
+  });
 
   setUp(() {
     mockRepository = MockActionCardRepository();
+    mockGameStateRepository = MockGameStateRepository();
+    mockUseCase = MockUseActionCardUseCase();
     container = ProviderContainer(
       overrides: [
         actionCardRepositoryProvider.overrideWithValue(mockRepository),
+        gameStateRepositoryProvider.overrideWithValue(mockGameStateRepository),
+        useActionCardUseCaseProvider.overrideWithValue(mockUseCase),
       ],
     );
   });
@@ -46,186 +62,67 @@ void main() {
       final useCase = container.read(useActionCardUseCaseProvider);
 
       // Assert
-      expect(useCase, isA<UseActionCardUseCase>());
-    });
-  });
-
-  group('playerActionCardsProvider', () {
-    test('should return empty list when player has no cards', () {
-      // Arrange
-      const playerId = 'player1';
-      when(() => mockRepository.getPlayerActionCards(playerId)).thenReturn([]);
-
-      // Act
-      final cards = container.read(playerActionCardsProvider(playerId));
-
-      // Assert
-      expect(cards, isEmpty);
-      verify(() => mockRepository.getPlayerActionCards(playerId)).called(1);
-    });
-
-    test('should return player action cards', () {
-      // Arrange
-      const playerId = 'player1';
-      final actionCards = [
-        ActionCard(
-          id: 'card1',
-          type: ActionCardType.teleport,
-          name: 'Téléportation',
-          description: 'Échangez deux cartes',
-          timing: ActionTiming.optional,
-          target: ActionTarget.self,
-        ),
-        ActionCard(
-          id: 'card2',
-          type: ActionCardType.skip,
-          name: 'Saut',
-          description: 'Sautez le tour du prochain joueur',
-          timing: ActionTiming.optional,
-          target: ActionTarget.none,
-        ),
-      ];
-
-      when(
-        () => mockRepository.getPlayerActionCards(playerId),
-      ).thenReturn(actionCards);
-
-      // Act
-      final cards = container.read(playerActionCardsProvider(playerId));
-
-      // Assert
-      expect(cards, equals(actionCards));
-      expect(cards.length, equals(2));
-    });
-  });
-
-  group('canUseActionCardProvider', () {
-    test('should return false when no action card selected', () {
-      // Arrange
-      const playerId = 'player1';
-      final params = (playerId: playerId, actionCard: null as ActionCard?);
-
-      // Act
-      final canUse = container.read(canUseActionCardProvider(params));
-
-      // Assert
-      expect(canUse, isFalse);
-    });
-
-    test('should return false when player does not have the card', () {
-      // Arrange
-      const playerId = 'player1';
-      final actionCard = ActionCard(
-        id: 'card1',
-        type: ActionCardType.teleport,
-        name: 'Téléportation',
-        description: 'Échangez deux cartes',
-        timing: ActionTiming.optional,
-        target: ActionTarget.self,
-      );
-      final params = (playerId: playerId, actionCard: actionCard);
-
-      when(
-        () => mockRepository.getPlayerActionCards(playerId),
-      ).thenReturn([]); // GamePlayer has no cards
-
-      // Act
-      final canUse = container.read(canUseActionCardProvider(params));
-
-      // Assert
-      expect(canUse, isFalse);
-    });
-
-    test('should return true when player has the card', () {
-      // Arrange
-      const playerId = 'player1';
-      final actionCard = ActionCard(
-        id: 'card1',
-        type: ActionCardType.teleport,
-        name: 'Téléportation',
-        description: 'Échangez deux cartes',
-        timing: ActionTiming.optional,
-        target: ActionTarget.self,
-      );
-      final params = (playerId: playerId, actionCard: actionCard);
-
-      when(
-        () => mockRepository.getPlayerActionCards(playerId),
-      ).thenReturn([actionCard]); // GamePlayer has the card
-
-      // Act
-      final canUse = container.read(canUseActionCardProvider(params));
-
-      // Assert
-      expect(canUse, isTrue);
+      expect(useCase, equals(mockUseCase));
     });
   });
 
   group('actionCardNotifierProvider', () {
     test('should use action card successfully', () async {
       // Arrange
-      final actionCard = ActionCard(
-        id: 'card1',
-        type: ActionCardType.skip,
-        name: 'Saut',
-        description: 'Sautez le tour du prochain joueur',
-        timing: ActionTiming.optional,
-        target: ActionTarget.none,
-      );
+      const gameStateId = 'game123';
+      const playerId = 'player1';
+      const actionCardType = ActionCardType.skip;
+      final expectedResult = <String, dynamic>{'success': true};
 
-      final gameState = GameState(
-        roomId: 'test-room',
-        players: [
-          GamePlayer(
-            id: 'player1',
-            name: 'GamePlayer 1',
-            grid: PlayerGrid.empty(),
-            actionCards: [actionCard],
-          ),
-          GamePlayer(
-            id: 'player2',
-            name: 'GamePlayer 2',
-            grid: PlayerGrid.empty(),
-            actionCards: [],
-          ),
-        ],
-        currentPlayerIndex: 0,
-        deck: [],
-        discardPile: [],
-        actionDeck: [],
-        actionDiscard: [],
-        status: GameStatus.playing,
-        turnDirection: TurnDirection.clockwise,
-        lastRound: false,
-        createdAt: DateTime.now(),
+      when(() => mockUseCase(any())).thenAnswer(
+        (_) async => Right(expectedResult),
       );
-
-      final updatedGameState = gameState.copyWith(currentPlayerIndex: 0);
 
       final notifier = container.read(actionCardNotifierProvider.notifier);
 
-      // Mock the use case to return success
-      final useCase = container.read(useActionCardUseCaseProvider);
-      when(
-        () => mockRepository.getPlayerActionCards('player1'),
-      ).thenReturn([actionCard]);
-      when(
-        () => mockRepository.removeActionCardFromPlayer('player1', actionCard),
-      ).thenAnswer((_) {});
-      when(
-        () => mockRepository.discardActionCard(actionCard),
-      ).thenAnswer((_) {});
-
       // Act
       final result = await notifier.useActionCard(
-        playerId: 'player1',
-        actionCard: actionCard,
-        gameState: gameState,
+        gameStateId: gameStateId,
+        playerId: playerId,
+        actionCardType: actionCardType,
         targetData: null,
       );
 
       // Assert
       expect(result.isRight(), isTrue);
+      result.fold(
+        (failure) => fail('Should not return failure'),
+        (data) => expect(data, equals(expectedResult)),
+      );
+    });
+
+    test('should handle failure when using action card', () async {
+      // Arrange
+      const gameStateId = 'game123';
+      const playerId = 'player1';
+      const actionCardType = ActionCardType.skip;
+      final failure = Failure.server(message: 'Test error');
+
+      when(() => mockUseCase(any())).thenAnswer(
+        (_) async => Left(failure),
+      );
+
+      final notifier = container.read(actionCardNotifierProvider.notifier);
+
+      // Act
+      final result = await notifier.useActionCard(
+        gameStateId: gameStateId,
+        playerId: playerId,
+        actionCardType: actionCardType,
+        targetData: null,
+      );
+
+      // Assert
+      expect(result.isLeft(), isTrue);
+      result.fold(
+        (error) => expect(error, equals(failure)),
+        (data) => fail('Should not return success'),
+      );
     });
   });
 }

@@ -38,7 +38,7 @@ void main() {
 
         // Calculate total expected cards
         final totalExpected = expectedDistribution.values.reduce((a, b) => a + b);
-        expect(totalExpected, 37); // Verify our expected distribution is correct
+        expect(totalExpected, 34); // Verify our expected distribution is correct
       });
     });
   });

@@ -5,12 +5,10 @@ import 'package:ojyx/features/game/presentation/providers/direction_observer_pro
 import 'package:ojyx/features/game/presentation/providers/game_state_notifier.dart';
 import 'package:ojyx/features/game/presentation/providers/game_animation_provider.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/play_direction.dart';
+// play_direction import removed - TurnDirection is in game_state.dart
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
-import 'package:ojyx/features/game/domain/entities/grid_card.dart';
-import 'package:ojyx/features/game/domain/entities/deck.dart';
-import 'package:ojyx/features/game/domain/entities/game_card.dart';
+import 'package:ojyx/features/game/domain/entities/card.dart';
 
 class MockGameAnimationNotifier extends Mock implements GameAnimationNotifier {}
 
@@ -24,23 +22,23 @@ void main() {
     setUp(() {
       mockAnimationNotifier = MockGameAnimationNotifier();
 
-      final mockPlayerGrid = PlayerGrid(
-        cards: List.generate(12, (_) => const GridCard(value: 5)),
-      );
+      final mockPlayerGrid = PlayerGrid.empty();
 
       initialGameState = GameState(
-        id: 'game123',
         roomId: 'room123',
         players: [
-          GamePlayer(id: 'p1', name: 'Player 1', grid: mockPlayerGrid),
-          GamePlayer(id: 'p2', name: 'Player 2', grid: mockPlayerGrid),
+          GamePlayer(id: 'p1', name: 'Player 1', grid: mockPlayerGrid, actionCards: []),
+          GamePlayer(id: 'p2', name: 'Player 2', grid: mockPlayerGrid, actionCards: []),
         ],
         currentPlayerIndex: 0,
-        deck: const Deck(
-          drawPile: [GameCard(value: 5, color: CardColor.red)],
-          discardPile: [GameCard(value: 3, color: CardColor.blue)],
-        ),
+        deck: [Card(value: 5), Card(value: 3)],
+        discardPile: [Card(value: 2)],
+        actionDeck: [],
+        actionDiscard: [],
+        status: GameStatus.playing,
         turnDirection: TurnDirection.clockwise,
+        lastRound: false,
+        createdAt: DateTime.now(),
       );
 
       updatedGameState = initialGameState.copyWith(

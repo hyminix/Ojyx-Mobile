@@ -6,7 +6,7 @@ void main() {
   group('PlayerModel', () {
     test('should create from domain entity', () {
       // Given
-      final player = Player(
+      final player = LobbyPlayer(
         id: 'test-id',
         name: 'TestPlayer',
         avatarUrl: 'http://example.com/avatar.png',
