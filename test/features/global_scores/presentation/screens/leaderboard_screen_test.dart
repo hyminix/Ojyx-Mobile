@@ -63,52 +63,51 @@ void main() {
     }) {
       // Set up mock behavior
       if (error != null) {
-        when(() => mockRepository.getTopPlayers(limit: any(named: 'limit')))
-            .thenThrow(error);
+        when(
+          () => mockRepository.getTopPlayers(limit: any(named: 'limit')),
+        ).thenThrow(error);
       } else if (isLoading) {
         // For loading state, we'll override with a completer
       } else {
-        when(() => mockRepository.getTopPlayers(limit: any(named: 'limit')))
-            .thenAnswer((_) async => players ?? testPlayers);
+        when(
+          () => mockRepository.getTopPlayers(limit: any(named: 'limit')),
+        ).thenAnswer((_) async => players ?? testPlayers);
       }
 
       return ProviderScope(
         overrides: [
           globalScoreRepositoryProvider.overrideWithValue(mockRepository),
         ],
-        child: MaterialApp(
-          home: LeaderboardScreen(onPlayerTap: onPlayerTap),
-        ),
+        child: MaterialApp(home: LeaderboardScreen(onPlayerTap: onPlayerTap)),
       );
     }
 
-    testWidgets('should display loading indicator when loading', (tester) async {
+    testWidgets('should display loading indicator when loading', (
+      tester,
+    ) async {
       // Set up a never-completing future
       final completer = Completer<List<PlayerStats>>();
-      when(() => mockRepository.getTopPlayers(limit: any(named: 'limit')))
-          .thenAnswer((_) => completer.future);
+      when(
+        () => mockRepository.getTopPlayers(limit: any(named: 'limit')),
+      ).thenAnswer((_) => completer.future);
 
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
             globalScoreRepositoryProvider.overrideWithValue(mockRepository),
           ],
-          child: const MaterialApp(
-            home: LeaderboardScreen(),
-          ),
+          child: const MaterialApp(home: LeaderboardScreen()),
         ),
       );
-      
+
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
     testWidgets('should display leaderboard when loaded', (tester) async {
-      await tester.pumpWidget(
-        createWidgetUnderTest(players: testPlayers),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(players: testPlayers));
+
       await tester.pumpAndSettle();
 
       // Check app bar
@@ -125,10 +124,8 @@ void main() {
     });
 
     testWidgets('should display trophy icons for top 3', (tester) async {
-      await tester.pumpWidget(
-        createWidgetUnderTest(players: testPlayers),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(players: testPlayers));
+
       await tester.pumpAndSettle();
 
       // Check for trophy emojis
@@ -138,10 +135,8 @@ void main() {
     });
 
     testWidgets('should display player statistics', (tester) async {
-      await tester.pumpWidget(
-        createWidgetUnderTest(players: testPlayers),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(players: testPlayers));
+
       await tester.pumpAndSettle();
 
       // Check Alice's stats
@@ -155,10 +150,8 @@ void main() {
     });
 
     testWidgets('should display empty message when no players', (tester) async {
-      await tester.pumpWidget(
-        createWidgetUnderTest(players: []),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(players: []));
+
       await tester.pumpAndSettle();
 
       expect(find.text('Aucun joueur dans le classement'), findsOneWidget);
@@ -169,7 +162,7 @@ void main() {
       await tester.pumpWidget(
         createWidgetUnderTest(error: Exception('Failed to load')),
       );
-      
+
       await tester.pumpAndSettle();
 
       expect(find.text('Erreur lors du chargement'), findsOneWidget);
@@ -177,10 +170,8 @@ void main() {
     });
 
     testWidgets('should support pull to refresh', (tester) async {
-      await tester.pumpWidget(
-        createWidgetUnderTest(players: testPlayers),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(players: testPlayers));
+
       await tester.pumpAndSettle();
 
       expect(find.byType(RefreshIndicator), findsOneWidget);
@@ -205,7 +196,7 @@ void main() {
           },
         ),
       );
-      
+
       await tester.pumpAndSettle();
 
       await tester.tap(find.byType(Card).first);
@@ -252,10 +243,8 @@ void main() {
         ),
       ];
 
-      await tester.pumpWidget(
-        createWidgetUnderTest(players: unsortedPlayers),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(players: unsortedPlayers));
+
       await tester.pumpAndSettle();
 
       // Verify order: High Winner (80%) should be first

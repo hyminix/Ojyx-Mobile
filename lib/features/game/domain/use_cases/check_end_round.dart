@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:ojyx/core/errors/failures.dart';
 import 'package:ojyx/core/usecases/usecase.dart';
 import '../entities/game_state.dart';
-import '../entities/player.dart';
+import '../entities/game_player.dart';
 
 class CheckEndRoundParams {
   final GameState gameState;
@@ -31,7 +31,7 @@ class CheckEndRound implements UseCase<GameState, CheckEndRoundParams> {
       }
 
       // End of round - calculate final scores and apply penalty if needed
-      var updatedPlayers = List<Player>.from(gameState.players);
+      var updatedPlayers = List<GamePlayer>.from(gameState.players);
 
       // Find the lowest score
       final scores = updatedPlayers.map((p) => p.currentScore).toList();

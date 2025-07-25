@@ -4,21 +4,21 @@ import 'package:mocktail/mocktail.dart';
 import 'package:ojyx/features/game/presentation/widgets/deck_and_discard_widget.dart';
 import 'package:ojyx/features/game/presentation/widgets/card_widget.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 
-class MockPlayer extends Mock implements Player {}
+class MockPlayer extends Mock implements GamePlayer {}
 
 void main() {
   group('DeckAndDiscardWidget', () {
     late GameState mockGameState;
-    late Player mockPlayer;
+    late GamePlayer mockPlayer;
 
     setUp(() {
       mockPlayer = MockPlayer();
       when(() => mockPlayer.id).thenReturn('player-id');
-      when(() => mockPlayer.name).thenReturn('Test Player');
+      when(() => mockPlayer.name).thenReturn('Test GamePlayer');
       when(() => mockPlayer.grid).thenReturn(PlayerGrid.empty());
       when(() => mockPlayer.isHost).thenReturn(true);
 

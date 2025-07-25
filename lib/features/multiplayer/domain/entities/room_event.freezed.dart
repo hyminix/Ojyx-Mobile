@@ -44,9 +44,13 @@ mixin _$RoomEvent {
   TResult when<TResult extends Object?>({
     required TResult Function(String playerId, String playerName) playerJoined,
     required TResult Function(String playerId) playerLeft,
-    required TResult Function(String gameId, GameState initialState)
+    required TResult Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )
     gameStarted,
-    required TResult Function(GameState newState) gameStateUpdated,
+    required TResult Function(@GameStateConverter() GameState newState)
+    gameStateUpdated,
     required TResult Function(
       String playerId,
       PlayerActionType actionType,
@@ -58,8 +62,13 @@ mixin _$RoomEvent {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String playerId, String playerName)? playerJoined,
     TResult? Function(String playerId)? playerLeft,
-    TResult? Function(String gameId, GameState initialState)? gameStarted,
-    TResult? Function(GameState newState)? gameStateUpdated,
+    TResult? Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )?
+    gameStarted,
+    TResult? Function(@GameStateConverter() GameState newState)?
+    gameStateUpdated,
     TResult? Function(
       String playerId,
       PlayerActionType actionType,
@@ -71,8 +80,13 @@ mixin _$RoomEvent {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String playerId, String playerName)? playerJoined,
     TResult Function(String playerId)? playerLeft,
-    TResult Function(String gameId, GameState initialState)? gameStarted,
-    TResult Function(GameState newState)? gameStateUpdated,
+    TResult Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )?
+    gameStarted,
+    TResult Function(@GameStateConverter() GameState newState)?
+    gameStateUpdated,
     TResult Function(
       String playerId,
       PlayerActionType actionType,
@@ -223,9 +237,13 @@ class _$PlayerJoinedImpl implements PlayerJoined {
   TResult when<TResult extends Object?>({
     required TResult Function(String playerId, String playerName) playerJoined,
     required TResult Function(String playerId) playerLeft,
-    required TResult Function(String gameId, GameState initialState)
+    required TResult Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )
     gameStarted,
-    required TResult Function(GameState newState) gameStateUpdated,
+    required TResult Function(@GameStateConverter() GameState newState)
+    gameStateUpdated,
     required TResult Function(
       String playerId,
       PlayerActionType actionType,
@@ -241,8 +259,13 @@ class _$PlayerJoinedImpl implements PlayerJoined {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String playerId, String playerName)? playerJoined,
     TResult? Function(String playerId)? playerLeft,
-    TResult? Function(String gameId, GameState initialState)? gameStarted,
-    TResult? Function(GameState newState)? gameStateUpdated,
+    TResult? Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )?
+    gameStarted,
+    TResult? Function(@GameStateConverter() GameState newState)?
+    gameStateUpdated,
     TResult? Function(
       String playerId,
       PlayerActionType actionType,
@@ -258,8 +281,13 @@ class _$PlayerJoinedImpl implements PlayerJoined {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String playerId, String playerName)? playerJoined,
     TResult Function(String playerId)? playerLeft,
-    TResult Function(String gameId, GameState initialState)? gameStarted,
-    TResult Function(GameState newState)? gameStateUpdated,
+    TResult Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )?
+    gameStarted,
+    TResult Function(@GameStateConverter() GameState newState)?
+    gameStateUpdated,
     TResult Function(
       String playerId,
       PlayerActionType actionType,
@@ -420,9 +448,13 @@ class _$PlayerLeftImpl implements PlayerLeft {
   TResult when<TResult extends Object?>({
     required TResult Function(String playerId, String playerName) playerJoined,
     required TResult Function(String playerId) playerLeft,
-    required TResult Function(String gameId, GameState initialState)
+    required TResult Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )
     gameStarted,
-    required TResult Function(GameState newState) gameStateUpdated,
+    required TResult Function(@GameStateConverter() GameState newState)
+    gameStateUpdated,
     required TResult Function(
       String playerId,
       PlayerActionType actionType,
@@ -438,8 +470,13 @@ class _$PlayerLeftImpl implements PlayerLeft {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String playerId, String playerName)? playerJoined,
     TResult? Function(String playerId)? playerLeft,
-    TResult? Function(String gameId, GameState initialState)? gameStarted,
-    TResult? Function(GameState newState)? gameStateUpdated,
+    TResult? Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )?
+    gameStarted,
+    TResult? Function(@GameStateConverter() GameState newState)?
+    gameStateUpdated,
     TResult? Function(
       String playerId,
       PlayerActionType actionType,
@@ -455,8 +492,13 @@ class _$PlayerLeftImpl implements PlayerLeft {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String playerId, String playerName)? playerJoined,
     TResult Function(String playerId)? playerLeft,
-    TResult Function(String gameId, GameState initialState)? gameStarted,
-    TResult Function(GameState newState)? gameStateUpdated,
+    TResult Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )?
+    gameStarted,
+    TResult Function(@GameStateConverter() GameState newState)?
+    gameStateUpdated,
     TResult Function(
       String playerId,
       PlayerActionType actionType,
@@ -539,7 +581,7 @@ abstract class _$$GameStartedImplCopyWith<$Res> {
     $Res Function(_$GameStartedImpl) then,
   ) = __$$GameStartedImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({String gameId, GameState initialState});
+  $Res call({String gameId, @GameStateConverter() GameState initialState});
 
   $GameStateCopyWith<$Res> get initialState;
 }
@@ -588,7 +630,7 @@ class __$$GameStartedImplCopyWithImpl<$Res>
 class _$GameStartedImpl implements GameStarted {
   const _$GameStartedImpl({
     required this.gameId,
-    required this.initialState,
+    @GameStateConverter() required this.initialState,
     final String? $type,
   }) : $type = $type ?? 'gameStarted';
 
@@ -598,6 +640,7 @@ class _$GameStartedImpl implements GameStarted {
   @override
   final String gameId;
   @override
+  @GameStateConverter()
   final GameState initialState;
 
   @JsonKey(name: 'runtimeType')
@@ -635,9 +678,13 @@ class _$GameStartedImpl implements GameStarted {
   TResult when<TResult extends Object?>({
     required TResult Function(String playerId, String playerName) playerJoined,
     required TResult Function(String playerId) playerLeft,
-    required TResult Function(String gameId, GameState initialState)
+    required TResult Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )
     gameStarted,
-    required TResult Function(GameState newState) gameStateUpdated,
+    required TResult Function(@GameStateConverter() GameState newState)
+    gameStateUpdated,
     required TResult Function(
       String playerId,
       PlayerActionType actionType,
@@ -653,8 +700,13 @@ class _$GameStartedImpl implements GameStarted {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String playerId, String playerName)? playerJoined,
     TResult? Function(String playerId)? playerLeft,
-    TResult? Function(String gameId, GameState initialState)? gameStarted,
-    TResult? Function(GameState newState)? gameStateUpdated,
+    TResult? Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )?
+    gameStarted,
+    TResult? Function(@GameStateConverter() GameState newState)?
+    gameStateUpdated,
     TResult? Function(
       String playerId,
       PlayerActionType actionType,
@@ -670,8 +722,13 @@ class _$GameStartedImpl implements GameStarted {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String playerId, String playerName)? playerJoined,
     TResult Function(String playerId)? playerLeft,
-    TResult Function(String gameId, GameState initialState)? gameStarted,
-    TResult Function(GameState newState)? gameStateUpdated,
+    TResult Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )?
+    gameStarted,
+    TResult Function(@GameStateConverter() GameState newState)?
+    gameStateUpdated,
     TResult Function(
       String playerId,
       PlayerActionType actionType,
@@ -735,13 +792,14 @@ class _$GameStartedImpl implements GameStarted {
 abstract class GameStarted implements RoomEvent {
   const factory GameStarted({
     required final String gameId,
-    required final GameState initialState,
+    @GameStateConverter() required final GameState initialState,
   }) = _$GameStartedImpl;
 
   factory GameStarted.fromJson(Map<String, dynamic> json) =
       _$GameStartedImpl.fromJson;
 
   String get gameId;
+  @GameStateConverter()
   GameState get initialState;
 
   /// Create a copy of RoomEvent
@@ -758,7 +816,7 @@ abstract class _$$GameStateUpdatedImplCopyWith<$Res> {
     $Res Function(_$GameStateUpdatedImpl) then,
   ) = __$$GameStateUpdatedImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({GameState newState});
+  $Res call({@GameStateConverter() GameState newState});
 
   $GameStateCopyWith<$Res> get newState;
 }
@@ -801,13 +859,16 @@ class __$$GameStateUpdatedImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$GameStateUpdatedImpl implements GameStateUpdated {
-  const _$GameStateUpdatedImpl({required this.newState, final String? $type})
-    : $type = $type ?? 'gameStateUpdated';
+  const _$GameStateUpdatedImpl({
+    @GameStateConverter() required this.newState,
+    final String? $type,
+  }) : $type = $type ?? 'gameStateUpdated';
 
   factory _$GameStateUpdatedImpl.fromJson(Map<String, dynamic> json) =>
       _$$GameStateUpdatedImplFromJson(json);
 
   @override
+  @GameStateConverter()
   final GameState newState;
 
   @JsonKey(name: 'runtimeType')
@@ -847,9 +908,13 @@ class _$GameStateUpdatedImpl implements GameStateUpdated {
   TResult when<TResult extends Object?>({
     required TResult Function(String playerId, String playerName) playerJoined,
     required TResult Function(String playerId) playerLeft,
-    required TResult Function(String gameId, GameState initialState)
+    required TResult Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )
     gameStarted,
-    required TResult Function(GameState newState) gameStateUpdated,
+    required TResult Function(@GameStateConverter() GameState newState)
+    gameStateUpdated,
     required TResult Function(
       String playerId,
       PlayerActionType actionType,
@@ -865,8 +930,13 @@ class _$GameStateUpdatedImpl implements GameStateUpdated {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String playerId, String playerName)? playerJoined,
     TResult? Function(String playerId)? playerLeft,
-    TResult? Function(String gameId, GameState initialState)? gameStarted,
-    TResult? Function(GameState newState)? gameStateUpdated,
+    TResult? Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )?
+    gameStarted,
+    TResult? Function(@GameStateConverter() GameState newState)?
+    gameStateUpdated,
     TResult? Function(
       String playerId,
       PlayerActionType actionType,
@@ -882,8 +952,13 @@ class _$GameStateUpdatedImpl implements GameStateUpdated {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String playerId, String playerName)? playerJoined,
     TResult Function(String playerId)? playerLeft,
-    TResult Function(String gameId, GameState initialState)? gameStarted,
-    TResult Function(GameState newState)? gameStateUpdated,
+    TResult Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )?
+    gameStarted,
+    TResult Function(@GameStateConverter() GameState newState)?
+    gameStateUpdated,
     TResult Function(
       String playerId,
       PlayerActionType actionType,
@@ -945,12 +1020,14 @@ class _$GameStateUpdatedImpl implements GameStateUpdated {
 }
 
 abstract class GameStateUpdated implements RoomEvent {
-  const factory GameStateUpdated({required final GameState newState}) =
-      _$GameStateUpdatedImpl;
+  const factory GameStateUpdated({
+    @GameStateConverter() required final GameState newState,
+  }) = _$GameStateUpdatedImpl;
 
   factory GameStateUpdated.fromJson(Map<String, dynamic> json) =
       _$GameStateUpdatedImpl.fromJson;
 
+  @GameStateConverter()
   GameState get newState;
 
   /// Create a copy of RoomEvent
@@ -1084,9 +1161,13 @@ class _$PlayerActionImpl implements PlayerAction {
   TResult when<TResult extends Object?>({
     required TResult Function(String playerId, String playerName) playerJoined,
     required TResult Function(String playerId) playerLeft,
-    required TResult Function(String gameId, GameState initialState)
+    required TResult Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )
     gameStarted,
-    required TResult Function(GameState newState) gameStateUpdated,
+    required TResult Function(@GameStateConverter() GameState newState)
+    gameStateUpdated,
     required TResult Function(
       String playerId,
       PlayerActionType actionType,
@@ -1102,8 +1183,13 @@ class _$PlayerActionImpl implements PlayerAction {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String playerId, String playerName)? playerJoined,
     TResult? Function(String playerId)? playerLeft,
-    TResult? Function(String gameId, GameState initialState)? gameStarted,
-    TResult? Function(GameState newState)? gameStateUpdated,
+    TResult? Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )?
+    gameStarted,
+    TResult? Function(@GameStateConverter() GameState newState)?
+    gameStateUpdated,
     TResult? Function(
       String playerId,
       PlayerActionType actionType,
@@ -1119,8 +1205,13 @@ class _$PlayerActionImpl implements PlayerAction {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String playerId, String playerName)? playerJoined,
     TResult Function(String playerId)? playerLeft,
-    TResult Function(String gameId, GameState initialState)? gameStarted,
-    TResult Function(GameState newState)? gameStateUpdated,
+    TResult Function(
+      String gameId,
+      @GameStateConverter() GameState initialState,
+    )?
+    gameStarted,
+    TResult Function(@GameStateConverter() GameState newState)?
+    gameStateUpdated,
     TResult Function(
       String playerId,
       PlayerActionType actionType,

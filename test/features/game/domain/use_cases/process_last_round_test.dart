@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/domain/use_cases/process_last_round.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 
@@ -26,14 +26,19 @@ void main() {
           .placeCard(const Card(value: 7, isRevealed: false), 1, 0);
 
       final players = [
-        Player(id: 'player1', name: 'Player 1', grid: grid1, isHost: true),
-        Player(id: 'player2', name: 'Player 2', grid: grid2),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid1,
+          isHost: true,
+        ),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
           .copyWith(
             status: GameStatus.lastRound,
-            endRoundInitiator: 'player1', // Player 1 is initiator
+            endRoundInitiator: 'player1', // GamePlayer 1 is initiator
           );
 
       final result = await processLastRound(
@@ -43,13 +48,13 @@ void main() {
       expect(result.isRight(), true);
 
       result.fold((failure) => fail('Should not fail'), (newState) {
-        // Player 1 (initiator) cards should remain as they were
+        // GamePlayer 1 (initiator) cards should remain as they were
         final player1 = newState.players[0];
         expect(player1.grid.cards[0][0]?.isRevealed, true); // Was revealed
         expect(player1.grid.cards[0][1]?.isRevealed, false); // Stays hidden
         expect(player1.grid.cards[1][0]?.isRevealed, false); // Stays hidden
 
-        // Player 2 cards should all be revealed
+        // GamePlayer 2 cards should all be revealed
         final player2 = newState.players[1];
         expect(player2.grid.cards[0][0]?.isRevealed, true);
         expect(player2.grid.cards[0][1]?.isRevealed, true);
@@ -59,13 +64,17 @@ void main() {
 
     test('should not change status during last round processing', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(
@@ -90,8 +99,13 @@ void main() {
           .placeCard(const Card(value: 10, isRevealed: false), 0, 1);
 
       final players = [
-        Player(id: 'player1', name: 'Player 1', grid: grid, isHost: true),
-        Player(id: 'player2', name: 'Player 2', grid: grid),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
+        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -123,7 +137,12 @@ void main() {
       // Other positions are empty
 
       final players = [
-        Player(id: 'player1', name: 'Player 1', grid: grid, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -152,9 +171,9 @@ void main() {
     test('should handle multiple players correctly', () async {
       final players = List.generate(
         5,
-        (index) => Player(
+        (index) => GamePlayer(
           id: 'player$index',
-          name: 'Player $index',
+          name: 'GamePlayer $index',
           grid: PlayerGrid.empty().placeCard(
             Card(value: index, isRevealed: false),
             0,
@@ -167,7 +186,7 @@ void main() {
       final gameState = GameState.initial(roomId: 'room123', players: players)
           .copyWith(
             status: GameStatus.lastRound,
-            endRoundInitiator: 'player2', // Player 2 is initiator
+            endRoundInitiator: 'player2', // GamePlayer 2 is initiator
           );
 
       final result = await processLastRound(
@@ -198,7 +217,12 @@ void main() {
       );
 
       final players = [
-        Player(id: 'player1', name: 'Player 1', grid: grid, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)

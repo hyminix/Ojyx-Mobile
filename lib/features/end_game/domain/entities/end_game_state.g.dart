@@ -15,7 +15,7 @@ _$EndGameStateImpl _$$EndGameStateImplFromJson(Map<String, dynamic> json) =>
           players: $checkedConvert(
             'players',
             (v) => (v as List<dynamic>)
-                .map((e) => Player.fromJson(e as Map<String, dynamic>))
+                .map((e) => GamePlayer.fromJson(e as Map<String, dynamic>))
                 .toList(),
           ),
           roundInitiatorId: $checkedConvert(

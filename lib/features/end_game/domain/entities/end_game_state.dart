@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 
 part 'end_game_state.freezed.dart';
 part 'end_game_state.g.dart';
@@ -9,7 +9,7 @@ class EndGameState with _$EndGameState {
   const EndGameState._();
 
   const factory EndGameState({
-    required List<Player> players,
+    required List<GamePlayer> players,
     required String roundInitiatorId,
     required int roundNumber,
     @Default({}) Map<String, bool> playersVotes,
@@ -20,7 +20,7 @@ class EndGameState with _$EndGameState {
 
   /// Get players ranked by score (lowest to highest)
   /// Applies penalty to round initiator if they don't have the lowest score
-  List<Player> get rankedPlayers {
+  List<GamePlayer> get rankedPlayers {
     // Find the lowest score
     final lowestScore = players
         .map((p) => p.currentScore)
@@ -36,14 +36,14 @@ class EndGameState with _$EndGameState {
     }).toList();
 
     // Sort by score (ascending)
-    final sorted = List<Player>.from(playersWithPenalty)
+    final sorted = List<GamePlayer>.from(playersWithPenalty)
       ..sort((a, b) => a.currentScore.compareTo(b.currentScore));
 
     return sorted;
   }
 
   /// Get the winner (player with lowest score after penalties)
-  Player get winner => rankedPlayers.first;
+  GamePlayer get winner => rankedPlayers.first;
 
   /// Update a player's vote
   EndGameState updatePlayerVote(String playerId, bool vote) {

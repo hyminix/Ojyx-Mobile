@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
 import 'package:ojyx/features/multiplayer/domain/repositories/room_repository.dart';
 import 'package:ojyx/features/multiplayer/domain/use_cases/create_room_use_case.dart';
@@ -16,6 +17,10 @@ class MockGoRouter extends Mock implements GoRouter {
     // Do nothing - just for testing
   }
 }
+
+class MockSupabaseClient extends Mock implements SupabaseClient {}
+
+class MockGoTrueClient extends Mock implements GoTrueClient {}
 
 class MockRoomRepository extends Mock implements RoomRepository {}
 

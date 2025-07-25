@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/domain/use_cases/discard_card.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 
@@ -15,13 +15,17 @@ void main() {
   group('DiscardCard UseCase', () {
     test('should discard drawn card successfully', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -58,13 +62,17 @@ void main() {
       final gridWithCard = grid.placeCard(const Card(value: 10), 1, 2);
 
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: gridWithCard,
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -103,9 +111,9 @@ void main() {
 
     test('should fail if no drawn card', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
@@ -139,13 +147,17 @@ void main() {
 
     test('should fail if not player turn', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -179,9 +191,9 @@ void main() {
 
     test('should fail if grid position is empty', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
@@ -219,9 +231,9 @@ void main() {
 
     test('should fail if grid position is invalid', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
@@ -259,14 +271,22 @@ void main() {
 
     test('should wrap around to first player after last player turn', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
-        Player(id: 'player3', name: 'Player 3', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
+        GamePlayer(
+          id: 'player3',
+          name: 'GamePlayer 3',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -300,7 +320,12 @@ void main() {
           ); // Different card that will be replaced
 
       final players = [
-        Player(id: 'player1', name: 'Player 1', grid: grid, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)

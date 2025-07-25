@@ -2,9 +2,8 @@ import 'package:fpdart/fpdart.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../../../core/utils/constants.dart';
-import '../entities/action_card.dart';
 import '../entities/game_state.dart';
-import '../entities/player.dart';
+import '../entities/game_player.dart';
 import '../entities/card.dart' as game_card;
 import '../repositories/action_card_repository.dart';
 
@@ -61,7 +60,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
       if (playerIndex == -1) {
         return Left(
           Failure.gameLogic(
-            message: 'Player not found',
+            message: 'GamePlayer not found',
             code: 'PLAYER_NOT_FOUND',
           ),
         );
@@ -81,7 +80,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
       }
 
       // Draw an action card from the repository
-      final drawnCard = _repository.drawActionCard();
+      final drawnCard = await _repository.drawActionCard();
       if (drawnCard == null) {
         return Left(
           Failure.gameLogic(
@@ -92,11 +91,11 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
       }
 
       // Add the card to the player's hand
-      _repository.addActionCardToPlayer(params.playerId, drawnCard);
+      await _repository.addActionCardToPlayer(params.playerId, drawnCard);
 
       // Update the player in game state
       final updatedPlayer = player.addActionCard(drawnCard);
-      final updatedPlayers = List<Player>.from(params.gameState.players);
+      final updatedPlayers = List<GamePlayer>.from(params.gameState.players);
       updatedPlayers[playerIndex] = updatedPlayer;
 
       // Create updated game state

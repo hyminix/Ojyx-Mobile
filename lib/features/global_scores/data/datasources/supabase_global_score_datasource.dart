@@ -15,21 +15,20 @@ class SupabaseGlobalScoreDataSource implements GlobalScoreRemoteDataSource {
         .insert(score.toSupabaseJson())
         .select()
         .single();
-    
+
     return GlobalScoreModel.fromJson(response);
   }
 
   @override
-  Future<List<GlobalScoreModel>> saveBatchScores(List<GlobalScoreModel> scores) async {
+  Future<List<GlobalScoreModel>> saveBatchScores(
+    List<GlobalScoreModel> scores,
+  ) async {
     if (scores.isEmpty) return [];
 
     final data = scores.map((m) => m.toSupabaseJson()).toList();
-    
-    final response = await _supabase
-        .from(_tableName)
-        .insert(data)
-        .select();
-    
+
+    final response = await _supabase.from(_tableName).insert(data).select();
+
     return (response as List)
         .map((json) => GlobalScoreModel.fromJson(json))
         .toList();
@@ -42,7 +41,7 @@ class SupabaseGlobalScoreDataSource implements GlobalScoreRemoteDataSource {
         .select()
         .eq('player_id', playerId)
         .order('created_at', ascending: false);
-    
+
     return (response as List)
         .map((json) => GlobalScoreModel.fromJson(json))
         .toList();
@@ -55,7 +54,7 @@ class SupabaseGlobalScoreDataSource implements GlobalScoreRemoteDataSource {
         .select()
         .eq('room_id', roomId)
         .order('position', ascending: true);
-    
+
     return (response as List)
         .map((json) => GlobalScoreModel.fromJson(json))
         .toList();
@@ -63,22 +62,26 @@ class SupabaseGlobalScoreDataSource implements GlobalScoreRemoteDataSource {
 
   @override
   Future<List<Map<String, dynamic>>> getTopPlayersRaw({int limit = 10}) async {
-    final response = await _supabase.rpc('get_top_players', params: {
-      'limit_count': limit,
-    });
+    final response = await _supabase.rpc(
+      'get_top_players',
+      params: {'limit_count': limit},
+    );
 
     return response as List<Map<String, dynamic>>;
   }
 
   @override
-  Future<List<GlobalScoreModel>> getRecentGames(String playerId, {int limit = 10}) async {
+  Future<List<GlobalScoreModel>> getRecentGames(
+    String playerId, {
+    int limit = 10,
+  }) async {
     final response = await _supabase
         .from(_tableName)
         .select()
         .eq('player_id', playerId)
         .order('created_at', ascending: false)
         .limit(limit);
-    
+
     return (response as List)
         .map((json) => GlobalScoreModel.fromJson(json))
         .toList();
@@ -91,7 +94,7 @@ class SupabaseGlobalScoreDataSource implements GlobalScoreRemoteDataSource {
         .delete()
         .eq('id', scoreId)
         .select();
-    
+
     return (response as List).isNotEmpty;
   }
 
@@ -102,7 +105,7 @@ class SupabaseGlobalScoreDataSource implements GlobalScoreRemoteDataSource {
         .delete()
         .eq('player_id', playerId)
         .select();
-    
+
     return (response as List).length;
   }
 }

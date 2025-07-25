@@ -1,12 +1,11 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:ojyx/core/utils/constants.dart';
 import 'package:ojyx/core/utils/extensions.dart';
-import 'player.dart';
+import 'game_player.dart';
 import 'card.dart';
 import 'action_card.dart';
 
 part 'game_state.freezed.dart';
-part 'game_state.g.dart';
 
 enum GameStatus {
   waitingToStart,
@@ -23,7 +22,7 @@ enum TurnDirection { clockwise, counterClockwise }
 class GameState with _$GameState {
   const factory GameState({
     required String roomId,
-    required List<Player> players,
+    required List<GamePlayer> players,
     required int currentPlayerIndex,
     required List<Card> deck,
     required List<Card> discardPile,
@@ -44,7 +43,7 @@ class GameState with _$GameState {
 
   factory GameState.initial({
     required String roomId,
-    required List<Player> players,
+    required List<GamePlayer> players,
     int currentPlayerIndex = 0,
   }) {
     final deck = _createInitialDeck();
@@ -64,10 +63,7 @@ class GameState with _$GameState {
     );
   }
 
-  factory GameState.fromJson(Map<String, dynamic> json) =>
-      _$GameStateFromJson(json);
-
-  Player get currentPlayer => players[currentPlayerIndex];
+  GamePlayer get currentPlayer => players[currentPlayerIndex];
 
   bool get canStart =>
       players.length >= kMinPlayers && players.length <= kMaxPlayers;

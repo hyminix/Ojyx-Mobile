@@ -3,22 +3,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/presentation/widgets/opponents_view_widget.dart';
 import 'package:ojyx/features/game/presentation/widgets/opponent_grid_widget.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 
 void main() {
   group('OpponentsViewWidget', () {
     late GameState mockGameState;
-    late Player currentPlayer;
-    late Player opponent1;
-    late Player opponent2;
+    late GamePlayer currentPlayer;
+    late GamePlayer opponent1;
+    late GamePlayer opponent2;
 
     setUp(() {
-      // Create current player with real Player object
-      currentPlayer = Player(
+      // Create current player with real GamePlayer object
+      currentPlayer = GamePlayer(
         id: 'current-player-id',
-        name: 'Current Player',
+        name: 'Current GamePlayer',
         grid: PlayerGrid.empty(),
         actionCards: [],
         isHost: false,
@@ -30,7 +30,7 @@ void main() {
       grid1 = grid1.placeCard(game.Card(value: 5, isRevealed: false), 0, 0);
       grid1 = grid1.revealCard(0, 0);
 
-      opponent1 = Player(
+      opponent1 = GamePlayer(
         id: 'opponent-1-id',
         name: 'Opponent 1',
         grid: grid1,
@@ -44,7 +44,7 @@ void main() {
       grid2 = grid2.placeCard(game.Card(value: 8, isRevealed: false), 1, 1);
       grid2 = grid2.revealCard(1, 1);
 
-      opponent2 = Player(
+      opponent2 = GamePlayer(
         id: 'opponent-2-id',
         name: 'Opponent 2',
         grid: grid2,
@@ -306,13 +306,13 @@ void main() {
 
   group('OpponentsGridViewWidget', () {
     late GameState mockGameState;
-    late Player currentPlayer;
-    late List<Player> opponents;
+    late GamePlayer currentPlayer;
+    late List<GamePlayer> opponents;
 
     setUp(() {
-      currentPlayer = Player(
+      currentPlayer = GamePlayer(
         id: 'current-player-id',
-        name: 'Current Player',
+        name: 'Current GamePlayer',
         grid: PlayerGrid.empty(),
         actionCards: [],
         isHost: false,
@@ -321,7 +321,7 @@ void main() {
 
       // Create 4 opponents
       opponents = List.generate(4, (index) {
-        return Player(
+        return GamePlayer(
           id: 'opponent-$index-id',
           name: 'Opponent $index',
           grid: PlayerGrid.empty(),

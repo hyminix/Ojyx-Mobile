@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/player.dart';
+import '../../domain/entities/game_player.dart';
 import '../../domain/entities/card.dart' as game;
 import '../../domain/entities/card_position.dart';
 import '../providers/card_selection_provider.dart';
@@ -11,7 +11,7 @@ import 'visual_feedback_widget.dart';
 
 /// Enhanced player grid with animations and visual feedback
 class EnhancedPlayerGrid extends ConsumerStatefulWidget {
-  final Player player;
+  final GamePlayer player;
   final bool isCurrentPlayer;
   final Function(int position) onCardTap;
   final bool showSuccessFeedback;

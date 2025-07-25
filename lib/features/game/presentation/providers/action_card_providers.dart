@@ -3,13 +3,17 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../core/errors/failures.dart';
+import '../../../../core/providers/supabase_provider.dart';
 import '../../data/datasources/action_card_local_datasource.dart';
 import '../../data/datasources/action_card_local_datasource_impl.dart';
+import '../../data/datasources/supabase_action_card_datasource.dart';
 import '../../data/repositories/action_card_repository_impl.dart';
+import '../../data/repositories/supabase_action_card_repository.dart';
 import '../../domain/entities/action_card.dart';
 import '../../domain/entities/game_state.dart';
 import '../../domain/repositories/action_card_repository.dart';
 import '../../domain/use_cases/use_action_card_use_case.dart';
+import 'repository_providers.dart';
 
 part 'action_card_providers.g.dart';
 part 'action_card_providers.freezed.dart';
@@ -27,26 +31,47 @@ ActionCardRepository actionCardRepository(ActionCardRepositoryRef ref) {
   return ActionCardRepositoryImpl(localDataSource);
 }
 
+// New Supabase-based providers
+@riverpod
+ActionCardRepository supabaseActionCardRepository(
+  SupabaseActionCardRepositoryRef ref,
+  String gameStateId,
+) {
+  final supabaseClient = ref.watch(supabaseClientProvider);
+  final dataSource = SupabaseActionCardDataSource(supabaseClient, gameStateId);
+  return SupabaseActionCardRepository(dataSource);
+}
+
 @riverpod
 UseActionCardUseCase useActionCardUseCase(UseActionCardUseCaseRef ref) {
-  final repository = ref.watch(actionCardRepositoryProvider);
-  return UseActionCardUseCase(repository);
+  final gameStateRepository = ref.watch(gameStateRepositoryProvider);
+  return UseActionCardUseCase(gameStateRepository);
 }
 
 @riverpod
-List<ActionCard> playerActionCards(PlayerActionCardsRef ref, String playerId) {
-  final repository = ref.watch(actionCardRepositoryProvider);
-  return repository.getPlayerActionCards(playerId);
+Future<List<ActionCard>> playerActionCards(
+  PlayerActionCardsRef ref,
+  ({String playerId, String gameStateId}) params,
+) async {
+  final repository = ref.watch(
+    supabaseActionCardRepositoryProvider(params.gameStateId),
+  );
+  return await repository.getPlayerActionCards(params.playerId);
 }
 
 @riverpod
-bool canUseActionCard(
+Future<bool> canUseActionCard(
   CanUseActionCardRef ref,
-  ({String playerId, ActionCard? actionCard}) params,
-) {
+  ({String playerId, String gameStateId, ActionCard? actionCard}) params,
+) async {
   if (params.actionCard == null) return false;
 
-  final playerCards = ref.watch(playerActionCardsProvider(params.playerId));
+  final playerCards = await ref.watch(
+    playerActionCardsProvider((
+      playerId: params.playerId,
+      gameStateId: params.gameStateId,
+    )).future,
+  );
   return playerCards.contains(params.actionCard);
 }
 
@@ -57,10 +82,10 @@ class ActionCardNotifier extends _$ActionCardNotifier {
     return const AsyncData(null);
   }
 
-  Future<Either<Failure, GameState>> useActionCard({
+  Future<Either<Failure, Map<String, dynamic>>> useActionCard({
+    required String gameStateId,
     required String playerId,
-    required ActionCard actionCard,
-    required GameState gameState,
+    required ActionCardType actionCardType,
     Map<String, dynamic>? targetData,
   }) async {
     state = const AsyncLoading();
@@ -68,9 +93,9 @@ class ActionCardNotifier extends _$ActionCardNotifier {
     try {
       final useCase = ref.read(useActionCardUseCaseProvider);
       final params = UseActionCardParams(
+        gameStateId: gameStateId,
         playerId: playerId,
-        actionCard: actionCard,
-        gameState: gameState,
+        actionCardType: actionCardType,
         targetData: targetData,
       );
 

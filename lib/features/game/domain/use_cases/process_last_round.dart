@@ -3,7 +3,7 @@ import 'package:ojyx/core/errors/failures.dart';
 import 'package:ojyx/core/usecases/usecase.dart';
 import 'package:ojyx/core/utils/constants.dart';
 import '../entities/game_state.dart';
-import '../entities/player.dart';
+import '../entities/game_player.dart';
 
 class ProcessLastRoundParams {
   final GameState gameState;
@@ -22,7 +22,7 @@ class ProcessLastRound implements UseCase<GameState, ProcessLastRoundParams> {
         return Right(gameState);
       }
 
-      var updatedPlayers = List<Player>.from(gameState.players);
+      var updatedPlayers = List<GamePlayer>.from(gameState.players);
 
       // Reveal all cards for all players except the initiator
       for (int i = 0; i < updatedPlayers.length; i++) {

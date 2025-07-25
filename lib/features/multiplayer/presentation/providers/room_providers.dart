@@ -1,19 +1,20 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../data/datasources/supabase_room_datasource.dart';
-import '../../data/datasources/supabase_room_datasource_impl.dart';
-import '../../data/repositories/room_repository_impl.dart';
-import '../../domain/datasources/room_datasource.dart';
-import '../../domain/repositories/room_repository.dart';
-import '../../domain/use_cases/create_room_use_case.dart';
-import '../../domain/use_cases/join_room_use_case.dart';
-import '../../domain/use_cases/sync_game_state_use_case.dart';
-import '../../domain/entities/room.dart';
-import '../../domain/entities/room_event.dart';
-import '../../../game/domain/use_cases/game_initialization_use_case.dart';
-import '../../../game/presentation/providers/game_state_notifier.dart';
-import '../../../../core/providers/supabase_provider.dart';
+import 'package:ojyx/features/multiplayer/data/datasources/supabase_room_datasource.dart';
+import 'package:ojyx/features/multiplayer/data/datasources/supabase_room_datasource_impl.dart';
+import 'package:ojyx/features/multiplayer/data/repositories/room_repository_impl.dart';
+import 'package:ojyx/features/multiplayer/domain/datasources/room_datasource.dart';
+import 'package:ojyx/features/multiplayer/domain/repositories/room_repository.dart';
+import 'package:ojyx/features/multiplayer/domain/use_cases/create_room_use_case.dart';
+import 'package:ojyx/features/multiplayer/domain/use_cases/join_room_use_case.dart';
+import 'package:ojyx/features/multiplayer/domain/use_cases/sync_game_state_use_case.dart';
+import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
+import 'package:ojyx/features/multiplayer/domain/entities/room_event.dart';
+import 'package:ojyx/features/game/domain/use_cases/game_initialization_use_case.dart';
+import 'package:ojyx/features/game/presentation/providers/game_state_notifier.dart';
+import 'package:ojyx/features/game/presentation/providers/repository_providers.dart';
+import 'package:ojyx/core/providers/supabase_provider.dart';
 
 part 'room_providers.g.dart';
 
@@ -52,8 +53,8 @@ JoinRoomUseCase joinRoomUseCase(JoinRoomUseCaseRef ref) {
 
 @riverpod
 SyncGameStateUseCase syncGameStateUseCase(SyncGameStateUseCaseRef ref) {
-  final repository = ref.watch(roomRepositoryProvider);
-  return SyncGameStateUseCase(repository);
+  final gameStateRepository = ref.watch(gameStateRepositoryProvider);
+  return SyncGameStateUseCase(gameStateRepository);
 }
 
 @riverpod

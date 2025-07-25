@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/presentation/widgets/action_card_hand_widget.dart';
 import 'package:ojyx/features/game/presentation/widgets/action_card_widget.dart';
 
 void main() {
   group('ActionCardHandWidget', () {
-    late Player testPlayer;
+    late GamePlayer testPlayer;
     late List<ActionCard> testCards;
 
     setUp(() {
@@ -40,16 +40,16 @@ void main() {
         ),
       ];
 
-      testPlayer = Player(
+      testPlayer = GamePlayer(
         id: 'player1',
-        name: 'Test Player',
+        name: 'Test GamePlayer',
         grid: PlayerGrid.empty(),
         actionCards: testCards,
       );
     });
 
     Widget createTestWidget({
-      required Player player,
+      required GamePlayer player,
       bool isCurrentPlayer = true,
       void Function(ActionCard)? onCardTap,
       void Function(ActionCard)? onCardDiscard,
@@ -209,7 +209,7 @@ void main() {
     });
 
     testWidgets('should scroll horizontally when many cards', (tester) async {
-      // Arrange - Player with 3 cards (max allowed)
+      // Arrange - GamePlayer with 3 cards (max allowed)
       final manyCards = List.generate(
         3,
         (i) => ActionCard(

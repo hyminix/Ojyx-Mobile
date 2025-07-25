@@ -7,7 +7,7 @@ part of 'game_state_notifier.dart';
 // **************************************************************************
 
 String _$gameInitializationUseCaseHash() =>
-    r'fdb8b21942040076f7131ddef231ffd326ce4eb5';
+    r'8a15b1719c410fd31c5046637be4bede5ee1e7d3';
 
 /// See also [gameInitializationUseCase].
 @ProviderFor(gameInitializationUseCase)

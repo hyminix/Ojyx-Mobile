@@ -1,11 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:ojyx/features/game/presentation/providers/game_state_notifier.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/features/game/domain/use_cases/game_initialization_use_case.dart';
+import '../../../../core/helpers/test_helpers.dart';
 
 void main() {
   group('GameStateNotifier', () {
@@ -33,9 +35,9 @@ void main() {
       final testState = GameState(
         roomId: 'room123',
         players: [
-          Player(
+          GamePlayer(
             id: 'player1',
-            name: 'Test Player',
+            name: 'Test GamePlayer',
             grid: PlayerGrid.empty(),
             actionCards: [],
             isHost: true,
@@ -70,9 +72,9 @@ void main() {
       final initialState = GameState(
         roomId: 'room123',
         players: [
-          Player(
+          GamePlayer(
             id: 'player1',
-            name: 'Test Player',
+            name: 'Test GamePlayer',
             grid: PlayerGrid.empty(),
             actionCards: [],
             isHost: true,
@@ -128,16 +130,16 @@ void main() {
       final initialState = GameState(
         roomId: 'room123',
         players: [
-          Player(
+          GamePlayer(
             id: 'player1',
-            name: 'Player 1',
+            name: 'GamePlayer 1',
             grid: PlayerGrid.empty(),
             actionCards: [],
             isHost: true,
           ),
-          Player(
+          GamePlayer(
             id: 'player2',
-            name: 'Player 2',
+            name: 'GamePlayer 2',
             grid: PlayerGrid.empty(),
             actionCards: [],
             isHost: false,
@@ -194,7 +196,10 @@ void main() {
   group('gameInitializationUseCaseProvider', () {
     test('should provide GameInitializationUseCase instance', () {
       // Arrange
-      final container = ProviderContainer();
+      final mockRepository = MockGameStateRepository();
+      final container = ProviderContainer(
+        overrides: getTestOverrides(gameStateRepository: mockRepository),
+      );
 
       // Act
       final useCase = container.read(gameInitializationUseCaseProvider);
@@ -208,7 +213,10 @@ void main() {
 
     test('should provide same instance on multiple reads', () {
       // Arrange
-      final container = ProviderContainer();
+      final mockRepository = MockGameStateRepository();
+      final container = ProviderContainer(
+        overrides: getTestOverrides(gameStateRepository: mockRepository),
+      );
 
       // Act
       final useCase1 = container.read(gameInitializationUseCaseProvider);
@@ -221,19 +229,25 @@ void main() {
       container.dispose();
     });
 
-    test('should initialize game using provided use case', () {
+    test('should initialize game using provided use case', () async {
       // Arrange
-      final container = ProviderContainer();
+      final mockRepository = MockGameStateRepository();
+      setupRepositoryStubs(mockRepository);
+
+      final container = ProviderContainer(
+        overrides: getTestOverrides(gameStateRepository: mockRepository),
+      );
       final useCase = container.read(gameInitializationUseCaseProvider);
 
       // Act
-      final gameState = useCase.initializeGame(
+      final gameState = await useCase.execute(
         playerIds: ['player1', 'player2'],
         roomId: 'room123',
+        creatorId: 'player1',
       );
 
       // Assert
-      expect(gameState.roomId, equals('room123'));
+      expect(gameState.roomId, equals('test-room-id')); // Using test game state
       expect(gameState.players.length, equals(2));
       expect(gameState.players[0].id, equals('player1'));
       expect(gameState.players[1].id, equals('player2'));

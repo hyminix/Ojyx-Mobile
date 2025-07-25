@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/end_game/presentation/screens/end_game_screen.dart';
 import 'package:ojyx/features/end_game/presentation/providers/end_game_provider.dart';
 import 'package:ojyx/features/end_game/domain/entities/end_game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game_card;
 import 'package:mocktail/mocktail.dart';
@@ -14,7 +14,7 @@ class MockEndGameState extends Mock implements EndGameState {}
 void main() {
   group('EndGameScreen', () {
     late EndGameState mockEndGameState;
-    late List<Player> testPlayers;
+    late List<GamePlayer> testPlayers;
 
     PlayerGrid createGridWithScore(int totalScore) {
       final cards = <game_card.Card>[];
@@ -46,19 +46,19 @@ void main() {
 
     setUp(() {
       testPlayers = [
-        Player(
+        GamePlayer(
           id: 'player1',
           name: 'Alice',
           grid: createGridWithScore(25),
           hasFinishedRound: true,
         ),
-        Player(
+        GamePlayer(
           id: 'player2',
           name: 'Bob',
           grid: createGridWithScore(30),
           hasFinishedRound: true,
         ),
-        Player(
+        GamePlayer(
           id: 'player3',
           name: 'Charlie',
           grid: createGridWithScore(20),
@@ -193,7 +193,7 @@ void main() {
       // Scroll to make the button visible
       await tester.ensureVisible(find.text('Vote to Continue'));
       await tester.pumpAndSettle();
-      
+
       await tester.tap(find.text('Vote to Continue'));
       await tester.pumpAndSettle();
 
@@ -219,7 +219,7 @@ void main() {
       // Scroll to make the button visible
       await tester.ensureVisible(find.text('End Game'));
       await tester.pumpAndSettle();
-      
+
       await tester.tap(find.text('End Game'));
       await tester.pumpAndSettle();
 

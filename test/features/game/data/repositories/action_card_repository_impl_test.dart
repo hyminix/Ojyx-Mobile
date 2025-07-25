@@ -26,44 +26,46 @@ void main() {
       target: ActionTarget.self,
     );
 
-    test('should get available action cards from datasource', () {
+    test('should get available action cards from datasource', () async {
       // Arrange
       final cards = [testCard];
-      when(() => mockDataSource.getAvailableActionCards()).thenReturn(cards);
+      when(
+        () => mockDataSource.getAvailableActionCards(),
+      ).thenAnswer((_) async => cards);
 
       // Act
-      final result = repository.getAvailableActionCards();
+      final result = await repository.getAvailableActionCards();
 
       // Assert
       expect(result, equals(cards));
       verify(() => mockDataSource.getAvailableActionCards()).called(1);
     });
 
-    test('should get player action cards from datasource', () {
+    test('should get player action cards from datasource', () async {
       // Arrange
       final playerId = 'player1';
       final cards = [testCard];
       when(
         () => mockDataSource.getPlayerActionCards(playerId),
-      ).thenReturn(cards);
+      ).thenAnswer((_) async => cards);
 
       // Act
-      final result = repository.getPlayerActionCards(playerId);
+      final result = await repository.getPlayerActionCards(playerId);
 
       // Assert
       expect(result, equals(cards));
       verify(() => mockDataSource.getPlayerActionCards(playerId)).called(1);
     });
 
-    test('should add action card to player through datasource', () {
+    test('should add action card to player through datasource', () async {
       // Arrange
       final playerId = 'player1';
       when(
         () => mockDataSource.addActionCardToPlayer(playerId, testCard),
-      ).thenAnswer((_) {});
+      ).thenAnswer((_) async {});
 
       // Act
-      repository.addActionCardToPlayer(playerId, testCard);
+      await repository.addActionCardToPlayer(playerId, testCard);
 
       // Assert
       verify(
@@ -71,15 +73,15 @@ void main() {
       ).called(1);
     });
 
-    test('should remove action card from player through datasource', () {
+    test('should remove action card from player through datasource', () async {
       // Arrange
       final playerId = 'player1';
       when(
         () => mockDataSource.removeActionCardFromPlayer(playerId, testCard),
-      ).thenAnswer((_) {});
+      ).thenAnswer((_) async {});
 
       // Act
-      repository.removeActionCardFromPlayer(playerId, testCard);
+      await repository.removeActionCardFromPlayer(playerId, testCard);
 
       // Assert
       verify(
@@ -87,47 +89,51 @@ void main() {
       ).called(1);
     });
 
-    test('should draw action card from datasource', () {
+    test('should draw action card from datasource', () async {
       // Arrange
-      when(() => mockDataSource.drawActionCard()).thenReturn(testCard);
+      when(
+        () => mockDataSource.drawActionCard(),
+      ).thenAnswer((_) async => testCard);
 
       // Act
-      final result = repository.drawActionCard();
+      final result = await repository.drawActionCard();
 
       // Assert
       expect(result, equals(testCard));
       verify(() => mockDataSource.drawActionCard()).called(1);
     });
 
-    test('should return null when drawing from empty pile', () {
+    test('should return null when drawing from empty pile', () async {
       // Arrange
-      when(() => mockDataSource.drawActionCard()).thenReturn(null);
+      when(() => mockDataSource.drawActionCard()).thenAnswer((_) async => null);
 
       // Act
-      final result = repository.drawActionCard();
+      final result = await repository.drawActionCard();
 
       // Assert
       expect(result, isNull);
       verify(() => mockDataSource.drawActionCard()).called(1);
     });
 
-    test('should discard action card through datasource', () {
+    test('should discard action card through datasource', () async {
       // Arrange
-      when(() => mockDataSource.discardActionCard(testCard)).thenAnswer((_) {});
+      when(
+        () => mockDataSource.discardActionCard(testCard),
+      ).thenAnswer((_) async {});
 
       // Act
-      repository.discardActionCard(testCard);
+      await repository.discardActionCard(testCard);
 
       // Assert
       verify(() => mockDataSource.discardActionCard(testCard)).called(1);
     });
 
-    test('should shuffle action cards through datasource', () {
+    test('should shuffle action cards through datasource', () async {
       // Arrange
-      when(() => mockDataSource.shuffleActionCards()).thenAnswer((_) {});
+      when(() => mockDataSource.shuffleActionCards()).thenAnswer((_) async {});
 
       // Act
-      repository.shuffleActionCards();
+      await repository.shuffleActionCards();
 
       // Assert
       verify(() => mockDataSource.shuffleActionCards()).called(1);
@@ -140,7 +146,9 @@ void main() {
         final playerId = 'player1';
         when(
           () => mockDataSource.addActionCardToPlayer(playerId, testCard),
-        ).thenThrow(Exception('Player cannot have more than 3 action cards'));
+        ).thenThrow(
+          Exception('GamePlayer cannot have more than 3 action cards'),
+        );
 
         // Act & Assert
         expect(
@@ -157,7 +165,7 @@ void main() {
         final playerId = 'player1';
         when(
           () => mockDataSource.removeActionCardFromPlayer(playerId, testCard),
-        ).thenThrow(Exception('Player does not have this action card'));
+        ).thenThrow(Exception('GamePlayer does not have this action card'));
 
         // Act & Assert
         expect(

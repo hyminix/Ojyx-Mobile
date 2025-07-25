@@ -70,7 +70,7 @@ class PlayerStats with _$PlayerStats {
     final totalScore = scores.fold<int>(0, (sum, s) => sum + s.totalScore);
     final totalPositions = scores.fold<int>(0, (sum, s) => sum + s.position);
     final totalRounds = scores.fold<int>(0, (sum, s) => sum + s.roundNumber);
-    
+
     final scoreValues = scores.map((s) => s.totalScore).toList()..sort();
 
     return PlayerStats(

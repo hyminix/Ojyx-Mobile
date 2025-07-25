@@ -3,7 +3,7 @@ import 'package:ojyx/core/errors/failures.dart';
 import 'package:ojyx/core/usecases/usecase.dart';
 import 'package:ojyx/core/utils/constants.dart';
 import '../entities/game_state.dart';
-import '../entities/player.dart';
+import '../entities/game_player.dart';
 import '../entities/player_grid.dart';
 import '../entities/card.dart';
 
@@ -23,7 +23,7 @@ class DistributeCards implements UseCase<GameState, DistributeCardsParams> {
     try {
       final gameState = params.gameState;
       final deck = List<Card>.from(gameState.deck);
-      final updatedPlayers = <Player>[];
+      final updatedPlayers = <GamePlayer>[];
 
       // Verify we have enough cards
       final requiredCards =

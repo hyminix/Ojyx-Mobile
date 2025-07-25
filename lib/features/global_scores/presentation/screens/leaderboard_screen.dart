@@ -6,19 +6,14 @@ import 'package:ojyx/features/global_scores/presentation/providers/global_score_
 class LeaderboardScreen extends ConsumerWidget {
   final void Function(PlayerStats)? onPlayerTap;
 
-  const LeaderboardScreen({
-    super.key,
-    this.onPlayerTap,
-  });
+  const LeaderboardScreen({super.key, this.onPlayerTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playersAsync = ref.watch(topPlayersProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Classement'),
-      ),
+      appBar: AppBar(title: const Text('Classement')),
       body: RefreshIndicator(
         onRefresh: () async {
           // Force refresh by invalidating the provider
@@ -52,9 +47,7 @@ class LeaderboardScreen extends ConsumerWidget {
               },
             );
           },
-          loading: () => const Center(
-            child: CircularProgressIndicator(),
-          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stack) => Center(
             child: Text(
               'Erreur lors du chargement',
@@ -75,16 +68,12 @@ class _PlayerRankCard extends StatelessWidget {
   final int rank;
   final void Function(PlayerStats)? onTap;
 
-  const _PlayerRankCard({
-    required this.player,
-    required this.rank,
-    this.onTap,
-  });
+  const _PlayerRankCard({required this.player, required this.rank, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final trophy = _getTrophyEmoji(rank);
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: rank <= 3 ? 4 : 2,
@@ -105,10 +94,7 @@ class _PlayerRankCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: trophy != null
-                      ? Text(
-                          trophy,
-                          style: const TextStyle(fontSize: 24),
-                        )
+                      ? Text(trophy, style: const TextStyle(fontSize: 24))
                       : Text(
                           '$rank',
                           style: const TextStyle(
@@ -120,7 +106,7 @@ class _PlayerRankCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              // Player info
+              // GamePlayer info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +124,9 @@ class _PlayerRankCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -170,7 +158,8 @@ class _PlayerRankCard extends StatelessWidget {
                       children: [
                         _StatChip(
                           icon: Icons.score,
-                          label: 'Score moyen: ${player.averageScore.toStringAsFixed(1)}',
+                          label:
+                              'Score moyen: ${player.averageScore.toStringAsFixed(1)}',
                         ),
                         const SizedBox(width: 12),
                         _StatChip(
@@ -220,26 +209,16 @@ class _StatChip extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _StatChip({
-    required this.icon,
-    required this.label,
-  });
+  const _StatChip({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: Theme.of(context).colorScheme.secondary,
-        ),
+        Icon(icon, size: 16, color: Theme.of(context).colorScheme.secondary),
         const SizedBox(width: 4),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+        Text(label, style: Theme.of(context).textTheme.bodySmall),
       ],
     );
   }

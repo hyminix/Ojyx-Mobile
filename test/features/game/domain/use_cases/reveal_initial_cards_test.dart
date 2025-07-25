@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/domain/use_cases/reveal_initial_cards.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/core/utils/constants.dart';
@@ -22,14 +22,14 @@ void main() {
       );
 
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.fromCards(cards),
         ),
-        Player(
+        GamePlayer(
           id: 'player2',
-          name: 'Player 2',
+          name: 'GamePlayer 2',
           grid: PlayerGrid.fromCards(cards),
         ),
       ];
@@ -75,9 +75,9 @@ void main() {
       );
 
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.fromCards(cards),
         ),
       ];
@@ -102,9 +102,9 @@ void main() {
       );
 
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.fromCards(cards),
         ),
       ];
@@ -129,9 +129,9 @@ void main() {
       );
 
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.fromCards(cards),
         ),
       ];
@@ -159,9 +159,9 @@ void main() {
       );
 
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.fromCards(cards),
         ),
       ];
@@ -187,9 +187,9 @@ void main() {
 
       final players = List.generate(
         3,
-        (i) => Player(
+        (i) => GamePlayer(
           id: 'player$i',
-          name: 'Player $i',
+          name: 'GamePlayer $i',
           grid: PlayerGrid.fromCards(List.from(cards)),
         ),
       );

@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/end_game/domain/entities/end_game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 
 void main() {
   group('EndGameState', () {
-    late List<Player> testPlayers;
+    late List<GamePlayer> testPlayers;
 
     PlayerGrid createGridWithScore(int totalScore) {
       // Create a grid with specific cards to achieve desired score
@@ -41,19 +41,19 @@ void main() {
 
     setUp(() {
       testPlayers = [
-        Player(
+        GamePlayer(
           id: 'player1',
           name: 'Alice',
           grid: createGridWithScore(25),
           hasFinishedRound: true,
         ),
-        Player(
+        GamePlayer(
           id: 'player2',
           name: 'Bob',
           grid: createGridWithScore(30),
           hasFinishedRound: true,
         ),
-        Player(
+        GamePlayer(
           id: 'player3',
           name: 'Charlie',
           grid: createGridWithScore(20),
@@ -136,19 +136,19 @@ void main() {
 
     test('should not apply penalty when initiator ties for lowest score', () {
       final playersWithTie = [
-        Player(
+        GamePlayer(
           id: 'player1',
           name: 'Alice',
           grid: createGridWithScore(20),
           hasFinishedRound: true,
         ),
-        Player(
+        GamePlayer(
           id: 'player2',
           name: 'Bob',
           grid: createGridWithScore(30),
           hasFinishedRound: true,
         ),
-        Player(
+        GamePlayer(
           id: 'player3',
           name: 'Charlie',
           grid: createGridWithScore(20),

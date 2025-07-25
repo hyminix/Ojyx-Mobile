@@ -29,52 +29,58 @@ void main() {
       target: ActionTarget.none,
     );
 
-    test('should initialize with default action cards', () {
+    test('should initialize with default action cards', () async {
       // Act
-      final cards = dataSource.getAvailableActionCards();
+      final cards = await dataSource.getAvailableActionCards();
 
       // Assert
       expect(cards, isNotEmpty);
       expect(cards.every((card) => card is ActionCard), isTrue);
     });
 
-    test('should get empty player action cards initially', () {
+    test('should get empty player action cards initially', () async {
       // Act
-      final cards = dataSource.getPlayerActionCards('player1');
+      final cards = await dataSource.getPlayerActionCards('player1');
 
       // Assert
       expect(cards, isEmpty);
     });
 
-    test('should add action card to player', () {
+    test('should add action card to player', () async {
       // Act
-      dataSource.addActionCardToPlayer('player1', testCard1);
-      final cards = dataSource.getPlayerActionCards('player1');
+      await dataSource.addActionCardToPlayer('player1', testCard1);
+      final cards = await dataSource.getPlayerActionCards('player1');
 
       // Assert
       expect(cards.length, equals(1));
       expect(cards.first, equals(testCard1));
     });
 
-    test('should add multiple action cards to different players', () {
+    test('should add multiple action cards to different players', () async {
       // Act
-      dataSource.addActionCardToPlayer('player1', testCard1);
-      dataSource.addActionCardToPlayer('player2', testCard2);
+      await dataSource.addActionCardToPlayer('player1', testCard1);
+      await dataSource.addActionCardToPlayer('player2', testCard2);
 
       // Assert
-      expect(dataSource.getPlayerActionCards('player1'), contains(testCard1));
       expect(
-        dataSource.getPlayerActionCards('player1'),
+        await dataSource.getPlayerActionCards('player1'),
+        contains(testCard1),
+      );
+      expect(
+        await dataSource.getPlayerActionCards('player1'),
         isNot(contains(testCard2)),
       );
-      expect(dataSource.getPlayerActionCards('player2'), contains(testCard2));
       expect(
-        dataSource.getPlayerActionCards('player2'),
+        await dataSource.getPlayerActionCards('player2'),
+        contains(testCard2),
+      );
+      expect(
+        await dataSource.getPlayerActionCards('player2'),
         isNot(contains(testCard1)),
       );
     });
 
-    test('should throw when adding more than 3 cards to a player', () {
+    test('should throw when adding more than 3 cards to a player', () async {
       // Arrange
       final cards = List.generate(
         kMaxActionCardsInHand,
@@ -88,7 +94,7 @@ void main() {
       );
 
       for (final card in cards) {
-        dataSource.addActionCardToPlayer('player1', card);
+        await dataSource.addActionCardToPlayer('player1', card);
       }
 
       final extraCard = ActionCard(
@@ -106,16 +112,16 @@ void main() {
       );
     });
 
-    test('should remove action card from player', () {
+    test('should remove action card from player', () async {
       // Arrange
-      dataSource.addActionCardToPlayer('player1', testCard1);
-      dataSource.addActionCardToPlayer('player1', testCard2);
+      await dataSource.addActionCardToPlayer('player1', testCard1);
+      await dataSource.addActionCardToPlayer('player1', testCard2);
 
       // Act
-      dataSource.removeActionCardFromPlayer('player1', testCard1);
+      await dataSource.removeActionCardFromPlayer('player1', testCard1);
 
       // Assert
-      final cards = dataSource.getPlayerActionCards('player1');
+      final cards = await dataSource.getPlayerActionCards('player1');
       expect(cards.length, equals(1));
       expect(cards, contains(testCard2));
       expect(cards, isNot(contains(testCard1)));
@@ -129,81 +135,85 @@ void main() {
       );
     });
 
-    test('should draw action card from pile', () {
+    test('should draw action card from pile', () async {
       // Arrange
-      dataSource.initializeDeck(); // Ensure deck is populated
+      await dataSource.initializeDeck(); // Ensure deck is populated
 
       // Act
-      final drawnCard = dataSource.drawActionCard();
+      final drawnCard = await dataSource.drawActionCard();
 
       // Assert
       expect(drawnCard, isNotNull);
       expect(drawnCard, isA<ActionCard>());
     });
 
-    test('should return null when drawing from empty pile', () {
+    test('should return null when drawing from empty pile', () async {
       // Arrange - draw all cards
-      dataSource.initializeDeck();
+      await dataSource.initializeDeck();
       ActionCard? card;
       do {
-        card = dataSource.drawActionCard();
+        card = await dataSource.drawActionCard();
       } while (card != null);
 
       // Act
-      final result = dataSource.drawActionCard();
+      final result = await dataSource.drawActionCard();
 
       // Assert
       expect(result, isNull);
     });
 
-    test('should discard action card', () {
+    test('should discard action card', () async {
       // Arrange
-      dataSource.initializeDeck();
+      await dataSource.initializeDeck();
       // Draw all cards first
       ActionCard? card;
       final drawnCards = <ActionCard>[];
       do {
-        card = dataSource.drawActionCard();
+        card = await dataSource.drawActionCard();
         if (card != null) drawnCards.add(card);
       } while (card != null);
 
       // Act - discard some cards
-      dataSource.discardActionCard(drawnCards[0]);
-      dataSource.discardActionCard(drawnCards[1]);
+      await dataSource.discardActionCard(drawnCards[0]);
+      await dataSource.discardActionCard(drawnCards[1]);
 
       // Assert - should be able to draw again
-      final newDraw = dataSource.drawActionCard();
+      final newDraw = await dataSource.drawActionCard();
       expect(newDraw, isNotNull);
       expect([drawnCards[0], drawnCards[1]], contains(newDraw));
     });
 
-    test('should shuffle action cards', () {
+    test('should shuffle action cards', () async {
       // Arrange
-      dataSource.initializeDeck();
-      final originalOrder = dataSource.getAvailableActionCards().toList();
+      await dataSource.initializeDeck();
+      final originalOrder = (await dataSource.getAvailableActionCards())
+          .toList();
 
       // Act
-      dataSource.shuffleActionCards();
+      await dataSource.shuffleActionCards();
 
       // Assert
-      final newOrder = dataSource.getAvailableActionCards();
+      final newOrder = await dataSource.getAvailableActionCards();
       expect(newOrder.length, equals(originalOrder.length));
       expect(newOrder.toSet(), equals(originalOrder.toSet()));
       // We can't guarantee order will be different, but all cards should be present
     });
 
-    test('should maintain player cards after operations', () {
+    test('should maintain player cards after operations', () async {
       // Arrange
-      dataSource.addActionCardToPlayer('player1', testCard1);
+      await dataSource.addActionCardToPlayer('player1', testCard1);
 
       // Act - various operations
-      dataSource.initializeDeck();
-      dataSource.shuffleActionCards();
-      dataSource.drawActionCard();
-      dataSource.discardActionCard(testCard2);
+      await dataSource.initializeDeck();
+      await dataSource.shuffleActionCards();
+      await dataSource.drawActionCard();
+      await dataSource.discardActionCard(testCard2);
 
       // Assert - player cards unchanged
-      expect(dataSource.getPlayerActionCards('player1'), contains(testCard1));
+      expect(
+        await dataSource.getPlayerActionCards('player1'),
+        contains(testCard1),
+      );
     });
   });
 }

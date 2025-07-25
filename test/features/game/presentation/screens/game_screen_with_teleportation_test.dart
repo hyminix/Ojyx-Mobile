@@ -7,7 +7,7 @@ import 'package:ojyx/features/game/presentation/widgets/player_grid_widget.dart'
 import 'package:ojyx/features/game/presentation/widgets/player_grid_with_selection.dart';
 import 'package:ojyx/features/game/presentation/providers/card_selection_provider.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
@@ -20,7 +20,7 @@ class MockRoom extends Mock implements Room {}
 
 class MockGameState extends Mock implements GameState {}
 
-class MockPlayer extends Mock implements Player {}
+class MockPlayer extends Mock implements GamePlayer {}
 
 class FakeGameStateNotifier extends GameStateNotifier {
   final GameState? _gameState;
@@ -35,8 +35,8 @@ void main() {
   group('GameScreen - Basic Teleportation Setup', () {
     late MockRoom mockRoom;
     late GameState mockGameState;
-    late Player mockCurrentPlayer;
-    late Player mockOpponent;
+    late GamePlayer mockCurrentPlayer;
+    late GamePlayer mockOpponent;
     late List<game.Card> testCards;
     late PlayerGrid testGrid;
 
@@ -51,7 +51,7 @@ void main() {
 
       // Setup players
       when(() => mockCurrentPlayer.id).thenReturn('current-user-id');
-      when(() => mockCurrentPlayer.name).thenReturn('Current Player');
+      when(() => mockCurrentPlayer.name).thenReturn('Current GamePlayer');
       when(() => mockCurrentPlayer.grid).thenReturn(testGrid);
       when(() => mockCurrentPlayer.isHost).thenReturn(true);
       when(() => mockCurrentPlayer.actionCards).thenReturn([]);

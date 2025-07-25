@@ -3,16 +3,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ojyx/features/game/presentation/widgets/turn_info_widget.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game_card;
 
-class MockPlayer extends Mock implements Player {}
+class MockPlayer extends Mock implements GamePlayer {}
 
 void main() {
   group('TurnInfoWidget', () {
-    late Player mockCurrentPlayer;
-    late Player mockOpponent;
+    late GamePlayer mockCurrentPlayer;
+    late GamePlayer mockOpponent;
     late GameState mockGameState;
 
     setUp(() {
@@ -20,12 +20,12 @@ void main() {
       mockOpponent = MockPlayer();
 
       when(() => mockCurrentPlayer.id).thenReturn('current-user-id');
-      when(() => mockCurrentPlayer.name).thenReturn('Current Player');
+      when(() => mockCurrentPlayer.name).thenReturn('Current GamePlayer');
       when(() => mockCurrentPlayer.grid).thenReturn(PlayerGrid.empty());
       when(() => mockCurrentPlayer.isHost).thenReturn(true);
 
       when(() => mockOpponent.id).thenReturn('opponent-id');
-      when(() => mockOpponent.name).thenReturn('Opponent Player');
+      when(() => mockOpponent.name).thenReturn('Opponent GamePlayer');
       when(() => mockOpponent.grid).thenReturn(PlayerGrid.empty());
       when(() => mockOpponent.isHost).thenReturn(false);
 
@@ -80,7 +80,7 @@ void main() {
       );
 
       // Assert
-      expect(find.text('Tour de Opponent Player'), findsOneWidget);
+      expect(find.text('Tour de Opponent GamePlayer'), findsOneWidget);
       expect(
         find.byIcon(Icons.rotate_right),
         findsOneWidget,

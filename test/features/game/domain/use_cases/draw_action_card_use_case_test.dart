@@ -5,7 +5,7 @@ import 'package:ojyx/core/errors/failures.dart';
 import 'package:ojyx/core/utils/constants.dart';
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game_card;
 import 'package:ojyx/features/game/domain/repositories/action_card_repository.dart';
@@ -36,9 +36,9 @@ void main() {
       List.generate(12, (i) => game_card.Card(value: 0, isRevealed: false)),
     );
 
-    final testPlayer = Player(
+    final testPlayer = GamePlayer(
       id: 'player1',
-      name: 'Test Player',
+      name: 'Test GamePlayer',
       grid: testGrid,
       actionCards: [],
     );
@@ -63,7 +63,9 @@ void main() {
       'should draw an action card when player has less than 3 cards',
       () async {
         // Arrange
-        when(() => mockRepository.drawActionCard()).thenReturn(testActionCard);
+        when(
+          () => mockRepository.drawActionCard(),
+        ).thenAnswer((_) async => testActionCard);
         when(
           () => mockRepository.addActionCardToPlayer('player1', testActionCard),
         ).thenAnswer((_) async {});
@@ -133,9 +135,9 @@ void main() {
 
     test('should fail when it is not the player\'s turn', () async {
       // Arrange
-      final otherPlayer = Player(
+      final otherPlayer = GamePlayer(
         id: 'player2',
-        name: 'Other Player',
+        name: 'Other GamePlayer',
         grid: testGrid,
         actionCards: [],
       );
@@ -192,7 +194,7 @@ void main() {
 
     test('should fail when action card deck is empty', () async {
       // Arrange
-      when(() => mockRepository.drawActionCard()).thenReturn(null);
+      when(() => mockRepository.drawActionCard()).thenAnswer((_) async => null);
 
       final params = DrawActionCardParams(
         playerId: 'player1',
@@ -247,7 +249,9 @@ void main() {
         target: ActionTarget.none,
       );
 
-      when(() => mockRepository.drawActionCard()).thenReturn(immediateCard);
+      when(
+        () => mockRepository.drawActionCard(),
+      ).thenAnswer((_) async => immediateCard);
       when(
         () => mockRepository.addActionCardToPlayer('player1', immediateCard),
       ).thenAnswer((_) async {});
@@ -284,7 +288,9 @@ void main() {
         target: ActionTarget.none,
       );
 
-      when(() => mockRepository.drawActionCard()).thenReturn(optionalCard);
+      when(
+        () => mockRepository.drawActionCard(),
+      ).thenAnswer((_) async => optionalCard);
       when(
         () => mockRepository.addActionCardToPlayer('player1', optionalCard),
       ).thenAnswer((_) async {});

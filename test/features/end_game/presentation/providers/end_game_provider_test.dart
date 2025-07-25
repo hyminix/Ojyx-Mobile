@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/end_game/presentation/providers/end_game_provider.dart';
 import 'package:ojyx/features/end_game/domain/entities/end_game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
@@ -17,9 +17,9 @@ class MockRoom extends Mock implements Room {}
 
 class StubGameStateNotifier extends GameStateNotifier {
   final GameState? stubState;
-  
+
   StubGameStateNotifier(this.stubState);
-  
+
   @override
   GameState? build() => stubState;
 }
@@ -29,7 +29,7 @@ void main() {
     late ProviderContainer container;
     late GameState mockGameState;
     late Room mockRoom;
-    late List<Player> testPlayers;
+    late List<GamePlayer> testPlayers;
 
     PlayerGrid createGridWithScore(int totalScore) {
       final cards = <Card>[];
@@ -61,19 +61,19 @@ void main() {
 
     setUp(() {
       testPlayers = [
-        Player(
+        GamePlayer(
           id: 'player1',
           name: 'Alice',
           grid: createGridWithScore(25),
           hasFinishedRound: true,
         ),
-        Player(
+        GamePlayer(
           id: 'player2',
           name: 'Bob',
           grid: createGridWithScore(30),
           hasFinishedRound: true,
         ),
-        Player(
+        GamePlayer(
           id: 'player3',
           name: 'Charlie',
           grid: createGridWithScore(20),
@@ -159,7 +159,7 @@ void main() {
         () => container.read(voteToContineProvider('player1')),
         returnsNormally,
       );
-      
+
       // Note: The actual vote update would be handled by the multiplayer system
       // This test just verifies the provider can be called without errors
     });
@@ -188,7 +188,7 @@ void main() {
       // Initial state with finished status
       final listener = container.listen(endGameProvider, (previous, next) {});
       expect(listener.read().value, isNotNull);
-      
+
       // Create a new container with playing status
       final mockGameStatePlaying = MockGameState();
       when(() => mockGameStatePlaying.players).thenReturn(testPlayers);
@@ -196,7 +196,7 @@ void main() {
       when(() => mockGameStatePlaying.initiatorPlayerId).thenReturn(null);
       when(() => mockGameStatePlaying.status).thenReturn(GameStatus.playing);
       when(() => mockGameStatePlaying.roomId).thenReturn('test-room');
-      
+
       final newContainer = ProviderContainer(
         overrides: [
           gameStateNotifierProvider.overrideWith(
@@ -209,7 +209,7 @@ void main() {
       // State should be null when game is playing
       final playingState = newContainer.read(endGameProvider);
       expect(playingState.value, isNull);
-      
+
       newContainer.dispose();
     });
   });

@@ -96,7 +96,7 @@ final joinRoomUseCaseProvider = AutoDisposeProvider<JoinRoomUseCase>.internal(
 // ignore: unused_element
 typedef JoinRoomUseCaseRef = AutoDisposeProviderRef<JoinRoomUseCase>;
 String _$syncGameStateUseCaseHash() =>
-    r'877325225d031d4f497ff8d3cb5fe147b63ee920';
+    r'bedf189f4fd74bcf943f72f9bfaea4cba1a126d9';
 
 /// See also [syncGameStateUseCase].
 @ProviderFor(syncGameStateUseCase)

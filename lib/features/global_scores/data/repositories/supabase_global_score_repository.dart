@@ -57,7 +57,7 @@ class SupabaseGlobalScoreRepository implements GlobalScoreRepository {
     try {
       final scores = await getScoresByPlayer(playerId);
       if (scores.isEmpty) return null;
-      
+
       return PlayerStats.fromScores(scores);
     } catch (e) {
       throw Exception('Failed to get player stats: $e');
@@ -69,24 +69,31 @@ class SupabaseGlobalScoreRepository implements GlobalScoreRepository {
     try {
       final response = await _dataSource.getTopPlayersRaw(limit: limit);
 
-      return response.map((data) => PlayerStats(
-        playerId: data['player_id'],
-        playerName: data['player_name'],
-        totalGamesPlayed: data['total_games'],
-        totalWins: data['total_wins'],
-        averageScore: data['average_score'].toDouble(),
-        bestScore: data['best_score'],
-        worstScore: data['worst_score'],
-        averagePosition: data['average_position'].toDouble(),
-        totalRoundsPlayed: data['total_rounds'],
-      )).toList();
+      return response
+          .map(
+            (data) => PlayerStats(
+              playerId: data['player_id'],
+              playerName: data['player_name'],
+              totalGamesPlayed: data['total_games'],
+              totalWins: data['total_wins'],
+              averageScore: data['average_score'].toDouble(),
+              bestScore: data['best_score'],
+              worstScore: data['worst_score'],
+              averagePosition: data['average_position'].toDouble(),
+              totalRoundsPlayed: data['total_rounds'],
+            ),
+          )
+          .toList();
     } catch (e) {
       throw Exception('Failed to get top players: $e');
     }
   }
 
   @override
-  Future<List<GlobalScore>> getRecentGames(String playerId, {int limit = 10}) async {
+  Future<List<GlobalScore>> getRecentGames(
+    String playerId, {
+    int limit = 10,
+  }) async {
     try {
       final models = await _dataSource.getRecentGames(playerId, limit: limit);
       return models.map((m) => m.toDomain()).toList();

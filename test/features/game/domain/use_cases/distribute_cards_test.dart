@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/domain/use_cases/distribute_cards.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/core/utils/constants.dart';
 
@@ -15,14 +15,22 @@ void main() {
   group('DistributeCards UseCase', () {
     test('should distribute 12 cards to each player', () async {
       final players = [
-        Player(
+        GamePlayer(
           id: 'player1',
-          name: 'Player 1',
+          name: 'GamePlayer 1',
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        Player(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
-        Player(id: 'player3', name: 'Player 3', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
+        GamePlayer(
+          id: 'player3',
+          name: 'GamePlayer 3',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final initialState = GameState.initial(
@@ -59,9 +67,9 @@ void main() {
     test('should reveal 2 initial cards for each player', () async {
       final players = List.generate(
         2,
-        (index) => Player(
+        (index) => GamePlayer(
           id: 'player$index',
-          name: 'Player $index',
+          name: 'GamePlayer $index',
           grid: PlayerGrid.empty(),
         ),
       );
@@ -97,7 +105,11 @@ void main() {
 
     test('should create initial discard pile', () async {
       final players = [
-        Player(id: 'player1', name: 'Player 1', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final initialState = GameState.initial(
@@ -120,9 +132,9 @@ void main() {
     test('should maintain unique cards in distribution', () async {
       final players = List.generate(
         4,
-        (index) => Player(
+        (index) => GamePlayer(
           id: 'player$index',
-          name: 'Player $index',
+          name: 'GamePlayer $index',
           grid: PlayerGrid.empty(),
         ),
       );
@@ -171,9 +183,9 @@ void main() {
     test('should handle maximum players', () async {
       final players = List.generate(
         kMaxPlayers,
-        (index) => Player(
+        (index) => GamePlayer(
           id: 'player$index',
-          name: 'Player $index',
+          name: 'GamePlayer $index',
           grid: PlayerGrid.empty(),
         ),
       );

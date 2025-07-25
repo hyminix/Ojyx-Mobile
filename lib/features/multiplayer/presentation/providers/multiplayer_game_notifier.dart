@@ -7,6 +7,7 @@ import '../../../game/domain/entities/action_card.dart';
 import '../../../game/presentation/providers/game_state_notifier.dart';
 import '../../domain/entities/room_event.dart';
 import '../../domain/use_cases/sync_game_state_use_case.dart';
+import '../../domain/repositories/room_repository.dart';
 import 'room_providers.dart';
 
 part 'multiplayer_game_notifier.g.dart';
@@ -14,6 +15,7 @@ part 'multiplayer_game_notifier.g.dart';
 @riverpod
 class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
   late SyncGameStateUseCase _syncUseCase;
+  late RoomRepository _roomRepository;
   StreamSubscription<RoomEvent>? _eventSubscription;
   String? _roomId;
 
@@ -21,6 +23,7 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
   Future<void> build(String roomId) async {
     _roomId = roomId;
     _syncUseCase = ref.read(syncGameStateUseCaseProvider);
+    _roomRepository = ref.read(roomRepositoryProvider);
 
     ref.onDispose(() {
       _eventSubscription?.cancel();
@@ -30,7 +33,9 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
   }
 
   void _listenToRoomEvents(String roomId) {
-    _eventSubscription = _syncUseCase.watchGameEvents(roomId).listen((event) {
+    _eventSubscription = _roomRepository.watchRoomEvents(roomId).listen((
+      event,
+    ) {
       event.when(
         playerJoined: (playerId, playerName) {
           // Géré par le provider de room
@@ -68,12 +73,16 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
     Map<String, dynamic>? actionData,
   }) async {
     final roomId = _roomId ?? '';
-    await _syncUseCase.sendPlayerAction(
-      roomId: roomId,
+
+    // Créer l'événement d'action du joueur
+    final event = RoomEvent.playerAction(
       playerId: playerId,
       actionType: actionType,
       actionData: actionData,
     );
+
+    // Envoyer l'événement via le repository
+    await _roomRepository.sendEvent(roomId: roomId, event: event);
   }
 
   Future<void> drawFromDeck(String playerId) async {

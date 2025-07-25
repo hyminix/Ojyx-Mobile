@@ -31,31 +31,34 @@ void main() {
     );
 
     test('should get player stats from repository', () async {
-      when(() => mockRepository.getPlayerStats('player1'))
-          .thenAnswer((_) async => testStats);
+      when(
+        () => mockRepository.getPlayerStats('player1'),
+      ).thenAnswer((_) async => testStats);
 
-      final result = await useCase(const GetPlayerStatsParams(playerId: 'player1'));
+      final result = await useCase(
+        const GetPlayerStatsParams(playerId: 'player1'),
+      );
 
       expect(result.isRight(), isTrue);
-      result.fold(
-        (failure) => fail('Should not fail'),
-        (stats) {
-          expect(stats, isNotNull);
-          expect(stats!.playerId, equals('player1'));
-          expect(stats.totalGamesPlayed, equals(25));
-          expect(stats.totalWins, equals(15));
-          expect(stats.winRate, equals(0.6)); // 15/25
-        },
-      );
+      result.fold((failure) => fail('Should not fail'), (stats) {
+        expect(stats, isNotNull);
+        expect(stats!.playerId, equals('player1'));
+        expect(stats.totalGamesPlayed, equals(25));
+        expect(stats.totalWins, equals(15));
+        expect(stats.winRate, equals(0.6)); // 15/25
+      });
 
       verify(() => mockRepository.getPlayerStats('player1')).called(1);
     });
 
     test('should return null when player has no stats', () async {
-      when(() => mockRepository.getPlayerStats('unknown'))
-          .thenAnswer((_) async => null);
+      when(
+        () => mockRepository.getPlayerStats('unknown'),
+      ).thenAnswer((_) async => null);
 
-      final result = await useCase(const GetPlayerStatsParams(playerId: 'unknown'));
+      final result = await useCase(
+        const GetPlayerStatsParams(playerId: 'unknown'),
+      );
 
       expect(result.isRight(), isTrue);
       result.fold(
@@ -65,10 +68,13 @@ void main() {
     });
 
     test('should return failure when repository throws exception', () async {
-      when(() => mockRepository.getPlayerStats(any()))
-          .thenThrow(Exception('Database error'));
+      when(
+        () => mockRepository.getPlayerStats(any()),
+      ).thenThrow(Exception('Database error'));
 
-      final result = await useCase(const GetPlayerStatsParams(playerId: 'player1'));
+      final result = await useCase(
+        const GetPlayerStatsParams(playerId: 'player1'),
+      );
 
       expect(result.isLeft(), isTrue);
       result.fold(
@@ -90,24 +96,25 @@ void main() {
         totalRoundsPlayed: 200,
       );
 
-      when(() => mockRepository.getPlayerStats('player2'))
-          .thenAnswer((_) async => statsWithDifferentWinRate);
+      when(
+        () => mockRepository.getPlayerStats('player2'),
+      ).thenAnswer((_) async => statsWithDifferentWinRate);
 
-      final result = await useCase(const GetPlayerStatsParams(playerId: 'player2'));
+      final result = await useCase(
+        const GetPlayerStatsParams(playerId: 'player2'),
+      );
 
       expect(result.isRight(), isTrue);
-      result.fold(
-        (failure) => fail('Should not fail'),
-        (stats) {
-          expect(stats, isNotNull);
-          expect(stats!.winRate, equals(0.2)); // 10/50
-        },
-      );
+      result.fold((failure) => fail('Should not fail'), (stats) {
+        expect(stats, isNotNull);
+        expect(stats!.winRate, equals(0.2)); // 10/50
+      });
     });
 
     test('should handle empty player ID', () async {
-      when(() => mockRepository.getPlayerStats(''))
-          .thenAnswer((_) async => null);
+      when(
+        () => mockRepository.getPlayerStats(''),
+      ).thenAnswer((_) async => null);
 
       final result = await useCase(const GetPlayerStatsParams(playerId: ''));
 

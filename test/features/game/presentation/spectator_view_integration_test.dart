@@ -6,7 +6,7 @@ import 'package:ojyx/features/game/presentation/screens/game_screen.dart';
 import 'package:ojyx/features/game/presentation/widgets/opponents_view_widget.dart';
 import 'package:ojyx/features/game/presentation/widgets/opponent_grid_widget.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
@@ -35,7 +35,7 @@ void main() {
   group('Spectator View Integration Test', () {
     late MockRoom mockRoom;
     late GameState gameState;
-    late List<Player> players;
+    late List<GamePlayer> players;
 
     setUp(() {
       mockRoom = MockRoom();
@@ -47,10 +47,10 @@ void main() {
         // Create a grid with some revealed cards
         final grid = PlayerGrid.empty();
         // Place revealed cards based on player index
-        // Player 0: 1 revealed card
-        // Player 1: 2 revealed cards
-        // Player 2: 3 revealed cards
-        // Player 3: 4 revealed cards
+        // GamePlayer 0: 1 revealed card
+        // GamePlayer 1: 2 revealed cards
+        // GamePlayer 2: 3 revealed cards
+        // GamePlayer 3: 4 revealed cards
         for (int i = 0; i < index + 1; i++) {
           final row = i ~/ 4;
           final col = i % 4;
@@ -63,9 +63,9 @@ void main() {
           grid.revealCard(row, col);
         }
 
-        return Player(
+        return GamePlayer(
           id: playerId,
-          name: 'Player $index',
+          name: 'GamePlayer $index',
           grid: grid,
           actionCards: [],
           isHost: index == 0,
@@ -124,7 +124,7 @@ void main() {
           .widgetList<OpponentGridWidget>(find.byType(OpponentGridWidget))
           .toList();
 
-      // Player 1 should be highlighted as current turn
+      // GamePlayer 1 should be highlighted as current turn
       expect(opponentWidgets[0].isCurrentPlayer, isTrue);
       expect(opponentWidgets[0].playerState.playerId, equals('player-1'));
     });
@@ -137,7 +137,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      // Player 3 has finished, should show flag
+      // GamePlayer 3 has finished, should show flag
       final lastOpponentWidget = tester.widget<OpponentGridWidget>(
         find.byType(OpponentGridWidget).last,
       );
@@ -169,7 +169,10 @@ void main() {
       var opponentWidgets = tester
           .widgetList<OpponentGridWidget>(find.byType(OpponentGridWidget))
           .toList();
-      expect(opponentWidgets[0].isCurrentPlayer, isTrue); // Player 1 is current
+      expect(
+        opponentWidgets[0].isCurrentPlayer,
+        isTrue,
+      ); // GamePlayer 1 is current
 
       // Update game state
       gameState = gameState.copyWith(
@@ -189,11 +192,11 @@ void main() {
       expect(
         opponentWidgets[1].isCurrentPlayer,
         isTrue,
-      ); // Player 2 is now current
+      ); // GamePlayer 2 is now current
       expect(
         opponentWidgets[0].isCurrentPlayer,
         isFalse,
-      ); // Player 1 is not current
+      ); // GamePlayer 1 is not current
     });
 
     testWidgets('should handle tap on opponent grid', (tester) async {
@@ -223,17 +226,17 @@ void main() {
 
       // Assert
       // Use keys to find specific counts
-      // Player 1 has 2 revealed cards
+      // GamePlayer 1 has 2 revealed cards
       expect(
         find.byKey(const ValueKey('revealed_count_player-1')),
         findsOneWidget,
       );
-      // Player 2 has 3 revealed cards
+      // GamePlayer 2 has 3 revealed cards
       expect(
         find.byKey(const ValueKey('revealed_count_player-2')),
         findsOneWidget,
       );
-      // Player 3 has 4 revealed cards
+      // GamePlayer 3 has 4 revealed cards
       expect(
         find.byKey(const ValueKey('revealed_count_player-3')),
         findsOneWidget,
@@ -278,9 +281,9 @@ void main() {
         grid.placeCard(game.Card(value: 5, isRevealed: true), row, 0);
       }
 
-      final playerWithColumns = Player(
+      final playerWithColumns = GamePlayer(
         id: 'player-columns',
-        name: 'Columns Player',
+        name: 'Columns GamePlayer',
         grid: grid,
         actionCards: [],
         isHost: false,

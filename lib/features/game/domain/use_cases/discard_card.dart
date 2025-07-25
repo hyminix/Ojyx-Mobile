@@ -4,7 +4,7 @@ import 'package:ojyx/core/usecases/usecase.dart';
 import 'package:ojyx/core/utils/constants.dart';
 import '../entities/game_state.dart';
 import '../entities/card.dart';
-import '../entities/player.dart';
+import '../entities/game_player.dart';
 import '../entities/player_grid.dart';
 
 class GridPosition {
@@ -35,7 +35,7 @@ class DiscardCard implements UseCase<GameState, DiscardCardParams> {
 
       // Validate it's player's turn
       final currentPlayer = gameState.currentPlayer;
-      if (currentPlayer == null || currentPlayer.id != playerId) {
+      if (currentPlayer.id != playerId) {
         return Left(
           Failure.gameLogic(message: 'Not your turn', code: 'NOT_YOUR_TURN'),
         );
@@ -53,7 +53,7 @@ class DiscardCard implements UseCase<GameState, DiscardCardParams> {
 
       // Validate game status
       if (gameState.status != GameStatus.drawPhase) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'Must draw a card first',
             code: 'INVALID_STATUS',
@@ -63,7 +63,7 @@ class DiscardCard implements UseCase<GameState, DiscardCardParams> {
 
       final drawnCard = gameState.drawnCard!;
       var discardPile = List<Card>.from(gameState.discardPile);
-      var updatedPlayers = List<Player>.from(gameState.players);
+      var updatedPlayers = List<GamePlayer>.from(gameState.players);
       Card cardToDiscard = drawnCard;
 
       // If grid position provided, exchange with grid card

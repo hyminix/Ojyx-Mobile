@@ -21,7 +21,7 @@ EndGameState _$EndGameStateFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$EndGameState {
-  List<Player> get players => throw _privateConstructorUsedError;
+  List<GamePlayer> get players => throw _privateConstructorUsedError;
   String get roundInitiatorId => throw _privateConstructorUsedError;
   int get roundNumber => throw _privateConstructorUsedError;
   Map<String, bool> get playersVotes => throw _privateConstructorUsedError;
@@ -44,7 +44,7 @@ abstract class $EndGameStateCopyWith<$Res> {
   ) = _$EndGameStateCopyWithImpl<$Res, EndGameState>;
   @useResult
   $Res call({
-    List<Player> players,
+    List<GamePlayer> players,
     String roundInitiatorId,
     int roundNumber,
     Map<String, bool> playersVotes,
@@ -76,7 +76,7 @@ class _$EndGameStateCopyWithImpl<$Res, $Val extends EndGameState>
             players: null == players
                 ? _value.players
                 : players // ignore: cast_nullable_to_non_nullable
-                      as List<Player>,
+                      as List<GamePlayer>,
             roundInitiatorId: null == roundInitiatorId
                 ? _value.roundInitiatorId
                 : roundInitiatorId // ignore: cast_nullable_to_non_nullable
@@ -105,7 +105,7 @@ abstract class _$$EndGameStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    List<Player> players,
+    List<GamePlayer> players,
     String roundInitiatorId,
     int roundNumber,
     Map<String, bool> playersVotes,
@@ -136,7 +136,7 @@ class __$$EndGameStateImplCopyWithImpl<$Res>
         players: null == players
             ? _value._players
             : players // ignore: cast_nullable_to_non_nullable
-                  as List<Player>,
+                  as List<GamePlayer>,
         roundInitiatorId: null == roundInitiatorId
             ? _value.roundInitiatorId
             : roundInitiatorId // ignore: cast_nullable_to_non_nullable
@@ -158,7 +158,7 @@ class __$$EndGameStateImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$EndGameStateImpl extends _EndGameState {
   const _$EndGameStateImpl({
-    required final List<Player> players,
+    required final List<GamePlayer> players,
     required this.roundInitiatorId,
     required this.roundNumber,
     final Map<String, bool> playersVotes = const {},
@@ -169,9 +169,9 @@ class _$EndGameStateImpl extends _EndGameState {
   factory _$EndGameStateImpl.fromJson(Map<String, dynamic> json) =>
       _$$EndGameStateImplFromJson(json);
 
-  final List<Player> _players;
+  final List<GamePlayer> _players;
   @override
-  List<Player> get players {
+  List<GamePlayer> get players {
     if (_players is EqualUnmodifiableListView) return _players;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_players);
@@ -237,7 +237,7 @@ class _$EndGameStateImpl extends _EndGameState {
 
 abstract class _EndGameState extends EndGameState {
   const factory _EndGameState({
-    required final List<Player> players,
+    required final List<GamePlayer> players,
     required final String roundInitiatorId,
     required final int roundNumber,
     final Map<String, bool> playersVotes,
@@ -248,7 +248,7 @@ abstract class _EndGameState extends EndGameState {
       _$EndGameStateImpl.fromJson;
 
   @override
-  List<Player> get players;
+  List<GamePlayer> get players;
   @override
   String get roundInitiatorId;
   @override

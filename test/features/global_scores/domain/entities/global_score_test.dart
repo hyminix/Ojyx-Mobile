@@ -43,7 +43,10 @@ void main() {
         gameEndedAt: DateTime(2025, 1, 24, 11, 45),
       );
 
-      expect(globalScore.gameDuration, equals(const Duration(hours: 1, minutes: 15)));
+      expect(
+        globalScore.gameDuration,
+        equals(const Duration(hours: 1, minutes: 15)),
+      );
     });
 
     test('should support null gameEndedAt for ongoing games', () {
@@ -163,7 +166,7 @@ void main() {
       expect(stats.averageScore, equals(110)); // (100 + 150 + 80) / 3
       expect(stats.bestScore, equals(80));
       expect(stats.worstScore, equals(150));
-      expect(stats.averagePosition, equals(4/3)); // (1 + 2 + 1) / 3
+      expect(stats.averagePosition, equals(4 / 3)); // (1 + 2 + 1) / 3
       expect(stats.totalRoundsPlayed, equals(9)); // 3 + 4 + 2
     });
 

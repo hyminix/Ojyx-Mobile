@@ -2,9 +2,9 @@ import 'package:ojyx/features/multiplayer/domain/datasources/room_datasource.dar
 import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
 import 'package:ojyx/features/multiplayer/domain/entities/room_event.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'supabase_room_datasource.dart';
-import '../models/room_model.dart';
-import '../../../game/data/models/game_state_model.dart';
+import 'package:ojyx/features/multiplayer/data/datasources/supabase_room_datasource.dart';
+import 'package:ojyx/features/multiplayer/data/models/room_model.dart';
+import 'package:ojyx/features/game/data/models/game_state_model.dart';
 
 /// Implementation of RoomDatasource using Supabase
 class SupabaseRoomDatasourceImpl implements RoomDatasource {
@@ -152,11 +152,23 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
       gameStarted: (gameId, initialState) => {
         'type': 'game_started',
         'game_id': gameId,
-        'initial_state': GameStateModel.fromDomain(initialState).toJson(),
+        'initial_state': GameStateModel.fromDomainComplete(
+          initialState,
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          turnNumber: 1,
+          roundNumber: 1,
+          updatedAt: DateTime.now(),
+        ).toJson(),
       },
       gameStateUpdated: (newState) => {
         'type': 'game_state_updated',
-        'new_state': GameStateModel.fromDomain(newState).toJson(),
+        'new_state': GameStateModel.fromDomainComplete(
+          newState,
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          turnNumber: 1,
+          roundNumber: 1,
+          updatedAt: DateTime.now(),
+        ).toJson(),
       },
       playerAction: (playerId, actionType, actionData) => {
         'type': 'player_action',
@@ -183,11 +195,13 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
           gameId: data['game_id'],
           initialState: GameStateModel.fromJson(
             data['initial_state'],
-          ).toDomain(),
+          ).toDomainComplete(),
         );
       case 'game_state_updated':
         return RoomEvent.gameStateUpdated(
-          newState: GameStateModel.fromJson(data['new_state']).toDomain(),
+          newState: GameStateModel.fromJson(
+            data['new_state'],
+          ).toDomainComplete(),
         );
       case 'player_action':
         return RoomEvent.playerAction(

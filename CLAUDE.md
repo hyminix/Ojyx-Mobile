@@ -268,3 +268,7 @@ flutter run --dart-define=SUPABASE_URL=xxx --dart-define=SUPABASE_ANON_KEY=xxx
 - Performance : Attention aux rebuilds inutiles avec Riverpod
 - Sécurité : Validation côté serveur pour toutes les actions de jeu
 - UX : Feedback visuel immédiat pour toutes les actions
+
+## Task Master AI Instructions
+**Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
+@./.taskmaster/CLAUDE.md

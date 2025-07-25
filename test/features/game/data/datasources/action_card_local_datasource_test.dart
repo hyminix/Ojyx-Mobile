@@ -21,7 +21,7 @@ void main() {
   });
 
   group('ActionCardLocalDataSource interface', () {
-    test('should define getAvailableActionCards method', () {
+    test('should define getAvailableActionCards method', () async {
       // Arrange
       final expectedCards = [
         testActionCard,
@@ -34,26 +34,26 @@ void main() {
       ];
       when(
         () => mockDataSource.getAvailableActionCards(),
-      ).thenReturn(expectedCards);
+      ).thenAnswer((_) async => expectedCards);
 
       // Act
-      final result = mockDataSource.getAvailableActionCards();
+      final result = await mockDataSource.getAvailableActionCards();
 
       // Assert
       expect(result, equals(expectedCards));
       verify(() => mockDataSource.getAvailableActionCards()).called(1);
     });
 
-    test('should define getPlayerActionCards method', () {
+    test('should define getPlayerActionCards method', () async {
       // Arrange
       const playerId = 'player1';
       final expectedCards = [testActionCard];
       when(
         () => mockDataSource.getPlayerActionCards(playerId),
-      ).thenReturn(expectedCards);
+      ).thenAnswer((_) async => expectedCards);
 
       // Act
-      final result = mockDataSource.getPlayerActionCards(playerId);
+      final result = await mockDataSource.getPlayerActionCards(playerId);
 
       // Assert
       expect(result, equals(expectedCards));
@@ -65,7 +65,7 @@ void main() {
       const playerId = 'player1';
       when(
         () => mockDataSource.addActionCardToPlayer(playerId, testActionCard),
-      ).thenReturn(null);
+      ).thenAnswer((_) async {});
 
       // Act & Assert
       expect(
@@ -84,7 +84,7 @@ void main() {
         const playerId = 'player1';
         when(
           () => mockDataSource.addActionCardToPlayer(playerId, testActionCard),
-        ).thenThrow(Exception('Player already has 3 cards'));
+        ).thenThrow(Exception('GamePlayer already has 3 cards'));
 
         // Act & Assert
         expect(
@@ -100,7 +100,7 @@ void main() {
       when(
         () =>
             mockDataSource.removeActionCardFromPlayer(playerId, testActionCard),
-      ).thenReturn(null);
+      ).thenAnswer((_) async {});
 
       // Act & Assert
       expect(
@@ -120,7 +120,7 @@ void main() {
       when(
         () =>
             mockDataSource.removeActionCardFromPlayer(playerId, testActionCard),
-      ).thenThrow(Exception('Player doesn\'t have this card'));
+      ).thenThrow(Exception('GamePlayer doesn\'t have this card'));
 
       // Act & Assert
       expect(
@@ -130,24 +130,26 @@ void main() {
       );
     });
 
-    test('should define drawActionCard method', () {
+    test('should define drawActionCard method', () async {
       // Arrange
-      when(() => mockDataSource.drawActionCard()).thenReturn(testActionCard);
+      when(
+        () => mockDataSource.drawActionCard(),
+      ).thenAnswer((_) async => testActionCard);
 
       // Act
-      final result = mockDataSource.drawActionCard();
+      final result = await mockDataSource.drawActionCard();
 
       // Assert
       expect(result, equals(testActionCard));
       verify(() => mockDataSource.drawActionCard()).called(1);
     });
 
-    test('should return null when draw pile is empty', () {
+    test('should return null when draw pile is empty', () async {
       // Arrange
-      when(() => mockDataSource.drawActionCard()).thenReturn(null);
+      when(() => mockDataSource.drawActionCard()).thenAnswer((_) async => null);
 
       // Act
-      final result = mockDataSource.drawActionCard();
+      final result = await mockDataSource.drawActionCard();
 
       // Assert
       expect(result, isNull);
@@ -158,7 +160,7 @@ void main() {
       // Arrange
       when(
         () => mockDataSource.discardActionCard(testActionCard),
-      ).thenReturn(null);
+      ).thenAnswer((_) async {});
 
       // Act & Assert
       expect(
@@ -170,28 +172,30 @@ void main() {
 
     test('should define shuffleActionCards method', () {
       // Arrange
-      when(() => mockDataSource.shuffleActionCards()).thenReturn(null);
+      when(() => mockDataSource.shuffleActionCards()).thenAnswer((_) async {});
 
       // Act & Assert
       expect(() => mockDataSource.shuffleActionCards(), returnsNormally);
       verify(() => mockDataSource.shuffleActionCards()).called(1);
     });
 
-    test('should handle multiple operations in sequence', () {
+    test('should handle multiple operations in sequence', () async {
       // Arrange
       const playerId = 'player1';
-      when(() => mockDataSource.drawActionCard()).thenReturn(testActionCard);
+      when(
+        () => mockDataSource.drawActionCard(),
+      ).thenAnswer((_) async => testActionCard);
       when(
         () => mockDataSource.addActionCardToPlayer(playerId, testActionCard),
-      ).thenReturn(null);
+      ).thenAnswer((_) async {});
       when(
         () => mockDataSource.getPlayerActionCards(playerId),
-      ).thenReturn([testActionCard]);
+      ).thenAnswer((_) async => [testActionCard]);
 
       // Act
-      final drawnCard = mockDataSource.drawActionCard();
-      mockDataSource.addActionCardToPlayer(playerId, drawnCard!);
-      final playerCards = mockDataSource.getPlayerActionCards(playerId);
+      final drawnCard = await mockDataSource.drawActionCard();
+      await mockDataSource.addActionCardToPlayer(playerId, drawnCard!);
+      final playerCards = await mockDataSource.getPlayerActionCards(playerId);
 
       // Assert
       expect(drawnCard, equals(testActionCard));

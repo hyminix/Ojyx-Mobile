@@ -63,7 +63,7 @@ class PlayerGridWithSelection extends ConsumerWidget {
           _buildSelectionHeader(context, selectionState, selectionNotifier),
           const SizedBox(height: 8),
 
-          // Player grid
+          // GamePlayer grid
           PlayerGridWidget(
             grid: grid,
             isCurrentPlayer: isCurrentPlayer,

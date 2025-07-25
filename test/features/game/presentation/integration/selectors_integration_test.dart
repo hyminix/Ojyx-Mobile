@@ -213,7 +213,7 @@ void main() {
                               .read(cardSelectionProvider.notifier)
                               .selectOpponent('player-2');
                         },
-                        child: const Text('Select Player 2'),
+                        child: const Text('Select GamePlayer 2'),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -240,7 +240,7 @@ void main() {
       expect(find.text('Complete: false'), findsOneWidget);
 
       // Select opponent
-      await tester.tap(find.text('Select Player 2'));
+      await tester.tap(find.text('Select GamePlayer 2'));
       await tester.pumpAndSettle();
 
       expect(selectedOpponentId, equals('player-2'));

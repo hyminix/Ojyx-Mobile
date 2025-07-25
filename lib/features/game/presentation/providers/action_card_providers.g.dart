@@ -45,26 +45,8 @@ final actionCardRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ActionCardRepositoryRef = AutoDisposeProviderRef<ActionCardRepository>;
-String _$useActionCardUseCaseHash() =>
-    r'4522385cee7895f7fb2ef1008ba4f59f6dcf4b72';
-
-/// See also [useActionCardUseCase].
-@ProviderFor(useActionCardUseCase)
-final useActionCardUseCaseProvider =
-    AutoDisposeProvider<UseActionCardUseCase>.internal(
-      useActionCardUseCase,
-      name: r'useActionCardUseCaseProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$useActionCardUseCaseHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef UseActionCardUseCaseRef = AutoDisposeProviderRef<UseActionCardUseCase>;
-String _$playerActionCardsHash() => r'905945a2fcbaae595f50907533575e5c8c39241e';
+String _$supabaseActionCardRepositoryHash() =>
+    r'a56329548b3e6ab79a859bf0fbb72187ba683732';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -87,25 +69,175 @@ class _SystemHash {
   }
 }
 
+/// See also [supabaseActionCardRepository].
+@ProviderFor(supabaseActionCardRepository)
+const supabaseActionCardRepositoryProvider =
+    SupabaseActionCardRepositoryFamily();
+
+/// See also [supabaseActionCardRepository].
+class SupabaseActionCardRepositoryFamily extends Family<ActionCardRepository> {
+  /// See also [supabaseActionCardRepository].
+  const SupabaseActionCardRepositoryFamily();
+
+  /// See also [supabaseActionCardRepository].
+  SupabaseActionCardRepositoryProvider call(String gameStateId) {
+    return SupabaseActionCardRepositoryProvider(gameStateId);
+  }
+
+  @override
+  SupabaseActionCardRepositoryProvider getProviderOverride(
+    covariant SupabaseActionCardRepositoryProvider provider,
+  ) {
+    return call(provider.gameStateId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'supabaseActionCardRepositoryProvider';
+}
+
+/// See also [supabaseActionCardRepository].
+class SupabaseActionCardRepositoryProvider
+    extends AutoDisposeProvider<ActionCardRepository> {
+  /// See also [supabaseActionCardRepository].
+  SupabaseActionCardRepositoryProvider(String gameStateId)
+    : this._internal(
+        (ref) => supabaseActionCardRepository(
+          ref as SupabaseActionCardRepositoryRef,
+          gameStateId,
+        ),
+        from: supabaseActionCardRepositoryProvider,
+        name: r'supabaseActionCardRepositoryProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$supabaseActionCardRepositoryHash,
+        dependencies: SupabaseActionCardRepositoryFamily._dependencies,
+        allTransitiveDependencies:
+            SupabaseActionCardRepositoryFamily._allTransitiveDependencies,
+        gameStateId: gameStateId,
+      );
+
+  SupabaseActionCardRepositoryProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.gameStateId,
+  }) : super.internal();
+
+  final String gameStateId;
+
+  @override
+  Override overrideWith(
+    ActionCardRepository Function(SupabaseActionCardRepositoryRef provider)
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: SupabaseActionCardRepositoryProvider._internal(
+        (ref) => create(ref as SupabaseActionCardRepositoryRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        gameStateId: gameStateId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeProviderElement<ActionCardRepository> createElement() {
+    return _SupabaseActionCardRepositoryProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SupabaseActionCardRepositoryProvider &&
+        other.gameStateId == gameStateId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, gameStateId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SupabaseActionCardRepositoryRef
+    on AutoDisposeProviderRef<ActionCardRepository> {
+  /// The parameter `gameStateId` of this provider.
+  String get gameStateId;
+}
+
+class _SupabaseActionCardRepositoryProviderElement
+    extends AutoDisposeProviderElement<ActionCardRepository>
+    with SupabaseActionCardRepositoryRef {
+  _SupabaseActionCardRepositoryProviderElement(super.provider);
+
+  @override
+  String get gameStateId =>
+      (origin as SupabaseActionCardRepositoryProvider).gameStateId;
+}
+
+String _$useActionCardUseCaseHash() =>
+    r'18cf40308275d1f830793d1e2691376171607364';
+
+/// See also [useActionCardUseCase].
+@ProviderFor(useActionCardUseCase)
+final useActionCardUseCaseProvider =
+    AutoDisposeProvider<UseActionCardUseCase>.internal(
+      useActionCardUseCase,
+      name: r'useActionCardUseCaseProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$useActionCardUseCaseHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef UseActionCardUseCaseRef = AutoDisposeProviderRef<UseActionCardUseCase>;
+String _$playerActionCardsHash() => r'712af947de989a0703f7647eb2f199f491317b4e';
+
 /// See also [playerActionCards].
 @ProviderFor(playerActionCards)
 const playerActionCardsProvider = PlayerActionCardsFamily();
 
 /// See also [playerActionCards].
-class PlayerActionCardsFamily extends Family<List<ActionCard>> {
+class PlayerActionCardsFamily extends Family<AsyncValue<List<ActionCard>>> {
   /// See also [playerActionCards].
   const PlayerActionCardsFamily();
 
   /// See also [playerActionCards].
-  PlayerActionCardsProvider call(String playerId) {
-    return PlayerActionCardsProvider(playerId);
+  PlayerActionCardsProvider call(
+    ({String gameStateId, String playerId}) params,
+  ) {
+    return PlayerActionCardsProvider(params);
   }
 
   @override
   PlayerActionCardsProvider getProviderOverride(
     covariant PlayerActionCardsProvider provider,
   ) {
-    return call(provider.playerId);
+    return call(provider.params);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -124,11 +256,12 @@ class PlayerActionCardsFamily extends Family<List<ActionCard>> {
 }
 
 /// See also [playerActionCards].
-class PlayerActionCardsProvider extends AutoDisposeProvider<List<ActionCard>> {
+class PlayerActionCardsProvider
+    extends AutoDisposeFutureProvider<List<ActionCard>> {
   /// See also [playerActionCards].
-  PlayerActionCardsProvider(String playerId)
+  PlayerActionCardsProvider(({String gameStateId, String playerId}) params)
     : this._internal(
-        (ref) => playerActionCards(ref as PlayerActionCardsRef, playerId),
+        (ref) => playerActionCards(ref as PlayerActionCardsRef, params),
         from: playerActionCardsProvider,
         name: r'playerActionCardsProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -137,7 +270,7 @@ class PlayerActionCardsProvider extends AutoDisposeProvider<List<ActionCard>> {
         dependencies: PlayerActionCardsFamily._dependencies,
         allTransitiveDependencies:
             PlayerActionCardsFamily._allTransitiveDependencies,
-        playerId: playerId,
+        params: params,
       );
 
   PlayerActionCardsProvider._internal(
@@ -147,14 +280,14 @@ class PlayerActionCardsProvider extends AutoDisposeProvider<List<ActionCard>> {
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.playerId,
+    required this.params,
   }) : super.internal();
 
-  final String playerId;
+  final ({String gameStateId, String playerId}) params;
 
   @override
   Override overrideWith(
-    List<ActionCard> Function(PlayerActionCardsRef provider) create,
+    FutureOr<List<ActionCard>> Function(PlayerActionCardsRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -165,25 +298,25 @@ class PlayerActionCardsProvider extends AutoDisposeProvider<List<ActionCard>> {
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        playerId: playerId,
+        params: params,
       ),
     );
   }
 
   @override
-  AutoDisposeProviderElement<List<ActionCard>> createElement() {
+  AutoDisposeFutureProviderElement<List<ActionCard>> createElement() {
     return _PlayerActionCardsProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is PlayerActionCardsProvider && other.playerId == playerId;
+    return other is PlayerActionCardsProvider && other.params == params;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, playerId.hashCode);
+    hash = _SystemHash.combine(hash, params.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -191,34 +324,35 @@ class PlayerActionCardsProvider extends AutoDisposeProvider<List<ActionCard>> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin PlayerActionCardsRef on AutoDisposeProviderRef<List<ActionCard>> {
-  /// The parameter `playerId` of this provider.
-  String get playerId;
+mixin PlayerActionCardsRef on AutoDisposeFutureProviderRef<List<ActionCard>> {
+  /// The parameter `params` of this provider.
+  ({String gameStateId, String playerId}) get params;
 }
 
 class _PlayerActionCardsProviderElement
-    extends AutoDisposeProviderElement<List<ActionCard>>
+    extends AutoDisposeFutureProviderElement<List<ActionCard>>
     with PlayerActionCardsRef {
   _PlayerActionCardsProviderElement(super.provider);
 
   @override
-  String get playerId => (origin as PlayerActionCardsProvider).playerId;
+  ({String gameStateId, String playerId}) get params =>
+      (origin as PlayerActionCardsProvider).params;
 }
 
-String _$canUseActionCardHash() => r'7d687ae1d741221527d69c10903de9172bac6ab1';
+String _$canUseActionCardHash() => r'f1d8147520bdd36cc410163d778d590368b594a3';
 
 /// See also [canUseActionCard].
 @ProviderFor(canUseActionCard)
 const canUseActionCardProvider = CanUseActionCardFamily();
 
 /// See also [canUseActionCard].
-class CanUseActionCardFamily extends Family<bool> {
+class CanUseActionCardFamily extends Family<AsyncValue<bool>> {
   /// See also [canUseActionCard].
   const CanUseActionCardFamily();
 
   /// See also [canUseActionCard].
   CanUseActionCardProvider call(
-    ({ActionCard? actionCard, String playerId}) params,
+    ({ActionCard? actionCard, String gameStateId, String playerId}) params,
   ) {
     return CanUseActionCardProvider(params);
   }
@@ -246,10 +380,11 @@ class CanUseActionCardFamily extends Family<bool> {
 }
 
 /// See also [canUseActionCard].
-class CanUseActionCardProvider extends AutoDisposeProvider<bool> {
+class CanUseActionCardProvider extends AutoDisposeFutureProvider<bool> {
   /// See also [canUseActionCard].
-  CanUseActionCardProvider(({ActionCard? actionCard, String playerId}) params)
-    : this._internal(
+  CanUseActionCardProvider(
+    ({ActionCard? actionCard, String gameStateId, String playerId}) params,
+  ) : this._internal(
         (ref) => canUseActionCard(ref as CanUseActionCardRef, params),
         from: canUseActionCardProvider,
         name: r'canUseActionCardProvider',
@@ -272,10 +407,12 @@ class CanUseActionCardProvider extends AutoDisposeProvider<bool> {
     required this.params,
   }) : super.internal();
 
-  final ({ActionCard? actionCard, String playerId}) params;
+  final ({ActionCard? actionCard, String gameStateId, String playerId}) params;
 
   @override
-  Override overrideWith(bool Function(CanUseActionCardRef provider) create) {
+  Override overrideWith(
+    FutureOr<bool> Function(CanUseActionCardRef provider) create,
+  ) {
     return ProviderOverride(
       origin: this,
       override: CanUseActionCardProvider._internal(
@@ -291,7 +428,7 @@ class CanUseActionCardProvider extends AutoDisposeProvider<bool> {
   }
 
   @override
-  AutoDisposeProviderElement<bool> createElement() {
+  AutoDisposeFutureProviderElement<bool> createElement() {
     return _CanUseActionCardProviderElement(this);
   }
 
@@ -311,22 +448,23 @@ class CanUseActionCardProvider extends AutoDisposeProvider<bool> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin CanUseActionCardRef on AutoDisposeProviderRef<bool> {
+mixin CanUseActionCardRef on AutoDisposeFutureProviderRef<bool> {
   /// The parameter `params` of this provider.
-  ({ActionCard? actionCard, String playerId}) get params;
+  ({ActionCard? actionCard, String gameStateId, String playerId}) get params;
 }
 
-class _CanUseActionCardProviderElement extends AutoDisposeProviderElement<bool>
+class _CanUseActionCardProviderElement
+    extends AutoDisposeFutureProviderElement<bool>
     with CanUseActionCardRef {
   _CanUseActionCardProviderElement(super.provider);
 
   @override
-  ({ActionCard? actionCard, String playerId}) get params =>
+  ({ActionCard? actionCard, String gameStateId, String playerId}) get params =>
       (origin as CanUseActionCardProvider).params;
 }
 
 String _$actionCardNotifierHash() =>
-    r'476aa9536b7bd3e2b2d5d6ad639d2611c0826675';
+    r'9c201be34b19e0aa40817baec41adda6b56d4364';
 
 /// See also [ActionCardNotifier].
 @ProviderFor(ActionCardNotifier)

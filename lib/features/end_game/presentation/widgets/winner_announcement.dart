@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ojyx/features/game/domain/entities/player.dart';
+import 'package:ojyx/features/game/domain/entities/game_player.dart';
 
 class WinnerAnnouncement extends StatelessWidget {
-  final Player winner;
+  final GamePlayer winner;
 
   const WinnerAnnouncement({super.key, required this.winner});
 

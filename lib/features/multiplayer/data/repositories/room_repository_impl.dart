@@ -78,11 +78,21 @@ class RoomRepositoryImpl implements RoomRepository {
     required String gameId,
   }) async {
     final room = await _datasource.getRoom(roomId);
-    if (room != null) {
-      await _datasource.updateRoom(
-        room.copyWith(status: RoomStatus.inGame, currentGameId: gameId),
-      );
+    if (room == null) {
+      throw Exception('Room not found');
     }
+
+    // Use the game initialization use case to create server-authoritative game
+    await _gameInitializationUseCase.execute(
+      roomId: roomId,
+      playerIds: room.playerIds,
+      creatorId: room.creatorId,
+    );
+
+    // Update room status to in-game
+    await _datasource.updateRoom(
+      room.copyWith(status: RoomStatus.inGame, currentGameId: gameId),
+    );
   }
 
   @override

@@ -61,7 +61,8 @@ _$GameStartedImpl _$$GameStartedImplFromJson(Map<String, dynamic> json) =>
           gameId: $checkedConvert('game_id', (v) => v as String),
           initialState: $checkedConvert(
             'initial_state',
-            (v) => GameState.fromJson(v as Map<String, dynamic>),
+            (v) =>
+                const GameStateConverter().fromJson(v as Map<String, dynamic>),
           ),
           $type: $checkedConvert('runtimeType', (v) => v as String?),
         );
@@ -77,7 +78,7 @@ _$GameStartedImpl _$$GameStartedImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$GameStartedImplToJson(_$GameStartedImpl instance) =>
     <String, dynamic>{
       'game_id': instance.gameId,
-      'initial_state': instance.initialState.toJson(),
+      'initial_state': const GameStateConverter().toJson(instance.initialState),
       'runtimeType': instance.$type,
     };
 
@@ -90,7 +91,7 @@ _$GameStateUpdatedImpl _$$GameStateUpdatedImplFromJson(
     final val = _$GameStateUpdatedImpl(
       newState: $checkedConvert(
         'new_state',
-        (v) => GameState.fromJson(v as Map<String, dynamic>),
+        (v) => const GameStateConverter().fromJson(v as Map<String, dynamic>),
       ),
       $type: $checkedConvert('runtimeType', (v) => v as String?),
     );
@@ -102,7 +103,7 @@ _$GameStateUpdatedImpl _$$GameStateUpdatedImplFromJson(
 Map<String, dynamic> _$$GameStateUpdatedImplToJson(
   _$GameStateUpdatedImpl instance,
 ) => <String, dynamic>{
-  'new_state': instance.newState.toJson(),
+  'new_state': const GameStateConverter().toJson(instance.newState),
   'runtimeType': instance.$type,
 };
 
