@@ -2,9 +2,9 @@ import 'package:ojyx/features/multiplayer/domain/datasources/room_datasource.dar
 import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
 import 'package:ojyx/features/multiplayer/domain/entities/room_event.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'supabase_room_datasource.dart';
-import '../models/room_model.dart';
-import '../../../game/data/models/game_state_model.dart';
+import 'package:ojyx/features/multiplayer/data/datasources/supabase_room_datasource.dart';
+import 'package:ojyx/features/multiplayer/data/models/room_model.dart';
+import 'package:ojyx/features/game/data/models/game_state_model.dart';
 
 /// Implementation of RoomDatasource using Supabase
 class SupabaseRoomDatasourceImpl implements RoomDatasource {

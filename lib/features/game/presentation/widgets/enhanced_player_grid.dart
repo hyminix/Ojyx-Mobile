@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/player.dart';
+import '../../domain/entities/game_player.dart';
 import '../../domain/entities/card.dart' as game;
 import '../../domain/entities/card_position.dart';
 import '../providers/card_selection_provider.dart';
