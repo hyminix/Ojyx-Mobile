@@ -25,17 +25,29 @@ void main() {
 
     setUp(() {
       mockAnimationNotifier = MockGameAnimationNotifier();
-      
+
       // Set up default stub for showDirectionChange
-      when(() => mockAnimationNotifier.showDirectionChange(any())).thenReturn(null);
+      when(
+        () => mockAnimationNotifier.showDirectionChange(any()),
+      ).thenReturn(null);
 
       final mockPlayerGrid = PlayerGrid.empty();
 
       initialGameState = GameState(
         roomId: 'room123',
         players: [
-          GamePlayer(id: 'p1', name: 'Player 1', grid: mockPlayerGrid, actionCards: []),
-          GamePlayer(id: 'p2', name: 'Player 2', grid: mockPlayerGrid, actionCards: []),
+          GamePlayer(
+            id: 'p1',
+            name: 'Player 1',
+            grid: mockPlayerGrid,
+            actionCards: [],
+          ),
+          GamePlayer(
+            id: 'p2',
+            name: 'Player 2',
+            grid: mockPlayerGrid,
+            actionCards: [],
+          ),
         ],
         currentPlayerIndex: 0,
         deck: [Card(value: 5), Card(value: 3)],
@@ -65,10 +77,7 @@ void main() {
     });
 
     test('should initialize without error', () {
-      expect(
-        () => container.read(directionObserverProvider),
-        returnsNormally,
-      );
+      expect(() => container.read(directionObserverProvider), returnsNormally);
     });
 
     test('should not trigger animation on first state update', () async {
@@ -76,113 +85,167 @@ void main() {
       container.read(directionObserverProvider);
 
       // Update game state for the first time
-      container.read(gameStateNotifierProvider.notifier).loadState(initialGameState);
+      container
+          .read(gameStateNotifierProvider.notifier)
+          .loadState(initialGameState);
 
       await Future.delayed(Duration.zero);
 
       verifyNever(() => mockAnimationNotifier.showDirectionChange(any()));
     });
 
-    test('should trigger animation when direction changes from clockwise to counterclockwise', () async {
-      // Initialize the observer
-      container.read(directionObserverProvider);
+    test(
+      'should trigger animation when direction changes from clockwise to counterclockwise',
+      () async {
+        // Initialize the observer
+        container.read(directionObserverProvider);
 
-      // Set initial state
-      container.read(gameStateNotifierProvider.notifier).loadState(initialGameState);
-      await Future.delayed(Duration.zero);
+        // Set initial state
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .loadState(initialGameState);
+        await Future.delayed(Duration.zero);
 
-      // First update to same state to set previousDirection
-      container.read(gameStateNotifierProvider.notifier).updateState((state) => state.copyWith(
-        currentPlayerIndex: 0, // Same state to initialize previousDirection
-      ));
-      await Future.delayed(Duration.zero);
+        // First update to same state to set previousDirection
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .updateState(
+              (state) => state.copyWith(
+                currentPlayerIndex:
+                    0, // Same state to initialize previousDirection
+              ),
+            );
+        await Future.delayed(Duration.zero);
 
-      // Update to state with different direction
-      container.read(gameStateNotifierProvider.notifier).updateState((_) => updatedGameState);
-      await Future.delayed(Duration.zero);
+        // Update to state with different direction
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .updateState((_) => updatedGameState);
+        await Future.delayed(Duration.zero);
 
-      // Should trigger animation with backward direction
-      verify(() => mockAnimationNotifier.showDirectionChange(PlayDirection.backward)).called(1);
-    });
+        // Should trigger animation with backward direction
+        verify(
+          () =>
+              mockAnimationNotifier.showDirectionChange(PlayDirection.backward),
+        ).called(1);
+      },
+    );
 
-    test('should trigger animation when direction changes from counterclockwise to clockwise', () async {
-      // Initialize the observer
-      container.read(directionObserverProvider);
+    test(
+      'should trigger animation when direction changes from counterclockwise to clockwise',
+      () async {
+        // Initialize the observer
+        container.read(directionObserverProvider);
 
-      // Set initial state with counterclockwise
-      final counterClockwiseState = initialGameState.copyWith(
-        turnDirection: TurnDirection.counterClockwise,
-      );
-      container.read(gameStateNotifierProvider.notifier).loadState(counterClockwiseState);
-      await Future.delayed(Duration.zero);
+        // Set initial state with counterclockwise
+        final counterClockwiseState = initialGameState.copyWith(
+          turnDirection: TurnDirection.counterClockwise,
+        );
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .loadState(counterClockwiseState);
+        await Future.delayed(Duration.zero);
 
-      // First update to same state to set previousDirection
-      container.read(gameStateNotifierProvider.notifier).updateState((state) => state.copyWith(
-        currentPlayerIndex: 0, // Same state to initialize previousDirection
-      ));
-      await Future.delayed(Duration.zero);
+        // First update to same state to set previousDirection
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .updateState(
+              (state) => state.copyWith(
+                currentPlayerIndex:
+                    0, // Same state to initialize previousDirection
+              ),
+            );
+        await Future.delayed(Duration.zero);
 
-      // Update to clockwise
-      final clockwiseState = counterClockwiseState.copyWith(
-        turnDirection: TurnDirection.clockwise,
-      );
-      container.read(gameStateNotifierProvider.notifier).updateState((_) => clockwiseState);
-      await Future.delayed(Duration.zero);
+        // Update to clockwise
+        final clockwiseState = counterClockwiseState.copyWith(
+          turnDirection: TurnDirection.clockwise,
+        );
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .updateState((_) => clockwiseState);
+        await Future.delayed(Duration.zero);
 
-      // Should trigger animation with forward direction
-      verify(() => mockAnimationNotifier.showDirectionChange(PlayDirection.forward)).called(1);
-    });
+        // Should trigger animation with forward direction
+        verify(
+          () =>
+              mockAnimationNotifier.showDirectionChange(PlayDirection.forward),
+        ).called(1);
+      },
+    );
 
-    test('should not trigger animation when direction stays the same', () async {
-      // Initialize the observer
-      container.read(directionObserverProvider);
+    test(
+      'should not trigger animation when direction stays the same',
+      () async {
+        // Initialize the observer
+        container.read(directionObserverProvider);
 
-      // Set initial state
-      container.read(gameStateNotifierProvider.notifier).loadState(initialGameState);
-      await Future.delayed(Duration.zero);
+        // Set initial state
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .loadState(initialGameState);
+        await Future.delayed(Duration.zero);
 
-      // Update with same direction but different current player
-      final sameDirectionState = initialGameState.copyWith(
-        currentPlayerIndex: 1,
-      );
-      container.read(gameStateNotifierProvider.notifier).updateState((_) => sameDirectionState);
-      await Future.delayed(Duration.zero);
+        // Update with same direction but different current player
+        final sameDirectionState = initialGameState.copyWith(
+          currentPlayerIndex: 1,
+        );
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .updateState((_) => sameDirectionState);
+        await Future.delayed(Duration.zero);
 
-      // Should not trigger animation
-      verifyNever(() => mockAnimationNotifier.showDirectionChange(any()));
-    });
+        // Should not trigger animation
+        verifyNever(() => mockAnimationNotifier.showDirectionChange(any()));
+      },
+    );
 
     test('should handle multiple direction changes', () async {
       // Initialize the observer
       container.read(directionObserverProvider);
 
       // Set initial state
-      container.read(gameStateNotifierProvider.notifier).loadState(initialGameState);
+      container
+          .read(gameStateNotifierProvider.notifier)
+          .loadState(initialGameState);
       await Future.delayed(Duration.zero);
 
       // First update to same state to set previousDirection
-      container.read(gameStateNotifierProvider.notifier).updateState((state) => state.copyWith(
-        currentPlayerIndex: 0, // Same state to initialize previousDirection
-      ));
+      container
+          .read(gameStateNotifierProvider.notifier)
+          .updateState(
+            (state) => state.copyWith(
+              currentPlayerIndex:
+                  0, // Same state to initialize previousDirection
+            ),
+          );
       await Future.delayed(Duration.zero);
 
       // First change: clockwise to counterclockwise
       final counterClockwiseState = initialGameState.copyWith(
         turnDirection: TurnDirection.counterClockwise,
       );
-      container.read(gameStateNotifierProvider.notifier).updateState((_) => counterClockwiseState);
+      container
+          .read(gameStateNotifierProvider.notifier)
+          .updateState((_) => counterClockwiseState);
       await Future.delayed(Duration.zero);
 
-      verify(() => mockAnimationNotifier.showDirectionChange(PlayDirection.backward)).called(1);
+      verify(
+        () => mockAnimationNotifier.showDirectionChange(PlayDirection.backward),
+      ).called(1);
 
       // Second change: back to clockwise
       final backToClockwiseState = counterClockwiseState.copyWith(
         turnDirection: TurnDirection.clockwise,
       );
-      container.read(gameStateNotifierProvider.notifier).updateState((_) => backToClockwiseState);
+      container
+          .read(gameStateNotifierProvider.notifier)
+          .updateState((_) => backToClockwiseState);
       await Future.delayed(Duration.zero);
 
-      verify(() => mockAnimationNotifier.showDirectionChange(PlayDirection.forward)).called(1);
+      verify(
+        () => mockAnimationNotifier.showDirectionChange(PlayDirection.forward),
+      ).called(1);
     });
 
     test('should handle null previous state', () async {
@@ -190,7 +253,9 @@ void main() {
       container.read(directionObserverProvider);
 
       // Directly update to a state (simulating initial load)
-      container.read(gameStateNotifierProvider.notifier).loadState(initialGameState);
+      container
+          .read(gameStateNotifierProvider.notifier)
+          .loadState(initialGameState);
       await Future.delayed(Duration.zero);
 
       // Should not crash and should not trigger animation
@@ -202,32 +267,47 @@ void main() {
       container.read(directionObserverProvider);
 
       // Set initial state
-      container.read(gameStateNotifierProvider.notifier).loadState(initialGameState);
+      container
+          .read(gameStateNotifierProvider.notifier)
+          .loadState(initialGameState);
       await Future.delayed(Duration.zero);
 
       // First update to same state to set previousDirection
-      container.read(gameStateNotifierProvider.notifier).updateState((state) => state.copyWith(
-        currentPlayerIndex: 0, // Same state to initialize previousDirection
-      ));
+      container
+          .read(gameStateNotifierProvider.notifier)
+          .updateState(
+            (state) => state.copyWith(
+              currentPlayerIndex:
+                  0, // Same state to initialize previousDirection
+            ),
+          );
       await Future.delayed(Duration.zero);
 
       // Test clockwise to counterclockwise conversion
       final counterClockwiseState = initialGameState.copyWith(
         turnDirection: TurnDirection.counterClockwise,
       );
-      container.read(gameStateNotifierProvider.notifier).updateState((_) => counterClockwiseState);
+      container
+          .read(gameStateNotifierProvider.notifier)
+          .updateState((_) => counterClockwiseState);
       await Future.delayed(Duration.zero);
 
-      verify(() => mockAnimationNotifier.showDirectionChange(PlayDirection.backward)).called(1);
+      verify(
+        () => mockAnimationNotifier.showDirectionChange(PlayDirection.backward),
+      ).called(1);
 
       // Test counterclockwise to clockwise conversion
       final clockwiseState = counterClockwiseState.copyWith(
         turnDirection: TurnDirection.clockwise,
       );
-      container.read(gameStateNotifierProvider.notifier).updateState((_) => clockwiseState);
+      container
+          .read(gameStateNotifierProvider.notifier)
+          .updateState((_) => clockwiseState);
       await Future.delayed(Duration.zero);
 
-      verify(() => mockAnimationNotifier.showDirectionChange(PlayDirection.forward)).called(1);
+      verify(
+        () => mockAnimationNotifier.showDirectionChange(PlayDirection.forward),
+      ).called(1);
     });
   });
 }

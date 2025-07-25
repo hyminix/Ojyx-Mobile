@@ -52,18 +52,26 @@ void main() {
       const roomId = 'room123';
       const creatorId = 'player1';
 
-      when(() => mockRepository.initializeGame(
-        roomId: roomId,
-        playerIds: playerIds,
-        creatorId: creatorId,
-      )).thenAnswer((_) async => testGameState.copyWith(
-        players: playerIds.map((id) => GamePlayer(
-          id: id,
-          name: 'Player $id',
-          grid: PlayerGrid.empty(),
-          isHost: id == creatorId,
-        )).toList(),
-      ));
+      when(
+        () => mockRepository.initializeGame(
+          roomId: roomId,
+          playerIds: playerIds,
+          creatorId: creatorId,
+        ),
+      ).thenAnswer(
+        (_) async => testGameState.copyWith(
+          players: playerIds
+              .map(
+                (id) => GamePlayer(
+                  id: id,
+                  name: 'Player $id',
+                  grid: PlayerGrid.empty(),
+                  isHost: id == creatorId,
+                ),
+              )
+              .toList(),
+        ),
+      );
 
       // Act
       final result = await useCase.execute(
@@ -75,11 +83,13 @@ void main() {
       // Assert
       expect(result.players.length, equals(3));
       expect(result.roomId, equals(roomId));
-      verify(() => mockRepository.initializeGame(
-        roomId: roomId,
-        playerIds: playerIds,
-        creatorId: creatorId,
-      )).called(1);
+      verify(
+        () => mockRepository.initializeGame(
+          roomId: roomId,
+          playerIds: playerIds,
+          creatorId: creatorId,
+        ),
+      ).called(1);
     });
 
     test('should set creator as host', () async {
@@ -89,19 +99,25 @@ void main() {
       const creatorId = 'player2';
 
       final expectedGameState = testGameState.copyWith(
-        players: playerIds.map((id) => GamePlayer(
-          id: id,
-          name: 'Player $id',
-          grid: PlayerGrid.empty(),
-          isHost: id == creatorId,
-        )).toList(),
+        players: playerIds
+            .map(
+              (id) => GamePlayer(
+                id: id,
+                name: 'Player $id',
+                grid: PlayerGrid.empty(),
+                isHost: id == creatorId,
+              ),
+            )
+            .toList(),
       );
 
-      when(() => mockRepository.initializeGame(
-        roomId: roomId,
-        playerIds: playerIds,
-        creatorId: creatorId,
-      )).thenAnswer((_) async => expectedGameState);
+      when(
+        () => mockRepository.initializeGame(
+          roomId: roomId,
+          playerIds: playerIds,
+          creatorId: creatorId,
+        ),
+      ).thenAnswer((_) async => expectedGameState);
 
       // Act
       final result = await useCase.execute(
@@ -129,11 +145,13 @@ void main() {
           roomId: roomId,
           creatorId: creatorId,
         ),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('Cannot initialize game with no players'),
-        )),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Cannot initialize game with no players'),
+          ),
+        ),
       );
     });
 
@@ -150,11 +168,13 @@ void main() {
           roomId: roomId,
           creatorId: creatorId,
         ),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('Game requires 2-8 players'),
-        )),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Game requires 2-8 players'),
+          ),
+        ),
       );
     });
 
@@ -171,11 +191,13 @@ void main() {
           roomId: roomId,
           creatorId: creatorId,
         ),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('Game requires 2-8 players'),
-        )),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Game requires 2-8 players'),
+          ),
+        ),
       );
     });
 
@@ -192,11 +214,13 @@ void main() {
           roomId: roomId,
           creatorId: creatorId,
         ),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('Creator must be included in player list'),
-        )),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Creator must be included in player list'),
+          ),
+        ),
       );
     });
 
@@ -206,11 +230,13 @@ void main() {
       const roomId = 'room123';
       const creatorId = 'player1';
 
-      when(() => mockRepository.initializeGame(
-        roomId: roomId,
-        playerIds: playerIds,
-        creatorId: creatorId,
-      )).thenThrow(Exception('Database error'));
+      when(
+        () => mockRepository.initializeGame(
+          roomId: roomId,
+          playerIds: playerIds,
+          creatorId: creatorId,
+        ),
+      ).thenThrow(Exception('Database error'));
 
       // Act & Assert
       expect(
@@ -219,11 +245,13 @@ void main() {
           roomId: roomId,
           creatorId: creatorId,
         ),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('Failed to initialize game'),
-        )),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Failed to initialize game'),
+          ),
+        ),
       );
     });
 
@@ -231,8 +259,9 @@ void main() {
       // Arrange
       const gameStateId = 'game123';
 
-      when(() => mockRepository.getGameState(gameStateId))
-          .thenAnswer((_) async => testGameState);
+      when(
+        () => mockRepository.getGameState(gameStateId),
+      ).thenAnswer((_) async => testGameState);
 
       // Act
       final result = await useCase.getGameState(gameStateId);
@@ -247,8 +276,9 @@ void main() {
       const gameStateId = 'game123';
       final gameStateStream = Stream.value(testGameState);
 
-      when(() => mockRepository.watchGameState(gameStateId))
-          .thenAnswer((_) => gameStateStream);
+      when(
+        () => mockRepository.watchGameState(gameStateId),
+      ).thenAnswer((_) => gameStateStream);
 
       // Act
       final stream = useCase.watchGameState(gameStateId);

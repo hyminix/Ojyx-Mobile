@@ -30,15 +30,11 @@ void main() {
           ],
           isHost: true,
         ),
-        GamePlayer(
-          id: 'player2',
-          name: 'Player 2',
-          grid: PlayerGrid.empty(),
-        ),
+        GamePlayer(id: 'player2', name: 'Player 2', grid: PlayerGrid.empty()),
       ];
 
       testDeck = List.generate(
-        10, 
+        10,
         (i) => Card(value: i + 1, isRevealed: false),
       );
 
@@ -76,100 +72,121 @@ void main() {
       );
     });
 
-    test('should have toDomainComplete method that reconstructs full GameState', () {
-      // This test will initially fail, guiding us to implement toDomainComplete
-      
-      // Create a GameStateModel from database representation
-      final model = GameStateModel(
-        id: 'game-123',
-        roomId: 'test-room-123',
-        status: 'playing',
-        currentPlayerId: 'player1',
-        turnNumber: 5,
-        roundNumber: 1,
-        gameData: {
-          'players': testPlayers.map((p) => {
-            'id': p.id,
-            'name': p.name,
-            'grid': {
-              'cards': p.grid.cards.map((row) => 
-            row.map((c) => c != null ? {
-              'value': c.value,
-              'isRevealed': c.isRevealed,
-            } : null).toList()
-          ).toList(),
-            },
-            'actionCards': p.actionCards.map((a) => {
-              'id': a.id,
-              'type': a.type.name,
-              'name': a.name,
-              'description': a.description,
-              'timing': a.timing.name,
-              'target': a.target.name,
-              'parameters': a.parameters,
-            }).toList(),
-            'isConnected': p.isConnected,
-            'isHost': p.isHost,
-            'hasFinishedRound': p.hasFinishedRound,
-            'scoreMultiplier': p.scoreMultiplier,
-          }).toList(),
-          'currentPlayerIndex': 0,
-          'deck': testDeck.map((c) => {
-            'value': c.value,
-            'isRevealed': c.isRevealed,
-          }).toList(),
-          'discardPile': testDiscardPile.map((c) => {
-            'value': c.value,
-            'isRevealed': c.isRevealed,
-          }).toList(),
-          'actionDeck': testActionDeck.map((a) => {
-            'id': a.id,
-            'type': a.type.name,
-            'name': a.name,
-            'description': a.description,
-            'timing': a.timing.name,
-            'target': a.target.name,
-            'parameters': a.parameters,
-          }).toList(),
-          'actionDiscard': [],
-          'turnDirection': 'clockwise',
-          'lastRound': false,
-          'initiatorPlayerId': 'player1',
-          'endRoundInitiator': null,
-          'drawnCard': {'value': 7, 'isRevealed': false},
-          'startedAt': DateTime(2024, 1, 1, 10, 0).toIso8601String(),
-        },
-        winnerId: null,
-        endedAt: null,
-        createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1, 10, 30),
-      );
+    test(
+      'should have toDomainComplete method that reconstructs full GameState',
+      () {
+        // This test will initially fail, guiding us to implement toDomainComplete
 
-      // Convert to domain
-      final reconstructed = model.toDomainComplete();
+        // Create a GameStateModel from database representation
+        final model = GameStateModel(
+          id: 'game-123',
+          roomId: 'test-room-123',
+          status: 'playing',
+          currentPlayerId: 'player1',
+          turnNumber: 5,
+          roundNumber: 1,
+          gameData: {
+            'players': testPlayers
+                .map(
+                  (p) => {
+                    'id': p.id,
+                    'name': p.name,
+                    'grid': {
+                      'cards': p.grid.cards
+                          .map(
+                            (row) => row
+                                .map(
+                                  (c) => c != null
+                                      ? {
+                                          'value': c.value,
+                                          'isRevealed': c.isRevealed,
+                                        }
+                                      : null,
+                                )
+                                .toList(),
+                          )
+                          .toList(),
+                    },
+                    'actionCards': p.actionCards
+                        .map(
+                          (a) => {
+                            'id': a.id,
+                            'type': a.type.name,
+                            'name': a.name,
+                            'description': a.description,
+                            'timing': a.timing.name,
+                            'target': a.target.name,
+                            'parameters': a.parameters,
+                          },
+                        )
+                        .toList(),
+                    'isConnected': p.isConnected,
+                    'isHost': p.isHost,
+                    'hasFinishedRound': p.hasFinishedRound,
+                    'scoreMultiplier': p.scoreMultiplier,
+                  },
+                )
+                .toList(),
+            'currentPlayerIndex': 0,
+            'deck': testDeck
+                .map((c) => {'value': c.value, 'isRevealed': c.isRevealed})
+                .toList(),
+            'discardPile': testDiscardPile
+                .map((c) => {'value': c.value, 'isRevealed': c.isRevealed})
+                .toList(),
+            'actionDeck': testActionDeck
+                .map(
+                  (a) => {
+                    'id': a.id,
+                    'type': a.type.name,
+                    'name': a.name,
+                    'description': a.description,
+                    'timing': a.timing.name,
+                    'target': a.target.name,
+                    'parameters': a.parameters,
+                  },
+                )
+                .toList(),
+            'actionDiscard': [],
+            'turnDirection': 'clockwise',
+            'lastRound': false,
+            'initiatorPlayerId': 'player1',
+            'endRoundInitiator': null,
+            'drawnCard': {'value': 7, 'isRevealed': false},
+            'startedAt': DateTime(2024, 1, 1, 10, 0).toIso8601String(),
+          },
+          winnerId: null,
+          endedAt: null,
+          createdAt: DateTime(2024, 1, 1),
+          updatedAt: DateTime(2024, 1, 1, 10, 30),
+        );
 
-      // Verify all properties are correctly mapped
-      expect(reconstructed.roomId, equals('test-room-123'));
-      expect(reconstructed.status, equals(GameStatus.playing));
-      expect(reconstructed.players.length, equals(2));
-      expect(reconstructed.players[0].id, equals('player1'));
-      expect(reconstructed.players[0].name, equals('Player 1'));
-      expect(reconstructed.players[0].actionCards.length, equals(1));
-      expect(reconstructed.currentPlayerIndex, equals(0));
-      expect(reconstructed.deck.length, equals(10));
-      expect(reconstructed.discardPile.length, equals(2));
-      expect(reconstructed.actionDeck.length, equals(1));
-      expect(reconstructed.turnDirection, equals(TurnDirection.clockwise));
-      expect(reconstructed.lastRound, isFalse);
-      expect(reconstructed.initiatorPlayerId, equals('player1'));
-      expect(reconstructed.drawnCard?.value, equals(7));
-      expect(reconstructed.startedAt, equals(DateTime(2024, 1, 1, 10, 0)));
-      expect(reconstructed.createdAt, equals(DateTime(2024, 1, 1)));
-    });
+        // Convert to domain
+        final reconstructed = model.toDomainComplete();
+
+        // Verify all properties are correctly mapped
+        expect(reconstructed.roomId, equals('test-room-123'));
+        expect(reconstructed.status, equals(GameStatus.playing));
+        expect(reconstructed.players.length, equals(2));
+        expect(reconstructed.players[0].id, equals('player1'));
+        expect(reconstructed.players[0].name, equals('Player 1'));
+        expect(reconstructed.players[0].actionCards.length, equals(1));
+        expect(reconstructed.currentPlayerIndex, equals(0));
+        expect(reconstructed.deck.length, equals(10));
+        expect(reconstructed.discardPile.length, equals(2));
+        expect(reconstructed.actionDeck.length, equals(1));
+        expect(reconstructed.turnDirection, equals(TurnDirection.clockwise));
+        expect(reconstructed.lastRound, isFalse);
+        expect(reconstructed.initiatorPlayerId, equals('player1'));
+        expect(reconstructed.drawnCard?.value, equals(7));
+        expect(reconstructed.startedAt, equals(DateTime(2024, 1, 1, 10, 0)));
+        expect(reconstructed.createdAt, equals(DateTime(2024, 1, 1)));
+      },
+    );
 
     test('should have fromDomainComplete method for complete persistence', () {
       // This test will initially fail, guiding us to implement fromDomainComplete
-      
+
       // Convert domain to model
       final model = GameStateModel.fromDomainComplete(
         domainGameState,
@@ -208,32 +225,49 @@ void main() {
         roundNumber: 1,
         updatedAt: DateTime.now(),
       );
-      
+
       final reconstructed = model.toDomainComplete();
 
       // Core properties should match
       expect(reconstructed.roomId, equals(domainGameState.roomId));
       expect(reconstructed.status, equals(domainGameState.status));
-      expect(reconstructed.players.length, equals(domainGameState.players.length));
-      expect(reconstructed.currentPlayerIndex, equals(domainGameState.currentPlayerIndex));
+      expect(
+        reconstructed.players.length,
+        equals(domainGameState.players.length),
+      );
+      expect(
+        reconstructed.currentPlayerIndex,
+        equals(domainGameState.currentPlayerIndex),
+      );
       expect(reconstructed.deck.length, equals(domainGameState.deck.length));
-      expect(reconstructed.discardPile.length, equals(domainGameState.discardPile.length));
-      expect(reconstructed.actionDeck.length, equals(domainGameState.actionDeck.length));
-      expect(reconstructed.turnDirection, equals(domainGameState.turnDirection));
+      expect(
+        reconstructed.discardPile.length,
+        equals(domainGameState.discardPile.length),
+      );
+      expect(
+        reconstructed.actionDeck.length,
+        equals(domainGameState.actionDeck.length),
+      );
+      expect(
+        reconstructed.turnDirection,
+        equals(domainGameState.turnDirection),
+      );
       expect(reconstructed.lastRound, equals(domainGameState.lastRound));
-      expect(reconstructed.initiatorPlayerId, equals(domainGameState.initiatorPlayerId));
-      expect(reconstructed.drawnCard?.value, equals(domainGameState.drawnCard?.value));
+      expect(
+        reconstructed.initiatorPlayerId,
+        equals(domainGameState.initiatorPlayerId),
+      );
+      expect(
+        reconstructed.drawnCard?.value,
+        equals(domainGameState.drawnCard?.value),
+      );
     });
 
     test('should handle null optional fields correctly', () {
       final minimalGameState = GameState(
         roomId: 'minimal-room',
         players: [
-          GamePlayer(
-            id: 'player1',
-            name: 'Player 1',
-            grid: PlayerGrid.empty(),
-          ),
+          GamePlayer(id: 'player1', name: 'Player 1', grid: PlayerGrid.empty()),
         ],
         currentPlayerIndex: 0,
         deck: [],

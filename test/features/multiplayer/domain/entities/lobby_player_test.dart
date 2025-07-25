@@ -83,7 +83,7 @@ void main() {
       // Given
       final originalDate = DateTime(2024, 1, 1);
       final newDate = DateTime(2024, 1, 2);
-      
+
       final player = LobbyPlayer(
         id: 'test-id',
         name: 'TestPlayer',
@@ -113,13 +113,16 @@ void main() {
       expect(updatedPlayer.connectionStatus, equals(ConnectionStatus.away));
       expect(updatedPlayer.currentRoomId, equals('new-room-id'));
       expect(updatedPlayer.id, equals('test-id')); // ID should remain unchanged
-      expect(updatedPlayer.createdAt, equals(originalDate)); // createdAt should remain unchanged
+      expect(
+        updatedPlayer.createdAt,
+        equals(originalDate),
+      ); // createdAt should remain unchanged
     });
 
     test('should have equality based on all fields', () {
       // Given
       final date = DateTime(2024, 1, 1);
-      
+
       final player1 = LobbyPlayer(
         id: 'test-id',
         name: 'TestPlayer',
@@ -159,12 +162,18 @@ void main() {
     });
 
     test('should parse from string correctly', () {
-      expect(ConnectionStatus.values.firstWhere((s) => s.name == 'online'), 
-             equals(ConnectionStatus.online));
-      expect(ConnectionStatus.values.firstWhere((s) => s.name == 'offline'), 
-             equals(ConnectionStatus.offline));
-      expect(ConnectionStatus.values.firstWhere((s) => s.name == 'away'), 
-             equals(ConnectionStatus.away));
+      expect(
+        ConnectionStatus.values.firstWhere((s) => s.name == 'online'),
+        equals(ConnectionStatus.online),
+      );
+      expect(
+        ConnectionStatus.values.firstWhere((s) => s.name == 'offline'),
+        equals(ConnectionStatus.offline),
+      );
+      expect(
+        ConnectionStatus.values.firstWhere((s) => s.name == 'away'),
+        equals(ConnectionStatus.away),
+      );
     });
   });
 }

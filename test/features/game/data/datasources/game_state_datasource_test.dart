@@ -6,7 +6,7 @@ void main() {
   group('GameStateDataSource', () {
     test('should define interface for game state operations', () {
       // This test verifies the interface structure
-      
+
       // The datasource should support these operations:
       final expectedMethods = [
         'createGameState',
@@ -81,12 +81,12 @@ void main() {
       // Test game phase validation
       const validPhases = [
         'waiting',
-        'in_progress', 
+        'in_progress',
         'last_round',
         'round_ended',
-        'game_ended'
+        'game_ended',
       ];
-      
+
       for (final phase in validPhases) {
         expect(validPhases, contains(phase));
       }
@@ -95,7 +95,7 @@ void main() {
     test('should validate game directions', () async {
       // Test direction validation
       const validDirections = ['clockwise', 'counter_clockwise'];
-      
+
       for (final direction in validDirections) {
         expect(validDirections, contains(direction));
       }

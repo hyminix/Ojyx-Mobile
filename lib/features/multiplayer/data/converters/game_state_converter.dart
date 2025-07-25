@@ -2,7 +2,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/data/models/game_state_model.dart';
 
-class GameStateConverter implements JsonConverter<GameState, Map<String, dynamic>> {
+class GameStateConverter
+    implements JsonConverter<GameState, Map<String, dynamic>> {
   const GameStateConverter();
 
   @override
@@ -13,16 +14,21 @@ class GameStateConverter implements JsonConverter<GameState, Map<String, dynamic
       id: json['id'] ?? 'temp-id',
       roomId: json['roomId'] ?? json['room_id'] ?? '',
       status: json['status'] ?? 'waitingToStart',
-      currentPlayerId: json['currentPlayerId'] ?? json['current_player_id'] ?? '',
+      currentPlayerId:
+          json['currentPlayerId'] ?? json['current_player_id'] ?? '',
       turnNumber: json['turnNumber'] ?? json['turn_number'] ?? 0,
       roundNumber: json['roundNumber'] ?? json['round_number'] ?? 0,
       gameData: json['gameData'] ?? json['game_data'] ?? {},
       winnerId: json['winnerId'] ?? json['winner_id'],
       endedAt: json['endedAt'] != null ? DateTime.parse(json['endedAt']) : null,
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now(),
-      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : DateTime.now(),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : DateTime.now(),
     );
-    
+
     return tempModel.toDomainComplete();
   }
 
@@ -36,7 +42,7 @@ class GameStateConverter implements JsonConverter<GameState, Map<String, dynamic
       roundNumber: 0,
       updatedAt: DateTime.now(),
     );
-    
+
     return tempModel.toJson();
   }
 }

@@ -237,7 +237,7 @@ void main() {
           RETURN jsonb_build_object('valid', true, 'action', 'teleport_executed');
         END;
         \$\$ LANGUAGE plpgsql;
-        '''
+        ''',
       ];
 
       for (final func in executionFunctions) {

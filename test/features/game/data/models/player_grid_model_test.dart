@@ -9,11 +9,11 @@ void main() {
   group('PlayerGridModel', () {
     test('should convert to domain entity (PlayerGrid)', () {
       // Given
-      final gridCardsJson = List.generate(12, (i) => {
-        'value': i,
-        'is_revealed': i < 2,
-      });
-      
+      final gridCardsJson = List.generate(
+        12,
+        (i) => {'value': i, 'is_revealed': i < 2},
+      );
+
       final actionCardsJson = [
         {
           'id': '1',
@@ -56,15 +56,18 @@ void main() {
       expect(playerGrid, isA<PlayerGrid>());
       expect(playerGrid.cards, hasLength(3)); // 3 rows
       expect(playerGrid.cards[0], hasLength(4)); // 4 columns
-      expect(playerGrid.cards.expand((row) => row).where((card) => card != null), hasLength(12));
+      expect(
+        playerGrid.cards.expand((row) => row).where((card) => card != null),
+        hasLength(12),
+      );
     });
 
     test('should convert to DbPlayerGrid', () {
       // Given
-      final gridCardsJson = List.generate(12, (i) => {
-        'value': i,
-        'is_revealed': i < 2,
-      });
+      final gridCardsJson = List.generate(
+        12,
+        (i) => {'value': i, 'is_revealed': i < 2},
+      );
 
       final actionCardsJson = [
         {
@@ -77,14 +80,14 @@ void main() {
           'parameters': {},
         },
         {
-          'id': '2', 
+          'id': '2',
           'type': 'teleport',
           'timing': 'optional',
           'name': 'Téléportation',
           'description': 'Échangez deux cartes',
           'target': 'none',
           'parameters': {},
-        }
+        },
       ];
 
       final model = PlayerGridModel(
@@ -120,18 +123,22 @@ void main() {
       // Given
       final model = PlayerGridModel(
         id: 'grid-id',
-        gameStateId: 'game-id', 
+        gameStateId: 'game-id',
         playerId: 'player-id',
-        gridCards: [{'value': 5, 'is_revealed': true}],
-        actionCards: [{
-          'id': '1', 
-          'type': 'teleport', 
-          'timing': 'optional',
-          'name': 'Téléportation',
-          'description': 'Échangez deux cartes',
-          'target': 'none',
-          'parameters': {},
-        }],
+        gridCards: [
+          {'value': 5, 'is_revealed': true},
+        ],
+        actionCards: [
+          {
+            'id': '1',
+            'type': 'teleport',
+            'timing': 'optional',
+            'name': 'Téléportation',
+            'description': 'Échangez deux cartes',
+            'target': 'none',
+            'parameters': {},
+          },
+        ],
         score: 25,
         position: 2,
         isActive: false,
@@ -161,7 +168,9 @@ void main() {
         'id': 'grid-id',
         'game_state_id': 'game-id',
         'player_id': 'player-id',
-        'grid_cards': [{'value': 3, 'is_revealed': false}],
+        'grid_cards': [
+          {'value': 3, 'is_revealed': false},
+        ],
         'action_cards': [],
         'score': 15,
         'position': 3,

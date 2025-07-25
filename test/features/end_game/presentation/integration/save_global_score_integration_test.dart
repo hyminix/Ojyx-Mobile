@@ -18,14 +18,17 @@ import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
 
 class MockGlobalScoreRepository extends Mock implements GlobalScoreRepository {}
-class MockSaveGlobalScoreUseCase extends Mock implements SaveGlobalScoreUseCase {}
+
+class MockSaveGlobalScoreUseCase extends Mock
+    implements SaveGlobalScoreUseCase {}
+
 class FakeSaveGlobalScoreParams extends Fake implements SaveGlobalScoreParams {}
 
 class StubGameStateNotifier extends GameStateNotifier {
   final GameState? stubState;
-  
+
   StubGameStateNotifier(this.stubState);
-  
+
   @override
   GameState? build() => stubState;
 }
@@ -52,11 +55,9 @@ void main() {
           id: 'player1',
           name: 'Alice',
           grid: PlayerGrid.fromCards(
-            List.generate(12, (i) => 
-              game_card.Card(
-                value: i == 0 ? 5 : 10,
-                isRevealed: true,
-              ),
+            List.generate(
+              12,
+              (i) => game_card.Card(value: i == 0 ? 5 : 10, isRevealed: true),
             ),
           ),
         ),
@@ -64,11 +65,9 @@ void main() {
           id: 'player2',
           name: 'Bob',
           grid: PlayerGrid.fromCards(
-            List.generate(12, (i) => 
-              game_card.Card(
-                value: 12,
-                isRevealed: true,
-              ),
+            List.generate(
+              12,
+              (i) => game_card.Card(value: 12, isRevealed: true),
             ),
           ),
         ),
@@ -92,7 +91,9 @@ void main() {
       container = ProviderContainer(
         overrides: [
           currentRoomIdProvider.overrideWithValue('room123'),
-          gameStateNotifierProvider.overrideWith(() => StubGameStateNotifier(testGameState)),
+          gameStateNotifierProvider.overrideWith(
+            () => StubGameStateNotifier(testGameState),
+          ),
           globalScoreRepositoryProvider.overrideWithValue(mockRepository),
           saveGlobalScoreUseCaseProvider.overrideWithValue(mockUseCase),
         ],
@@ -130,9 +131,9 @@ void main() {
         ),
       ];
 
-      when(() => mockUseCase(any())).thenAnswer(
-        (_) async => Right(expectedScores),
-      );
+      when(
+        () => mockUseCase(any()),
+      ).thenAnswer((_) async => Right(expectedScores));
 
       // Act
       await container.read(endGameWithSaveProvider.future);
@@ -140,7 +141,7 @@ void main() {
       // Assert and capture in one call
       final captured = verify(() => mockUseCase(captureAny())).captured;
       expect(captured.length, equals(1));
-      
+
       final params = captured.first as SaveGlobalScoreParams;
       expect(params.gameState, equals(testGameState));
       expect(params.roundNumber, equals(1));
@@ -149,7 +150,8 @@ void main() {
     test('should handle save errors gracefully', () async {
       // Arrange
       when(() => mockUseCase(any())).thenAnswer(
-        (_) async => const Left(Failure.server(message: 'Failed to save scores')),
+        (_) async =>
+            const Left(Failure.server(message: 'Failed to save scores')),
       );
 
       // Act & Assert
@@ -161,14 +163,14 @@ void main() {
 
     test('should not save scores if game not finished', () async {
       // Arrange
-      final inProgressGame = testGameState.copyWith(
-        status: GameStatus.playing,
-      );
-      
+      final inProgressGame = testGameState.copyWith(status: GameStatus.playing);
+
       container = ProviderContainer(
         overrides: [
           currentRoomIdProvider.overrideWithValue('room123'),
-          gameStateNotifierProvider.overrideWith(() => StubGameStateNotifier(inProgressGame)),
+          gameStateNotifierProvider.overrideWith(
+            () => StubGameStateNotifier(inProgressGame),
+          ),
           globalScoreRepositoryProvider.overrideWithValue(mockRepository),
           saveGlobalScoreUseCaseProvider.overrideWithValue(mockUseCase),
         ],
@@ -186,7 +188,9 @@ void main() {
       container = ProviderContainer(
         overrides: [
           currentRoomIdProvider.overrideWithValue(null),
-          gameStateNotifierProvider.overrideWith(() => StubGameStateNotifier(testGameState)),
+          gameStateNotifierProvider.overrideWith(
+            () => StubGameStateNotifier(testGameState),
+          ),
           globalScoreRepositoryProvider.overrideWithValue(mockRepository),
           saveGlobalScoreUseCaseProvider.overrideWithValue(mockUseCase),
         ],

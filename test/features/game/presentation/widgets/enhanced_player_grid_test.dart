@@ -22,7 +22,11 @@ void main() {
         (index) => game.Card(value: index, isRevealed: index < 2),
       );
       testGrid = PlayerGrid.fromCards(cards);
-      testPlayer = GamePlayer(id: 'player-1', name: 'Test GamePlayer', grid: testGrid);
+      testPlayer = GamePlayer(
+        id: 'player-1',
+        name: 'Test GamePlayer',
+        grid: testGrid,
+      );
     });
 
     testWidgets('should wrap PlayerGridWidget with enhanced features', (

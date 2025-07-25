@@ -51,8 +51,9 @@ void main() {
         actionDiscard: [],
       );
 
-      when(() => mockRepository.watchGameState(gameStateId))
-          .thenAnswer((_) => Stream.value(gameState));
+      when(
+        () => mockRepository.watchGameState(gameStateId),
+      ).thenAnswer((_) => Stream.value(gameState));
 
       // Act
       final stream = syncGameStateUseCase.watchGameState(gameStateId);
@@ -89,11 +90,14 @@ void main() {
         actionDiscard: [],
       );
 
-      when(() => mockRepository.getGameState(gameStateId))
-          .thenAnswer((_) async => gameState);
+      when(
+        () => mockRepository.getGameState(gameStateId),
+      ).thenAnswer((_) async => gameState);
 
       // Act
-      final result = await syncGameStateUseCase.getCurrentGameState(gameStateId);
+      final result = await syncGameStateUseCase.getCurrentGameState(
+        gameStateId,
+      );
 
       // Assert
       expect(result, equals(gameState));
@@ -108,10 +112,12 @@ void main() {
         List.generate(12, (_) => const Card(value: 5, isRevealed: false)),
       );
 
-      when(() => mockRepository.watchPlayerGrid(
-            gameStateId: gameStateId,
-            playerId: playerId,
-          )).thenAnswer((_) => Stream.value(playerGrid));
+      when(
+        () => mockRepository.watchPlayerGrid(
+          gameStateId: gameStateId,
+          playerId: playerId,
+        ),
+      ).thenAnswer((_) => Stream.value(playerGrid));
 
       // Act
       final stream = syncGameStateUseCase.watchPlayerGrid(
@@ -121,10 +127,12 @@ void main() {
 
       // Assert
       expect(await stream.first, equals(playerGrid));
-      verify(() => mockRepository.watchPlayerGrid(
-            gameStateId: gameStateId,
-            playerId: playerId,
-          )).called(1);
+      verify(
+        () => mockRepository.watchPlayerGrid(
+          gameStateId: gameStateId,
+          playerId: playerId,
+        ),
+      ).called(1);
     });
 
     test('should watch game actions', () async {
@@ -132,8 +140,9 @@ void main() {
       const gameStateId = 'game123';
       final action = {'type': 'draw_card', 'player_id': 'player1'};
 
-      when(() => mockRepository.watchGameActions(gameStateId))
-          .thenAnswer((_) => Stream.value(action));
+      when(
+        () => mockRepository.watchGameActions(gameStateId),
+      ).thenAnswer((_) => Stream.value(action));
 
       // Act
       final stream = syncGameStateUseCase.watchGameActions(gameStateId);
@@ -148,13 +157,18 @@ void main() {
       const gameStateId = 'game123';
       const playerId = 'player1';
       const position = 5;
-      final result = {'success': true, 'card': {'value': 7}};
+      final result = {
+        'success': true,
+        'card': {'value': 7},
+      };
 
-      when(() => mockRepository.revealCard(
-            gameStateId: gameStateId,
-            playerId: playerId,
-            position: position,
-          )).thenAnswer((_) async => result);
+      when(
+        () => mockRepository.revealCard(
+          gameStateId: gameStateId,
+          playerId: playerId,
+          position: position,
+        ),
+      ).thenAnswer((_) async => result);
 
       // Act
       final response = await syncGameStateUseCase.revealCard(
@@ -165,11 +179,13 @@ void main() {
 
       // Assert
       expect(response, equals(result));
-      verify(() => mockRepository.revealCard(
-            gameStateId: gameStateId,
-            playerId: playerId,
-            position: position,
-          )).called(1);
+      verify(
+        () => mockRepository.revealCard(
+          gameStateId: gameStateId,
+          playerId: playerId,
+          position: position,
+        ),
+      ).called(1);
     });
 
     test('should check if player can act', () async {
@@ -210,8 +226,9 @@ void main() {
         actionDiscard: [],
       );
 
-      when(() => mockRepository.getGameState(gameStateId))
-          .thenAnswer((_) async => gameState);
+      when(
+        () => mockRepository.getGameState(gameStateId),
+      ).thenAnswer((_) async => gameState);
 
       // Act
       final canAct = await syncGameStateUseCase.canPlayerAct(

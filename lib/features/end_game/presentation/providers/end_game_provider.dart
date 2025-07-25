@@ -54,7 +54,7 @@ final voteToContineProvider = Provider.family<void, String>((ref, playerId) {
 final endGameActionProvider = Provider<void>((ref) {
   // Save global scores first
   ref.read(endGameWithSaveProvider);
-  
+
   // Navigate to home screen
   ref.read(navigateToHomeProvider);
 
@@ -66,24 +66,24 @@ final endGameActionProvider = Provider<void>((ref) {
 final endGameWithSaveProvider = FutureProvider<void>((ref) async {
   final gameState = ref.read(gameStateNotifierProvider);
   final roomId = ref.read(currentRoomIdProvider);
-  
+
   if (gameState == null || roomId == null) {
     return;
   }
-  
+
   // Only save if game is finished
   if (gameState.status != GameStatus.finished) {
     return;
   }
-  
+
   final useCase = ref.read(saveGlobalScoreUseCaseProvider);
   final params = SaveGlobalScoreParams(
     gameState: gameState,
     roundNumber: 1, // TODO: Track round number properly
   );
-  
+
   final result = await useCase(params);
-  
+
   result.fold(
     (failure) => throw Exception('Failed to save scores: ${failure.message}'),
     (_) => {}, // Success

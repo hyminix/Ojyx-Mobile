@@ -67,13 +67,15 @@ void main() {
     }) {
       // Set up mock behavior
       if (error != null) {
-        when(() => mockRepository.getRecentGames(playerId, limit: 10))
-            .thenThrow(error);
+        when(
+          () => mockRepository.getRecentGames(playerId, limit: 10),
+        ).thenThrow(error);
       } else if (isLoading) {
         // Don't use the mock for loading test, rely on default provider behavior
       } else {
-        when(() => mockRepository.getRecentGames(playerId, limit: 10))
-            .thenAnswer((_) async => games ?? testGames);
+        when(
+          () => mockRepository.getRecentGames(playerId, limit: 10),
+        ).thenAnswer((_) async => games ?? testGames);
       }
 
       return ProviderScope(
@@ -86,11 +88,14 @@ void main() {
       );
     }
 
-    testWidgets('should display loading indicator when loading', (tester) async {
+    testWidgets('should display loading indicator when loading', (
+      tester,
+    ) async {
       // Set up a never-completing future
       final completer = Completer<List<GlobalScore>>();
-      when(() => mockRepository.getRecentGames('player1', limit: 10))
-          .thenAnswer((_) => completer.future);
+      when(
+        () => mockRepository.getRecentGames('player1', limit: 10),
+      ).thenAnswer((_) => completer.future);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -102,17 +107,15 @@ void main() {
           ),
         ),
       );
-      
+
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
     testWidgets('should display game history when loaded', (tester) async {
-      await tester.pumpWidget(
-        createWidgetUnderTest(games: testGames),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(games: testGames));
+
       await tester.pumpAndSettle();
 
       // Check app bar
@@ -130,10 +133,8 @@ void main() {
     });
 
     testWidgets('should display position correctly', (tester) async {
-      await tester.pumpWidget(
-        createWidgetUnderTest(games: testGames),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(games: testGames));
+
       await tester.pumpAndSettle();
 
       expect(find.text('Position: 1er'), findsOneWidget); // First game
@@ -142,10 +143,8 @@ void main() {
     });
 
     testWidgets('should show game duration when available', (tester) async {
-      await tester.pumpWidget(
-        createWidgetUnderTest(games: testGames),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(games: testGames));
+
       await tester.pumpAndSettle();
 
       // First game has 30 minutes duration
@@ -153,10 +152,8 @@ void main() {
     });
 
     testWidgets('should show round number', (tester) async {
-      await tester.pumpWidget(
-        createWidgetUnderTest(games: testGames),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(games: testGames));
+
       await tester.pumpAndSettle();
 
       expect(find.text('3 manches'), findsOneWidget);
@@ -165,10 +162,8 @@ void main() {
     });
 
     testWidgets('should display empty message when no games', (tester) async {
-      await tester.pumpWidget(
-        createWidgetUnderTest(games: []),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(games: []));
+
       await tester.pumpAndSettle();
 
       expect(find.text('Aucune partie jouée'), findsOneWidget);
@@ -179,7 +174,7 @@ void main() {
       await tester.pumpWidget(
         createWidgetUnderTest(error: Exception('Failed to load')),
       );
-      
+
       await tester.pumpAndSettle();
 
       expect(find.text('Erreur lors du chargement'), findsOneWidget);
@@ -187,10 +182,8 @@ void main() {
     });
 
     testWidgets('should support pull to refresh', (tester) async {
-      await tester.pumpWidget(
-        createWidgetUnderTest(games: testGames),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(games: testGames));
+
       await tester.pumpAndSettle();
 
       expect(find.byType(RefreshIndicator), findsOneWidget);
@@ -215,7 +208,7 @@ void main() {
           },
         ),
       );
-      
+
       await tester.pumpAndSettle();
 
       await tester.tap(find.byType(Card).first);
@@ -225,10 +218,8 @@ void main() {
     });
 
     testWidgets('should format dates in French', (tester) async {
-      await tester.pumpWidget(
-        createWidgetUnderTest(games: testGames),
-      );
-      
+      await tester.pumpWidget(createWidgetUnderTest(games: testGames));
+
       await tester.pumpAndSettle();
 
       expect(find.text('24 janvier 2025'), findsOneWidget);

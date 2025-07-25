@@ -14,7 +14,9 @@ import 'package:fpdart/fpdart.dart';
 import 'package:ojyx/core/errors/failures.dart';
 
 class MockActionCardRepository extends Mock implements ActionCardRepository {}
+
 class MockGameStateRepository extends Mock implements GameStateRepository {}
+
 class MockUseActionCardUseCase extends Mock implements UseActionCardUseCase {}
 
 class FakeUseActionCardParams extends Fake implements UseActionCardParams {}
@@ -74,9 +76,9 @@ void main() {
       const actionCardType = ActionCardType.skip;
       final expectedResult = <String, dynamic>{'success': true};
 
-      when(() => mockUseCase(any())).thenAnswer(
-        (_) async => Right(expectedResult),
-      );
+      when(
+        () => mockUseCase(any()),
+      ).thenAnswer((_) async => Right(expectedResult));
 
       final notifier = container.read(actionCardNotifierProvider.notifier);
 
@@ -103,9 +105,7 @@ void main() {
       const actionCardType = ActionCardType.skip;
       final failure = Failure.server(message: 'Test error');
 
-      when(() => mockUseCase(any())).thenAnswer(
-        (_) async => Left(failure),
-      );
+      when(() => mockUseCase(any())).thenAnswer((_) async => Left(failure));
 
       final notifier = container.read(actionCardNotifierProvider.notifier);
 

@@ -8,10 +8,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: VoteSection(
-              onVoteToContinue: () {},
-              onEndGame: () {},
-            ),
+            body: VoteSection(onVoteToContinue: () {}, onEndGame: () {}),
           ),
         ),
       );
@@ -23,14 +20,13 @@ void main() {
       );
     });
 
-    testWidgets('should display both buttons with correct labels', (tester) async {
+    testWidgets('should display both buttons with correct labels', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: VoteSection(
-              onVoteToContinue: () {},
-              onEndGame: () {},
-            ),
+            body: VoteSection(onVoteToContinue: () {}, onEndGame: () {}),
           ),
         ),
       );
@@ -41,29 +37,34 @@ void main() {
       expect(find.byIcon(Icons.stop), findsOneWidget);
     });
 
-    testWidgets('should call onVoteToContinue when continue button is pressed', (tester) async {
-      bool continueCalled = false;
+    testWidgets(
+      'should call onVoteToContinue when continue button is pressed',
+      (tester) async {
+        bool continueCalled = false;
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: VoteSection(
-              onVoteToContinue: () {
-                continueCalled = true;
-              },
-              onEndGame: () {},
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: VoteSection(
+                onVoteToContinue: () {
+                  continueCalled = true;
+                },
+                onEndGame: () {},
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.tap(find.text('Vote to Continue'));
-      await tester.pump();
+        await tester.tap(find.text('Vote to Continue'));
+        await tester.pump();
 
-      expect(continueCalled, isTrue);
-    });
+        expect(continueCalled, isTrue);
+      },
+    );
 
-    testWidgets('should call onEndGame when end game button is pressed', (tester) async {
+    testWidgets('should call onEndGame when end game button is pressed', (
+      tester,
+    ) async {
       bool endGameCalled = false;
 
       await tester.pumpWidget(
@@ -89,10 +90,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: VoteSection(
-              onVoteToContinue: () {},
-              onEndGame: () {},
-            ),
+            body: VoteSection(onVoteToContinue: () {}, onEndGame: () {}),
           ),
         ),
       );
@@ -100,15 +98,15 @@ void main() {
       // Check that the buttons have text
       expect(find.text('Vote to Continue'), findsOneWidget);
       expect(find.text('End Game'), findsOneWidget);
-      
+
       // Verify button icons
       expect(find.byIcon(Icons.play_arrow), findsOneWidget);
       expect(find.byIcon(Icons.stop), findsOneWidget);
-      
+
       // Verify the buttons can be tapped (they have callbacks)
       await tester.tap(find.text('Vote to Continue'));
       await tester.pump();
-      
+
       await tester.tap(find.text('End Game'));
       await tester.pump();
     });
@@ -117,10 +115,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: VoteSection(
-              onVoteToContinue: () {},
-              onEndGame: () {},
-            ),
+            body: VoteSection(onVoteToContinue: () {}, onEndGame: () {}),
           ),
         ),
       );
@@ -133,32 +128,27 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: VoteSection(
-              onVoteToContinue: () {},
-              onEndGame: () {},
-            ),
+            body: VoteSection(onVoteToContinue: () {}, onEndGame: () {}),
           ),
         ),
       );
 
       final padding = tester.widget<Padding>(
-        find.descendant(
-          of: find.byType(Card),
-          matching: find.byType(Padding),
-        ).first,
+        find
+            .descendant(of: find.byType(Card), matching: find.byType(Padding))
+            .first,
       );
       // The actual padding might be different, let's check if it exists
       expect(padding.padding, isNotNull);
     });
 
-    testWidgets('buttons should be in a Row with proper spacing', (tester) async {
+    testWidgets('buttons should be in a Row with proper spacing', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: VoteSection(
-              onVoteToContinue: () {},
-              onEndGame: () {},
-            ),
+            body: VoteSection(onVoteToContinue: () {}, onEndGame: () {}),
           ),
         ),
       );
@@ -166,7 +156,7 @@ void main() {
       // Verify both buttons exist
       expect(find.text('Vote to Continue'), findsOneWidget);
       expect(find.text('End Game'), findsOneWidget);
-      
+
       // Find any Row in the widget tree
       final rows = find.byType(Row);
       expect(rows, findsWidgets);

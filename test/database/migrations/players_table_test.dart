@@ -6,7 +6,7 @@ void main() {
     test('should create players table with correct structure', () async {
       // This test verifies that the players table migration creates the correct structure
       // The actual test will be run against the real database after migration
-      
+
       final expectedColumns = {
         'id': 'uuid',
         'name': 'text',
@@ -36,7 +36,7 @@ void main() {
       expect(migrationSQL, contains('CREATE TABLE'));
       expect(migrationSQL, contains('public.players'));
       expect(migrationSQL, contains('PRIMARY KEY'));
-      
+
       // Verify all expected columns are present
       for (final column in expectedColumns.keys) {
         expect(migrationSQL.toLowerCase(), contains(column.toLowerCase()));
@@ -57,7 +57,7 @@ void main() {
           OR id = auth.uid()
         );
         ''',
-        
+
         // Players can only update their own record
         '''
         CREATE POLICY "Players can update own record"
@@ -65,7 +65,7 @@ void main() {
         USING (id = auth.uid())
         WITH CHECK (id = auth.uid());
         ''',
-        
+
         // Anyone can create a player (anonymous auth)
         '''
         CREATE POLICY "Anyone can create a player"

@@ -21,7 +21,11 @@ void main() {
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -64,7 +68,11 @@ void main() {
           grid: gridWithCard,
           isHost: true,
         ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -145,7 +153,11 @@ void main() {
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -265,8 +277,16 @@ void main() {
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
-        GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
+        GamePlayer(
+          id: 'player3',
+          name: 'GamePlayer 3',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -300,7 +320,12 @@ void main() {
           ); // Different card that will be replaced
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)

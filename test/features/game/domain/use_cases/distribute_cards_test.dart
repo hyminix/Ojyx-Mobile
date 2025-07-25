@@ -21,8 +21,16 @@ void main() {
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
-        GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
+        GamePlayer(
+          id: 'player3',
+          name: 'GamePlayer 3',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final initialState = GameState.initial(
@@ -97,7 +105,11 @@ void main() {
 
     test('should create initial discard pile', () async {
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final initialState = GameState.initial(

@@ -58,10 +58,7 @@ class SupabasePlayerDataSource implements PlayerDataSource {
 
   @override
   Future<void> deletePlayer(String playerId) async {
-    await _supabase
-        .from('players')
-        .delete()
-        .eq('id', playerId);
+    await _supabase.from('players').delete().eq('id', playerId);
   }
 
   @override
@@ -95,9 +92,7 @@ class SupabasePlayerDataSource implements PlayerDataSource {
   Future<void> updateLastSeen(String playerId) async {
     await _supabase
         .from('players')
-        .update({
-          'last_seen_at': DateTime.now().toIso8601String(),
-        })
+        .update({'last_seen_at': DateTime.now().toIso8601String()})
         .eq('id', playerId);
   }
 
@@ -117,8 +112,6 @@ class SupabasePlayerDataSource implements PlayerDataSource {
         .stream(primaryKey: ['id'])
         .eq('current_room_id', roomId)
         .order('created_at')
-        .map((data) => data
-            .map((json) => PlayerModel.fromJson(json))
-            .toList());
+        .map((data) => data.map((json) => PlayerModel.fromJson(json)).toList());
   }
 }

@@ -233,7 +233,7 @@ void main() {
       // Arrange
       final mockRepository = MockGameStateRepository();
       setupRepositoryStubs(mockRepository);
-      
+
       final container = ProviderContainer(
         overrides: getTestOverrides(gameStateRepository: mockRepository),
       );

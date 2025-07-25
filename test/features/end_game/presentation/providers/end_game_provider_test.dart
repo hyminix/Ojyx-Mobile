@@ -17,9 +17,9 @@ class MockRoom extends Mock implements Room {}
 
 class StubGameStateNotifier extends GameStateNotifier {
   final GameState? stubState;
-  
+
   StubGameStateNotifier(this.stubState);
-  
+
   @override
   GameState? build() => stubState;
 }
@@ -159,7 +159,7 @@ void main() {
         () => container.read(voteToContineProvider('player1')),
         returnsNormally,
       );
-      
+
       // Note: The actual vote update would be handled by the multiplayer system
       // This test just verifies the provider can be called without errors
     });
@@ -188,7 +188,7 @@ void main() {
       // Initial state with finished status
       final listener = container.listen(endGameProvider, (previous, next) {});
       expect(listener.read().value, isNotNull);
-      
+
       // Create a new container with playing status
       final mockGameStatePlaying = MockGameState();
       when(() => mockGameStatePlaying.players).thenReturn(testPlayers);
@@ -196,7 +196,7 @@ void main() {
       when(() => mockGameStatePlaying.initiatorPlayerId).thenReturn(null);
       when(() => mockGameStatePlaying.status).thenReturn(GameStatus.playing);
       when(() => mockGameStatePlaying.roomId).thenReturn('test-room');
-      
+
       final newContainer = ProviderContainer(
         overrides: [
           gameStateNotifierProvider.overrideWith(
@@ -209,7 +209,7 @@ void main() {
       // State should be null when game is playing
       final playingState = newContainer.read(endGameProvider);
       expect(playingState.value, isNull);
-      
+
       newContainer.dispose();
     });
   });

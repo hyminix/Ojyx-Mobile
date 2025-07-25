@@ -12,9 +12,12 @@ void main() {
       // This is a simple test just to ensure the datasource can be created
       final mockClient = _createMockSupabaseClient();
       const testGameStateId = 'test-game-state-id';
-      
-      final dataSource = SupabaseActionCardDataSource(mockClient, testGameStateId);
-      
+
+      final dataSource = SupabaseActionCardDataSource(
+        mockClient,
+        testGameStateId,
+      );
+
       expect(dataSource, isNotNull);
     });
 
@@ -37,8 +40,13 @@ void main() {
         };
 
         // Calculate total expected cards
-        final totalExpected = expectedDistribution.values.reduce((a, b) => a + b);
-        expect(totalExpected, 34); // Verify our expected distribution is correct
+        final totalExpected = expectedDistribution.values.reduce(
+          (a, b) => a + b,
+        );
+        expect(
+          totalExpected,
+          34,
+        ); // Verify our expected distribution is correct
       });
     });
   });

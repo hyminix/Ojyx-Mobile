@@ -67,9 +67,7 @@ class SyncGameStateUseCase {
   Future<Map<String, dynamic>> advanceTurn({
     required String gameStateId,
   }) async {
-    return await _gameStateRepository.advanceTurn(
-      gameStateId: gameStateId,
-    );
+    return await _gameStateRepository.advanceTurn(gameStateId: gameStateId);
   }
 
   /// Check for end game conditions (server-validated)
@@ -100,10 +98,10 @@ class SyncGameStateUseCase {
     try {
       final gameState = await getCurrentGameState(gameStateId);
       if (gameState == null) return false;
-      
+
       // Check if it's the player's turn and game is playing
-      return gameState.currentPlayer.id == playerId && 
-             gameState.status == GameStatus.playing;
+      return gameState.currentPlayer.id == playerId &&
+          gameState.status == GameStatus.playing;
     } catch (e) {
       return false;
     }

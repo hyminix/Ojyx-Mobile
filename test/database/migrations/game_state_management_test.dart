@@ -154,7 +154,10 @@ void main() {
 
       expect(functionSQL, contains('generate_shuffled_deck'));
       expect(functionSQL, contains('Fisher-Yates'));
-      expect(functionSQL, contains('1103515245')); // Linear congruential generator constant
+      expect(
+        functionSQL,
+        contains('1103515245'),
+      ); // Linear congruential generator constant
     });
 
     test('should create end game detection function', () async {
@@ -308,7 +311,7 @@ void main() {
           RETURN v_total_score;
         END;
         \$\$ LANGUAGE plpgsql;
-        '''
+        ''',
       ];
 
       for (final func in scoringFunctions) {

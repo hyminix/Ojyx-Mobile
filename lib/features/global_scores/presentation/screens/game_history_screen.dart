@@ -7,20 +7,14 @@ class GameHistoryScreen extends ConsumerWidget {
   final String playerId;
   final void Function(GlobalScore)? onGameTap;
 
-  const GameHistoryScreen({
-    super.key,
-    required this.playerId,
-    this.onGameTap,
-  });
+  const GameHistoryScreen({super.key, required this.playerId, this.onGameTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gamesAsync = ref.watch(recentGamesProvider(playerId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Historique des parties'),
-      ),
+      appBar: AppBar(title: const Text('Historique des parties')),
       body: RefreshIndicator(
         onRefresh: () async {
           // Force refresh by invalidating the provider
@@ -42,16 +36,11 @@ class GameHistoryScreen extends ConsumerWidget {
               itemCount: games.length,
               itemBuilder: (context, index) {
                 final game = games[index];
-                return _GameHistoryCard(
-                  game: game,
-                  onTap: onGameTap,
-                );
+                return _GameHistoryCard(game: game, onTap: onGameTap);
               },
             );
           },
-          loading: () => const Center(
-            child: CircularProgressIndicator(),
-          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stack) => Center(
             child: Text(
               'Erreur lors du chargement',
@@ -71,10 +60,7 @@ class _GameHistoryCard extends StatelessWidget {
   final GlobalScore game;
   final void Function(GlobalScore)? onTap;
 
-  const _GameHistoryCard({
-    required this.game,
-    this.onTap,
-  });
+  const _GameHistoryCard({required this.game, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -173,10 +159,20 @@ class _GameHistoryCard extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     const months = [
-      'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
-      'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
+      'janvier',
+      'février',
+      'mars',
+      'avril',
+      'mai',
+      'juin',
+      'juillet',
+      'août',
+      'septembre',
+      'octobre',
+      'novembre',
+      'décembre',
     ];
-    
+
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 }
@@ -185,26 +181,16 @@ class _InfoChip extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _InfoChip({
-    required this.icon,
-    required this.label,
-  });
+  const _InfoChip({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: Theme.of(context).colorScheme.secondary,
-        ),
+        Icon(icon, size: 16, color: Theme.of(context).colorScheme.secondary),
         const SizedBox(width: 4),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text(label, style: Theme.of(context).textTheme.bodyMedium),
       ],
     );
   }

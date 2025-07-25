@@ -26,7 +26,8 @@ class GameStateModel with _$GameStateModel {
 
   const GameStateModel._();
 
-  factory GameStateModel.fromJson(Map<String, dynamic> json) => _$GameStateModelFromJson(json);
+  factory GameStateModel.fromJson(Map<String, dynamic> json) =>
+      _$GameStateModelFromJson(json);
 
   factory GameStateModel.fromDomainComplete(
     GameState gameState, {
@@ -36,68 +37,89 @@ class GameStateModel with _$GameStateModel {
     required DateTime updatedAt,
   }) {
     final currentPlayerId = gameState.players[gameState.currentPlayerIndex].id;
-    
+
     final gameData = {
-      'players': gameState.players.map((p) => {
-        'id': p.id,
-        'name': p.name,
-        'grid': {
-          'cards': p.grid.cards.map((row) => 
-            row.map((c) => c != null ? {
-              'value': c.value,
-              'isRevealed': c.isRevealed,
-            } : null).toList()
-          ).toList(),
-        },
-        'actionCards': p.actionCards.map((a) => {
-          'id': a.id,
-          'type': a.type.name,
-          'name': a.name,
-          'description': a.description,
-          'timing': a.timing.name,
-          'target': a.target.name,
-          'parameters': a.parameters,
-        }).toList(),
-        'isConnected': p.isConnected,
-        'isHost': p.isHost,
-        'hasFinishedRound': p.hasFinishedRound,
-        'scoreMultiplier': p.scoreMultiplier,
-      }).toList(),
+      'players': gameState.players
+          .map(
+            (p) => {
+              'id': p.id,
+              'name': p.name,
+              'grid': {
+                'cards': p.grid.cards
+                    .map(
+                      (row) => row
+                          .map(
+                            (c) => c != null
+                                ? {'value': c.value, 'isRevealed': c.isRevealed}
+                                : null,
+                          )
+                          .toList(),
+                    )
+                    .toList(),
+              },
+              'actionCards': p.actionCards
+                  .map(
+                    (a) => {
+                      'id': a.id,
+                      'type': a.type.name,
+                      'name': a.name,
+                      'description': a.description,
+                      'timing': a.timing.name,
+                      'target': a.target.name,
+                      'parameters': a.parameters,
+                    },
+                  )
+                  .toList(),
+              'isConnected': p.isConnected,
+              'isHost': p.isHost,
+              'hasFinishedRound': p.hasFinishedRound,
+              'scoreMultiplier': p.scoreMultiplier,
+            },
+          )
+          .toList(),
       'currentPlayerIndex': gameState.currentPlayerIndex,
-      'deck': gameState.deck.map((c) => {
-        'value': c.value,
-        'isRevealed': c.isRevealed,
-      }).toList(),
-      'discardPile': gameState.discardPile.map((c) => {
-        'value': c.value,
-        'isRevealed': c.isRevealed,
-      }).toList(),
-      'actionDeck': gameState.actionDeck.map((a) => {
-        'id': a.id,
-        'type': a.type.name,
-        'name': a.name,
-        'description': a.description,
-        'timing': a.timing.name,
-        'target': a.target.name,
-        'parameters': a.parameters,
-      }).toList(),
-      'actionDiscard': gameState.actionDiscard.map((a) => {
-        'id': a.id,
-        'type': a.type.name,
-        'name': a.name,
-        'description': a.description,
-        'timing': a.timing.name,
-        'target': a.target.name,
-        'parameters': a.parameters,
-      }).toList(),
+      'deck': gameState.deck
+          .map((c) => {'value': c.value, 'isRevealed': c.isRevealed})
+          .toList(),
+      'discardPile': gameState.discardPile
+          .map((c) => {'value': c.value, 'isRevealed': c.isRevealed})
+          .toList(),
+      'actionDeck': gameState.actionDeck
+          .map(
+            (a) => {
+              'id': a.id,
+              'type': a.type.name,
+              'name': a.name,
+              'description': a.description,
+              'timing': a.timing.name,
+              'target': a.target.name,
+              'parameters': a.parameters,
+            },
+          )
+          .toList(),
+      'actionDiscard': gameState.actionDiscard
+          .map(
+            (a) => {
+              'id': a.id,
+              'type': a.type.name,
+              'name': a.name,
+              'description': a.description,
+              'timing': a.timing.name,
+              'target': a.target.name,
+              'parameters': a.parameters,
+            },
+          )
+          .toList(),
       'turnDirection': gameState.turnDirection.name,
       'lastRound': gameState.lastRound,
       'initiatorPlayerId': gameState.initiatorPlayerId,
       'endRoundInitiator': gameState.endRoundInitiator,
-      'drawnCard': gameState.drawnCard != null ? {
-        'value': gameState.drawnCard!.value,
-        'isRevealed': gameState.drawnCard!.isRevealed,
-      } : null,
+      'drawnCard': gameState.drawnCard != null
+          ? {
+              'value': gameState.drawnCard!.value,
+              'isRevealed': gameState.drawnCard!.isRevealed,
+            }
+          : null,
       'startedAt': gameState.startedAt?.toIso8601String(),
     };
 
@@ -122,7 +144,7 @@ class GameStateModel with _$GameStateModel {
     final players = playersData.map((playerJson) {
       final gridData = playerJson['grid'] as Map<String, dynamic>;
       final cardsData = gridData['cards'] as List<dynamic>;
-      
+
       final gridCards = cardsData.map((rowData) {
         final row = rowData as List<dynamic>;
         return row.map((cardData) {
@@ -156,7 +178,9 @@ class GameStateModel with _$GameStateModel {
             (t) => t.name == cardMap['target'],
             orElse: () => ActionTarget.none,
           ),
-          parameters: Map<String, dynamic>.from(cardMap['parameters'] as Map? ?? {}),
+          parameters: Map<String, dynamic>.from(
+            cardMap['parameters'] as Map? ?? {},
+          ),
         );
       }).toList();
 
@@ -212,7 +236,9 @@ class GameStateModel with _$GameStateModel {
           (t) => t.name == cardMap['target'],
           orElse: () => ActionTarget.none,
         ),
-        parameters: Map<String, dynamic>.from(cardMap['parameters'] as Map? ?? {}),
+        parameters: Map<String, dynamic>.from(
+          cardMap['parameters'] as Map? ?? {},
+        ),
       );
     }).toList();
 
@@ -236,7 +262,9 @@ class GameStateModel with _$GameStateModel {
           (t) => t.name == cardMap['target'],
           orElse: () => ActionTarget.none,
         ),
-        parameters: Map<String, dynamic>.from(cardMap['parameters'] as Map? ?? {}),
+        parameters: Map<String, dynamic>.from(
+          cardMap['parameters'] as Map? ?? {},
+        ),
       );
     }).toList();
 
@@ -247,13 +275,17 @@ class GameStateModel with _$GameStateModel {
     );
 
     final drawnCardData = gameData['drawnCard'] as Map<String, dynamic>?;
-    final drawnCard = drawnCardData != null ? Card(
-      value: drawnCardData['value'] as int,
-      isRevealed: drawnCardData['isRevealed'] as bool? ?? false,
-    ) : null;
+    final drawnCard = drawnCardData != null
+        ? Card(
+            value: drawnCardData['value'] as int,
+            isRevealed: drawnCardData['isRevealed'] as bool? ?? false,
+          )
+        : null;
 
     final startedAtStr = gameData['startedAt'] as String?;
-    final startedAt = startedAtStr != null ? DateTime.parse(startedAtStr) : null;
+    final startedAt = startedAtStr != null
+        ? DateTime.parse(startedAtStr)
+        : null;
 
     return GameState(
       roomId: roomId,

@@ -30,7 +30,10 @@ class TestActionCardRepository implements ActionCardRepository {
   }
 
   @override
-  Future<void> removeActionCardFromPlayer(String playerId, ActionCard card) async {
+  Future<void> removeActionCardFromPlayer(
+    String playerId,
+    ActionCard card,
+  ) async {
     final playerCards = _playerActionCards[playerId];
     if (playerCards == null || !playerCards.contains(card)) {
       throw Exception('GamePlayer does not have this action card');
@@ -279,7 +282,9 @@ void main() {
         repository.addToDrawPile(card);
       }
 
-      final originalOrder = List.from(await repository.getAvailableActionCards());
+      final originalOrder = List.from(
+        await repository.getAvailableActionCards(),
+      );
 
       // Act
       await repository.shuffleActionCards();

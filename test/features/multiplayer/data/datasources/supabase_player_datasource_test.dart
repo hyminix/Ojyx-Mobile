@@ -37,7 +37,9 @@ void main() {
       test('should call insert with correct data', () async {
         // Since mocking Supabase chain calls is complex, we'll test
         // that the method exists and can be called
-        when(() => mockSupabase.from(any())).thenThrow(Exception('Test exception'));
+        when(
+          () => mockSupabase.from(any()),
+        ).thenThrow(Exception('Test exception'));
 
         expect(
           () => dataSource.createPlayer(
@@ -54,7 +56,9 @@ void main() {
 
     group('updateConnectionStatus', () {
       test('should call update with correct status', () async {
-        when(() => mockSupabase.from(any())).thenThrow(Exception('Test exception'));
+        when(
+          () => mockSupabase.from(any()),
+        ).thenThrow(Exception('Test exception'));
 
         expect(
           () => dataSource.updateConnectionStatus(
@@ -70,12 +74,11 @@ void main() {
 
     group('updateLastSeen', () {
       test('should call update with current timestamp', () async {
-        when(() => mockSupabase.from(any())).thenThrow(Exception('Test exception'));
+        when(
+          () => mockSupabase.from(any()),
+        ).thenThrow(Exception('Test exception'));
 
-        expect(
-          () => dataSource.updateLastSeen('player123'),
-          throwsException,
-        );
+        expect(() => dataSource.updateLastSeen('player123'), throwsException);
 
         verify(() => mockSupabase.from('players')).called(1);
       });
@@ -83,12 +86,11 @@ void main() {
 
     group('deletePlayer', () {
       test('should call delete with player id', () async {
-        when(() => mockSupabase.from(any())).thenThrow(Exception('Test exception'));
+        when(
+          () => mockSupabase.from(any()),
+        ).thenThrow(Exception('Test exception'));
 
-        expect(
-          () => dataSource.deletePlayer('player123'),
-          throwsException,
-        );
+        expect(() => dataSource.deletePlayer('player123'), throwsException);
 
         verify(() => mockSupabase.from('players')).called(1);
       });

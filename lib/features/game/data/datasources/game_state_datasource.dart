@@ -16,7 +16,7 @@ abstract class GameStateDataSource {
   Future<PlayerGridModel> updatePlayerGrid(PlayerGridModel playerGrid);
   Future<List<PlayerGridModel>> getPlayerGrids(String gameStateId);
   Future<PlayerGridModel?> getPlayerGrid({
-    required String gameStateId, 
+    required String gameStateId,
     required String playerId,
   });
   Stream<List<PlayerGridModel>> watchPlayerGrids(String gameStateId);

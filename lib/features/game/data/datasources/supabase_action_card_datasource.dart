@@ -60,10 +60,7 @@ class SupabaseActionCardDataSource implements ActionCardLocalDataSource {
     }
 
     // Add the new card
-    final updatedCards = [
-      ...currentCards,
-      card.toJson(),
-    ];
+    final updatedCards = [...currentCards, card.toJson()];
 
     // Update player grid with new action cards
     await _supabaseClient
@@ -75,7 +72,10 @@ class SupabaseActionCardDataSource implements ActionCardLocalDataSource {
   }
 
   @override
-  Future<void> removeActionCardFromPlayer(String playerId, ActionCard card) async {
+  Future<void> removeActionCardFromPlayer(
+    String playerId,
+    ActionCard card,
+  ) async {
     // Get current action cards
     final response = await _supabaseClient
         .from('player_grids')
@@ -85,7 +85,7 @@ class SupabaseActionCardDataSource implements ActionCardLocalDataSource {
         .single();
 
     final currentCards = (response['action_cards'] as List<dynamic>?) ?? [];
-    
+
     // Check if player has the card
     final hasCard = currentCards.any((c) => c['id'] == card.id);
     if (!hasCard) {
@@ -93,9 +93,7 @@ class SupabaseActionCardDataSource implements ActionCardLocalDataSource {
     }
 
     // Remove the card
-    final updatedCards = currentCards
-        .where((c) => c['id'] != card.id)
-        .toList();
+    final updatedCards = currentCards.where((c) => c['id'] != card.id).toList();
 
     // Update player grid
     await _supabaseClient
@@ -124,7 +122,9 @@ class SupabaseActionCardDataSource implements ActionCardLocalDataSource {
     }
 
     // Get the card at current position
-    final drawnCard = ActionCard.fromJson(cards[position] as Map<String, dynamic>);
+    final drawnCard = ActionCard.fromJson(
+      cards[position] as Map<String, dynamic>,
+    );
 
     // Update deck position
     await _supabaseClient
@@ -146,13 +146,11 @@ class SupabaseActionCardDataSource implements ActionCardLocalDataSource {
         .eq('id', _gameStateId)
         .single();
 
-    final discardPile = (gameStateResponse['action_cards_discard'] as List<dynamic>?) ?? [];
-    
+    final discardPile =
+        (gameStateResponse['action_cards_discard'] as List<dynamic>?) ?? [];
+
     // Add card to discard pile
-    final updatedDiscard = [
-      ...discardPile,
-      card.toJson(),
-    ];
+    final updatedDiscard = [...discardPile, card.toJson()];
 
     // Update game state with new discard pile
     await _supabaseClient
@@ -172,18 +170,17 @@ class SupabaseActionCardDataSource implements ActionCardLocalDataSource {
         .eq('deck_type', 'action_cards')
         .single();
 
-    final cards = List<Map<String, dynamic>>.from(response['cards'] as List<dynamic>);
+    final cards = List<Map<String, dynamic>>.from(
+      response['cards'] as List<dynamic>,
+    );
     final position = response['position'] as int? ?? 0;
-    
+
     // Only shuffle cards that haven't been drawn yet
     final remainingCards = cards.sublist(position);
     remainingCards.shuffle(_random);
-    
+
     // Reconstruct the deck with drawn cards at the beginning
-    final shuffledDeck = [
-      ...cards.sublist(0, position),
-      ...remainingCards,
-    ];
+    final shuffledDeck = [...cards.sublist(0, position), ...remainingCards];
 
     // Update deck with shuffled cards
     await _supabaseClient
@@ -197,7 +194,7 @@ class SupabaseActionCardDataSource implements ActionCardLocalDataSource {
   @override
   Future<void> initializeDeck() async {
     final cards = <Map<String, dynamic>>[];
-    
+
     // Create a balanced deck of action cards
     final actionCardTypes = [
       // Movement cards

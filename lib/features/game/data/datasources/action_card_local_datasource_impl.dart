@@ -174,7 +174,10 @@ class ActionCardLocalDataSourceImpl implements ActionCardLocalDataSource {
   }
 
   @override
-  Future<void> removeActionCardFromPlayer(String playerId, ActionCard card) async {
+  Future<void> removeActionCardFromPlayer(
+    String playerId,
+    ActionCard card,
+  ) async {
     final playerCards = _playerCards[playerId];
     if (playerCards == null || !playerCards.contains(card)) {
       throw Exception('GamePlayer does not have this action card');

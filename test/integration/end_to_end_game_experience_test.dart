@@ -3,34 +3,36 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('End-to-End Game Experience Integration Tests', () {
     group('Complete Game Session', () {
-      test('should support full multiplayer game from start to finish', () async {
-        /// This test documents the complete user experience flow:
-        /// 
-        /// 1. ROOM CREATION AND JOINING
-        /// - Player 1 creates room via CreateRoomUseCase
-        /// - Players 2-4 join via JoinRoomUseCase
-        /// - Room status updates in real-time for all players
-        /// 
-        /// 2. GAME INITIALIZATION  
-        /// - Creator starts game via startGame in RoomRepository
-        /// - Server calls initialize_game PostgreSQL function
-        /// - All players receive real-time game state updates
-        /// - Each player can see their own grid via SyncGameStateUseCase
-        /// 
-        /// 3. GAMEPLAY LOOP
-        /// - Current player reveals cards via revealCard
-        /// - Server validates move and updates all clients
-        /// - Column completion detected automatically server-side
-        /// - Turn advances to next player via advanceTurn
-        /// - Action cards can be used with server validation
-        /// 
-        /// 4. GAME CONCLUSION
-        /// - End game triggered when player reveals 12th card
-        /// - Server calculates final scores and penalties
-        /// - Winner determined and results recorded in global_scores
-        /// - All players receive final game state updates
-        
-        const gameFlow = '''
+      test(
+        'should support full multiplayer game from start to finish',
+        () async {
+          /// This test documents the complete user experience flow:
+          ///
+          /// 1. ROOM CREATION AND JOINING
+          /// - Player 1 creates room via CreateRoomUseCase
+          /// - Players 2-4 join via JoinRoomUseCase
+          /// - Room status updates in real-time for all players
+          ///
+          /// 2. GAME INITIALIZATION
+          /// - Creator starts game via startGame in RoomRepository
+          /// - Server calls initialize_game PostgreSQL function
+          /// - All players receive real-time game state updates
+          /// - Each player can see their own grid via SyncGameStateUseCase
+          ///
+          /// 3. GAMEPLAY LOOP
+          /// - Current player reveals cards via revealCard
+          /// - Server validates move and updates all clients
+          /// - Column completion detected automatically server-side
+          /// - Turn advances to next player via advanceTurn
+          /// - Action cards can be used with server validation
+          ///
+          /// 4. GAME CONCLUSION
+          /// - End game triggered when player reveals 12th card
+          /// - Server calculates final scores and penalties
+          /// - Winner determined and results recorded in global_scores
+          /// - All players receive final game state updates
+
+          const gameFlow = '''
         PHASE 1: Room Setup
         ├── CREATE_ROOM(creator_id, max_players)
         ├── JOIN_ROOM(room_id, player_id) × 3
@@ -51,10 +53,11 @@ void main() {
         └── NOTIFY_PLAYERS → final game state broadcast
         ''';
 
-        expect(gameFlow, contains('PHASE 1'));
-        expect(gameFlow, contains('PHASE 2'));
-        expect(gameFlow, contains('PHASE 3'));
-      });
+          expect(gameFlow, contains('PHASE 1'));
+          expect(gameFlow, contains('PHASE 2'));
+          expect(gameFlow, contains('PHASE 3'));
+        },
+      );
 
       test('should handle concurrent player actions safely', () async {
         /// This test verifies the system handles race conditions:
@@ -62,7 +65,7 @@ void main() {
         /// - Server-side turn validation prevents invalid moves
         /// - Database transactions ensure consistency
         /// - Real-time updates keep all clients synchronized
-        
+
         const concurrencyScenarios = [
           'Two players try to reveal cards at same time',
           'Player uses action card while turn advances',
@@ -83,27 +86,31 @@ void main() {
         expect(safetyMeasures.length, equals(5));
       });
 
-      test('should provide consistent UI experience across all players', () async {
-        /// This test verifies UI consistency:
-        /// - All players see same game state (within network delays)
-        /// - Turn indicators update correctly for all players
-        /// - Action availability matches server permissions
-        /// - Score updates are reflected consistently
-        /// - Real-time action log visible to all players
-        
-        const uiConsistencyChecks = {
-          'current_player_indicator': 'Shows whose turn it is for all players',
-          'card_reveal_animation': 'Plays for all players when card revealed',
-          'score_updates': 'Reflected instantly across all client UIs',
-          'action_card_availability': 'Matches server-side validation state',
-          'turn_advancement': 'UI progresses to next player simultaneously',
-          'end_game_notification': 'Winner announcement shown to all players',
-        };
+      test(
+        'should provide consistent UI experience across all players',
+        () async {
+          /// This test verifies UI consistency:
+          /// - All players see same game state (within network delays)
+          /// - Turn indicators update correctly for all players
+          /// - Action availability matches server permissions
+          /// - Score updates are reflected consistently
+          /// - Real-time action log visible to all players
 
-        uiConsistencyChecks.forEach((component, description) {
-          expect(description, isNotEmpty);
-        });
-      });
+          const uiConsistencyChecks = {
+            'current_player_indicator':
+                'Shows whose turn it is for all players',
+            'card_reveal_animation': 'Plays for all players when card revealed',
+            'score_updates': 'Reflected instantly across all client UIs',
+            'action_card_availability': 'Matches server-side validation state',
+            'turn_advancement': 'UI progresses to next player simultaneously',
+            'end_game_notification': 'Winner announcement shown to all players',
+          };
+
+          uiConsistencyChecks.forEach((component, description) {
+            expect(description, isNotEmpty);
+          });
+        },
+      );
     });
 
     group('Error Recovery and Resilience', () {
@@ -113,7 +120,7 @@ void main() {
         /// - Reconnection restores current game state
         /// - Turn timer prevents games from stalling
         /// - Other players can continue playing
-        
+
         const disconnectScenarios = [
           'Player disconnects during their turn → skip after timeout',
           'Multiple players disconnect → game continues with remaining',
@@ -127,25 +134,28 @@ void main() {
         }
       });
 
-      test('should handle server errors without corrupting game state', () async {
-        /// This test verifies error resilience:
-        /// - Database transaction failures roll back cleanly
-        /// - Partial updates don't leave inconsistent state
-        /// - Client errors don't affect other players
-        /// - Server errors provide meaningful feedback
-        
-        const errorTypes = {
-          'database_timeout': 'Transaction rollback, retry mechanism',
-          'invalid_move': 'Server validation catches, returns error message',
-          'concurrent_modification': 'Optimistic locking prevents conflicts',
-          'network_partition': 'Clients queue actions until reconnection',
-          'server_restart': 'Game state persisted, clients reconnect',
-        };
+      test(
+        'should handle server errors without corrupting game state',
+        () async {
+          /// This test verifies error resilience:
+          /// - Database transaction failures roll back cleanly
+          /// - Partial updates don't leave inconsistent state
+          /// - Client errors don't affect other players
+          /// - Server errors provide meaningful feedback
 
-        errorTypes.forEach((error, handling) {
-          expect(handling, isNotEmpty);
-        });
-      });
+          const errorTypes = {
+            'database_timeout': 'Transaction rollback, retry mechanism',
+            'invalid_move': 'Server validation catches, returns error message',
+            'concurrent_modification': 'Optimistic locking prevents conflicts',
+            'network_partition': 'Clients queue actions until reconnection',
+            'server_restart': 'Game state persisted, clients reconnect',
+          };
+
+          errorTypes.forEach((error, handling) {
+            expect(handling, isNotEmpty);
+          });
+        },
+      );
 
       test('should maintain performance under load', () async {
         /// This test verifies performance characteristics:
@@ -153,7 +163,7 @@ void main() {
         /// - Database queries are optimized with indexes
         /// - Real-time updates scale with player count
         /// - Memory usage remains bounded
-        
+
         const performanceMetrics = [
           'Game initialization: < 500ms for 8 players',
           'Card reveal processing: < 100ms server-side',
@@ -176,7 +186,7 @@ void main() {
         /// - Player statistics tracked in global_scores
         /// - Performance metrics available for monitoring
         /// - Debugging information preserved
-        
+
         const trackedMetrics = [
           'Total games played per player',
           'Average game duration and turn time',
@@ -197,7 +207,7 @@ void main() {
         /// - Game state snapshots at key points
         /// - Player decision logs for analysis
         /// - Error tracking and resolution
-        
+
         const debuggingFeatures = [
           'Replay entire game from action log',
           'Restore game state to any point in time',
@@ -219,7 +229,7 @@ void main() {
         /// - Client cannot manipulate game state
         /// - Action validation prevents invalid moves
         /// - Random elements generated server-side
-        
+
         const securityMeasures = [
           'Card deck shuffling uses server-side randomization',
           'Move validation executed in PostgreSQL functions',
@@ -240,7 +250,7 @@ void main() {
         /// - Row Level Security enforces data access
         /// - Anonymous authentication protects identity
         /// - Sensitive data encrypted in transit
-        
+
         const privacyProtections = [
           'Hidden cards not transmitted to other players',
           'Action cards in hand private until played',
@@ -262,7 +272,7 @@ void main() {
         /// - Real-time subscriptions isolated per game
         /// - Server resources shared efficiently
         /// - Horizontal scaling possible
-        
+
         const scalabilityFeatures = [
           'Isolated game states prevent cross-game interference',
           'Database indexes optimize multi-game queries',
@@ -282,7 +292,7 @@ void main() {
         /// - Game rules can be modified via configuration
         /// - Different game modes supported by same infrastructure
         /// - Player progression systems can be added
-        
+
         const extensibilityPoints = [
           'Action card system extensible via PostgreSQL functions',
           'Game configuration stored in game_data JSONB field',

@@ -19,7 +19,8 @@ class PlayerModel with _$PlayerModel {
 
   const PlayerModel._();
 
-  factory PlayerModel.fromJson(Map<String, dynamic> json) => _$PlayerModelFromJson(json);
+  factory PlayerModel.fromJson(Map<String, dynamic> json) =>
+      _$PlayerModelFromJson(json);
 
   factory PlayerModel.fromDomain(LobbyPlayer player) {
     return PlayerModel(

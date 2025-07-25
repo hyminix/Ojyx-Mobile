@@ -19,7 +19,7 @@ void main() {
 
     setUp(() {
       repository = MockGlobalScoreRepository();
-      
+
       testScore = GlobalScore(
         id: 'score123',
         playerId: 'player1',
@@ -85,8 +85,9 @@ void main() {
           gameEndedAt: DateTime.now(),
         );
 
-        when(() => repository.saveScore(scoreToSave))
-            .thenAnswer((_) async => scoreToSave.copyWith(id: 'generated123'));
+        when(
+          () => repository.saveScore(scoreToSave),
+        ).thenAnswer((_) async => scoreToSave.copyWith(id: 'generated123'));
 
         final result = await repository.saveScore(scoreToSave);
 
@@ -97,20 +98,19 @@ void main() {
       });
 
       test('should throw exception when save fails', () async {
-        when(() => repository.saveScore(any()))
-            .thenThrow(Exception('Failed to save score'));
+        when(
+          () => repository.saveScore(any()),
+        ).thenThrow(Exception('Failed to save score'));
 
-        expect(
-          () => repository.saveScore(testScore),
-          throwsException,
-        );
+        expect(() => repository.saveScore(testScore), throwsException);
       });
     });
 
     group('saveBatchScores', () {
       test('should save multiple scores in batch', () async {
-        when(() => repository.saveBatchScores(testScores))
-            .thenAnswer((_) async => testScores);
+        when(
+          () => repository.saveBatchScores(testScores),
+        ).thenAnswer((_) async => testScores);
 
         final result = await repository.saveBatchScores(testScores);
 
@@ -130,10 +130,13 @@ void main() {
 
     group('getScoresByPlayer', () {
       test('should return all scores for a specific player', () async {
-        final playerScores = testScores.where((s) => s.playerId == 'player1').toList();
+        final playerScores = testScores
+            .where((s) => s.playerId == 'player1')
+            .toList();
 
-        when(() => repository.getScoresByPlayer('player1'))
-            .thenAnswer((_) async => playerScores);
+        when(
+          () => repository.getScoresByPlayer('player1'),
+        ).thenAnswer((_) async => playerScores);
 
         final result = await repository.getScoresByPlayer('player1');
 
@@ -143,8 +146,9 @@ void main() {
       });
 
       test('should return empty list when player has no scores', () async {
-        when(() => repository.getScoresByPlayer('unknown'))
-            .thenAnswer((_) async => []);
+        when(
+          () => repository.getScoresByPlayer('unknown'),
+        ).thenAnswer((_) async => []);
 
         final result = await repository.getScoresByPlayer('unknown');
 
@@ -154,10 +158,13 @@ void main() {
 
     group('getScoresByRoom', () {
       test('should return all scores for a specific room', () async {
-        final roomScores = testScores.where((s) => s.roomId == 'room1').toList();
+        final roomScores = testScores
+            .where((s) => s.roomId == 'room1')
+            .toList();
 
-        when(() => repository.getScoresByRoom('room1'))
-            .thenAnswer((_) async => roomScores);
+        when(
+          () => repository.getScoresByRoom('room1'),
+        ).thenAnswer((_) async => roomScores);
 
         final result = await repository.getScoresByRoom('room1');
 
@@ -169,11 +176,14 @@ void main() {
 
     group('getPlayerStats', () {
       test('should return calculated stats for a player', () async {
-        final playerScores = testScores.where((s) => s.playerId == 'player1').toList();
+        final playerScores = testScores
+            .where((s) => s.playerId == 'player1')
+            .toList();
         final expectedStats = PlayerStats.fromScores(playerScores);
 
-        when(() => repository.getPlayerStats('player1'))
-            .thenAnswer((_) async => expectedStats);
+        when(
+          () => repository.getPlayerStats('player1'),
+        ).thenAnswer((_) async => expectedStats);
 
         final result = await repository.getPlayerStats('player1');
 
@@ -185,8 +195,9 @@ void main() {
       });
 
       test('should return null when player not found', () async {
-        when(() => repository.getPlayerStats('unknown'))
-            .thenAnswer((_) async => null);
+        when(
+          () => repository.getPlayerStats('unknown'),
+        ).thenAnswer((_) async => null);
 
         final result = await repository.getPlayerStats('unknown');
 
@@ -221,8 +232,9 @@ void main() {
           ),
         ];
 
-        when(() => repository.getTopPlayers(limit: 10))
-            .thenAnswer((_) async => topPlayers);
+        when(
+          () => repository.getTopPlayers(limit: 10),
+        ).thenAnswer((_) async => topPlayers);
 
         final result = await repository.getTopPlayers(limit: 10);
 
@@ -247,8 +259,9 @@ void main() {
           ),
         );
 
-        when(() => repository.getTopPlayers(limit: 3))
-            .thenAnswer((_) async => topPlayers.take(3).toList());
+        when(
+          () => repository.getTopPlayers(limit: 3),
+        ).thenAnswer((_) async => topPlayers.take(3).toList());
 
         final result = await repository.getTopPlayers(limit: 3);
 
@@ -258,13 +271,13 @@ void main() {
 
     group('getRecentGames', () {
       test('should return recent games for a player', () async {
-        final recentGames = testScores
-            .where((s) => s.playerId == 'player1')
-            .toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        final recentGames =
+            testScores.where((s) => s.playerId == 'player1').toList()
+              ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-        when(() => repository.getRecentGames('player1', limit: 10))
-            .thenAnswer((_) async => recentGames);
+        when(
+          () => repository.getRecentGames('player1', limit: 10),
+        ).thenAnswer((_) async => recentGames);
 
         final result = await repository.getRecentGames('player1', limit: 10);
 
@@ -274,8 +287,9 @@ void main() {
       });
 
       test('should return empty list when no games found', () async {
-        when(() => repository.getRecentGames('unknown', limit: 10))
-            .thenAnswer((_) async => []);
+        when(
+          () => repository.getRecentGames('unknown', limit: 10),
+        ).thenAnswer((_) async => []);
 
         final result = await repository.getRecentGames('unknown', limit: 10);
 
@@ -285,8 +299,9 @@ void main() {
 
     group('deleteScore', () {
       test('should delete a score by id', () async {
-        when(() => repository.deleteScore('score123'))
-            .thenAnswer((_) async => true);
+        when(
+          () => repository.deleteScore('score123'),
+        ).thenAnswer((_) async => true);
 
         final result = await repository.deleteScore('score123');
 
@@ -295,8 +310,9 @@ void main() {
       });
 
       test('should return false when score not found', () async {
-        when(() => repository.deleteScore('unknown'))
-            .thenAnswer((_) async => false);
+        when(
+          () => repository.deleteScore('unknown'),
+        ).thenAnswer((_) async => false);
 
         final result = await repository.deleteScore('unknown');
 
@@ -306,8 +322,9 @@ void main() {
 
     group('deletePlayerData', () {
       test('should delete all data for a player', () async {
-        when(() => repository.deletePlayerData('player1'))
-            .thenAnswer((_) async => 2);
+        when(
+          () => repository.deletePlayerData('player1'),
+        ).thenAnswer((_) async => 2);
 
         final result = await repository.deletePlayerData('player1');
 
@@ -316,8 +333,9 @@ void main() {
       });
 
       test('should return 0 when player has no data', () async {
-        when(() => repository.deletePlayerData('unknown'))
-            .thenAnswer((_) async => 0);
+        when(
+          () => repository.deletePlayerData('unknown'),
+        ).thenAnswer((_) async => 0);
 
         final result = await repository.deletePlayerData('unknown');
 

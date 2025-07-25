@@ -6,11 +6,11 @@ void main() {
   group('PlayerDataSource', () {
     test('should define interface for player data operations', () {
       // This test verifies the interface structure
-      
+
       // The datasource should support these operations:
       final expectedMethods = [
         'createPlayer',
-        'getPlayer', 
+        'getPlayer',
         'updatePlayer',
         'deletePlayer',
         'getPlayersByRoom',
@@ -40,7 +40,7 @@ void main() {
     test('should handle connection status updates', () async {
       // Test connection status validation
       const validStatuses = ['online', 'offline', 'away'];
-      
+
       for (final status in validStatuses) {
         expect(validStatuses, contains(status));
       }
@@ -48,10 +48,7 @@ void main() {
 
     test('should support real-time player updates', () async {
       // Test that the datasource can watch player changes
-      const watchParams = {
-        'player_id': 'test-uuid',
-        'room_id': 'room-uuid',
-      };
+      const watchParams = {'player_id': 'test-uuid', 'room_id': 'room-uuid'};
 
       expect(watchParams['player_id'], isA<String>());
       expect(watchParams['room_id'], isA<String>());

@@ -10,7 +10,7 @@ void main() {
 
     setUp(() {
       testDateTime = DateTime(2024, 1, 1, 12, 0, 0);
-      
+
       testModel = GlobalScoreModel(
         id: 'score123',
         playerId: 'player123',
@@ -34,7 +34,9 @@ void main() {
         'position': 1,
         'is_winner': true,
         'created_at': testDateTime.toIso8601String(),
-        'game_ended_at': testDateTime.add(const Duration(hours: 1)).toIso8601String(),
+        'game_ended_at': testDateTime
+            .add(const Duration(hours: 1))
+            .toIso8601String(),
       };
     });
 
@@ -87,8 +89,10 @@ void main() {
         expect(json['position'], 1);
         expect(json['is_winner'], isTrue);
         expect(json['created_at'], testDateTime.toIso8601String());
-        expect(json['game_ended_at'], 
-            testDateTime.add(const Duration(hours: 1)).toIso8601String());
+        expect(
+          json['game_ended_at'],
+          testDateTime.add(const Duration(hours: 1)).toIso8601String(),
+        );
       });
 
       test('should handle null gameEndedAt in JSON', () {
@@ -181,8 +185,10 @@ void main() {
         expect(json['position'], 1);
         expect(json['is_winner'], isTrue);
         expect(json['created_at'], testDateTime.toIso8601String());
-        expect(json['game_ended_at'], 
-            testDateTime.add(const Duration(hours: 1)).toIso8601String());
+        expect(
+          json['game_ended_at'],
+          testDateTime.add(const Duration(hours: 1)).toIso8601String(),
+        );
       });
     });
 

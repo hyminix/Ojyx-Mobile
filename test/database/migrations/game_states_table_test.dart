@@ -4,7 +4,7 @@ void main() {
   group('Game States Table Migration', () {
     test('should create game_states table with correct structure', () async {
       // This test verifies that the game_states table migration creates the correct structure
-      
+
       final expectedColumns = {
         'id': 'uuid',
         'room_id': 'uuid',
@@ -48,16 +48,18 @@ void main() {
       expect(migrationSQL, contains('CREATE TABLE'));
       expect(migrationSQL, contains('public.game_states'));
       expect(migrationSQL, contains('PRIMARY KEY'));
-      
+
       // Verify all expected columns are present
       for (final column in expectedColumns.keys) {
         expect(migrationSQL.toLowerCase(), contains(column.toLowerCase()));
       }
     });
 
-    test('should create player_grids table for storing player game state', () async {
-      // Test for player_grids table that stores individual player game state
-      const migrationSQL = '''
+    test(
+      'should create player_grids table for storing player game state',
+      () async {
+        // Test for player_grids table that stores individual player game state
+        const migrationSQL = '''
         CREATE TABLE IF NOT EXISTS public.player_grids (
           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
           game_state_id UUID NOT NULL REFERENCES public.game_states(id) ON DELETE CASCADE,
@@ -74,11 +76,12 @@ void main() {
         );
       ''';
 
-      expect(migrationSQL, contains('CREATE TABLE'));
-      expect(migrationSQL, contains('public.player_grids'));
-      expect(migrationSQL, contains('grid_cards JSONB'));
-      expect(migrationSQL, contains('UNIQUE(game_state_id, player_id)'));
-    });
+        expect(migrationSQL, contains('CREATE TABLE'));
+        expect(migrationSQL, contains('public.player_grids'));
+        expect(migrationSQL, contains('grid_cards JSONB'));
+        expect(migrationSQL, contains('UNIQUE(game_state_id, player_id)'));
+      },
+    );
 
     test('should create RLS policies for game_states table', () async {
       // Test that RLS policies are correctly defined
@@ -93,7 +96,7 @@ void main() {
           )
         );
         ''',
-        
+
         // Only server can insert/update game states
         '''
         CREATE POLICY "Only authenticated users can modify game states"

@@ -3,7 +3,9 @@ import 'package:ojyx/features/global_scores/data/datasources/global_score_remote
 import 'package:ojyx/features/global_scores/data/models/global_score_model.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockGlobalScoreRemoteDataSource extends Mock implements GlobalScoreRemoteDataSource {}
+class MockGlobalScoreRemoteDataSource extends Mock
+    implements GlobalScoreRemoteDataSource {}
+
 class FakeGlobalScoreModel extends Fake implements GlobalScoreModel {}
 
 void main() {
@@ -36,8 +38,9 @@ void main() {
 
         final savedScore = scoreToSave.copyWith(id: 'generated123');
 
-        when(() => dataSource.saveScore(scoreToSave))
-            .thenAnswer((_) async => savedScore);
+        when(
+          () => dataSource.saveScore(scoreToSave),
+        ).thenAnswer((_) async => savedScore);
 
         final result = await dataSource.saveScore(scoreToSave);
 
@@ -80,8 +83,9 @@ void main() {
             .map((e) => e.value.copyWith(id: 'generated_${e.key}'))
             .toList();
 
-        when(() => dataSource.saveBatchScores(scores))
-            .thenAnswer((_) async => savedScores);
+        when(
+          () => dataSource.saveBatchScores(scores),
+        ).thenAnswer((_) async => savedScores);
 
         final result = await dataSource.saveBatchScores(scores);
 
@@ -118,8 +122,9 @@ void main() {
           ),
         ];
 
-        when(() => dataSource.getScoresByPlayer('player1'))
-            .thenAnswer((_) async => playerScores);
+        when(
+          () => dataSource.getScoresByPlayer('player1'),
+        ).thenAnswer((_) async => playerScores);
 
         final result = await dataSource.getScoresByPlayer('player1');
 
@@ -155,8 +160,9 @@ void main() {
           },
         ];
 
-        when(() => dataSource.getTopPlayersRaw(limit: 10))
-            .thenAnswer((_) async => topPlayersData);
+        when(
+          () => dataSource.getTopPlayersRaw(limit: 10),
+        ).thenAnswer((_) async => topPlayersData);
 
         final result = await dataSource.getTopPlayersRaw(limit: 10);
 
@@ -167,8 +173,9 @@ void main() {
 
     group('deleteScore', () {
       test('should delete score and return true', () async {
-        when(() => dataSource.deleteScore('score123'))
-            .thenAnswer((_) async => true);
+        when(
+          () => dataSource.deleteScore('score123'),
+        ).thenAnswer((_) async => true);
 
         final result = await dataSource.deleteScore('score123');
 
@@ -176,8 +183,9 @@ void main() {
       });
 
       test('should return false when score not found', () async {
-        when(() => dataSource.deleteScore('unknown'))
-            .thenAnswer((_) async => false);
+        when(
+          () => dataSource.deleteScore('unknown'),
+        ).thenAnswer((_) async => false);
 
         final result = await dataSource.deleteScore('unknown');
 
@@ -187,8 +195,9 @@ void main() {
 
     group('deletePlayerData', () {
       test('should delete all player data', () async {
-        when(() => dataSource.deletePlayerData('player1'))
-            .thenAnswer((_) async => 5);
+        when(
+          () => dataSource.deletePlayerData('player1'),
+        ).thenAnswer((_) async => 5);
 
         final result = await dataSource.deletePlayerData('player1');
 
@@ -196,8 +205,9 @@ void main() {
       });
 
       test('should return 0 when no data found', () async {
-        when(() => dataSource.deletePlayerData('unknown'))
-            .thenAnswer((_) async => 0);
+        when(
+          () => dataSource.deletePlayerData('unknown'),
+        ).thenAnswer((_) async => 0);
 
         final result = await dataSource.deletePlayerData('unknown');
 

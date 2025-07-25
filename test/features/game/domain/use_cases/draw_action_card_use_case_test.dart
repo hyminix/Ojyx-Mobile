@@ -63,7 +63,9 @@ void main() {
       'should draw an action card when player has less than 3 cards',
       () async {
         // Arrange
-        when(() => mockRepository.drawActionCard()).thenAnswer((_) async => testActionCard);
+        when(
+          () => mockRepository.drawActionCard(),
+        ).thenAnswer((_) async => testActionCard);
         when(
           () => mockRepository.addActionCardToPlayer('player1', testActionCard),
         ).thenAnswer((_) async {});
@@ -247,7 +249,9 @@ void main() {
         target: ActionTarget.none,
       );
 
-      when(() => mockRepository.drawActionCard()).thenAnswer((_) async => immediateCard);
+      when(
+        () => mockRepository.drawActionCard(),
+      ).thenAnswer((_) async => immediateCard);
       when(
         () => mockRepository.addActionCardToPlayer('player1', immediateCard),
       ).thenAnswer((_) async {});
@@ -284,7 +288,9 @@ void main() {
         target: ActionTarget.none,
       );
 
-      when(() => mockRepository.drawActionCard()).thenAnswer((_) async => optionalCard);
+      when(
+        () => mockRepository.drawActionCard(),
+      ).thenAnswer((_) async => optionalCard);
       when(
         () => mockRepository.addActionCardToPlayer('player1', optionalCard),
       ).thenAnswer((_) async {});

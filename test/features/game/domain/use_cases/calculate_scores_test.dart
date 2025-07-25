@@ -26,7 +26,12 @@ void main() {
           .placeCard(const Card(value: 7, isRevealed: true), 1, 0);
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid1,
+          isHost: true,
+        ),
         GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
       ];
 
@@ -53,7 +58,11 @@ void main() {
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players);
@@ -78,7 +87,12 @@ void main() {
           .placeCard(const Card(value: 3, isRevealed: true), 1, 1);
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players);
@@ -110,7 +124,12 @@ void main() {
           .placeCard(const Card(value: 2, isRevealed: true), 1, 1);
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players);
@@ -181,7 +200,12 @@ void main() {
       );
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid1,
+          isHost: true,
+        ),
         GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
         GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: grid3),
       ];

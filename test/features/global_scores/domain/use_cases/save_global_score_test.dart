@@ -11,7 +11,9 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockGlobalScoreRepository extends Mock implements GlobalScoreRepository {}
+
 class FakeGlobalScore extends Fake implements GlobalScore {}
+
 class FakeGameState extends Fake implements GameState {}
 
 void main() {
@@ -46,11 +48,14 @@ void main() {
       game_card.Card(value: 8, isRevealed: true),
     ];
     final aliceGrid = PlayerGrid.fromCards(aliceCards); // Score: 7*11 + 8 = 85
-    
+
     // Bob: cards to get score of 120
-    final bobCards = List.generate(12, (i) => game_card.Card(value: 10, isRevealed: true));
+    final bobCards = List.generate(
+      12,
+      (i) => game_card.Card(value: 10, isRevealed: true),
+    );
     final bobGrid = PlayerGrid.fromCards(bobCards); // Score: 10 * 12 = 120
-    
+
     // Charlie: cards to get score of 95
     final charlieCards = [
       game_card.Card(value: 8, isRevealed: true),
@@ -66,7 +71,9 @@ void main() {
       game_card.Card(value: 8, isRevealed: true),
       game_card.Card(value: 7, isRevealed: true),
     ];
-    final charlieGrid = PlayerGrid.fromCards(charlieCards); // Score: 8*11 + 7 = 95
+    final charlieGrid = PlayerGrid.fromCards(
+      charlieCards,
+    ); // Score: 8*11 + 7 = 95
 
     final testPlayers = [
       GamePlayer(
@@ -147,26 +154,28 @@ void main() {
         ),
       ];
 
-      when(() => mockRepository.saveBatchScores(any()))
-          .thenAnswer((_) async => expectedScores.map((s) => s.copyWith(id: 'generated_${s.playerId}')).toList());
+      when(() => mockRepository.saveBatchScores(any())).thenAnswer(
+        (_) async => expectedScores
+            .map((s) => s.copyWith(id: 'generated_${s.playerId}'))
+            .toList(),
+      );
 
-      final result = await useCase(SaveGlobalScoreParams(gameState: testGameState));
+      final result = await useCase(
+        SaveGlobalScoreParams(gameState: testGameState),
+      );
 
       expect(result.isRight(), isTrue);
-      result.fold(
-        (failure) => fail('Should not fail'),
-        (scores) {
-          expect(scores.length, equals(3));
-          // Verify positions are correct (sorted by score)
-          expect(scores[0].position, equals(1)); // Alice with 85
-          expect(scores[1].position, equals(2)); // Charlie with 95
-          expect(scores[2].position, equals(3)); // Bob with 120
-          // Verify winner
-          expect(scores[0].isWinner, isTrue);
-          expect(scores[1].isWinner, isFalse);
-          expect(scores[2].isWinner, isFalse);
-        },
-      );
+      result.fold((failure) => fail('Should not fail'), (scores) {
+        expect(scores.length, equals(3));
+        // Verify positions are correct (sorted by score)
+        expect(scores[0].position, equals(1)); // Alice with 85
+        expect(scores[1].position, equals(2)); // Charlie with 95
+        expect(scores[2].position, equals(3)); // Bob with 120
+        // Verify winner
+        expect(scores[0].isWinner, isTrue);
+        expect(scores[1].isWinner, isFalse);
+        expect(scores[2].isWinner, isFalse);
+      });
     });
 
     test('should apply penalty to round initiator if not winner', () async {
@@ -175,16 +184,21 @@ void main() {
         initiatorPlayerId: 'player2', // Bob
       );
 
-      when(() => mockRepository.saveBatchScores(any()))
-          .thenAnswer((invocation) async {
-            final scores = invocation.positionalArguments[0] as List<GlobalScore>;
-            // Bob's score should be doubled (120 * 2 = 240)
-            final bobScore = scores.firstWhere((s) => s.playerId == 'player2');
-            expect(bobScore.totalScore, equals(240));
-            return scores.map((s) => s.copyWith(id: 'generated_${s.playerId}')).toList();
-          });
+      when(() => mockRepository.saveBatchScores(any())).thenAnswer((
+        invocation,
+      ) async {
+        final scores = invocation.positionalArguments[0] as List<GlobalScore>;
+        // Bob's score should be doubled (120 * 2 = 240)
+        final bobScore = scores.firstWhere((s) => s.playerId == 'player2');
+        expect(bobScore.totalScore, equals(240));
+        return scores
+            .map((s) => s.copyWith(id: 'generated_${s.playerId}'))
+            .toList();
+      });
 
-      final result = await useCase(SaveGlobalScoreParams(gameState: gameWithPenalty));
+      final result = await useCase(
+        SaveGlobalScoreParams(gameState: gameWithPenalty),
+      );
 
       expect(result.isRight(), isTrue);
     });
@@ -195,25 +209,33 @@ void main() {
         initiatorPlayerId: 'player1', // Alice
       );
 
-      when(() => mockRepository.saveBatchScores(any()))
-          .thenAnswer((invocation) async {
-            final scores = invocation.positionalArguments[0] as List<GlobalScore>;
-            // Alice's score should NOT be doubled
-            final aliceScore = scores.firstWhere((s) => s.playerId == 'player1');
-            expect(aliceScore.totalScore, equals(85));
-            return scores.map((s) => s.copyWith(id: 'generated_${s.playerId}')).toList();
-          });
+      when(() => mockRepository.saveBatchScores(any())).thenAnswer((
+        invocation,
+      ) async {
+        final scores = invocation.positionalArguments[0] as List<GlobalScore>;
+        // Alice's score should NOT be doubled
+        final aliceScore = scores.firstWhere((s) => s.playerId == 'player1');
+        expect(aliceScore.totalScore, equals(85));
+        return scores
+            .map((s) => s.copyWith(id: 'generated_${s.playerId}'))
+            .toList();
+      });
 
-      final result = await useCase(SaveGlobalScoreParams(gameState: gameNoPenalty));
+      final result = await useCase(
+        SaveGlobalScoreParams(gameState: gameNoPenalty),
+      );
 
       expect(result.isRight(), isTrue);
     });
 
     test('should return failure when repository throws exception', () async {
-      when(() => mockRepository.saveBatchScores(any()))
-          .thenThrow(Exception('Database error'));
+      when(
+        () => mockRepository.saveBatchScores(any()),
+      ).thenThrow(Exception('Database error'));
 
-      final result = await useCase(SaveGlobalScoreParams(gameState: testGameState));
+      final result = await useCase(
+        SaveGlobalScoreParams(gameState: testGameState),
+      );
 
       expect(result.isLeft(), isTrue);
       result.fold(
@@ -227,16 +249,21 @@ void main() {
         players: [testPlayers[0]],
       );
 
-      when(() => mockRepository.saveBatchScores(any()))
-          .thenAnswer((invocation) async {
-            final scores = invocation.positionalArguments[0] as List<GlobalScore>;
-            expect(scores.length, equals(1));
-            expect(scores[0].isWinner, isTrue);
-            expect(scores[0].position, equals(1));
-            return scores.map((s) => s.copyWith(id: 'generated_${s.playerId}')).toList();
-          });
+      when(() => mockRepository.saveBatchScores(any())).thenAnswer((
+        invocation,
+      ) async {
+        final scores = invocation.positionalArguments[0] as List<GlobalScore>;
+        expect(scores.length, equals(1));
+        expect(scores[0].isWinner, isTrue);
+        expect(scores[0].position, equals(1));
+        return scores
+            .map((s) => s.copyWith(id: 'generated_${s.playerId}'))
+            .toList();
+      });
 
-      final result = await useCase(SaveGlobalScoreParams(gameState: singlePlayerGame));
+      final result = await useCase(
+        SaveGlobalScoreParams(gameState: singlePlayerGame),
+      );
 
       expect(result.isRight(), isTrue);
     });
@@ -244,17 +271,25 @@ void main() {
     test('should set correct game ended time', () async {
       final beforeCall = DateTime.now();
 
-      when(() => mockRepository.saveBatchScores(any()))
-          .thenAnswer((invocation) async {
-            final scores = invocation.positionalArguments[0] as List<GlobalScore>;
-            // All scores should have gameEndedAt set
-            for (final score in scores) {
-              expect(score.gameEndedAt, isNotNull);
-              expect(score.gameEndedAt!.isAfter(beforeCall), isTrue);
-              expect(score.gameEndedAt!.isBefore(DateTime.now().add(Duration(seconds: 1))), isTrue);
-            }
-            return scores.map((s) => s.copyWith(id: 'generated_${s.playerId}')).toList();
-          });
+      when(() => mockRepository.saveBatchScores(any())).thenAnswer((
+        invocation,
+      ) async {
+        final scores = invocation.positionalArguments[0] as List<GlobalScore>;
+        // All scores should have gameEndedAt set
+        for (final score in scores) {
+          expect(score.gameEndedAt, isNotNull);
+          expect(score.gameEndedAt!.isAfter(beforeCall), isTrue);
+          expect(
+            score.gameEndedAt!.isBefore(
+              DateTime.now().add(Duration(seconds: 1)),
+            ),
+            isTrue,
+          );
+        }
+        return scores
+            .map((s) => s.copyWith(id: 'generated_${s.playerId}'))
+            .toList();
+      });
 
       await useCase(SaveGlobalScoreParams(gameState: testGameState));
     });

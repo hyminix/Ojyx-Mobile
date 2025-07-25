@@ -33,7 +33,9 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
   }
 
   void _listenToRoomEvents(String roomId) {
-    _eventSubscription = _roomRepository.watchRoomEvents(roomId).listen((event) {
+    _eventSubscription = _roomRepository.watchRoomEvents(roomId).listen((
+      event,
+    ) {
       event.when(
         playerJoined: (playerId, playerName) {
           // Géré par le provider de room
@@ -71,14 +73,14 @@ class MultiplayerGameNotifier extends _$MultiplayerGameNotifier {
     Map<String, dynamic>? actionData,
   }) async {
     final roomId = _roomId ?? '';
-    
+
     // Créer l'événement d'action du joueur
     final event = RoomEvent.playerAction(
       playerId: playerId,
       actionType: actionType,
       actionData: actionData,
     );
-    
+
     // Envoyer l'événement via le repository
     await _roomRepository.sendEvent(roomId: roomId, event: event);
   }

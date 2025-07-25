@@ -27,7 +27,7 @@ class DbPlayerGridModel with _$DbPlayerGridModel {
 
   const DbPlayerGridModel._();
 
-  factory DbPlayerGridModel.fromJson(Map<String, dynamic> json) => 
+  factory DbPlayerGridModel.fromJson(Map<String, dynamic> json) =>
       _$DbPlayerGridModelFromJson(json);
 
   Map<String, dynamic> toSupabaseJson() {
@@ -35,19 +35,22 @@ class DbPlayerGridModel with _$DbPlayerGridModel {
       'id': id,
       'game_state_id': gameStateId,
       'player_id': playerId,
-      'grid_cards': gridCards.map((card) => {
-        'value': card.value,
-        'is_revealed': card.isRevealed,
-      }).toList(),
-      'action_cards': actionCards.map((card) => {
-        'id': card.id,
-        'type': card.type.name,
-        'name': card.name,
-        'description': card.description,
-        'timing': card.timing.name,
-        'target': card.target.name,
-        'parameters': card.parameters,
-      }).toList(),
+      'grid_cards': gridCards
+          .map((card) => {'value': card.value, 'is_revealed': card.isRevealed})
+          .toList(),
+      'action_cards': actionCards
+          .map(
+            (card) => {
+              'id': card.id,
+              'type': card.type.name,
+              'name': card.name,
+              'description': card.description,
+              'timing': card.timing.name,
+              'target': card.target.name,
+              'parameters': card.parameters,
+            },
+          )
+          .toList(),
       'score': score,
       'position': position,
       'is_active': isActive,

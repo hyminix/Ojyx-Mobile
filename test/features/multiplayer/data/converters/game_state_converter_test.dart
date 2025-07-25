@@ -10,20 +10,20 @@ void main() {
   group('GameStateConverter', () {
     late GameStateConverter converter;
     late GameState mockGameState;
-    
+
     setUp(() {
       converter = const GameStateConverter();
-      
+
       final mockPlayerGrid = PlayerGrid(
         cards: List.generate(3, (_) => List.generate(4, (_) => null)),
       );
-      
+
       mockGameState = GameState(
         roomId: 'room456',
         players: [
           GamePlayer(
-            id: 'p1', 
-            name: 'Player 1', 
+            id: 'p1',
+            name: 'Player 1',
             grid: mockPlayerGrid,
             actionCards: [],
             isConnected: true,
@@ -32,8 +32,8 @@ void main() {
             scoreMultiplier: 1,
           ),
           GamePlayer(
-            id: 'p2', 
-            name: 'Player 2', 
+            id: 'p2',
+            name: 'Player 2',
             grid: mockPlayerGrid,
             actionCards: [],
             isConnected: true,
@@ -74,14 +74,17 @@ void main() {
                 'id': 'p1',
                 'name': 'Player 1',
                 'grid': {
-                  'cards': List.generate(3, (_) => List.generate(4, (_) => null)),
+                  'cards': List.generate(
+                    3,
+                    (_) => List.generate(4, (_) => null),
+                  ),
                 },
                 'actionCards': [],
                 'isConnected': true,
                 'isHost': true,
                 'hasFinishedRound': false,
                 'scoreMultiplier': 1,
-              }
+              },
             ],
             'currentPlayerIndex': 0,
             'deck': [],
@@ -100,7 +103,7 @@ void main() {
         };
 
         final result = converter.fromJson(json);
-        
+
         expect(result.roomId, 'room456');
         expect(result.status, GameStatus.playing);
         expect(result.players.length, 1);
@@ -121,14 +124,17 @@ void main() {
                 'id': 'p1',
                 'name': 'Player 1',
                 'grid': {
-                  'cards': List.generate(3, (_) => List.generate(4, (_) => null)),
+                  'cards': List.generate(
+                    3,
+                    (_) => List.generate(4, (_) => null),
+                  ),
                 },
                 'actionCards': [],
                 'isConnected': true,
                 'isHost': true,
                 'hasFinishedRound': false,
                 'scoreMultiplier': 1,
-              }
+              },
             ],
             'currentPlayerIndex': 0,
             'deck': [],
@@ -147,7 +153,7 @@ void main() {
         };
 
         final result = converter.fromJson(json);
-        
+
         expect(result.roomId, 'room456');
         expect(result.status, GameStatus.playing);
       });
@@ -177,7 +183,7 @@ void main() {
         };
 
         final result = converter.fromJson(json);
-        
+
         expect(result.roomId, 'room456');
         expect(result.status, GameStatus.waitingToStart);
       });
@@ -206,7 +212,7 @@ void main() {
         };
 
         final result = converter.fromJson(json);
-        
+
         expect(result.roomId, 'room456');
       });
     });
@@ -214,7 +220,7 @@ void main() {
     group('toJson', () {
       test('should convert GameState to JSON with snake_case fields', () {
         final json = converter.toJson(mockGameState);
-        
+
         expect(json['room_id'], 'room456');
         expect(json['status'], 'playing');
         expect(json['current_player_id'], 'p1');
@@ -226,7 +232,7 @@ void main() {
       test('should handle roundtrip conversion', () {
         final json = converter.toJson(mockGameState);
         final backToGameState = converter.fromJson(json);
-        
+
         expect(backToGameState.roomId, mockGameState.roomId);
         expect(backToGameState.status, mockGameState.status);
         expect(backToGameState.players.length, mockGameState.players.length);

@@ -3,11 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'lobby_player.freezed.dart';
 part 'lobby_player.g.dart';
 
-enum ConnectionStatus {
-  online,
-  offline,
-  away,
-}
+enum ConnectionStatus { online, offline, away }
 
 @freezed
 class LobbyPlayer with _$LobbyPlayer {
@@ -22,5 +18,6 @@ class LobbyPlayer with _$LobbyPlayer {
     String? currentRoomId,
   }) = _LobbyPlayer;
 
-  factory LobbyPlayer.fromJson(Map<String, dynamic> json) => _$LobbyPlayerFromJson(json);
+  factory LobbyPlayer.fromJson(Map<String, dynamic> json) =>
+      _$LobbyPlayerFromJson(json);
 }

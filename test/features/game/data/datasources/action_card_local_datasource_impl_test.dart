@@ -62,12 +62,18 @@ void main() {
       await dataSource.addActionCardToPlayer('player2', testCard2);
 
       // Assert
-      expect(await dataSource.getPlayerActionCards('player1'), contains(testCard1));
+      expect(
+        await dataSource.getPlayerActionCards('player1'),
+        contains(testCard1),
+      );
       expect(
         await dataSource.getPlayerActionCards('player1'),
         isNot(contains(testCard2)),
       );
-      expect(await dataSource.getPlayerActionCards('player2'), contains(testCard2));
+      expect(
+        await dataSource.getPlayerActionCards('player2'),
+        contains(testCard2),
+      );
       expect(
         await dataSource.getPlayerActionCards('player2'),
         isNot(contains(testCard1)),
@@ -180,7 +186,8 @@ void main() {
     test('should shuffle action cards', () async {
       // Arrange
       await dataSource.initializeDeck();
-      final originalOrder = (await dataSource.getAvailableActionCards()).toList();
+      final originalOrder = (await dataSource.getAvailableActionCards())
+          .toList();
 
       // Act
       await dataSource.shuffleActionCards();
@@ -203,7 +210,10 @@ void main() {
       await dataSource.discardActionCard(testCard2);
 
       // Assert - player cards unchanged
-      expect(await dataSource.getPlayerActionCards('player1'), contains(testCard1));
+      expect(
+        await dataSource.getPlayerActionCards('player1'),
+        contains(testCard1),
+      );
     });
   });
 }

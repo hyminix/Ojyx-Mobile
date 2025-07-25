@@ -63,7 +63,6 @@ class GameState with _$GameState {
     );
   }
 
-
   GamePlayer get currentPlayer => players[currentPlayerIndex];
 
   bool get canStart =>

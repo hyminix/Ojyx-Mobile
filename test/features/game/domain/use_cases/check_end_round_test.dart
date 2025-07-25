@@ -37,8 +37,16 @@ void main() {
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
-        GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
+        GamePlayer(
+          id: 'player3',
+          name: 'GamePlayer 3',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(
@@ -117,7 +125,12 @@ void main() {
         }
 
         final players = [
-          GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+          GamePlayer(
+            id: 'player1',
+            name: 'GamePlayer 1',
+            grid: grid1,
+            isHost: true,
+          ),
           GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
           GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: grid3),
         ];
@@ -189,7 +202,12 @@ void main() {
         }
 
         final players = [
-          GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+          GamePlayer(
+            id: 'player1',
+            name: 'GamePlayer 1',
+            grid: grid1,
+            isHost: true,
+          ),
           GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
         ];
 
@@ -221,7 +239,12 @@ void main() {
       final grid2 = createFullGrid([10, 8]); // Score: 18
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid1,
+          isHost: true,
+        ),
         GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
       ];
 
@@ -252,7 +275,12 @@ void main() {
       final grid3 = createFullGrid([10]); // Score: 10
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid1,
+          isHost: true,
+        ),
         GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
         GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: grid3),
       ];
@@ -286,7 +314,11 @@ void main() {
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -318,8 +350,16 @@ void main() {
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
-        GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
+        GamePlayer(
+          id: 'player3',
+          name: 'GamePlayer 3',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)

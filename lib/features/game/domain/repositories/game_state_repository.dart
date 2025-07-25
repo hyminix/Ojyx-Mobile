@@ -44,9 +44,7 @@ abstract class GameStateRepository {
   });
 
   /// Advance to next player's turn
-  Future<Map<String, dynamic>> advanceTurn({
-    required String gameStateId,
-  });
+  Future<Map<String, dynamic>> advanceTurn({required String gameStateId});
 
   /// Check if game has ended and handle end conditions
   Future<Map<String, dynamic>> checkEndGameConditions({

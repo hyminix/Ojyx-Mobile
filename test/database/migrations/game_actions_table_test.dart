@@ -4,7 +4,7 @@ void main() {
   group('Game Actions Table Migration', () {
     test('should create game_actions table with correct structure', () async {
       // This test verifies that the game_actions table migration creates the correct structure
-      
+
       final expectedColumns = {
         'id': 'uuid',
         'game_state_id': 'uuid',
@@ -40,7 +40,7 @@ void main() {
       expect(migrationSQL, contains('CREATE TABLE'));
       expect(migrationSQL, contains('public.game_actions'));
       expect(migrationSQL, contains('PRIMARY KEY'));
-      
+
       // Verify all expected columns are present
       for (final column in expectedColumns.keys) {
         expect(migrationSQL.toLowerCase(), contains(column.toLowerCase()));
@@ -78,7 +78,7 @@ void main() {
           )
         );
         ''',
-        
+
         // Players can only insert their own actions
         '''
         CREATE POLICY "Players can insert their own actions"

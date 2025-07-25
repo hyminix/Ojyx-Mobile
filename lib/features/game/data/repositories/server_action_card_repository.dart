@@ -52,7 +52,7 @@ class ServerActionCardRepository implements ActionCardRepository {
     // This should not be used in server-authoritative architecture
     // GamePlayer action cards are now stored in player_grids table
     throw UnsupportedError(
-      'Use GameStateRepository.getPlayerGrid() to get player action cards'
+      'Use GameStateRepository.getPlayerGrid() to get player action cards',
     );
   }
 
@@ -60,15 +60,18 @@ class ServerActionCardRepository implements ActionCardRepository {
   Future<void> addActionCardToPlayer(String playerId, ActionCard card) async {
     // This should not be used in server-authoritative architecture
     throw UnsupportedError(
-      'Action cards are managed server-side through PostgreSQL functions'
+      'Action cards are managed server-side through PostgreSQL functions',
     );
   }
 
   @override
-  Future<void> removeActionCardFromPlayer(String playerId, ActionCard card) async {
+  Future<void> removeActionCardFromPlayer(
+    String playerId,
+    ActionCard card,
+  ) async {
     // This should not be used in server-authoritative architecture
     throw UnsupportedError(
-      'Action cards are managed server-side through PostgreSQL functions'
+      'Action cards are managed server-side through PostgreSQL functions',
     );
   }
 
@@ -76,7 +79,7 @@ class ServerActionCardRepository implements ActionCardRepository {
   Future<ActionCard?> drawActionCard() async {
     // This should not be used in server-authoritative architecture
     throw UnsupportedError(
-      'Card drawing is managed server-side through PostgreSQL functions'
+      'Card drawing is managed server-side through PostgreSQL functions',
     );
   }
 
@@ -84,7 +87,7 @@ class ServerActionCardRepository implements ActionCardRepository {
   Future<void> discardActionCard(ActionCard card) async {
     // This should not be used in server-authoritative architecture
     throw UnsupportedError(
-      'Card discarding is managed server-side through PostgreSQL functions'
+      'Card discarding is managed server-side through PostgreSQL functions',
     );
   }
 
@@ -92,7 +95,7 @@ class ServerActionCardRepository implements ActionCardRepository {
   Future<void> shuffleActionCards() async {
     // This should not be used in server-authoritative architecture
     throw UnsupportedError(
-      'Card shuffling is managed server-side through PostgreSQL functions'
+      'Card shuffling is managed server-side through PostgreSQL functions',
     );
   }
 
@@ -106,12 +109,15 @@ class ServerActionCardRepository implements ActionCardRepository {
     Map<String, dynamic>? targetData,
   }) async {
     try {
-      final response = await _supabase.rpc('validate_action_card_use', params: {
-        'p_game_state_id': gameStateId,
-        'p_player_id': playerId,
-        'p_action_card_type': actionCardType.name,
-        'p_target_data': targetData ?? {},
-      });
+      final response = await _supabase.rpc(
+        'validate_action_card_use',
+        params: {
+          'p_game_state_id': gameStateId,
+          'p_player_id': playerId,
+          'p_action_card_type': actionCardType.name,
+          'p_target_data': targetData ?? {},
+        },
+      );
 
       return response as Map<String, dynamic>;
     } catch (e) {
@@ -127,12 +133,15 @@ class ServerActionCardRepository implements ActionCardRepository {
     Map<String, dynamic>? targetData,
   }) async {
     try {
-      final response = await _supabase.rpc('process_action_card', params: {
-        'p_game_state_id': gameStateId,
-        'p_player_id': playerId,
-        'p_action_card_type': actionCardType.name,
-        'p_target_data': targetData ?? {},
-      });
+      final response = await _supabase.rpc(
+        'process_action_card',
+        params: {
+          'p_game_state_id': gameStateId,
+          'p_player_id': playerId,
+          'p_action_card_type': actionCardType.name,
+          'p_target_data': targetData ?? {},
+        },
+      );
 
       if (response['valid'] != true) {
         throw Exception(response['error'] ?? 'Invalid action card use');
@@ -151,11 +160,14 @@ class ServerActionCardRepository implements ActionCardRepository {
     required ActionCardType actionCardType,
   }) async {
     try {
-      final response = await _supabase.rpc('validate_action_timing', params: {
-        'p_game_state_id': gameStateId,
-        'p_player_id': playerId,
-        'p_action_card_type': actionCardType.name,
-      });
+      final response = await _supabase.rpc(
+        'validate_action_timing',
+        params: {
+          'p_game_state_id': gameStateId,
+          'p_player_id': playerId,
+          'p_action_card_type': actionCardType.name,
+        },
+      );
 
       return response as Map<String, dynamic>;
     } catch (e) {
@@ -166,9 +178,7 @@ class ServerActionCardRepository implements ActionCardRepository {
   /// Get action card definition by type
   Future<ActionCard?> getActionCardByType(ActionCardType type) async {
     final cards = await getAvailableActionCards();
-    return cards
-        .where((card) => card.type == type)
-        .firstOrNull;
+    return cards.where((card) => card.type == type).firstOrNull;
   }
 
   /// Check if action card is immediate (must be played right away)

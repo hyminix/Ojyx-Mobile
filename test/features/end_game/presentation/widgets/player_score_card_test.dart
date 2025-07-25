@@ -127,7 +127,9 @@ void main() {
       expect(find.text('Score doubled!'), findsOneWidget);
     });
 
-    testWidgets('should not show penalty indicator when not penalized', (tester) async {
+    testWidgets('should not show penalty indicator when not penalized', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -144,7 +146,9 @@ void main() {
       expect(find.text('Score doubled!'), findsNothing);
     });
 
-    testWidgets('should show vote indicator when hasVoted is true', (tester) async {
+    testWidgets('should show vote indicator when hasVoted is true', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -164,7 +168,9 @@ void main() {
       expect(icon.size, 32);
     });
 
-    testWidgets('should not show vote indicator when hasVoted is false', (tester) async {
+    testWidgets('should not show vote indicator when hasVoted is false', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -239,7 +245,7 @@ void main() {
             matching: find.byType(Container),
           ),
         );
-        
+
         Container? rankBadge;
         for (final container in containers) {
           if (container.decoration is BoxDecoration) {
@@ -250,7 +256,7 @@ void main() {
             }
           }
         }
-        
+
         expect(rankBadge, isNotNull);
         final decoration = rankBadge!.decoration as BoxDecoration;
         expect(decoration.color, Colors.amber.withOpacity(0.2));
@@ -278,7 +284,7 @@ void main() {
             matching: find.byType(Container),
           ),
         );
-        
+
         Container? rankBadge;
         for (final container in containers) {
           if (container.decoration is BoxDecoration) {
@@ -289,7 +295,7 @@ void main() {
             }
           }
         }
-        
+
         expect(rankBadge, isNotNull);
         final decoration = rankBadge!.decoration as BoxDecoration;
         expect(decoration.color, Colors.grey[400]!.withOpacity(0.2));
@@ -317,7 +323,7 @@ void main() {
             matching: find.byType(Container),
           ),
         );
-        
+
         Container? rankBadge;
         for (final container in containers) {
           if (container.decoration is BoxDecoration) {
@@ -328,7 +334,7 @@ void main() {
             }
           }
         }
-        
+
         expect(rankBadge, isNotNull);
         final decoration = rankBadge!.decoration as BoxDecoration;
         expect(decoration.color, Colors.brown[400]!.withOpacity(0.2));

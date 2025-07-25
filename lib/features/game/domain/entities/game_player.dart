@@ -22,7 +22,8 @@ class GamePlayer with _$GamePlayer {
 
   const GamePlayer._();
 
-  factory GamePlayer.fromJson(Map<String, dynamic> json) => _$GamePlayerFromJson(json);
+  factory GamePlayer.fromJson(Map<String, dynamic> json) =>
+      _$GamePlayerFromJson(json);
 
   int get currentScore => grid.totalScore * scoreMultiplier;
 

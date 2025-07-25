@@ -4,7 +4,7 @@ void main() {
   group('Global Scores Table Migration', () {
     test('should create global_scores table with correct structure', () async {
       // This test verifies that the global_scores table migration creates the correct structure
-      
+
       final expectedColumns = {
         'id': 'uuid',
         'player_id': 'uuid',
@@ -38,7 +38,7 @@ void main() {
       expect(migrationSQL, contains('CREATE TABLE'));
       expect(migrationSQL, contains('public.global_scores'));
       expect(migrationSQL, contains('PRIMARY KEY'));
-      
+
       // Verify all expected columns are present
       for (final column in expectedColumns.keys) {
         expect(migrationSQL.toLowerCase(), contains(column.toLowerCase()));
@@ -54,14 +54,14 @@ void main() {
         ON public.global_scores FOR SELECT
         USING (true);
         ''',
-        
+
         // Only authenticated users can insert scores
         '''
         CREATE POLICY "Authenticated users can insert scores"
         ON public.global_scores FOR INSERT
         WITH CHECK (auth.uid() IS NOT NULL);
         ''',
-        
+
         // Players can only delete their own scores
         '''
         CREATE POLICY "Players can delete their own scores"

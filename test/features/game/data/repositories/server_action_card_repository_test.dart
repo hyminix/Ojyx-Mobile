@@ -22,7 +22,7 @@ void main() {
 
         expect(cards, isNotEmpty);
         expect(cards.length, greaterThanOrEqualTo(4));
-        
+
         // Verify specific cards exist
         expect(
           cards.any((card) => card.type == ActionCardType.teleport),
@@ -32,14 +32,8 @@ void main() {
           cards.any((card) => card.type == ActionCardType.turnAround),
           isTrue,
         );
-        expect(
-          cards.any((card) => card.type == ActionCardType.peek),
-          isTrue,
-        );
-        expect(
-          cards.any((card) => card.type == ActionCardType.swap),
-          isTrue,
-        );
+        expect(cards.any((card) => card.type == ActionCardType.peek), isTrue);
+        expect(cards.any((card) => card.type == ActionCardType.swap), isTrue);
       });
 
       test('should return cards with correct properties', () async {
@@ -128,7 +122,9 @@ void main() {
 
     group('helper methods', () {
       test('getActionCardByType should return correct card', () async {
-        final card = await repository.getActionCardByType(ActionCardType.teleport);
+        final card = await repository.getActionCardByType(
+          ActionCardType.teleport,
+        );
 
         expect(card, isNotNull);
         expect(card!.type, ActionCardType.teleport);

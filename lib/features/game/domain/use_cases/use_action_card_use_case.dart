@@ -18,13 +18,16 @@ class UseActionCardParams {
   });
 }
 
-class UseActionCardUseCase extends UseCase<Map<String, dynamic>, UseActionCardParams> {
+class UseActionCardUseCase
+    extends UseCase<Map<String, dynamic>, UseActionCardParams> {
   final GameStateRepository _gameStateRepository;
 
   UseActionCardUseCase(this._gameStateRepository);
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> call(UseActionCardParams params) async {
+  Future<Either<Failure, Map<String, dynamic>>> call(
+    UseActionCardParams params,
+  ) async {
     try {
       // Validate action card usage with server-side validation
       final result = await _gameStateRepository.useActionCard(
@@ -81,7 +84,10 @@ class UseActionCardUseCase extends UseCase<Map<String, dynamic>, UseActionCardPa
   }
 
   /// Map server error messages to appropriate Failure types
-  Failure _mapServerErrorToFailure(String errorMessage, Map<String, dynamic> response) {
+  Failure _mapServerErrorToFailure(
+    String errorMessage,
+    Map<String, dynamic> response,
+  ) {
     switch (errorMessage.toLowerCase()) {
       case 'game not found':
       case 'game not active':
@@ -89,19 +95,13 @@ class UseActionCardUseCase extends UseCase<Map<String, dynamic>, UseActionCardPa
           message: errorMessage,
           code: 'GAME_STATE_INVALID',
         );
-      
+
       case 'not your turn':
-        return Failure.gameLogic(
-          message: errorMessage,
-          code: 'NOT_YOUR_TURN',
-        );
-      
+        return Failure.gameLogic(message: errorMessage, code: 'NOT_YOUR_TURN');
+
       case 'action card not available':
-        return Failure.gameLogic(
-          message: errorMessage,
-          code: 'CARD_NOT_OWNED',
-        );
-      
+        return Failure.gameLogic(message: errorMessage, code: 'CARD_NOT_OWNED');
+
       case 'invalid positions':
       case 'cannot swap card with itself':
       case 'cannot swap revealed card':
@@ -109,15 +109,12 @@ class UseActionCardUseCase extends UseCase<Map<String, dynamic>, UseActionCardPa
           message: errorMessage,
           errors: {'target': errorMessage},
         );
-      
+
       case 'player not in game':
         return Failure.authentication(message: errorMessage);
-      
+
       default:
-        return Failure.server(
-          message: errorMessage,
-          error: response,
-        );
+        return Failure.server(message: errorMessage, error: response);
     }
   }
 

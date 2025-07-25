@@ -25,8 +25,8 @@ class PlayerGridModel with _$PlayerGridModel {
 
   const PlayerGridModel._();
 
-  factory PlayerGridModel.fromJson(Map<String, dynamic> json) => _$PlayerGridModelFromJson(json);
-
+  factory PlayerGridModel.fromJson(Map<String, dynamic> json) =>
+      _$PlayerGridModelFromJson(json);
 
   Map<String, dynamic> toSupabaseJson() {
     return {
@@ -46,38 +46,53 @@ class PlayerGridModel with _$PlayerGridModel {
 
   PlayerGrid toDomain() {
     // Convert the gridCards data to Card entities and create PlayerGrid
-    final cards = gridCards.map((cardData) => Card(
-      value: cardData['value'] as int,
-      isRevealed: cardData['is_revealed'] as bool? ?? false,
-    )).toList();
-    
+    final cards = gridCards
+        .map(
+          (cardData) => Card(
+            value: cardData['value'] as int,
+            isRevealed: cardData['is_revealed'] as bool? ?? false,
+          ),
+        )
+        .toList();
+
     return PlayerGrid.fromCards(cards);
   }
-  
+
   DbPlayerGrid toDbPlayerGrid() {
     return DbPlayerGridModel(
       id: id,
       gameStateId: gameStateId,
       playerId: playerId,
-      gridCards: gridCards.map((cardData) => Card(
-        value: cardData['value'] as int,
-        isRevealed: cardData['is_revealed'] as bool? ?? false,
-      )).toList(),
-      actionCards: actionCards.map((cardData) => ActionCard(
-        id: cardData['id'] as String,
-        type: ActionCardType.values.firstWhere(
-          (e) => e.name == cardData['type'],
-        ),
-        name: cardData['name'] as String,
-        description: cardData['description'] as String,
-        timing: ActionTiming.values.firstWhere(
-          (e) => e.name == cardData['timing'],
-        ),
-        target: ActionTarget.values.firstWhere(
-          (e) => e.name == cardData['target'],
-        ),
-        parameters: (cardData['parameters'] as Map<dynamic, dynamic>?)?.cast<String, dynamic>() ?? {},
-      )).toList(),
+      gridCards: gridCards
+          .map(
+            (cardData) => Card(
+              value: cardData['value'] as int,
+              isRevealed: cardData['is_revealed'] as bool? ?? false,
+            ),
+          )
+          .toList(),
+      actionCards: actionCards
+          .map(
+            (cardData) => ActionCard(
+              id: cardData['id'] as String,
+              type: ActionCardType.values.firstWhere(
+                (e) => e.name == cardData['type'],
+              ),
+              name: cardData['name'] as String,
+              description: cardData['description'] as String,
+              timing: ActionTiming.values.firstWhere(
+                (e) => e.name == cardData['timing'],
+              ),
+              target: ActionTarget.values.firstWhere(
+                (e) => e.name == cardData['target'],
+              ),
+              parameters:
+                  (cardData['parameters'] as Map<dynamic, dynamic>?)
+                      ?.cast<String, dynamic>() ??
+                  {},
+            ),
+          )
+          .toList(),
       score: score,
       position: position,
       isActive: isActive,

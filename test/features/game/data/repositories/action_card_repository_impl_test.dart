@@ -29,7 +29,9 @@ void main() {
     test('should get available action cards from datasource', () async {
       // Arrange
       final cards = [testCard];
-      when(() => mockDataSource.getAvailableActionCards()).thenAnswer((_) async => cards);
+      when(
+        () => mockDataSource.getAvailableActionCards(),
+      ).thenAnswer((_) async => cards);
 
       // Act
       final result = await repository.getAvailableActionCards();
@@ -89,7 +91,9 @@ void main() {
 
     test('should draw action card from datasource', () async {
       // Arrange
-      when(() => mockDataSource.drawActionCard()).thenAnswer((_) async => testCard);
+      when(
+        () => mockDataSource.drawActionCard(),
+      ).thenAnswer((_) async => testCard);
 
       // Act
       final result = await repository.drawActionCard();
@@ -113,7 +117,9 @@ void main() {
 
     test('should discard action card through datasource', () async {
       // Arrange
-      when(() => mockDataSource.discardActionCard(testCard)).thenAnswer((_) async {});
+      when(
+        () => mockDataSource.discardActionCard(testCard),
+      ).thenAnswer((_) async {});
 
       // Act
       await repository.discardActionCard(testCard);
@@ -140,7 +146,9 @@ void main() {
         final playerId = 'player1';
         when(
           () => mockDataSource.addActionCardToPlayer(playerId, testCard),
-        ).thenThrow(Exception('GamePlayer cannot have more than 3 action cards'));
+        ).thenThrow(
+          Exception('GamePlayer cannot have more than 3 action cards'),
+        );
 
         // Act & Assert
         expect(

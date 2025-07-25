@@ -10,7 +10,7 @@ void main() {
         /// 3. Generates shuffled deck server-side
         /// 4. Sets up proper player order and turn management
         /// 5. Logs initial game action
-        
+
         const expectedWorkflow = '''
         1. Call initialize_game(room_id, player_ids[], creator_id)
         2. Function creates game_states record with:
@@ -38,7 +38,7 @@ void main() {
         /// - Creator must be in player list
         /// - Room must exist and be valid
         /// - All players must have valid IDs
-        
+
         const constraints = [
           'CHECK: player count >= 2 AND <= 8',
           'CHECK: creator_id IN player_ids array',
@@ -60,7 +60,7 @@ void main() {
         /// 2. process_card_reveal updates game state
         /// 3. Checks for column completion
         /// 4. Updates scores and logs actions
-        
+
         const revealWorkflow = '''
         1. Call validate_card_reveal(game_state_id, player_id, position)
         2. Function validates:
@@ -87,7 +87,7 @@ void main() {
         /// - Marks all 4 cards in column as discarded (value -1)
         /// - Recalculates score (discarded cards = 0 points)
         /// - Updates player grid in database
-        
+
         const columnCompletion = '''
         Column detection logic:
         - Column 0: positions 0, 3, 6, 9
@@ -113,7 +113,7 @@ void main() {
         /// 2. Validate timing (immediate/optional/reactive)
         /// 3. Validate targets and parameters
         /// 4. Check game state allows action
-        
+
         const validationChecks = [
           'Player owns the action card',
           'Timing allows usage (turn-based or reactive)',
@@ -133,7 +133,7 @@ void main() {
         /// 2. Swap cards at specified positions
         /// 3. Remove action card from player hand
         /// 4. Log action in game_actions
-        
+
         const teleportLogic = '''
         Teleport validation:
         - position1 and position2 both in range 0-11
@@ -156,7 +156,7 @@ void main() {
         /// - Immediate cards must be played right away
         /// - Optional cards can be stored for later use
         /// - Reactive cards can be played in response to other actions
-        
+
         const timingRules = {
           'immediate': ['turnAround - must reverse turn direction now'],
           'optional': ['teleport - can be stored and used later'],
@@ -176,7 +176,7 @@ void main() {
         /// 2. Calculate next player (round-robin)
         /// 3. Update current_player_id and turn_number
         /// 4. Log turn change action
-        
+
         const turnLogic = '''
         Turn advancement:
         - Read player_order from game_data
@@ -197,7 +197,7 @@ void main() {
         /// 3. Apply double penalty if trigger player doesn't win
         /// 4. Determine winner and update game status
         /// 5. Record results in global_scores
-        
+
         const endGameLogic = '''
         End game sequence:
         - Triggered when player reveals 12th card
@@ -215,25 +215,28 @@ void main() {
     });
 
     group('Real-time Synchronization', () {
-      test('should provide real-time updates via database subscriptions', () async {
-        /// This test verifies real-time functionality:
-        /// - game_states table changes trigger UI updates
-        /// - player_grids table changes update individual grids
-        /// - game_actions table provides action log stream
-        /// - All updates are server-authoritative
-        
-        const realtimeFeatures = [
-          'Supabase Realtime WebSocket subscriptions',
-          'game_states table streaming for turn changes',
-          'player_grids table streaming for grid updates',
-          'game_actions table streaming for action history',
-          'Row Level Security enforces access control',
-        ];
+      test(
+        'should provide real-time updates via database subscriptions',
+        () async {
+          /// This test verifies real-time functionality:
+          /// - game_states table changes trigger UI updates
+          /// - player_grids table changes update individual grids
+          /// - game_actions table provides action log stream
+          /// - All updates are server-authoritative
 
-        for (final feature in realtimeFeatures) {
-          expect(feature, isNotEmpty);
-        }
-      });
+          const realtimeFeatures = [
+            'Supabase Realtime WebSocket subscriptions',
+            'game_states table streaming for turn changes',
+            'player_grids table streaming for grid updates',
+            'game_actions table streaming for action history',
+            'Row Level Security enforces access control',
+          ];
+
+          for (final feature in realtimeFeatures) {
+            expect(feature, isNotEmpty);
+          }
+        },
+      );
 
       test('should enforce Row Level Security policies', () async {
         /// This test verifies RLS policies protect data:
@@ -241,7 +244,7 @@ void main() {
         /// - Players can only modify their own grids
         /// - Game actions are read-only except via functions
         /// - Global scores are publicly readable
-        
+
         const rlsPolicies = [
           'game_states: SELECT where player in game',
           'player_grids: SELECT/UPDATE where player_id = auth.uid()',
@@ -261,10 +264,10 @@ void main() {
         /// This test verifies foreign key constraints:
         /// - game_states.room_id → rooms.id
         /// - player_grids.game_state_id → game_states.id
-        /// - player_grids.player_id → players.id  
+        /// - player_grids.player_id → players.id
         /// - game_actions.game_state_id → game_states.id
         /// - global_scores references are valid
-        
+
         const foreignKeys = [
           'game_states(room_id) → rooms(id)',
           'player_grids(game_state_id) → game_states(id)',
@@ -285,7 +288,7 @@ void main() {
         /// - Scores must be non-negative
         /// - Turn numbers must be positive
         /// - Player positions in game must be valid
-        
+
         const constraints = [
           'CHECK (position >= 0 AND position <= 11)',
           'CHECK (score >= 0)',

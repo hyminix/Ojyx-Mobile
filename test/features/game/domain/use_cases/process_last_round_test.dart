@@ -26,7 +26,12 @@ void main() {
           .placeCard(const Card(value: 7, isRevealed: false), 1, 0);
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid1, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid1,
+          isHost: true,
+        ),
         GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
       ];
 
@@ -65,7 +70,11 @@ void main() {
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(
@@ -90,7 +99,12 @@ void main() {
           .placeCard(const Card(value: 10, isRevealed: false), 0, 1);
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
         GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid),
       ];
 
@@ -123,7 +137,12 @@ void main() {
       // Other positions are empty
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
@@ -198,7 +217,12 @@ void main() {
       );
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)

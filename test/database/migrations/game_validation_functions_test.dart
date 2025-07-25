@@ -202,7 +202,7 @@ void main() {
           RETURN v_total_score;
         END;
         \$\$ LANGUAGE plpgsql;
-        '''
+        ''',
       ];
 
       for (final func in helperFunctions) {
@@ -288,7 +288,7 @@ void main() {
         ON player_grids FOR UPDATE
         USING (player_id = auth.uid())
         WITH CHECK (player_id = auth.uid());
-        '''
+        ''',
       ];
 
       for (final policy in rlsPolicies) {

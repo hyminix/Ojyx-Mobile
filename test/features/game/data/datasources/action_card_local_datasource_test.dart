@@ -132,7 +132,9 @@ void main() {
 
     test('should define drawActionCard method', () async {
       // Arrange
-      when(() => mockDataSource.drawActionCard()).thenAnswer((_) async => testActionCard);
+      when(
+        () => mockDataSource.drawActionCard(),
+      ).thenAnswer((_) async => testActionCard);
 
       // Act
       final result = await mockDataSource.drawActionCard();
@@ -180,7 +182,9 @@ void main() {
     test('should handle multiple operations in sequence', () async {
       // Arrange
       const playerId = 'player1';
-      when(() => mockDataSource.drawActionCard()).thenAnswer((_) async => testActionCard);
+      when(
+        () => mockDataSource.drawActionCard(),
+      ).thenAnswer((_) async => testActionCard);
       when(
         () => mockDataSource.addActionCardToPlayer(playerId, testActionCard),
       ).thenAnswer((_) async {});

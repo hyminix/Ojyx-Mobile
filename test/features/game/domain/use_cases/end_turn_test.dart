@@ -23,8 +23,17 @@ void main() {
           .placeCard(const Card(value: 2), 1, 2);
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(
@@ -70,7 +79,12 @@ void main() {
           .placeCard(const Card(value: 5, isRevealed: true), 2, 1);
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
       ];
 
       final gameState = GameState.initial(
@@ -108,8 +122,17 @@ void main() {
       }
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(
@@ -146,7 +169,12 @@ void main() {
           .placeCard(const Card(value: 2), 1, 3);
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
       ];
 
       final gameState = GameState.initial(
@@ -186,7 +214,12 @@ void main() {
           .placeCard(const Card(value: 0, isRevealed: true), 1, 1);
 
       final players = [
-        GamePlayer(id: 'player1', name: 'GamePlayer 1', grid: grid, isHost: true),
+        GamePlayer(
+          id: 'player1',
+          name: 'GamePlayer 1',
+          grid: grid,
+          isHost: true,
+        ),
       ];
 
       final gameState = GameState.initial(
@@ -215,7 +248,11 @@ void main() {
           grid: PlayerGrid.empty(),
           isHost: true,
         ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: PlayerGrid.empty()),
+        GamePlayer(
+          id: 'player2',
+          name: 'GamePlayer 2',
+          grid: PlayerGrid.empty(),
+        ),
       ];
 
       final gameState = GameState.initial(

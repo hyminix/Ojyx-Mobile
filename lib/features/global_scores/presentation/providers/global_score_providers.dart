@@ -32,33 +32,39 @@ final getTopPlayersUseCaseProvider = Provider<GetTopPlayersUseCase>((ref) {
 });
 
 // Data Providers
-final playerStatsProvider = FutureProvider.family<PlayerStats?, String>((ref, playerId) async {
+final playerStatsProvider = FutureProvider.family<PlayerStats?, String>((
+  ref,
+  playerId,
+) async {
   final useCase = ref.watch(getPlayerStatsUseCaseProvider);
   final result = await useCase(GetPlayerStatsParams(playerId: playerId));
-  
-  return result.fold(
-    (failure) => throw Exception(failure),
-    (stats) => stats,
-  );
+
+  return result.fold((failure) => throw Exception(failure), (stats) => stats);
 });
 
 final topPlayersProvider = FutureProvider<List<PlayerStats>>((ref) async {
   final useCase = ref.watch(getTopPlayersUseCaseProvider);
   final result = await useCase(const GetTopPlayersParams());
-  
+
   return result.fold(
     (failure) => throw Exception(failure),
     (players) => players,
   );
 });
 
-final recentGamesProvider = FutureProvider.family<List<GlobalScore>, String>((ref, playerId) async {
+final recentGamesProvider = FutureProvider.family<List<GlobalScore>, String>((
+  ref,
+  playerId,
+) async {
   final repository = ref.watch(globalScoreRepositoryProvider);
   return await repository.getRecentGames(playerId, limit: 10);
 });
 
 // Room Scores Provider - for a specific game room
-final roomScoresProvider = FutureProvider.family<List<GlobalScore>, String>((ref, roomId) async {
+final roomScoresProvider = FutureProvider.family<List<GlobalScore>, String>((
+  ref,
+  roomId,
+) async {
   final repository = ref.watch(globalScoreRepositoryProvider);
   return await repository.getScoresByRoom(roomId);
 });

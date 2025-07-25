@@ -64,7 +64,7 @@ void main() {
       const gameStateId = 'test-game-id';
       const playerId = 'player1';
       const actionCardType = ActionCardType.skip;
-      
+
       final params = UseActionCardParams(
         gameStateId: gameStateId,
         playerId: playerId,
@@ -109,7 +109,7 @@ void main() {
       const gameStateId = 'test-game-id';
       const playerId = 'player1';
       const actionCardType = ActionCardType.teleport;
-      
+
       final params = UseActionCardParams(
         gameStateId: gameStateId,
         playerId: playerId,
@@ -147,7 +147,7 @@ void main() {
       const gameStateId = 'test-game-id';
       const playerId = 'player1';
       const actionCardType = ActionCardType.turnAround;
-      
+
       final params = UseActionCardParams(
         gameStateId: gameStateId,
         playerId: playerId,
@@ -178,7 +178,10 @@ void main() {
       expect(result.isRight(), isTrue);
       result.fold((failure) => fail('Should not fail'), (response) {
         expect(response['valid'], isTrue);
-        expect(response['gameState']['turnDirection'], equals('counterClockwise'));
+        expect(
+          response['gameState']['turnDirection'],
+          equals('counterClockwise'),
+        );
       });
     });
 
@@ -189,7 +192,7 @@ void main() {
         const gameStateId = 'test-game-id';
         const playerId = 'player1';
         const actionCardType = ActionCardType.turnAround;
-        
+
         final params = UseActionCardParams(
           gameStateId: gameStateId,
           playerId: playerId,
@@ -230,7 +233,7 @@ void main() {
       const gameStateId = 'test-game-id';
       const playerId = 'player1';
       const actionCardType = ActionCardType.teleport;
-      
+
       final params = UseActionCardParams(
         gameStateId: gameStateId,
         playerId: playerId,
@@ -238,10 +241,7 @@ void main() {
         targetData: null, // Missing required target data
       );
 
-      final expectedResponse = {
-        'valid': false,
-        'error': 'invalid positions',
-      };
+      final expectedResponse = {'valid': false, 'error': 'invalid positions'};
 
       when(
         () => mockRepository.useActionCard(
@@ -270,7 +270,7 @@ void main() {
         const gameStateId = 'test-game-id';
         const playerId = 'player1';
         const actionCardType = ActionCardType.teleport;
-        
+
         final targetData = {
           'position1': {'row': 0, 'col': 0},
           'position2': {'row': 1, 'col': 1},
@@ -285,9 +285,7 @@ void main() {
 
         final expectedResponse = {
           'valid': true,
-          'gameState': {
-            'cards_swapped': true,
-          },
+          'gameState': {'cards_swapped': true},
         };
 
         when(
@@ -316,7 +314,7 @@ void main() {
       const gameStateId = 'test-game-id';
       const playerId = 'player1';
       const actionCardType = ActionCardType.teleport;
-      
+
       final params = UseActionCardParams(
         gameStateId: gameStateId,
         playerId: playerId,
@@ -324,10 +322,7 @@ void main() {
         targetData: null,
       );
 
-      final expectedResponse = {
-        'valid': false,
-        'error': 'not your turn',
-      };
+      final expectedResponse = {'valid': false, 'error': 'not your turn'};
 
       when(
         () => mockRepository.useActionCard(
@@ -354,7 +349,7 @@ void main() {
       const gameStateId = 'test-game-id';
       const playerId = 'player1';
       const actionCardType = ActionCardType.shield;
-      
+
       final params = UseActionCardParams(
         gameStateId: gameStateId,
         playerId: playerId,
@@ -364,9 +359,7 @@ void main() {
 
       final expectedResponse = {
         'valid': true,
-        'gameState': {
-          'shield_activated': true,
-        },
+        'gameState': {'shield_activated': true},
       };
 
       when(

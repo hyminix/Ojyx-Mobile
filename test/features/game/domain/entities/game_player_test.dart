@@ -128,7 +128,11 @@ void main() {
           .setCard(0, 1, const Card(value: -2, isRevealed: true))
           .setCard(1, 0, const Card(value: 12, isRevealed: true));
 
-      final player = GamePlayer(id: 'player1', name: 'John', grid: gridWithCards);
+      final player = GamePlayer(
+        id: 'player1',
+        name: 'John',
+        grid: gridWithCards,
+      );
 
       expect(player.currentScore, 5 + (-2) + 12);
     });

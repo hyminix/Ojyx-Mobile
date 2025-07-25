@@ -169,7 +169,10 @@ void main() {
       var opponentWidgets = tester
           .widgetList<OpponentGridWidget>(find.byType(OpponentGridWidget))
           .toList();
-      expect(opponentWidgets[0].isCurrentPlayer, isTrue); // GamePlayer 1 is current
+      expect(
+        opponentWidgets[0].isCurrentPlayer,
+        isTrue,
+      ); // GamePlayer 1 is current
 
       // Update game state
       gameState = gameState.copyWith(

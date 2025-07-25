@@ -199,7 +199,9 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
         );
       case 'game_state_updated':
         return RoomEvent.gameStateUpdated(
-          newState: GameStateModel.fromJson(data['new_state']).toDomainComplete(),
+          newState: GameStateModel.fromJson(
+            data['new_state'],
+          ).toDomainComplete(),
         );
       case 'player_action':
         return RoomEvent.playerAction(

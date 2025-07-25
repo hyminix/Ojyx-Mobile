@@ -15,7 +15,9 @@ GameStateRepository gameStateRepository(GameStateRepositoryRef ref) {
 }
 
 @riverpod
-ActionCardRepository serverActionCardRepository(ServerActionCardRepositoryRef ref) {
+ActionCardRepository serverActionCardRepository(
+  ServerActionCardRepositoryRef ref,
+) {
   final supabaseClient = ref.watch(supabaseClientProvider);
   return ServerActionCardRepository(supabaseClient);
 }

@@ -35,14 +35,14 @@ void main() {
           SELECT current_room_id FROM public.players WHERE id = auth.uid()
         ));
         ''',
-        
+
         // Authenticated users can create rooms
         '''
         CREATE POLICY "Authenticated users can create rooms"
         ON public.rooms FOR INSERT
         WITH CHECK (auth.uid() IS NOT NULL);
         ''',
-        
+
         // Only room creator or players in room can update
         '''
         CREATE POLICY "Room participants can update room"
@@ -77,7 +77,7 @@ void main() {
           )
         );
         ''',
-        
+
         // Players can insert events in their rooms
         '''
         CREATE POLICY "Players can insert events in their rooms"

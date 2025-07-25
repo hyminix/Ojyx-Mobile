@@ -10,8 +10,11 @@ import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
 
 class MockGlobalScoreRepository extends Mock implements GlobalScoreRepository {}
+
 class FakeSaveGlobalScoreParams extends Fake implements SaveGlobalScoreParams {}
+
 class FakeGetPlayerStatsParams extends Fake implements GetPlayerStatsParams {}
+
 class FakeGetTopPlayersParams extends Fake implements GetTopPlayersParams {}
 
 void main() {
@@ -76,8 +79,9 @@ void main() {
       );
 
       test('should fetch player stats successfully', () async {
-        when(() => mockRepository.getPlayerStats('player1'))
-            .thenAnswer((_) async => testStats);
+        when(
+          () => mockRepository.getPlayerStats('player1'),
+        ).thenAnswer((_) async => testStats);
 
         final stats = await container.read(
           playerStatsProvider('player1').future,
@@ -88,8 +92,9 @@ void main() {
       });
 
       test('should handle null stats', () async {
-        when(() => mockRepository.getPlayerStats('unknown'))
-            .thenAnswer((_) async => null);
+        when(
+          () => mockRepository.getPlayerStats('unknown'),
+        ).thenAnswer((_) async => null);
 
         final stats = await container.read(
           playerStatsProvider('unknown').future,
@@ -99,8 +104,9 @@ void main() {
       });
 
       test('should handle errors', () async {
-        when(() => mockRepository.getPlayerStats(any()))
-            .thenThrow(Exception('Failed to fetch'));
+        when(
+          () => mockRepository.getPlayerStats(any()),
+        ).thenThrow(Exception('Failed to fetch'));
 
         expect(
           () => container.read(playerStatsProvider('player1').future),
@@ -136,8 +142,9 @@ void main() {
       ];
 
       test('should fetch top players successfully', () async {
-        when(() => mockRepository.getTopPlayers(limit: 10))
-            .thenAnswer((_) async => testTopPlayers);
+        when(
+          () => mockRepository.getTopPlayers(limit: 10),
+        ).thenAnswer((_) async => testTopPlayers);
 
         final players = await container.read(topPlayersProvider.future);
 
@@ -147,8 +154,9 @@ void main() {
       });
 
       test('should handle empty list', () async {
-        when(() => mockRepository.getTopPlayers(limit: any(named: 'limit')))
-            .thenAnswer((_) async => []);
+        when(
+          () => mockRepository.getTopPlayers(limit: any(named: 'limit')),
+        ).thenAnswer((_) async => []);
 
         final players = await container.read(topPlayersProvider.future);
 
@@ -156,8 +164,9 @@ void main() {
       });
 
       test('should handle errors', () async {
-        when(() => mockRepository.getTopPlayers(limit: any(named: 'limit')))
-            .thenThrow(Exception('Failed to fetch'));
+        when(
+          () => mockRepository.getTopPlayers(limit: any(named: 'limit')),
+        ).thenThrow(Exception('Failed to fetch'));
 
         expect(
           () => container.read(topPlayersProvider.future),
@@ -193,8 +202,9 @@ void main() {
       ];
 
       test('should fetch recent games successfully', () async {
-        when(() => mockRepository.getRecentGames('player1', limit: 10))
-            .thenAnswer((_) async => testGames);
+        when(
+          () => mockRepository.getRecentGames('player1', limit: 10),
+        ).thenAnswer((_) async => testGames);
 
         final games = await container.read(
           recentGamesProvider('player1').future,
@@ -202,12 +212,16 @@ void main() {
 
         expect(games.length, equals(2));
         expect(games.first.id, equals('1'));
-        verify(() => mockRepository.getRecentGames('player1', limit: 10)).called(1);
+        verify(
+          () => mockRepository.getRecentGames('player1', limit: 10),
+        ).called(1);
       });
 
       test('should handle empty list', () async {
-        when(() => mockRepository.getRecentGames(any(), limit: any(named: 'limit')))
-            .thenAnswer((_) async => []);
+        when(
+          () =>
+              mockRepository.getRecentGames(any(), limit: any(named: 'limit')),
+        ).thenAnswer((_) async => []);
 
         final games = await container.read(
           recentGamesProvider('player1').future,

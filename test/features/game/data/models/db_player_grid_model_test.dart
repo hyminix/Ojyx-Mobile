@@ -129,21 +129,21 @@ void main() {
       expect(supabaseJson['id'], equals('grid-123'));
       expect(supabaseJson['game_state_id'], equals('game-456'));
       expect(supabaseJson['player_id'], equals('player-789'));
-      
+
       // Grid cards should be serialized as JSON array
       expect(supabaseJson['grid_cards'], isA<List>());
       final gridCards = supabaseJson['grid_cards'] as List;
       expect(gridCards.length, equals(3));
       expect(gridCards[0]['value'], equals(5));
       expect(gridCards[0]['is_revealed'], isTrue);
-      
+
       // Action cards should be serialized as JSON array
       expect(supabaseJson['action_cards'], isA<List>());
       final actionCards = supabaseJson['action_cards'] as List;
       expect(actionCards.length, equals(2));
       expect(actionCards[0]['id'], equals('action1'));
       expect(actionCards[0]['type'], equals('teleport'));
-      
+
       expect(supabaseJson['score'], equals(13));
       expect(supabaseJson['position'], equals(1));
       expect(supabaseJson['is_active'], isTrue);
@@ -178,10 +178,7 @@ void main() {
 
     test('should support Freezed features', () {
       // Test copyWith
-      final updated = model.copyWith(
-        score: 20,
-        hasRevealedAll: true,
-      );
+      final updated = model.copyWith(score: 20, hasRevealedAll: true);
 
       expect(updated.score, equals(20));
       expect(updated.hasRevealedAll, isTrue);

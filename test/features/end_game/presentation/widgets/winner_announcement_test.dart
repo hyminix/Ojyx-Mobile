@@ -25,9 +25,7 @@ void main() {
     testWidgets('should display winner name and score', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: WinnerAnnouncement(winner: mockWinner),
-          ),
+          home: Scaffold(body: WinnerAnnouncement(winner: mockWinner)),
         ),
       );
 
@@ -41,27 +39,25 @@ void main() {
     testWidgets('should display trophy icon', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: WinnerAnnouncement(winner: mockWinner),
-          ),
+          home: Scaffold(body: WinnerAnnouncement(winner: mockWinner)),
         ),
       );
 
       // Verify trophy icon is displayed
       expect(find.byIcon(Icons.emoji_events), findsOneWidget);
-      
+
       // Verify icon has correct color
       final icon = tester.widget<Icon>(find.byIcon(Icons.emoji_events));
       expect(icon.color, Colors.amber);
       expect(icon.size, 64);
     });
 
-    testWidgets('should have animated container with amber styling', (tester) async {
+    testWidgets('should have animated container with amber styling', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: WinnerAnnouncement(winner: mockWinner),
-          ),
+          home: Scaffold(body: WinnerAnnouncement(winner: mockWinner)),
         ),
       );
 

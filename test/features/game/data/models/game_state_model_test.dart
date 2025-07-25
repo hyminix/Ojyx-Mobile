@@ -10,10 +10,10 @@ void main() {
   group('GameStateModel', () {
     late GameState testGameState;
     late DateTime testDateTime;
-    
+
     setUp(() {
       testDateTime = DateTime.now();
-      
+
       final testPlayers = [
         GamePlayer(
           id: 'player1',
@@ -93,66 +93,96 @@ void main() {
     });
 
     group('Domain conversion', () {
-      test('should convert from domain entity correctly using fromDomainComplete', () {
-        // Act
-        final model = GameStateModel.fromDomainComplete(
-          testGameState,
-          id: 'state123',
-          turnNumber: 1,
-          roundNumber: 1,
-          updatedAt: testDateTime,
-        );
+      test(
+        'should convert from domain entity correctly using fromDomainComplete',
+        () {
+          // Act
+          final model = GameStateModel.fromDomainComplete(
+            testGameState,
+            id: 'state123',
+            turnNumber: 1,
+            roundNumber: 1,
+            updatedAt: testDateTime,
+          );
 
-        // Assert
-        expect(model.id, equals('state123'));
-        expect(model.roomId, equals(testGameState.roomId));
-        expect(model.status, equals('waitingToStart'));
-        expect(model.currentPlayerId, equals('player1')); // First player
-        expect(model.turnNumber, equals(1));
-        expect(model.roundNumber, equals(1));
-        expect(model.gameData, isNotEmpty);
-        expect(model.gameData['players'], isA<List>());
-        expect(model.gameData['currentPlayerIndex'], equals(0));
-        expect(model.gameData['deck'], isA<List>());
-        expect(model.gameData['discardPile'], isA<List>());
-        expect(model.gameData['actionDeck'], isA<List>());
-        expect(model.gameData['actionDiscard'], isA<List>());
-        expect(model.gameData['turnDirection'], equals('clockwise'));
-        expect(model.gameData['lastRound'], isFalse);
-        expect(model.winnerId, isNull);
-        expect(model.endedAt, isNull);
-        expect(model.createdAt, equals(testGameState.createdAt));
-        expect(model.updatedAt, equals(testDateTime));
-      });
+          // Assert
+          expect(model.id, equals('state123'));
+          expect(model.roomId, equals(testGameState.roomId));
+          expect(model.status, equals('waitingToStart'));
+          expect(model.currentPlayerId, equals('player1')); // First player
+          expect(model.turnNumber, equals(1));
+          expect(model.roundNumber, equals(1));
+          expect(model.gameData, isNotEmpty);
+          expect(model.gameData['players'], isA<List>());
+          expect(model.gameData['currentPlayerIndex'], equals(0));
+          expect(model.gameData['deck'], isA<List>());
+          expect(model.gameData['discardPile'], isA<List>());
+          expect(model.gameData['actionDeck'], isA<List>());
+          expect(model.gameData['actionDiscard'], isA<List>());
+          expect(model.gameData['turnDirection'], equals('clockwise'));
+          expect(model.gameData['lastRound'], isFalse);
+          expect(model.winnerId, isNull);
+          expect(model.endedAt, isNull);
+          expect(model.createdAt, equals(testGameState.createdAt));
+          expect(model.updatedAt, equals(testDateTime));
+        },
+      );
 
-      test('should convert to domain entity correctly using toDomainComplete', () {
-        // Arrange
-        final model = GameStateModel.fromDomainComplete(
-          testGameState,
-          id: 'state123',
-          turnNumber: 1,
-          roundNumber: 1,
-          updatedAt: testDateTime,
-        );
+      test(
+        'should convert to domain entity correctly using toDomainComplete',
+        () {
+          // Arrange
+          final model = GameStateModel.fromDomainComplete(
+            testGameState,
+            id: 'state123',
+            turnNumber: 1,
+            roundNumber: 1,
+            updatedAt: testDateTime,
+          );
 
-        // Act
-        final domainEntity = model.toDomainComplete();
+          // Act
+          final domainEntity = model.toDomainComplete();
 
-        // Assert
-        expect(domainEntity.roomId, equals(testGameState.roomId));
-        expect(domainEntity.players.length, equals(testGameState.players.length));
-        expect(domainEntity.players[0].id, equals(testGameState.players[0].id));
-        expect(domainEntity.players[0].name, equals(testGameState.players[0].name));
-        expect(domainEntity.currentPlayerIndex, equals(testGameState.currentPlayerIndex));
-        expect(domainEntity.deck.length, equals(testGameState.deck.length));
-        expect(domainEntity.discardPile.length, equals(testGameState.discardPile.length));
-        expect(domainEntity.actionDeck.length, equals(testGameState.actionDeck.length));
-        expect(domainEntity.actionDiscard.length, equals(testGameState.actionDiscard.length));
-        expect(domainEntity.status, equals(testGameState.status));
-        expect(domainEntity.turnDirection, equals(testGameState.turnDirection));
-        expect(domainEntity.lastRound, equals(testGameState.lastRound));
-        expect(domainEntity.createdAt, equals(testGameState.createdAt));
-      });
+          // Assert
+          expect(domainEntity.roomId, equals(testGameState.roomId));
+          expect(
+            domainEntity.players.length,
+            equals(testGameState.players.length),
+          );
+          expect(
+            domainEntity.players[0].id,
+            equals(testGameState.players[0].id),
+          );
+          expect(
+            domainEntity.players[0].name,
+            equals(testGameState.players[0].name),
+          );
+          expect(
+            domainEntity.currentPlayerIndex,
+            equals(testGameState.currentPlayerIndex),
+          );
+          expect(domainEntity.deck.length, equals(testGameState.deck.length));
+          expect(
+            domainEntity.discardPile.length,
+            equals(testGameState.discardPile.length),
+          );
+          expect(
+            domainEntity.actionDeck.length,
+            equals(testGameState.actionDeck.length),
+          );
+          expect(
+            domainEntity.actionDiscard.length,
+            equals(testGameState.actionDiscard.length),
+          );
+          expect(domainEntity.status, equals(testGameState.status));
+          expect(
+            domainEntity.turnDirection,
+            equals(testGameState.turnDirection),
+          );
+          expect(domainEntity.lastRound, equals(testGameState.lastRound));
+          expect(domainEntity.createdAt, equals(testGameState.createdAt));
+        },
+      );
 
       test('should maintain data integrity through round-trip conversion', () {
         // Act
@@ -167,10 +197,19 @@ void main() {
 
         // Assert - Check key properties
         expect(convertedBack.roomId, equals(testGameState.roomId));
-        expect(convertedBack.players.length, equals(testGameState.players.length));
-        expect(convertedBack.currentPlayerIndex, equals(testGameState.currentPlayerIndex));
+        expect(
+          convertedBack.players.length,
+          equals(testGameState.players.length),
+        );
+        expect(
+          convertedBack.currentPlayerIndex,
+          equals(testGameState.currentPlayerIndex),
+        );
         expect(convertedBack.status, equals(testGameState.status));
-        expect(convertedBack.turnDirection, equals(testGameState.turnDirection));
+        expect(
+          convertedBack.turnDirection,
+          equals(testGameState.turnDirection),
+        );
         expect(convertedBack.lastRound, equals(testGameState.lastRound));
       });
     });
@@ -185,10 +224,7 @@ void main() {
           currentPlayerId: 'player1',
           turnNumber: 1,
           roundNumber: 1,
-          gameData: {
-            'test': 'data',
-            'number': 42,
-          },
+          gameData: {'test': 'data', 'number': 42},
           winnerId: null,
           endedAt: null,
           createdAt: testDateTime,
@@ -247,8 +283,14 @@ void main() {
         expect(model.gameData['list'], equals([1, 2, 3]));
         expect(model.winnerId, isNull);
         expect(model.endedAt, isNull);
-        expect(model.createdAt.toIso8601String(), equals(testDateTime.toIso8601String()));
-        expect(model.updatedAt.toIso8601String(), equals(testDateTime.toIso8601String()));
+        expect(
+          model.createdAt.toIso8601String(),
+          equals(testDateTime.toIso8601String()),
+        );
+        expect(
+          model.updatedAt.toIso8601String(),
+          equals(testDateTime.toIso8601String()),
+        );
       });
     });
 
@@ -281,8 +323,14 @@ void main() {
       expect(supabaseJson['game_data'], equals({'key': 'value'}));
       expect(supabaseJson['winner_id'], equals('player1'));
       expect(supabaseJson['ended_at'], equals(testDateTime.toIso8601String()));
-      expect(supabaseJson['created_at'], equals(testDateTime.toIso8601String()));
-      expect(supabaseJson['updated_at'], equals(testDateTime.toIso8601String()));
+      expect(
+        supabaseJson['created_at'],
+        equals(testDateTime.toIso8601String()),
+      );
+      expect(
+        supabaseJson['updated_at'],
+        equals(testDateTime.toIso8601String()),
+      );
     });
 
     test('should support equality comparison', () {

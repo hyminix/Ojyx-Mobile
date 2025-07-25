@@ -13,7 +13,9 @@ import 'package:ojyx/features/game/domain/entities/action_card.dart';
 
 // Mock classes
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockGameStateRepository extends Mock implements GameStateRepository {}
+
 class MockFunctionResponse extends Mock implements FunctionResponse {}
 
 // Test overrides
@@ -44,11 +46,18 @@ GameState createTestGameState({
 }) {
   return GameState(
     roomId: roomId ?? 'test-room-id',
-    players: players ?? [
-      createTestPlayer(id: 'player1', name: 'Player 1'),
-      createTestPlayer(id: 'player2', name: 'Player 2'),
-    ],
-    deck: deck ?? List.generate(100, (i) => domain.Card(value: i % 13 - 2, isRevealed: false)),
+    players:
+        players ??
+        [
+          createTestPlayer(id: 'player1', name: 'Player 1'),
+          createTestPlayer(id: 'player2', name: 'Player 2'),
+        ],
+    deck:
+        deck ??
+        List.generate(
+          100,
+          (i) => domain.Card(value: i % 13 - 2, isRevealed: false),
+        ),
     discardPile: discardPile ?? [domain.Card(value: 5, isRevealed: true)],
     currentPlayerIndex: currentPlayerIndex ?? 0,
     turnDirection: turnDirection ?? TurnDirection.clockwise,
@@ -74,9 +83,14 @@ GamePlayer createTestPlayer({
   return GamePlayer(
     id: id,
     name: name,
-    grid: grid ?? PlayerGrid.fromCards(
-      List.generate(12, (i) => domain.Card(value: i % 13 - 2, isRevealed: i < 2)),
-    ),
+    grid:
+        grid ??
+        PlayerGrid.fromCards(
+          List.generate(
+            12,
+            (i) => domain.Card(value: i % 13 - 2, isRevealed: i < 2),
+          ),
+        ),
     actionCards: actionCards ?? [],
     isConnected: isConnected ?? true,
     isHost: isHost ?? false,
@@ -87,15 +101,19 @@ GamePlayer createTestPlayer({
 
 // Setup function for tests that need initialized repositories
 void setupRepositoryStubs(MockGameStateRepository mockRepository) {
-  when(() => mockRepository.initializeGame(
-    roomId: any(named: 'roomId'),
-    playerIds: any(named: 'playerIds'),
-    creatorId: any(named: 'creatorId'),
-  )).thenAnswer((_) async => createTestGameState());
+  when(
+    () => mockRepository.initializeGame(
+      roomId: any(named: 'roomId'),
+      playerIds: any(named: 'playerIds'),
+      creatorId: any(named: 'creatorId'),
+    ),
+  ).thenAnswer((_) async => createTestGameState());
 
-  when(() => mockRepository.getGameState(any()))
-    .thenAnswer((_) async => createTestGameState());
+  when(
+    () => mockRepository.getGameState(any()),
+  ).thenAnswer((_) async => createTestGameState());
 
-  when(() => mockRepository.watchGameState(any()))
-    .thenAnswer((_) => Stream.value(createTestGameState()));
+  when(
+    () => mockRepository.watchGameState(any()),
+  ).thenAnswer((_) => Stream.value(createTestGameState()));
 }

@@ -5,8 +5,11 @@ import 'package:ojyx/features/global_scores/data/repositories/supabase_global_sc
 import 'package:ojyx/features/global_scores/domain/entities/global_score.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockGlobalScoreRemoteDataSource extends Mock implements GlobalScoreRemoteDataSource {}
+class MockGlobalScoreRemoteDataSource extends Mock
+    implements GlobalScoreRemoteDataSource {}
+
 class FakeGlobalScoreModel extends Fake implements GlobalScoreModel {}
+
 class FakeGlobalScore extends Fake implements GlobalScore {}
 
 void main() {
@@ -53,8 +56,9 @@ void main() {
           gameEndedAt: scoreToSave.gameEndedAt,
         );
 
-        when(() => mockDataSource.saveScore(any()))
-            .thenAnswer((_) async => savedModel);
+        when(
+          () => mockDataSource.saveScore(any()),
+        ).thenAnswer((_) async => savedModel);
 
         final result = await repository.saveScore(scoreToSave);
 
@@ -76,13 +80,11 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(() => mockDataSource.saveScore(any()))
-            .thenThrow(Exception('Datasource error'));
+        when(
+          () => mockDataSource.saveScore(any()),
+        ).thenThrow(Exception('Datasource error'));
 
-        expect(
-          () => repository.saveScore(scoreToSave),
-          throwsException,
-        );
+        expect(() => repository.saveScore(scoreToSave), throwsException);
       });
     });
 
@@ -138,8 +140,9 @@ void main() {
           ),
         ];
 
-        when(() => mockDataSource.saveBatchScores(any()))
-            .thenAnswer((_) async => savedModels);
+        when(
+          () => mockDataSource.saveBatchScores(any()),
+        ).thenAnswer((_) async => savedModels);
 
         final result = await repository.saveBatchScores(scores);
 
@@ -181,8 +184,9 @@ void main() {
           ),
         ];
 
-        when(() => mockDataSource.getScoresByPlayer('player1'))
-            .thenAnswer((_) async => playerModels);
+        when(
+          () => mockDataSource.getScoresByPlayer('player1'),
+        ).thenAnswer((_) async => playerModels);
 
         final result = await repository.getScoresByPlayer('player1');
 
@@ -218,8 +222,9 @@ void main() {
           ),
         ];
 
-        when(() => mockDataSource.getScoresByPlayer('player1'))
-            .thenAnswer((_) async => playerModels);
+        when(
+          () => mockDataSource.getScoresByPlayer('player1'),
+        ).thenAnswer((_) async => playerModels);
 
         final result = await repository.getPlayerStats('player1');
 
@@ -231,8 +236,9 @@ void main() {
       });
 
       test('should return null when player has no scores', () async {
-        when(() => mockDataSource.getScoresByPlayer('unknown'))
-            .thenAnswer((_) async => []);
+        when(
+          () => mockDataSource.getScoresByPlayer('unknown'),
+        ).thenAnswer((_) async => []);
 
         final result = await repository.getPlayerStats('unknown');
 
@@ -241,47 +247,52 @@ void main() {
     });
 
     group('getTopPlayers', () {
-      test('should get top players from datasource and convert to PlayerStats', () async {
-        final topPlayersData = [
-          {
-            'player_id': 'player1',
-            'player_name': 'Alice',
-            'total_games': 10,
-            'total_wins': 8,
-            'average_score': 95.0,
-            'best_score': 60,
-            'worst_score': 150,
-            'average_position': 1.5,
-            'total_rounds': 45,
-          },
-          {
-            'player_id': 'player2',
-            'player_name': 'Bob',
-            'total_games': 15,
-            'total_wins': 10,
-            'average_score': 105.0,
-            'best_score': 70,
-            'worst_score': 180,
-            'average_position': 2.2,
-            'total_rounds': 60,
-          },
-        ];
+      test(
+        'should get top players from datasource and convert to PlayerStats',
+        () async {
+          final topPlayersData = [
+            {
+              'player_id': 'player1',
+              'player_name': 'Alice',
+              'total_games': 10,
+              'total_wins': 8,
+              'average_score': 95.0,
+              'best_score': 60,
+              'worst_score': 150,
+              'average_position': 1.5,
+              'total_rounds': 45,
+            },
+            {
+              'player_id': 'player2',
+              'player_name': 'Bob',
+              'total_games': 15,
+              'total_wins': 10,
+              'average_score': 105.0,
+              'best_score': 70,
+              'worst_score': 180,
+              'average_position': 2.2,
+              'total_rounds': 60,
+            },
+          ];
 
-        when(() => mockDataSource.getTopPlayersRaw(limit: 10))
-            .thenAnswer((_) async => topPlayersData);
+          when(
+            () => mockDataSource.getTopPlayersRaw(limit: 10),
+          ).thenAnswer((_) async => topPlayersData);
 
-        final result = await repository.getTopPlayers(limit: 10);
+          final result = await repository.getTopPlayers(limit: 10);
 
-        expect(result.length, equals(2));
-        expect(result.first.winRate, equals(0.8)); // 8/10
-        expect(result.last.winRate, equals(10/15)); // 10/15
-      });
+          expect(result.length, equals(2));
+          expect(result.first.winRate, equals(0.8)); // 8/10
+          expect(result.last.winRate, equals(10 / 15)); // 10/15
+        },
+      );
     });
 
     group('deleteScore', () {
       test('should delete score via datasource', () async {
-        when(() => mockDataSource.deleteScore('score123'))
-            .thenAnswer((_) async => true);
+        when(
+          () => mockDataSource.deleteScore('score123'),
+        ).thenAnswer((_) async => true);
 
         final result = await repository.deleteScore('score123');
 
@@ -290,8 +301,9 @@ void main() {
       });
 
       test('should return false when score not found', () async {
-        when(() => mockDataSource.deleteScore('unknown'))
-            .thenAnswer((_) async => false);
+        when(
+          () => mockDataSource.deleteScore('unknown'),
+        ).thenAnswer((_) async => false);
 
         final result = await repository.deleteScore('unknown');
 
@@ -301,8 +313,9 @@ void main() {
 
     group('deletePlayerData', () {
       test('should delete all player data via datasource', () async {
-        when(() => mockDataSource.deletePlayerData('player1'))
-            .thenAnswer((_) async => 5);
+        when(
+          () => mockDataSource.deletePlayerData('player1'),
+        ).thenAnswer((_) async => 5);
 
         final result = await repository.deletePlayerData('player1');
 
@@ -311,8 +324,9 @@ void main() {
       });
 
       test('should return 0 when player has no data', () async {
-        when(() => mockDataSource.deletePlayerData('unknown'))
-            .thenAnswer((_) async => 0);
+        when(
+          () => mockDataSource.deletePlayerData('unknown'),
+        ).thenAnswer((_) async => 0);
 
         final result = await repository.deletePlayerData('unknown');
 

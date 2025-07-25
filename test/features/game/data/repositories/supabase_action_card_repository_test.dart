@@ -48,8 +48,9 @@ void main() {
           ),
         ];
 
-        when(() => mockDataSource.getAvailableActionCards())
-            .thenAnswer((_) async => expectedCards);
+        when(
+          () => mockDataSource.getAvailableActionCards(),
+        ).thenAnswer((_) async => expectedCards);
 
         // Act
         final result = await repository.getAvailableActionCards();
@@ -74,15 +75,18 @@ void main() {
           ),
         ];
 
-        when(() => mockDataSource.getPlayerActionCards(testPlayerId))
-            .thenAnswer((_) async => expectedCards);
+        when(
+          () => mockDataSource.getPlayerActionCards(testPlayerId),
+        ).thenAnswer((_) async => expectedCards);
 
         // Act
         final result = await repository.getPlayerActionCards(testPlayerId);
 
         // Assert
         expect(result, expectedCards);
-        verify(() => mockDataSource.getPlayerActionCards(testPlayerId)).called(1);
+        verify(
+          () => mockDataSource.getPlayerActionCards(testPlayerId),
+        ).called(1);
       });
     });
 
@@ -98,15 +102,17 @@ void main() {
           target: ActionTarget.deck,
         );
 
-        when(() => mockDataSource.addActionCardToPlayer(testPlayerId, card))
-            .thenAnswer((_) async {});
+        when(
+          () => mockDataSource.addActionCardToPlayer(testPlayerId, card),
+        ).thenAnswer((_) async {});
 
         // Act
         await repository.addActionCardToPlayer(testPlayerId, card);
 
         // Assert
-        verify(() => mockDataSource.addActionCardToPlayer(testPlayerId, card))
-            .called(1);
+        verify(
+          () => mockDataSource.addActionCardToPlayer(testPlayerId, card),
+        ).called(1);
       });
     });
 
@@ -122,16 +128,17 @@ void main() {
           target: ActionTarget.self,
         );
 
-        when(() => mockDataSource.removeActionCardFromPlayer(testPlayerId, card))
-            .thenAnswer((_) async {});
+        when(
+          () => mockDataSource.removeActionCardFromPlayer(testPlayerId, card),
+        ).thenAnswer((_) async {});
 
         // Act
         await repository.removeActionCardFromPlayer(testPlayerId, card);
 
         // Assert
         verify(
-            () => mockDataSource.removeActionCardFromPlayer(testPlayerId, card))
-            .called(1);
+          () => mockDataSource.removeActionCardFromPlayer(testPlayerId, card),
+        ).called(1);
       });
     });
 
@@ -147,8 +154,9 @@ void main() {
           target: ActionTarget.self,
         );
 
-        when(() => mockDataSource.drawActionCard())
-            .thenAnswer((_) async => expectedCard);
+        when(
+          () => mockDataSource.drawActionCard(),
+        ).thenAnswer((_) async => expectedCard);
 
         // Act
         final result = await repository.drawActionCard();
@@ -160,8 +168,9 @@ void main() {
 
       test('should return null when deck is empty', () async {
         // Arrange
-        when(() => mockDataSource.drawActionCard())
-            .thenAnswer((_) async => null);
+        when(
+          () => mockDataSource.drawActionCard(),
+        ).thenAnswer((_) async => null);
 
         // Act
         final result = await repository.drawActionCard();
@@ -184,8 +193,9 @@ void main() {
           target: ActionTarget.self,
         );
 
-        when(() => mockDataSource.discardActionCard(card))
-            .thenAnswer((_) async {});
+        when(
+          () => mockDataSource.discardActionCard(card),
+        ).thenAnswer((_) async {});
 
         // Act
         await repository.discardActionCard(card);
@@ -198,8 +208,9 @@ void main() {
     group('shuffleActionCards', () {
       test('should call datasource to shuffle cards', () async {
         // Arrange
-        when(() => mockDataSource.shuffleActionCards())
-            .thenAnswer((_) async {});
+        when(
+          () => mockDataSource.shuffleActionCards(),
+        ).thenAnswer((_) async {});
 
         // Act
         await repository.shuffleActionCards();

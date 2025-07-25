@@ -218,24 +218,26 @@ void main() {
           playerIds: any(named: 'playerIds'),
           creatorId: any(named: 'creatorId'),
         ),
-      ).thenAnswer((_) async => GameState(
-        roomId: roomId,
-        players: [],
-        currentPlayerIndex: 0,
-        deck: [],
-        discardPile: [],
-        actionDeck: [],
-        actionDiscard: [],
-        status: GameStatus.waitingToStart,
-        turnDirection: TurnDirection.clockwise,
-        lastRound: false,
-        drawnCard: null,
-        createdAt: DateTime.now(),
-        startedAt: null,
-        finishedAt: null,
-        initiatorPlayerId: null,
-        endRoundInitiator: null,
-      ));
+      ).thenAnswer(
+        (_) async => GameState(
+          roomId: roomId,
+          players: [],
+          currentPlayerIndex: 0,
+          deck: [],
+          discardPile: [],
+          actionDeck: [],
+          actionDiscard: [],
+          status: GameStatus.waitingToStart,
+          turnDirection: TurnDirection.clockwise,
+          lastRound: false,
+          drawnCard: null,
+          createdAt: DateTime.now(),
+          startedAt: null,
+          finishedAt: null,
+          initiatorPlayerId: null,
+          endRoundInitiator: null,
+        ),
+      );
 
       // Act
       await repository.startGame(roomId: roomId, gameId: gameId);

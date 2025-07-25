@@ -55,47 +55,44 @@ void main() {
     ];
 
     test('should get top players from repository with default limit', () async {
-      when(() => mockRepository.getTopPlayers(limit: 10))
-          .thenAnswer((_) async => testTopPlayers);
+      when(
+        () => mockRepository.getTopPlayers(limit: 10),
+      ).thenAnswer((_) async => testTopPlayers);
 
       final result = await useCase(const GetTopPlayersParams());
 
       expect(result.isRight(), isTrue);
-      result.fold(
-        (failure) => fail('Should not fail'),
-        (players) {
-          expect(players.length, equals(3));
-          expect(players.first.playerId, equals('player1'));
-          expect(players.first.winRate, equals(0.8)); // 40/50
-          // Verify players are sorted by win rate (descending)
-          expect(players[0].winRate, greaterThanOrEqualTo(players[1].winRate));
-          expect(players[1].winRate, greaterThanOrEqualTo(players[2].winRate));
-        },
-      );
+      result.fold((failure) => fail('Should not fail'), (players) {
+        expect(players.length, equals(3));
+        expect(players.first.playerId, equals('player1'));
+        expect(players.first.winRate, equals(0.8)); // 40/50
+        // Verify players are sorted by win rate (descending)
+        expect(players[0].winRate, greaterThanOrEqualTo(players[1].winRate));
+        expect(players[1].winRate, greaterThanOrEqualTo(players[2].winRate));
+      });
 
       verify(() => mockRepository.getTopPlayers(limit: 10)).called(1);
     });
 
     test('should get top players with custom limit', () async {
-      when(() => mockRepository.getTopPlayers(limit: 5))
-          .thenAnswer((_) async => testTopPlayers.take(2).toList());
+      when(
+        () => mockRepository.getTopPlayers(limit: 5),
+      ).thenAnswer((_) async => testTopPlayers.take(2).toList());
 
       final result = await useCase(const GetTopPlayersParams(limit: 5));
 
       expect(result.isRight(), isTrue);
-      result.fold(
-        (failure) => fail('Should not fail'),
-        (players) {
-          expect(players.length, equals(2));
-        },
-      );
+      result.fold((failure) => fail('Should not fail'), (players) {
+        expect(players.length, equals(2));
+      });
 
       verify(() => mockRepository.getTopPlayers(limit: 5)).called(1);
     });
 
     test('should handle empty list', () async {
-      when(() => mockRepository.getTopPlayers(limit: any(named: 'limit')))
-          .thenAnswer((_) async => []);
+      when(
+        () => mockRepository.getTopPlayers(limit: any(named: 'limit')),
+      ).thenAnswer((_) async => []);
 
       final result = await useCase(const GetTopPlayersParams());
 
@@ -107,8 +104,9 @@ void main() {
     });
 
     test('should return failure when repository throws exception', () async {
-      when(() => mockRepository.getTopPlayers(limit: any(named: 'limit')))
-          .thenThrow(Exception('Database error'));
+      when(
+        () => mockRepository.getTopPlayers(limit: any(named: 'limit')),
+      ).thenThrow(Exception('Database error'));
 
       final result = await useCase(const GetTopPlayersParams());
 
@@ -120,18 +118,16 @@ void main() {
     });
 
     test('should handle large limit', () async {
-      when(() => mockRepository.getTopPlayers(limit: 100))
-          .thenAnswer((_) async => testTopPlayers);
+      when(
+        () => mockRepository.getTopPlayers(limit: 100),
+      ).thenAnswer((_) async => testTopPlayers);
 
       final result = await useCase(const GetTopPlayersParams(limit: 100));
 
       expect(result.isRight(), isTrue);
-      result.fold(
-        (failure) => fail('Should not fail'),
-        (players) {
-          expect(players.length, equals(3));
-        },
-      );
+      result.fold((failure) => fail('Should not fail'), (players) {
+        expect(players.length, equals(3));
+      });
     });
 
     test('should filter out players with no games', () async {
@@ -150,20 +146,18 @@ void main() {
         ),
       ];
 
-      when(() => mockRepository.getTopPlayers(limit: 10))
-          .thenAnswer((_) async => playersWithNoGames);
+      when(
+        () => mockRepository.getTopPlayers(limit: 10),
+      ).thenAnswer((_) async => playersWithNoGames);
 
       final result = await useCase(const GetTopPlayersParams());
 
       expect(result.isRight(), isTrue);
-      result.fold(
-        (failure) => fail('Should not fail'),
-        (players) {
-          // Repository should already filter these, but verify
-          expect(players.length, equals(4));
-          expect(players.any((p) => p.totalGamesPlayed == 0), isTrue);
-        },
-      );
+      result.fold((failure) => fail('Should not fail'), (players) {
+        // Repository should already filter these, but verify
+        expect(players.length, equals(4));
+        expect(players.any((p) => p.totalGamesPlayed == 0), isTrue);
+      });
     });
   });
 }
