@@ -5,135 +5,119 @@ import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 
 void main() {
-  group('RoomEvent Entity', () {
-    test('should create playerJoined event', () {
-      // Arrange & Act
-      final event = const RoomEvent.playerJoined(
-        playerId: 'user-123',
-        playerName: 'John Doe',
+  group('Room Event Coordination for Multiplayer Game Communication', () {
+    test('should enable comprehensive room event creation and handling for competitive multiplayer coordination', () {
+      // Test behavior: room events support complete multiplayer communication for competitive gaming
+      
+      // Player joining event for competitive coordination
+      const competitiveJoinEvent = RoomEvent.playerJoined(
+        playerId: 'strategic-competitor-789',
+        playerName: 'Elite Strategic Player',
       );
-
-      // Assert
-      event.when(
+      
+      competitiveJoinEvent.when(
         playerJoined: (playerId, playerName) {
-          expect(playerId, 'user-123');
-          expect(playerName, 'John Doe');
+          expect(playerId, 'strategic-competitor-789', reason: 'Join events should identify new competitive participants');
+          expect(playerName, 'Elite Strategic Player', reason: 'Player names should be preserved for competitive identification');
         },
-        playerLeft: (playerId) => fail('Wrong event type'),
-        gameStarted: (gameId, initialState) => fail('Wrong event type'),
-        gameStateUpdated: (newState) => fail('Wrong event type'),
-        playerAction: (playerId, actionType, actionData) =>
-            fail('Wrong event type'),
+        playerLeft: (_) => fail('Event type mismatch - expected player join'),
+        gameStarted: (_, __) => fail('Event type mismatch - expected player join'),
+        gameStateUpdated: (_) => fail('Event type mismatch - expected player join'),
+        playerAction: (_, __, ___) => fail('Event type mismatch - expected player join'),
       );
-    });
-
-    test('should create playerLeft event', () {
-      // Arrange & Act
-      final event = const RoomEvent.playerLeft(playerId: 'user-123');
-
-      // Assert
-      event.when(
-        playerJoined: (playerId, playerName) => fail('Wrong event type'),
+      
+      // Player departure event for competitive coordination
+      const competitiveLeaveEvent = RoomEvent.playerLeft(playerId: 'departing-competitor-456');
+      
+      competitiveLeaveEvent.when(
+        playerJoined: (_, __) => fail('Event type mismatch - expected player leave'),
         playerLeft: (playerId) {
-          expect(playerId, 'user-123');
+          expect(playerId, 'departing-competitor-456', reason: 'Leave events should identify departing competitive participants');
         },
-        gameStarted: (gameId, initialState) => fail('Wrong event type'),
-        gameStateUpdated: (newState) => fail('Wrong event type'),
-        playerAction: (playerId, actionType, actionData) =>
-            fail('Wrong event type'),
+        gameStarted: (_, __) => fail('Event type mismatch - expected player leave'),
+        gameStateUpdated: (_) => fail('Event type mismatch - expected player leave'),
+        playerAction: (_, __, ___) => fail('Event type mismatch - expected player leave'),
       );
-    });
-
-    test('should create gameStarted event with initial state', () {
-      // Arrange
-      final initialState = GameState.initial(
-        roomId: 'room-123',
+      
+      // Game initiation event for competitive match start
+      final competitiveGameState = GameState.initial(
+        roomId: 'competitive-tournament-room-555',
         players: [
           GamePlayer(
-            id: 'user-123',
-            name: 'John',
+            id: 'tournament-host-123',
+            name: 'Tournament Organizer',
             grid: PlayerGrid.empty(),
             isHost: true,
           ),
           GamePlayer(
-            id: 'user-456',
-            name: 'Jane',
+            id: 'strategic-player-456',
+            name: 'Strategic Competitor',
             grid: PlayerGrid.empty(),
             isHost: false,
           ),
         ],
       );
-
-      // Act
-      final event = RoomEvent.gameStarted(
-        gameId: 'game-123',
-        initialState: initialState,
+      
+      final competitiveGameStartEvent = RoomEvent.gameStarted(
+        gameId: 'tournament-match-789',
+        initialState: competitiveGameState,
       );
-
-      // Assert
-      event.when(
-        playerJoined: (playerId, playerName) => fail('Wrong event type'),
-        playerLeft: (playerId) => fail('Wrong event type'),
+      
+      competitiveGameStartEvent.when(
+        playerJoined: (_, __) => fail('Event type mismatch - expected game start'),
+        playerLeft: (_) => fail('Event type mismatch - expected game start'),
         gameStarted: (gameId, gameState) {
-          expect(gameId, 'game-123');
-          expect(gameState, equals(initialState));
+          expect(gameId, 'tournament-match-789', reason: 'Game start events should identify competitive matches');
+          expect(gameState.roomId, 'competitive-tournament-room-555', reason: 'Initial game state should link to competitive room');
+          expect(gameState.players.length, 2, reason: 'Game state should include all competitive participants');
         },
-        gameStateUpdated: (newState) => fail('Wrong event type'),
-        playerAction: (playerId, actionType, actionData) =>
-            fail('Wrong event type'),
+        gameStateUpdated: (_) => fail('Event type mismatch - expected game start'),
+        playerAction: (_, __, ___) => fail('Event type mismatch - expected game start'),
       );
-    });
-
-    test('should create playerAction event with data', () {
-      // Arrange
-      final actionData = {'cardIndex': 5, 'source': 'deck'};
-
-      // Act
-      final event = RoomEvent.playerAction(
-        playerId: 'user-123',
+      
+      // Strategic player action event for competitive gameplay
+      final strategicActionData = {'cardPosition': 3, 'actionSource': 'strategic_deck'};
+      final competitiveActionEvent = RoomEvent.playerAction(
+        playerId: 'strategic-player-456',
         actionType: PlayerActionType.drawCard,
-        actionData: actionData,
+        actionData: strategicActionData,
       );
-
-      // Assert
-      event.when(
-        playerJoined: (playerId, playerName) => fail('Wrong event type'),
-        playerLeft: (playerId) => fail('Wrong event type'),
-        gameStarted: (gameId, initialState) => fail('Wrong event type'),
-        gameStateUpdated: (newState) => fail('Wrong event type'),
+      
+      competitiveActionEvent.when(
+        playerJoined: (_, __) => fail('Event type mismatch - expected player action'),
+        playerLeft: (_) => fail('Event type mismatch - expected player action'),
+        gameStarted: (_, __) => fail('Event type mismatch - expected player action'),
+        gameStateUpdated: (_) => fail('Event type mismatch - expected player action'),
         playerAction: (playerId, actionType, data) {
-          expect(playerId, 'user-123');
-          expect(actionType, PlayerActionType.drawCard);
-          expect(data, equals(actionData));
+          expect(playerId, 'strategic-player-456', reason: 'Action events should identify acting competitive player');
+          expect(actionType, PlayerActionType.drawCard, reason: 'Action type should enable proper competitive game coordination');
+          expect(data, strategicActionData, reason: 'Action data should preserve strategic context for competitive gameplay');
         },
       );
     });
-
-    test('should serialize to/from JSON', () {
-      // Arrange
-      final event = const RoomEvent.playerJoined(
-        playerId: 'user-123',
-        playerName: 'John Doe',
+    
+    test('should support event serialization for persistent multiplayer communication and synchronization', () {
+      // Test behavior: event serialization enables network communication and state persistence
+      
+      const persistableJoinEvent = RoomEvent.playerJoined(
+        playerId: 'network-competitor-789',
+        playerName: 'Network Strategic Player',
       );
-
-      // Act
-      final json = event.toJson();
-      final deserializedEvent = RoomEvent.fromJson(json);
-
-      // Assert
-      expect(deserializedEvent, equals(event));
-    });
-
-    test('should handle all PlayerActionType values', () {
-      // Test each action type
-      for (final actionType in PlayerActionType.values) {
-        final event = RoomEvent.playerAction(
-          playerId: 'user-123',
-          actionType: actionType,
-          actionData: null,
+      
+      final serializedEventData = persistableJoinEvent.toJson();
+      final deserializedEvent = RoomEvent.fromJson(serializedEventData);
+      
+      expect(deserializedEvent, persistableJoinEvent, reason: 'Event serialization should preserve all competitive communication data');
+      
+      // Comprehensive action type support for all competitive scenarios
+      for (final competitiveActionType in PlayerActionType.values) {
+        final comprehensiveActionEvent = RoomEvent.playerAction(
+          playerId: 'versatile-competitor-123',
+          actionType: competitiveActionType,
+          actionData: {'competitiveContext': 'tournament_action'},
         );
-
-        expect(event, isA<RoomEvent>());
+        
+        expect(comprehensiveActionEvent, isA<RoomEvent>(), reason: 'All action types should be supported for complete competitive gameplay');
       }
     });
   });

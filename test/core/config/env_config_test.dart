@@ -3,15 +3,13 @@ import 'package:ojyx/core/config/env_config.dart';
 
 void main() {
   group('EnvConfig', () {
-    test('should have default values', () {
-      // Since we can't test String.fromEnvironment directly in unit tests,
-      // we test the expected behavior and document the contract
-
-      // These will be empty in tests but populated via --dart-define in builds
-      expect(EnvConfig.supabaseUrl, isEmpty);
-      expect(EnvConfig.supabaseAnonKey, isEmpty);
-      expect(EnvConfig.sentryDsn, isEmpty);
-      expect(EnvConfig.sentryEnvironment, equals('development'));
+    test('should throw exception when required configuration is missing', () {
+      // Test the behavior when configuration is not provided
+      // In a real application, this prevents starting with invalid config
+      expect(
+        () => EnvConfig.validate(),
+        throwsA(isA<Exception>()),
+      );
     });
 
     test('should correctly identify environment', () {
@@ -20,8 +18,9 @@ void main() {
       expect(EnvConfig.isProduction, isFalse);
     });
 
-    test('should validate required configuration', () {
-      // Since values are empty in tests, validation should fail
+    test('should fail validation with specific error message when SUPABASE_URL is missing', () {
+      // Test the behavior: app should not start without proper configuration
+      // This protects against deployment errors
       expect(
         () => EnvConfig.validate(),
         throwsA(

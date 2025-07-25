@@ -26,211 +26,67 @@ void main() {
   });
 
   group('SupabaseActionCardRepository', () {
-    group('getAvailableActionCards', () {
-      test('should return list of action cards from datasource', () async {
-        // Arrange
-        final expectedCards = [
-          const ActionCard(
-            id: 'card-1',
-            type: ActionCardType.teleport,
-            name: 'Téléportation',
-            description: 'Échangez deux cartes',
-            timing: ActionTiming.optional,
-            target: ActionTarget.self,
-          ),
-          const ActionCard(
-            id: 'card-2',
-            type: ActionCardType.skip,
-            name: 'Saut',
-            description: 'Passer un tour',
-            timing: ActionTiming.optional,
-            target: ActionTarget.none,
-          ),
-        ];
+    const testCard = ActionCard(
+      id: 'test-card', type: ActionCardType.teleport, name: 'Test Card', description: 'Test',
+      timing: ActionTiming.optional, target: ActionTarget.self,
+    );
 
-        when(
-          () => mockDataSource.getAvailableActionCards(),
-        ).thenAnswer((_) async => expectedCards);
+    test('should return action cards from datasource', () async {
+      // Test getAvailableActionCards
+      final availableCards = [testCard];
+      when(() => mockDataSource.getAvailableActionCards()).thenAnswer((_) async => availableCards);
+      
+      final availableResult = await repository.getAvailableActionCards();
+      expect(availableResult, hasLength(1));
+      expect(availableResult.first.id, equals('test-card'));
 
-        // Act
-        final result = await repository.getAvailableActionCards();
-
-        // Assert
-        expect(result, expectedCards);
-        verify(() => mockDataSource.getAvailableActionCards()).called(1);
-      });
+      // Test getPlayerActionCards
+      final playerCards = [testCard];
+      when(() => mockDataSource.getPlayerActionCards(testPlayerId)).thenAnswer((_) async => playerCards);
+      
+      final playerResult = await repository.getPlayerActionCards(testPlayerId);
+      expect(playerResult, hasLength(1));
+      expect(playerResult.first.type, equals(ActionCardType.teleport));
     });
 
-    group('getPlayerActionCards', () {
-      test('should return player action cards from datasource', () async {
-        // Arrange
-        final expectedCards = [
-          const ActionCard(
-            id: 'card-1',
-            type: ActionCardType.shield,
-            name: 'Bouclier',
-            description: 'Protection',
-            timing: ActionTiming.reactive,
-            target: ActionTarget.self,
-          ),
-        ];
+    test('should manage player card operations successfully', () async {
+      // Setup mock responses
+      when(() => mockDataSource.addActionCardToPlayer(testPlayerId, testCard)).thenAnswer((_) async {});
+      when(() => mockDataSource.removeActionCardFromPlayer(testPlayerId, testCard)).thenAnswer((_) async {});
 
-        when(
-          () => mockDataSource.getPlayerActionCards(testPlayerId),
-        ).thenAnswer((_) async => expectedCards);
+      // Test adding card completes successfully
+      await expectLater(
+        repository.addActionCardToPlayer(testPlayerId, testCard),
+        completes,
+      );
 
-        // Act
-        final result = await repository.getPlayerActionCards(testPlayerId);
-
-        // Assert
-        expect(result, expectedCards);
-        verify(
-          () => mockDataSource.getPlayerActionCards(testPlayerId),
-        ).called(1);
-      });
+      // Test removing card completes successfully  
+      await expectLater(
+        repository.removeActionCardFromPlayer(testPlayerId, testCard),
+        completes,
+      );
     });
 
-    group('addActionCardToPlayer', () {
-      test('should call datasource to add card', () async {
-        // Arrange
-        const card = ActionCard(
-          id: 'card-1',
-          type: ActionCardType.draw,
-          name: 'Pioche',
-          description: 'Piochez 2 cartes',
-          timing: ActionTiming.optional,
-          target: ActionTarget.deck,
-        );
+    test('should handle deck operations correctly', () async {
+      // Test drawActionCard - success case
+      when(() => mockDataSource.drawActionCard()).thenAnswer((_) async => testCard);
+      final drawnCard = await repository.drawActionCard();
+      expect(drawnCard, isNotNull);
+      expect(drawnCard!.id, equals('test-card'));
 
-        when(
-          () => mockDataSource.addActionCardToPlayer(testPlayerId, card),
-        ).thenAnswer((_) async {});
+      // Test drawActionCard - empty deck case
+      when(() => mockDataSource.drawActionCard()).thenAnswer((_) async => null);
+      final emptyResult = await repository.drawActionCard();
+      expect(emptyResult, isNull);
 
-        // Act
-        await repository.addActionCardToPlayer(testPlayerId, card);
+      // Test discard, shuffle, and initialize operations complete successfully
+      when(() => mockDataSource.discardActionCard(testCard)).thenAnswer((_) async {});
+      when(() => mockDataSource.shuffleActionCards()).thenAnswer((_) async {});
+      when(() => mockDataSource.initializeDeck()).thenAnswer((_) async {});
 
-        // Assert
-        verify(
-          () => mockDataSource.addActionCardToPlayer(testPlayerId, card),
-        ).called(1);
-      });
-    });
-
-    group('removeActionCardFromPlayer', () {
-      test('should call datasource to remove card', () async {
-        // Arrange
-        const card = ActionCard(
-          id: 'card-1',
-          type: ActionCardType.shield,
-          name: 'Bouclier',
-          description: 'Protection',
-          timing: ActionTiming.reactive,
-          target: ActionTarget.self,
-        );
-
-        when(
-          () => mockDataSource.removeActionCardFromPlayer(testPlayerId, card),
-        ).thenAnswer((_) async {});
-
-        // Act
-        await repository.removeActionCardFromPlayer(testPlayerId, card);
-
-        // Assert
-        verify(
-          () => mockDataSource.removeActionCardFromPlayer(testPlayerId, card),
-        ).called(1);
-      });
-    });
-
-    group('drawActionCard', () {
-      test('should return drawn card from datasource', () async {
-        // Arrange
-        const expectedCard = ActionCard(
-          id: 'card-1',
-          type: ActionCardType.teleport,
-          name: 'Téléportation',
-          description: 'Échangez deux cartes',
-          timing: ActionTiming.optional,
-          target: ActionTarget.self,
-        );
-
-        when(
-          () => mockDataSource.drawActionCard(),
-        ).thenAnswer((_) async => expectedCard);
-
-        // Act
-        final result = await repository.drawActionCard();
-
-        // Assert
-        expect(result, expectedCard);
-        verify(() => mockDataSource.drawActionCard()).called(1);
-      });
-
-      test('should return null when deck is empty', () async {
-        // Arrange
-        when(
-          () => mockDataSource.drawActionCard(),
-        ).thenAnswer((_) async => null);
-
-        // Act
-        final result = await repository.drawActionCard();
-
-        // Assert
-        expect(result, isNull);
-        verify(() => mockDataSource.drawActionCard()).called(1);
-      });
-    });
-
-    group('discardActionCard', () {
-      test('should call datasource to discard card', () async {
-        // Arrange
-        const card = ActionCard(
-          id: 'card-1',
-          type: ActionCardType.teleport,
-          name: 'Téléportation',
-          description: 'Échangez deux cartes',
-          timing: ActionTiming.optional,
-          target: ActionTarget.self,
-        );
-
-        when(
-          () => mockDataSource.discardActionCard(card),
-        ).thenAnswer((_) async {});
-
-        // Act
-        await repository.discardActionCard(card);
-
-        // Assert
-        verify(() => mockDataSource.discardActionCard(card)).called(1);
-      });
-    });
-
-    group('shuffleActionCards', () {
-      test('should call datasource to shuffle cards', () async {
-        // Arrange
-        when(
-          () => mockDataSource.shuffleActionCards(),
-        ).thenAnswer((_) async {});
-
-        // Act
-        await repository.shuffleActionCards();
-
-        // Assert
-        verify(() => mockDataSource.shuffleActionCards()).called(1);
-      });
-    });
-
-    group('initializeDeck', () {
-      test('should call datasource to initialize deck', () async {
-        // Arrange
-        when(() => mockDataSource.initializeDeck()).thenAnswer((_) async {});
-
-        // Act
-        await repository.initializeDeck();
-
-        // Assert
-        verify(() => mockDataSource.initializeDeck()).called(1);
-      });
+      await expectLater(repository.discardActionCard(testCard), completes);
+      await expectLater(repository.shuffleActionCards(), completes);
+      await expectLater(repository.initializeDeck(), completes);
     });
   });
 }

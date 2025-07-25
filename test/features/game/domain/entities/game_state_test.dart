@@ -3,10 +3,11 @@ import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
+import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/core/utils/constants.dart';
 
 void main() {
-  group('GameState Entity', () {
+  group('GameState Entity - Comprehensive Behavior Tests', () {
     late List<GamePlayer> players;
 
     setUp(() {
@@ -25,7 +26,7 @@ void main() {
       ];
     });
 
-    test('should create initial game state', () {
+    test('should initialize game with waiting status when created', () {
       final gameState = GameState.initial(roomId: 'room123', players: players);
 
       expect(gameState.roomId, 'room123');
@@ -39,13 +40,13 @@ void main() {
       expect(gameState.initiatorPlayerId, isNull);
     });
 
-    test('should get current player', () {
+    test('should return first player as current player when game starts', () {
       final gameState = GameState.initial(roomId: 'room123', players: players);
 
       expect(gameState.currentPlayer.id, 'player1');
     });
 
-    test('should move to next player clockwise', () {
+    test('should advance turn to next player in clockwise direction when turn ends', () {
       final gameState = GameState.initial(roomId: 'room123', players: players);
 
       final nextState = gameState.nextPlayer();
@@ -54,7 +55,7 @@ void main() {
       expect(nextState.currentPlayer.id, 'player2');
     });
 
-    test('should move to next player counter-clockwise', () {
+    test('should advance turn to previous player when direction is counter-clockwise', () {
       final gameState = GameState.initial(
         roomId: 'room123',
         players: players,
@@ -67,7 +68,7 @@ void main() {
       expect(nextState.currentPlayer.id, 'player1');
     });
 
-    test('should wrap around when moving to next player', () {
+    test('should loop back to first player when last player finishes turn', () {
       final gameState = GameState.initial(
         roomId: 'room123',
         players: players,
@@ -79,7 +80,7 @@ void main() {
       expect(nextState.currentPlayerIndex, 0);
     });
 
-    test('should draw card from deck', () {
+    test('should provide top card from deck when player draws', () {
       final gameState = GameState.initial(roomId: 'room123', players: players);
 
       final initialDeckSize = gameState.deck.length;
@@ -89,7 +90,7 @@ void main() {
       expect(result.$2.deck.length, initialDeckSize - 1);
     });
 
-    test('should reshuffle discard pile when deck is empty', () {
+    test('should recycle discard pile into deck when no cards remain to draw', () {
       const topDiscard = Card(value: 5);
       final gameState = GameState.initial(roomId: 'room123', players: players)
           .copyWith(
@@ -190,6 +191,68 @@ void main() {
 
       expect(scores['player1'], 16); // (5+3) * 2 for penalty
       expect(scores['player2'], 3); // 2+1 no penalty
+    });
+
+    // === TESTS MERGED FROM game_state_clean_test.dart ===
+
+    test('should be a pure domain entity without JSON serialization coupling', () {
+      final gameState = GameState.initial(roomId: 'test-room', players: players);
+      
+      // Verify that GameState is a pure domain entity focused on behavior
+      expect(gameState.roomId, equals('test-room'));
+      expect(gameState.players, equals(players));
+      expect(gameState.currentPlayerIndex, equals(0));
+      
+      // Verify the entity maintains its domain characteristics
+      final type = gameState.runtimeType;
+      expect(type.toString(), contains('GameState'));
+    });
+
+    test('should maintain all core business logic methods for game flow', () {
+      final gameState = GameState.initial(roomId: 'test-room', players: players);
+      
+      // Ensure all business logic is preserved and functional
+      expect(gameState.currentPlayer, equals(players[0]));
+      expect(gameState.canStart, isTrue);
+
+      // Test turn advancement behavior
+      final nextState = gameState.nextPlayer();
+      expect(nextState.currentPlayerIndex, equals(1));
+
+      // Test card drawing behavior
+      final (drawnCard, newState) = gameState.drawCard();
+      expect(drawnCard, isNotNull);
+      expect(newState.deck.length, equals(gameState.deck.length - 1));
+
+      // Test card discarding behavior
+      final discardState = gameState.discardCard(const Card(value: 3));
+      expect(discardState.discardPile.first.value, equals(3));
+
+      // Test end-game detection
+      expect(gameState.shouldTriggerLastRound, isFalse);
+
+      // Test score calculation
+      final scores = gameState.calculateScores();
+      expect(scores.containsKey('player1'), isTrue);
+      expect(scores.containsKey('player2'), isTrue);
+    });
+
+    test('should work with immutability pattern using copyWith', () {
+      final gameState = GameState.initial(roomId: 'test-room', players: players);
+      
+      // Test that Freezed functionality works for immutable updates
+      final copied = gameState.copyWith(currentPlayerIndex: 1);
+      expect(copied.currentPlayerIndex, equals(1));
+      expect(copied.roomId, equals(gameState.roomId));
+      expect(gameState.currentPlayerIndex, equals(0), reason: 'Original should remain unchanged');
+
+      // Test equality behavior for value objects using same deck
+      final sameState = gameState.copyWith();
+      expect(gameState, equals(sameState));
+      
+      // Test that modified states are not equal
+      final differentState = gameState.copyWith(currentPlayerIndex: 1);
+      expect(gameState, isNot(equals(differentState)));
     });
   });
 }

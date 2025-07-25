@@ -4,62 +4,80 @@ import 'package:ojyx/core/utils/constants.dart';
 
 void main() {
   group('Card Entity', () {
-    test('should create a valid card with value in range', () {
-      const card = Card(value: 5);
+    test('should provide proper visual feedback based on value for player decision', () {
+      // Test behavior: players need visual cues to make strategic decisions
+      final colorTestCases = [
+        (-2, CardValueColor.darkBlue, 'negative values should show as dark blue for low score'),
+        (-1, CardValueColor.darkBlue, 'negative values should show as dark blue for low score'),
+        (0, CardValueColor.lightBlue, 'zero should show as light blue for neutral score'),
+        (3, CardValueColor.green, 'low positive values should show as green for good score'),
+        (7, CardValueColor.yellow, 'medium values should show as yellow for warning'),
+        (11, CardValueColor.red, 'high values should show as red for high penalty'),
+      ];
 
-      expect(card.value, 5);
-      expect(card.isRevealed, false);
+      for (final (value, expectedColor, reasoning) in colorTestCases) {
+        final card = Card(value: value);
+        expect(card.color, expectedColor, reason: reasoning);
+      }
     });
 
-    test('should throw assertion error for value below minimum', () {
-      expect(() => Card(value: kMinCardValue - 1), throwsAssertionError);
+    test('should allow strategic card revelation during gameplay', () {
+      // Test behavior: players must be able to reveal cards during their turn
+      const hiddenCard = Card(value: 5);
+      final revealedCard = hiddenCard.reveal();
+
+      // Verify the revelation behavior preserves game state
+      expect(hiddenCard.isRevealed, false, 
+             reason: 'Original card should remain unchanged for immutability');
+      expect(revealedCard.isRevealed, true, 
+             reason: 'Revealed card should be visible to all players');
+      expect(revealedCard.value, hiddenCard.value, 
+             reason: 'Card value should remain same after revelation');
     });
 
-    test('should throw assertion error for value above maximum', () {
-      expect(() => Card(value: kMaxCardValue + 1), throwsAssertionError);
+    test('should allow tactical card hiding for bluffing strategy', () {
+      // Test behavior: some action cards allow hiding revealed cards
+      const revealedCard = Card(value: 5, isRevealed: true);
+      final hiddenCard = revealedCard.hide();
+
+      // Verify the hiding behavior for strategic gameplay
+      expect(revealedCard.isRevealed, true, 
+             reason: 'Original card should remain unchanged for immutability');
+      expect(hiddenCard.isRevealed, false, 
+             reason: 'Hidden card should not be visible to opponents');
+      expect(hiddenCard.value, revealedCard.value, 
+             reason: 'Card value should remain same after hiding');
     });
 
-    test('should create revealed card', () {
-      const card = Card(value: 0, isRevealed: true);
-
-      expect(card.value, 0);
-      expect(card.isRevealed, true);
-    });
-
-    test('should correctly identify card color', () {
-      expect(const Card(value: -2).color, CardValueColor.darkBlue);
-      expect(const Card(value: -1).color, CardValueColor.darkBlue);
-      expect(const Card(value: 0).color, CardValueColor.lightBlue);
-      expect(const Card(value: 3).color, CardValueColor.green);
-      expect(const Card(value: 7).color, CardValueColor.yellow);
-      expect(const Card(value: 11).color, CardValueColor.red);
-    });
-
-    test('should reveal card', () {
-      const card = Card(value: 5);
-      final revealedCard = card.reveal();
-
-      expect(card.isRevealed, false);
-      expect(revealedCard.isRevealed, true);
-      expect(revealedCard.value, card.value);
-    });
-
-    test('should hide card', () {
-      const card = Card(value: 5, isRevealed: true);
-      final hiddenCard = card.hide();
-
-      expect(card.isRevealed, true);
-      expect(hiddenCard.isRevealed, false);
-      expect(hiddenCard.value, card.value);
-    });
-
-    test('should support value equality', () {
+    test('should distinguish cards for game state tracking', () {
+      // Test behavior: game must track identical vs different cards
       const card1 = Card(value: 5);
       const card2 = Card(value: 5);
-      const card3 = Card(value: 5, isRevealed: true);
+      const revealedCard = Card(value: 5, isRevealed: true);
 
-      expect(card1, equals(card2));
-      expect(card1, isNot(equals(card3)));
+      // Verify card comparison for game logic
+      expect(card1, equals(card2), 
+             reason: 'Hidden cards with same value should be equal');
+      expect(card1, isNot(equals(revealedCard)), 
+             reason: 'Hidden and revealed cards should be different for game state');
+    });
+
+    test('should enforce valid card values for fair gameplay', () {
+      // Test behavior: prevent invalid cards from breaking game balance
+      
+      // Valid cards should work normally
+      expect(() => Card(value: kMinCardValue), returnsNormally, 
+             reason: 'Minimum valid value should be allowed');
+      expect(() => Card(value: kMaxCardValue), returnsNormally, 
+             reason: 'Maximum valid value should be allowed');
+      expect(() => Card(value: 0), returnsNormally, 
+             reason: 'Zero value should be allowed');
+
+      // Invalid cards should be prevented
+      expect(() => Card(value: kMinCardValue - 1), throwsAssertionError, 
+             reason: 'Values below minimum should be rejected for game balance');
+      expect(() => Card(value: kMaxCardValue + 1), throwsAssertionError, 
+             reason: 'Values above maximum should be rejected for game balance');
     });
   });
 }

@@ -47,261 +47,97 @@ void main() {
     );
   }
 
-  group('CreateRoomScreen', () {
+  group('Room Creation UI for Competitive Multiplayer Setup', () {
     setUp(() {
       TestWidgetsFlutterBinding.ensureInitialized();
     });
 
-    testWidgets('should display initial UI elements', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('should enable comprehensive competitive room creation workflow with proper constraints and user feedback', (WidgetTester tester) async {
+      // Test behavior: screen provides complete room setup experience for competitive multiplayer gaming coordination
+      
       setLargeScreenSize(tester);
+      const competitiveHostId = 'tournament-organizer-789';
+      const strategicRoomId = 'competitive-arena-456';
+      
+      final successfulCompetitiveRoom = Room(
+        id: strategicRoomId,
+        creatorId: competitiveHostId,
+        playerIds: [competitiveHostId],
+        status: RoomStatus.waiting,
+        maxPlayers: 6,
+      );
 
-      // Act
-      await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
+      when(() => mockCreateRoomUseCase.call(
+            creatorId: competitiveHostId,
+            maxPlayers: 6,
+          )).thenAnswer((_) async {
+        await Future.delayed(const Duration(milliseconds: 50));
+        return successfulCompetitiveRoom;
+      });
 
-      // Assert
-      expect(find.text('Créer une partie'), findsOneWidget);
-      expect(find.text('Configuration de la partie'), findsOneWidget);
-      expect(find.text('Nombre de joueurs'), findsOneWidget);
-      expect(find.text('4'), findsOneWidget); // Default player count
-      expect(find.text('2 à 8 joueurs'), findsOneWidget);
-      expect(find.text('Créer la partie'), findsOneWidget);
-      expect(find.byIcon(Icons.group_add), findsOneWidget);
-      expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget);
-      expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
-    });
+      // Initial UI state - ready for competitive configuration
+      await tester.pumpWidget(createWidgetUnderTest(userId: competitiveHostId));
+      
+      expect(find.text('Créer une partie'), findsOneWidget, reason: 'Should display competitive room creation header');
+      expect(find.text('Configuration de la partie'), findsOneWidget, reason: 'Should provide configuration section for strategic setup');
+      expect(find.text('Nombre de joueurs'), findsOneWidget, reason: 'Should enable player capacity selection for competitive balance');
+      expect(find.text('4'), findsOneWidget, reason: 'Should default to balanced competitive capacity');
+      expect(find.text('2 à 8 joueurs'), findsOneWidget, reason: 'Should indicate competitive capacity constraints');
+      expect(find.byIcon(Icons.group_add), findsOneWidget, reason: 'Should display competitive room icon');
+      expect(find.byIcon(Icons.add_circle_outline), findsOneWidget, reason: 'Should enable capacity increase for larger competitive groups');
+      expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget, reason: 'Should enable capacity decrease for focused competitive play');
+      expect(find.text('Créer la partie'), findsOneWidget, reason: 'Should provide competitive room creation action');
 
-    testWidgets('should allow increasing player count', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
-
-      // Act
+      // Capacity adjustment behavior - enable strategic group sizing
+      await tester.tap(find.byIcon(Icons.add_circle_outline));
       await tester.tap(find.byIcon(Icons.add_circle_outline));
       await tester.pump();
-
-      // Assert
-      expect(find.text('5'), findsOneWidget);
-    });
-
-    testWidgets('should allow decreasing player count', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
-
-      // First increase to 5, then decrease to 3
-      await tester.tap(find.byIcon(Icons.add_circle_outline));
-      await tester.pump();
-
-      // Act
+      
+      expect(find.text('6'), findsOneWidget, reason: 'Should enable competitive capacity adjustment for strategic group gameplay');
+      
+      // Constraint enforcement behavior - maintain competitive balance
       await tester.tap(find.byIcon(Icons.remove_circle_outline));
-      await tester.pump();
-
-      // Assert
-      expect(find.text('4'), findsOneWidget);
-    });
-
-    testWidgets('should not allow player count below 2', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
-
-      // Decrease to minimum (2)
+      await tester.tap(find.byIcon(Icons.remove_circle_outline));
       await tester.tap(find.byIcon(Icons.remove_circle_outline));
       await tester.tap(find.byIcon(Icons.remove_circle_outline));
       await tester.pump();
-
-      expect(find.text('2'), findsOneWidget);
-
-      // Act - try to decrease further
-      final decreaseButton = find.byIcon(Icons.remove_circle_outline);
-      await tester.tap(decreaseButton);
+      
+      expect(find.text('2'), findsOneWidget, reason: 'Should enforce minimum competitive capacity');
+      
+      await tester.tap(find.byIcon(Icons.remove_circle_outline));
       await tester.pump();
-
-      // Assert - should still be 2
-      expect(find.text('2'), findsOneWidget);
-    });
-
-    testWidgets('should not allow player count above 8', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
-
-      // Increase to maximum (8)
-      for (int i = 0; i < 4; i++) {
+      
+      expect(find.text('2'), findsOneWidget, reason: 'Should prevent sub-competitive capacity to maintain multiplayer integrity');
+      
+      // Maximum capacity constraint
+      for (int i = 0; i < 6; i++) {
         await tester.tap(find.byIcon(Icons.add_circle_outline));
         await tester.pump();
       }
-
-      expect(find.text('8'), findsOneWidget);
-
-      // Act - try to increase further
+      
+      expect(find.text('8'), findsOneWidget, reason: 'Should reach maximum competitive capacity');
+      
       await tester.tap(find.byIcon(Icons.add_circle_outline));
       await tester.pump();
+      
+      expect(find.text('8'), findsOneWidget, reason: 'Should enforce maximum competitive capacity to maintain strategic balance');
+      
+      // Reset to strategic capacity for creation test
+      await tester.tap(find.byIcon(Icons.remove_circle_outline));
+      await tester.tap(find.byIcon(Icons.remove_circle_outline));
+      await tester.pump();
+      
+      expect(find.text('6'), findsOneWidget);
 
-      // Assert - should still be 8
-      expect(find.text('8'), findsOneWidget);
-    });
-
-    testWidgets('should create room successfully', (WidgetTester tester) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      const userId = 'user123';
-      const roomId = 'room456';
-      final expectedRoom = Room(
-        id: roomId,
-        creatorId: userId,
-        playerIds: [userId],
-        status: RoomStatus.waiting,
-        maxPlayers: 4,
-      );
-
-      when(
-        () => mockCreateRoomUseCase.call(creatorId: userId, maxPlayers: 4),
-      ).thenAnswer((_) async => expectedRoom);
-
-      await tester.pumpWidget(createWidgetUnderTest(userId: userId));
-
-      // Act
-      await tester.tap(find.text('Créer la partie'));
-      await tester.pump(); // Trigger the async operation
-      await tester.pumpAndSettle(); // Wait for navigation
-
-      // Assert
-      verify(
-        () => mockCreateRoomUseCase.call(creatorId: userId, maxPlayers: 4),
-      ).called(1);
-
-      // Verify navigation occurred
-      expect(find.text('Room $roomId'), findsOneWidget);
-    });
-
-    testWidgets('should show loading state during room creation', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      const userId = 'user123';
-      final expectedRoom = Room(
-        id: 'room456',
-        creatorId: userId,
-        playerIds: [userId],
-        status: RoomStatus.waiting,
-        maxPlayers: 4,
-      );
-
-      // Add delay to simulate async operation
-      when(
-        () => mockCreateRoomUseCase.call(creatorId: userId, maxPlayers: 4),
-      ).thenAnswer((_) async {
-        await Future.delayed(const Duration(milliseconds: 100));
-        return expectedRoom;
-      });
-
-      await tester.pumpWidget(createWidgetUnderTest(userId: userId));
-
-      // Act
-      await tester.tap(find.text('Créer la partie'));
-      await tester.pump(); // Start the async operation
-
-      // Assert
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      expect(find.text('Créer la partie'), findsNothing);
-
-      // Wait for completion
-      await tester.pumpAndSettle();
-    });
-
-    testWidgets('should show error when user not logged in', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      await tester.pumpWidget(createWidgetUnderTest(userId: null));
-
-      // Act
+      // Room creation workflow behavior - competitive environment establishment
       await tester.tap(find.text('Créer la partie'));
       await tester.pump();
-      await tester.pump(); // Allow snackbar to appear
-
-      // Assert
-      expect(
-        find.text('Erreur: Exception: Utilisateur non connecté'),
-        findsOneWidget,
-      );
-      expect(find.byType(SnackBar), findsOneWidget);
-    });
-
-    testWidgets('should show error when room creation fails', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      const userId = 'user123';
-      const errorMessage = 'Network error';
-
-      when(
-        () => mockCreateRoomUseCase.call(creatorId: userId, maxPlayers: 4),
-      ).thenThrow(Exception(errorMessage));
-
-      await tester.pumpWidget(createWidgetUnderTest(userId: userId));
-
-      // Act
-      await tester.tap(find.text('Créer la partie'));
-      await tester.pump();
-      await tester.pump(); // Allow snackbar to appear
-
-      // Assert
-      expect(find.text('Erreur: Exception: $errorMessage'), findsOneWidget);
-      expect(find.byType(SnackBar), findsOneWidget);
-    });
-
-    testWidgets('should disable controls during room creation', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      const userId = 'user123';
-      final expectedRoom = Room(
-        id: 'room456',
-        creatorId: userId,
-        playerIds: [userId],
-        status: RoomStatus.waiting,
-        maxPlayers: 4,
-      );
-
-      when(
-        () => mockCreateRoomUseCase.call(creatorId: userId, maxPlayers: 4),
-      ).thenAnswer((_) async {
-        await Future.delayed(const Duration(milliseconds: 100));
-        return expectedRoom;
-      });
-
-      await tester.pumpWidget(createWidgetUnderTest(userId: userId));
-
-      // Act
-      await tester.tap(find.text('Créer la partie'));
-      await tester.pump(); // Start the async operation
-
-      // Assert - buttons should be disabled
+      
+      // Loading state behavior - provide user feedback during creation
+      expect(find.byType(CircularProgressIndicator), findsOneWidget, reason: 'Should display loading indicator during competitive room creation');
+      expect(find.text('Créer la partie'), findsNothing, reason: 'Should hide creation button during processing');
+      
+      // Control disabling behavior - prevent interference during creation
       final increaseButton = tester.widget<IconButton>(
         find.widgetWithIcon(IconButton, Icons.add_circle_outline),
       );
@@ -311,83 +147,88 @@ void main() {
       final createButton = tester.widget<ElevatedButton>(
         find.byType(ElevatedButton),
       );
-
-      expect(increaseButton.onPressed, isNull);
-      expect(decreaseButton.onPressed, isNull);
-      expect(createButton.onPressed, isNull);
-
-      // Wait for completion
+      
+      expect(increaseButton.onPressed, isNull, reason: 'Should disable capacity controls during competitive room creation');
+      expect(decreaseButton.onPressed, isNull, reason: 'Should disable capacity controls during competitive room creation');
+      expect(createButton.onPressed, isNull, reason: 'Should disable creation button during processing');
+      
       await tester.pumpAndSettle();
+      
+      // Navigation behavior - transition to competitive room
+      expect(find.text('Room $strategicRoomId'), findsOneWidget, reason: 'Should navigate to created competitive room for participant coordination');
+      
+      verify(() => mockCreateRoomUseCase.call(
+            creatorId: competitiveHostId,
+            maxPlayers: 6,
+          )).called(1);
     });
 
-    testWidgets('should create room with selected player count', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
+    group('should handle competitive room creation failures with proper user feedback', () {
+      testWidgets('when user authentication is missing', (WidgetTester tester) async {
+        // Test behavior: screen validates user authentication to ensure competitive room ownership
+        
+        setLargeScreenSize(tester);
+        
+        await tester.pumpWidget(createWidgetUnderTest(userId: null));
+        
+        await tester.tap(find.text('Créer la partie'));
+        await tester.pump();
+        await tester.pump();
+        
+        expect(
+          find.text('Erreur: Exception: Utilisateur non connecté'),
+          findsOneWidget,
+          reason: 'Should inform user about authentication requirement for competitive room creation',
+        );
+        expect(find.byType(SnackBar), findsOneWidget, reason: 'Should display error feedback for authentication failure');
+      });
 
-      // Arrange
-      const userId = 'user123';
-      const selectedPlayers = 6;
-      final expectedRoom = Room(
-        id: 'room456',
-        creatorId: userId,
-        playerIds: [userId],
-        status: RoomStatus.waiting,
-        maxPlayers: selectedPlayers,
-      );
-
-      when(
-        () => mockCreateRoomUseCase.call(
-          creatorId: userId,
-          maxPlayers: selectedPlayers,
-        ),
-      ).thenAnswer((_) async => expectedRoom);
-
-      await tester.pumpWidget(createWidgetUnderTest(userId: userId));
-
-      // Change player count to 6
-      await tester.tap(find.byIcon(Icons.add_circle_outline));
-      await tester.tap(find.byIcon(Icons.add_circle_outline));
-      await tester.pump();
-
-      expect(find.text('6'), findsOneWidget);
-
-      // Act
-      await tester.tap(find.text('Créer la partie'));
-      await tester.pump();
-      await tester.pumpAndSettle();
-
-      // Assert
-      verify(
-        () => mockCreateRoomUseCase.call(
-          creatorId: userId,
-          maxPlayers: selectedPlayers,
-        ),
-      ).called(1);
+      testWidgets('when infrastructure fails during creation', (WidgetTester tester) async {
+        // Test behavior: screen handles creation failures gracefully to maintain user experience
+        
+        setLargeScreenSize(tester);
+        const competitiveHostId = 'tournament-organizer-789';
+        const infrastructureError = 'Competitive infrastructure temporarily unavailable';
+        
+        when(() => mockCreateRoomUseCase.call(
+              creatorId: competitiveHostId,
+              maxPlayers: 4,
+            )).thenThrow(Exception(infrastructureError));
+        
+        await tester.pumpWidget(createWidgetUnderTest(userId: competitiveHostId));
+        
+        await tester.tap(find.text('Créer la partie'));
+        await tester.pump();
+        await tester.pump();
+        
+        expect(
+          find.text('Erreur: Exception: $infrastructureError'),
+          findsOneWidget,
+          reason: 'Should provide clear error feedback when competitive infrastructure fails',
+        );
+        expect(find.byType(SnackBar), findsOneWidget, reason: 'Should display error notification for infrastructure failures');
+      });
     });
 
-    testWidgets('should apply correct styling', (WidgetTester tester) async {
+    testWidgets('should maintain proper competitive styling and layout for strategic gaming interface', (WidgetTester tester) async {
+      // Test behavior: screen provides polished interface suitable for competitive gaming setup
+      
       setLargeScreenSize(tester);
-
-      // Arrange
-      await tester.pumpWidget(createWidgetUnderTest(userId: 'user123'));
-
-      // Assert
-      expect(find.byType(Card), findsOneWidget);
-      expect(
-        find.byType(ConstrainedBox),
-        findsWidgets,
-      ); // Multiple ConstrainedBox is fine
-      expect(find.byType(SafeArea), findsWidgets); // Multiple SafeArea is fine
-
-      // Check that player count is displayed in a circular container
+      
+      await tester.pumpWidget(createWidgetUnderTest(userId: 'competitive-host-123'));
+      
+      expect(find.byType(Card), findsOneWidget, reason: 'Should use card layout for organized competitive setup interface');
+      expect(find.byType(ConstrainedBox), findsWidgets, reason: 'Should constrain layout for consistent competitive interface');
+      expect(find.byType(SafeArea), findsWidgets, reason: 'Should respect device boundaries for competitive interface safety');
+      
+      // Circular player count display for competitive clarity
       final container = tester.widget<Container>(
         find
             .descendant(of: find.byType(Row), matching: find.byType(Container))
             .first,
       );
       final decoration = container.decoration as BoxDecoration;
-      expect(decoration.shape, BoxShape.circle);
+      expect(decoration.shape, BoxShape.circle, reason: 'Should display player count in circular format for competitive visual clarity');
     });
   });
 }

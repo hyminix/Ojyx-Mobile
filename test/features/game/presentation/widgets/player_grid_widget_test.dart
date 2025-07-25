@@ -34,48 +34,41 @@ void main() {
       expect(find.byType(CardWidget), findsNWidgets(12)); // 3 rows * 4 columns
     });
 
-    testWidgets('should display "Votre grille" when isCurrentPlayer is true', (
+    testWidgets('should display "Votre grille" based on isCurrentPlayer value', (
       tester,
     ) async {
-      // Act
-      await tester.pumpWidget(
-        wrapWithConstraints(
-          PlayerGridWidget(grid: testGrid, isCurrentPlayer: true),
-        ),
-      );
+      // Test cases for isCurrentPlayer true/false
+      final testCases = [
+        (isCurrentPlayer: true, expectedFinds: findsOneWidget),
+        (isCurrentPlayer: false, expectedFinds: findsNothing),
+      ];
 
-      // Assert
-      expect(find.text('Votre grille'), findsOneWidget);
-      expect(find.byIcon(Icons.person), findsOneWidget);
-    });
-
-    testWidgets(
-      'should not display "Votre grille" when isCurrentPlayer is false',
-      (tester) async {
+      for (final testCase in testCases) {
         // Act
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: 400,
-                    maxHeight: 600,
-                  ),
-                  child: PlayerGridWidget(
-                    grid: testGrid,
-                    isCurrentPlayer: false,
-                  ),
-                ),
-              ),
+          wrapWithConstraints(
+            PlayerGridWidget(
+              grid: testGrid,
+              isCurrentPlayer: testCase.isCurrentPlayer,
             ),
           ),
         );
 
         // Assert
-        expect(find.text('Votre grille'), findsNothing);
-      },
-    );
+        expect(
+          find.text('Votre grille'),
+          testCase.expectedFinds,
+          reason: 'When isCurrentPlayer=${testCase.isCurrentPlayer}, "Votre grille" should ${testCase.expectedFinds == findsOneWidget ? "be visible" : "not be visible"}',
+        );
+        
+        if (testCase.isCurrentPlayer) {
+          expect(find.byIcon(Icons.person), findsOneWidget);
+        }
+
+        // Clear for next iteration
+        await tester.pumpWidget(Container());
+      }
+    });
 
     testWidgets('should display grid stats when isCurrentPlayer is true', (
       tester,
@@ -318,10 +311,4 @@ void main() {
     });
   });
 
-  group('_StatChip', () {
-    testWidgets('should display tooltip on hover', (tester) async {
-      // This test would require more complex setup for tooltip testing
-      // Skipping for now as it requires MaterialApp with overlay support
-    });
-  });
 }

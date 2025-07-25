@@ -13,175 +13,138 @@ class MockSupabaseRoomDatasource extends Mock
     implements SupabaseRoomDatasource {}
 
 void main() {
-  late SupabaseRoomDatasourceImpl datasource;
-  late MockSupabaseRoomDatasource mockSupabaseDatasource;
+  group('Supabase Room Data Persistence for Competitive Multiplayer Gaming Infrastructure', () {
+    late SupabaseRoomDatasourceImpl datasource;
+    late MockSupabaseRoomDatasource mockSupabaseDatasource;
 
-  setUp(() {
-    mockSupabaseDatasource = MockSupabaseRoomDatasource();
-    datasource = SupabaseRoomDatasourceImpl(mockSupabaseDatasource);
-  });
+    setUp(() {
+      mockSupabaseDatasource = MockSupabaseRoomDatasource();
+      datasource = SupabaseRoomDatasourceImpl(mockSupabaseDatasource);
+    });
 
-  setUpAll(() {
-    registerRoomFallbackValues();
-  });
+    setUpAll(() {
+      registerRoomFallbackValues();
+    });
 
-  group('createRoom', () {
-    test('should create a room successfully', () async {
-      // Arrange
-      const creatorId = 'user-123';
-      const maxPlayers = 4;
-      final room = Room(
-        id: 'room-123',
-        creatorId: creatorId,
-        playerIds: [creatorId],
+    test('should enable comprehensive competitive room data management for strategic multiplayer gaming coordination', () async {
+      // Test behavior: datasource provides reliable room persistence to support competitive multiplayer experiences through complete room lifecycle management
+      
+      const strategicHostId = 'competitive-tournament-host-789';
+      const competitiveCapacity = 6;
+      const competitiveRoomId = 'strategic-tournament-arena-456';
+      const liveGameId = 'active-competitive-match-999';
+      
+      final newCompetitiveRoom = Room(
+        id: competitiveRoomId,
+        creatorId: strategicHostId,
+        playerIds: [strategicHostId],
         status: RoomStatus.waiting,
-        maxPlayers: maxPlayers,
+        maxPlayers: competitiveCapacity,
         createdAt: DateTime.now(),
       );
-
-      when(
-        () => mockSupabaseDatasource.createRoom(
-          creatorId: any(named: 'creatorId'),
-          maxPlayers: any(named: 'maxPlayers'),
-        ),
-      ).thenAnswer((_) async => room.toModel());
-
-      // Act
-      final result = await datasource.createRoom(
-        creatorId: creatorId,
-        maxPlayers: maxPlayers,
-      );
-
-      // Assert
-      expect(result, equals(room));
-      verify(
-        () => mockSupabaseDatasource.createRoom(
-          creatorId: creatorId,
-          maxPlayers: maxPlayers,
-        ),
-      ).called(1);
-    });
-
-    test('should throw exception on database error', () async {
-      // Arrange
-      const creatorId = 'user-123';
-      const maxPlayers = 4;
-
-      when(
-        () => mockSupabaseDatasource.createRoom(
-          creatorId: any(named: 'creatorId'),
-          maxPlayers: any(named: 'maxPlayers'),
-        ),
-      ).thenThrow(Exception('Database error'));
-
-      // Act & Assert
-      expect(
-        () =>
-            datasource.createRoom(creatorId: creatorId, maxPlayers: maxPlayers),
-        throwsException,
-      );
-    });
-  });
-
-  group('watchRoom', () {
-    test('should return stream of room updates', () async {
-      // Arrange
-      const roomId = 'room-123';
-      final room = Room(
-        id: roomId,
-        creatorId: 'user-123',
-        playerIds: ['user-123'],
-        status: RoomStatus.waiting,
-        maxPlayers: 4,
-        createdAt: DateTime.now(),
-      );
-
-      when(
-        () => mockSupabaseDatasource.watchRoom(roomId),
-      ).thenAnswer((_) => Stream.value(room.toModel()));
-
-      // Act
-      final stream = datasource.watchRoom(roomId);
-
-      // Assert
-      await expectLater(stream, emits(room));
-    });
-  });
-
-  group('updateRoom', () {
-    test('should update room successfully', () async {
-      // Arrange
-      final room = Room(
-        id: 'room-123',
-        creatorId: 'user-123',
-        playerIds: ['user-123', 'user-456'],
+      
+      final updatedCompetitiveRoom = newCompetitiveRoom.copyWith(
+        playerIds: [strategicHostId, 'strategic-competitor-123', 'tactical-player-456'],
         status: RoomStatus.inGame,
-        maxPlayers: 4,
-        currentGameId: 'game-123',
-        createdAt: DateTime.now(),
+        currentGameId: liveGameId,
         updatedAt: DateTime.now(),
       );
-
-      when(
-        () => mockSupabaseDatasource.updateRoomStatus(
-          roomId: any(named: 'roomId'),
-          status: any(named: 'status'),
-          gameId: any(named: 'gameId'),
-        ),
-      ).thenAnswer((_) async {});
-
-      when(
-        () => mockSupabaseDatasource.getRoom(room.id),
-      ).thenAnswer((_) async => room.toModel());
-
-      // Act
-      final result = await datasource.updateRoom(room);
-
-      // Assert
-      expect(result, equals(room));
-      verify(
-        () => mockSupabaseDatasource.updateRoomStatus(
-          roomId: room.id,
-          status: 'in_game',
-          gameId: room.currentGameId,
-        ),
-      ).called(1);
-    });
-  });
-
-  group('getAvailableRooms', () {
-    test('should return list of available rooms', () async {
-      // Arrange
-      final rooms = [
+      
+      final availableCompetitiveRooms = [
         Room(
-          id: 'room-1',
-          creatorId: 'user-1',
-          playerIds: ['user-1'],
+          id: 'arena-alpha-123',
+          creatorId: 'host-alpha',
+          playerIds: ['host-alpha'],
           status: RoomStatus.waiting,
           maxPlayers: 4,
           createdAt: DateTime.now(),
         ),
         Room(
-          id: 'room-2',
-          creatorId: 'user-2',
-          playerIds: ['user-2', 'user-3'],
+          id: 'arena-beta-456',
+          creatorId: 'host-beta',
+          playerIds: ['host-beta', 'player-gamma'],
           status: RoomStatus.waiting,
           maxPlayers: 6,
           createdAt: DateTime.now(),
         ),
       ];
 
-      when(
-        () => mockSupabaseDatasource.getAvailableRooms(),
-      ).thenAnswer((_) async => rooms.map((r) => r.toModel()).toList());
+      // Room creation behavior - establish competitive environments
+      when(() => mockSupabaseDatasource.createRoom(
+            creatorId: strategicHostId,
+            maxPlayers: competitiveCapacity,
+          )).thenAnswer((_) async => newCompetitiveRoom.toModel());
 
-      // Act
-      final result = await datasource.getAvailableRooms();
+      final createdRoom = await datasource.createRoom(
+        creatorId: strategicHostId,
+        maxPlayers: competitiveCapacity,
+      );
 
-      // Assert
-      expect(result.length, 2);
-      expect(result[0].id, 'room-1');
-      expect(result[1].id, 'room-2');
+      expect(createdRoom.creatorId, strategicHostId, reason: 'Room creation should establish proper host authority for competitive control');
+      expect(createdRoom.maxPlayers, competitiveCapacity, reason: 'Capacity should enable strategic group competitive gameplay');
+      expect(createdRoom.status, RoomStatus.waiting, reason: 'New rooms should be ready to accept competitive participants');
+      
+      // Real-time room monitoring behavior - enable live coordination
+      when(() => mockSupabaseDatasource.watchRoom(competitiveRoomId))
+          .thenAnswer((_) => Stream.value(updatedCompetitiveRoom.toModel()));
+
+      final roomMonitoringStream = datasource.watchRoom(competitiveRoomId);
+      
+      await expectLater(
+        roomMonitoringStream,
+        emits(updatedCompetitiveRoom),
+        reason: 'Room monitoring should provide real-time updates for competitive coordination',
+      );
+      
+      // Room state management behavior - coordinate competitive transitions
+      when(() => mockSupabaseDatasource.updateRoomStatus(
+            roomId: competitiveRoomId,
+            status: 'in_game',
+            gameId: liveGameId,
+          )).thenAnswer((_) async {});
+      when(() => mockSupabaseDatasource.getRoom(competitiveRoomId))
+          .thenAnswer((_) async => updatedCompetitiveRoom.toModel());
+
+      final persistedRoom = await datasource.updateRoom(updatedCompetitiveRoom);
+      
+      expect(persistedRoom.status, RoomStatus.inGame, reason: 'Room updates should reflect competitive game transitions');
+      expect(persistedRoom.currentGameId, liveGameId, reason: 'Active game references should be maintained for competitive coordination');
+      expect(persistedRoom.playerIds.length, 3, reason: 'Player roster should be preserved through competitive state changes');
+      
+      // Room discovery behavior - enable competitive matchmaking
+      when(() => mockSupabaseDatasource.getAvailableRooms())
+          .thenAnswer((_) async => availableCompetitiveRooms.map((r) => r.toModel()).toList());
+
+      final discoveredRooms = await datasource.getAvailableRooms();
+      
+      expect(discoveredRooms.length, 2, reason: 'Room discovery should provide multiple competitive options for strategic matchmaking');
+      expect(discoveredRooms[0].id, 'arena-alpha-123', reason: 'First discovered room should be accessible for competitive participation');
+      expect(discoveredRooms[1].id, 'arena-beta-456', reason: 'Second discovered room should offer alternative competitive gameplay');
+      expect(discoveredRooms.every((room) => room.status == RoomStatus.waiting), true, reason: 'All discovered rooms should be accepting new competitive participants');
+      
+      // Error handling behavior - maintain system reliability
+      when(() => mockSupabaseDatasource.createRoom(
+            creatorId: any(named: 'creatorId'),
+            maxPlayers: any(named: 'maxPlayers'),
+          )).thenThrow(Exception('Competitive room infrastructure temporarily unavailable'));
+
+      expect(
+        () => datasource.createRoom(creatorId: 'failing-host', maxPlayers: 4),
+        throwsException,
+        reason: 'Infrastructure failures should be properly propagated to maintain competitive system reliability',
+      );
+      
+      verify(() => mockSupabaseDatasource.createRoom(
+            creatorId: strategicHostId,
+            maxPlayers: competitiveCapacity,
+          )).called(1);
+      verify(() => mockSupabaseDatasource.updateRoomStatus(
+            roomId: competitiveRoomId,
+            status: 'in_game',
+            gameId: liveGameId,
+          )).called(1);
+      verify(() => mockSupabaseDatasource.getRoom(competitiveRoomId)).called(1);
+      verify(() => mockSupabaseDatasource.getAvailableRooms()).called(1);
     });
   });
 }

@@ -131,7 +131,9 @@ class GameStateModel with _$GameStateModel {
       turnNumber: turnNumber,
       roundNumber: roundNumber,
       gameData: gameData,
-      winnerId: null, // Set from gameState.finishedAt logic if needed
+      winnerId: gameState.status == GameStatus.finished 
+          ? _calculateWinner(gameState.players, gameState.initiatorPlayerId)
+          : null,
       endedAt: gameState.finishedAt,
       createdAt: gameState.createdAt ?? DateTime.now(),
       updatedAt: updatedAt,
@@ -324,5 +326,30 @@ class GameStateModel with _$GameStateModel {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
+  }
+
+  /// Calculate the winner based on the lowest score, applying penalty to initiator if needed
+  static String? _calculateWinner(List<GamePlayer> players, String? initiatorPlayerId) {
+    if (players.isEmpty) return null;
+
+    // Find the lowest score
+    final lowestScore = players
+        .map((p) => p.currentScore)
+        .reduce((a, b) => a < b ? a : b);
+
+    // Apply penalty if needed and find winner
+    final playersWithPenalty = players.map((player) {
+      if (player.id == initiatorPlayerId && player.currentScore > lowestScore) {
+        // Double the score as penalty by setting scoreMultiplier to 2
+        return player.copyWith(scoreMultiplier: 2);
+      }
+      return player;
+    }).toList();
+
+    // Sort by score (ascending) and return the winner's ID
+    final sorted = List<GamePlayer>.from(playersWithPenalty)
+      ..sort((a, b) => a.currentScore.compareTo(b.currentScore));
+
+    return sorted.first.id;
   }
 }

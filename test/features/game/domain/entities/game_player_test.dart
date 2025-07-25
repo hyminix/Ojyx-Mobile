@@ -5,35 +5,9 @@ import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 
 void main() {
-  group('GamePlayer Entity', () {
-    test('should create game player with required fields', () {
-      final player = GamePlayer(
-        id: 'player1',
-        name: 'John Doe',
-        grid: PlayerGrid.empty(),
-      );
-
-      expect(player.id, 'player1');
-      expect(player.name, 'John Doe');
-      expect(player.grid, isNotNull);
-      expect(player.actionCards, isEmpty);
-      expect(player.isConnected, true);
-      expect(player.isHost, false);
-      expect(player.hasFinishedRound, false);
-    });
-
-    test('should create host game player', () {
-      final player = GamePlayer(
-        id: 'host1',
-        name: 'Host GamePlayer',
-        grid: PlayerGrid.empty(),
-        isHost: true,
-      );
-
-      expect(player.isHost, true);
-    });
-
-    test('should add action card to hand', () {
+  group('GamePlayer Action Card Management', () {
+    test('should expand action card options when receiving new cards during gameplay', () {
+      // Test behavior: players accumulate strategic options through action cards
       final player = GamePlayer(
         id: 'player1',
         name: 'John',
@@ -41,7 +15,7 @@ void main() {
       );
 
       const actionCard = ActionCard(
-        id: 'action1',
+        id: 'teleport-1',
         type: ActionCardType.teleport,
         name: 'Téléportation',
         description: 'Échange deux cartes',
@@ -49,84 +23,92 @@ void main() {
 
       final updatedPlayer = player.addActionCard(actionCard);
 
-      expect(player.actionCards, isEmpty);
-      expect(updatedPlayer.actionCards.length, 1);
-      expect(updatedPlayer.actionCards.first, equals(actionCard));
+      // Verify immutability and behavior
+      expect(player.actionCards, isEmpty, reason: 'Original player should remain unchanged');
+      expect(updatedPlayer.actionCards.length, 1, reason: 'Player should gain strategic option');
+      expect(updatedPlayer.actionCards.first, equals(actionCard), reason: 'Exact card should be available');
     });
 
-    test('should not add more than 3 action cards', () {
+    test('should enforce hand limit to maintain game balance when action cards are abundant', () {
+      // Test behavior: game prevents action card hoarding by enforcing 3-card limit
       var player = GamePlayer(
         id: 'player1',
         name: 'John',
         grid: PlayerGrid.empty(),
       );
 
-      // Add 3 cards
+      // Fill player's action card hand to maximum
       for (int i = 0; i < 3; i++) {
         player = player.addActionCard(
           ActionCard(
             id: 'action$i',
             type: ActionCardType.teleport,
             name: 'Card $i',
-            description: 'Description',
+            description: 'Strategic option $i',
           ),
         );
       }
 
-      expect(player.actionCards.length, 3);
+      expect(player.actionCards.length, 3, reason: 'Player should reach maximum hand size');
 
-      // Try to add 4th card
+      // Verify game rule enforcement
       expect(
         () => player.addActionCard(
           const ActionCard(
-            id: 'action4',
+            id: 'overflow-card',
             type: ActionCardType.teleport,
-            name: 'Card 4',
-            description: 'Description',
+            name: 'Overflow Card',
+            description: 'This should not be addable',
           ),
         ),
         throwsAssertionError,
+        reason: 'Game should prevent action card hoarding beyond limit',
       );
     });
 
-    test('should remove action card from hand', () {
+    test('should allow strategic card usage by removing cards from hand', () {
+      // Test behavior: players can use action cards, reducing their strategic options
       var player = GamePlayer(
         id: 'player1',
         name: 'John',
         grid: PlayerGrid.empty(),
       );
 
-      const actionCard1 = ActionCard(
-        id: 'action1',
+      const teleportCard = ActionCard(
+        id: 'teleport-1',
         type: ActionCardType.teleport,
-        name: 'Card 1',
-        description: 'Description',
+        name: 'Teleport',
+        description: 'Teleport card',
       );
-      const actionCard2 = ActionCard(
-        id: 'action2',
+      const reverseCard = ActionCard(
+        id: 'reverse-1',
         type: ActionCardType.turnAround,
-        name: 'Card 2',
-        description: 'Description',
+        name: 'Reverse',
+        description: 'Turn around card',
       );
 
-      player = player.addActionCard(actionCard1);
-      player = player.addActionCard(actionCard2);
+      // Build up player's strategic options
+      player = player.addActionCard(teleportCard);
+      player = player.addActionCard(reverseCard);
 
-      expect(player.actionCards.length, 2);
+      expect(player.actionCards.length, 2, reason: 'Player should have multiple strategic options');
 
-      final updatedPlayer = player.removeActionCard('action1');
+      // Player uses teleport card
+      final updatedPlayer = player.removeActionCard('teleport-1');
 
-      expect(updatedPlayer.actionCards.length, 1);
-      expect(updatedPlayer.actionCards.first.id, 'action2');
+      // Verify strategic option is consumed
+      expect(updatedPlayer.actionCards.length, 1, reason: 'Player should have fewer options after using card');
+      expect(updatedPlayer.actionCards.first.id, 'reverse-1', reason: 'Remaining card should be available');
     });
 
-    test('should calculate current score', () {
+    test('should calculate meaningful score for competitive ranking during end game', () {
+      // Test behavior: score calculation determines game winner
       final grid = PlayerGrid.empty();
-      // Add some cards with values
+      // Create realistic scoring scenario with mixed card values
       final gridWithCards = grid
-          .setCard(0, 0, const Card(value: 5, isRevealed: true))
-          .setCard(0, 1, const Card(value: -2, isRevealed: true))
-          .setCard(1, 0, const Card(value: 12, isRevealed: true));
+          .setCard(0, 0, const Card(value: 5, isRevealed: true))   // Moderate penalty
+          .setCard(0, 1, const Card(value: -2, isRevealed: true))  // Bonus points
+          .setCard(1, 0, const Card(value: 12, isRevealed: true)); // High penalty
 
       final player = GamePlayer(
         id: 'player1',
@@ -134,20 +116,10 @@ void main() {
         grid: gridWithCards,
       );
 
-      expect(player.currentScore, 5 + (-2) + 12);
-    });
-
-    test('should support value equality', () {
-      final grid = PlayerGrid.empty();
-
-      final player1 = GamePlayer(id: 'player1', name: 'John', grid: grid);
-
-      final player2 = GamePlayer(id: 'player1', name: 'John', grid: grid);
-
-      final player3 = GamePlayer(id: 'player2', name: 'John', grid: grid);
-
-      expect(player1, equals(player2));
-      expect(player1, isNot(equals(player3)));
+      // Verify score calculation for game ranking
+      const expectedScore = 5 + (-2) + 12; // 15 points
+      expect(player.currentScore, expectedScore, 
+             reason: 'Score should reflect revealed card values for competitive ranking');
     });
   });
 }

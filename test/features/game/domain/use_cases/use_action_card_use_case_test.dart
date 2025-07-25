@@ -8,7 +8,6 @@ import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 import 'package:ojyx/features/game/domain/repositories/game_state_repository.dart';
 import 'package:ojyx/features/game/domain/use_cases/use_action_card_use_case.dart';
 import 'package:ojyx/core/errors/failures.dart';
-import 'package:fpdart/fpdart.dart';
 
 class MockGameStateRepository extends Mock implements GameStateRepository {}
 
@@ -21,365 +20,210 @@ void main() {
     useCase = UseActionCardUseCase(mockRepository);
   });
 
-  GameState createTestGameState({
-    int currentPlayerIndex = 0,
-    TurnDirection turnDirection = TurnDirection.clockwise,
-    bool lastRound = false,
-  }) {
-    final players = [
-      GamePlayer(
-        id: 'player1',
-        name: 'GamePlayer 1',
-        grid: PlayerGrid.empty(),
-        actionCards: [],
-        hasFinishedRound: false,
-      ),
-      GamePlayer(
-        id: 'player2',
-        name: 'GamePlayer 2',
-        grid: PlayerGrid.empty(),
-        actionCards: [],
-        hasFinishedRound: false,
-      ),
-    ];
-
-    return GameState(
-      roomId: 'test-room',
-      players: players,
-      currentPlayerIndex: currentPlayerIndex,
-      deck: [],
-      discardPile: [],
-      actionDeck: [],
-      actionDiscard: [],
-      status: GameStatus.playing,
-      turnDirection: turnDirection,
-      lastRound: lastRound,
-      createdAt: DateTime.now(),
-    );
-  }
-
   group('UseActionCardUseCase', () {
-    test('should use optional action card successfully', () async {
-      // Arrange
-      const gameStateId = 'test-game-id';
-      const playerId = 'player1';
-      const actionCardType = ActionCardType.skip;
-
-      final params = UseActionCardParams(
-        gameStateId: gameStateId,
-        playerId: playerId,
-        actionCardType: actionCardType,
-        targetData: null,
-      );
-
-      final expectedResponse = {
-        'valid': true,
-        'gameState': {}, // Server response format
-      };
-
-      when(
-        () => mockRepository.useActionCard(
-          gameStateId: gameStateId,
-          playerId: playerId,
-          actionCardType: actionCardType,
-          targetData: null,
-        ),
-      ).thenAnswer((_) async => expectedResponse);
-
-      // Act
-      final result = await useCase(params);
-
-      // Assert
-      expect(result.isRight(), isTrue);
-      result.fold((failure) => fail('Should not fail'), (response) {
-        expect(response['valid'], isTrue);
-        verify(
-          () => mockRepository.useActionCard(
-            gameStateId: gameStateId,
-            playerId: playerId,
-            actionCardType: actionCardType,
-            targetData: null,
-          ),
-        ).called(1);
-      });
-    });
-
-    test('should fail if player does not have the action card', () async {
-      // Arrange
-      const gameStateId = 'test-game-id';
-      const playerId = 'player1';
-      const actionCardType = ActionCardType.teleport;
-
-      final params = UseActionCardParams(
-        gameStateId: gameStateId,
-        playerId: playerId,
-        actionCardType: actionCardType,
-        targetData: null,
-      );
-
-      final expectedResponse = {
-        'valid': false,
-        'error': 'action card not available',
-      };
-
-      when(
-        () => mockRepository.useActionCard(
-          gameStateId: gameStateId,
-          playerId: playerId,
-          actionCardType: actionCardType,
-          targetData: null,
-        ),
-      ).thenAnswer((_) async => expectedResponse);
-
-      // Act
-      final result = await useCase(params);
-
-      // Assert
-      expect(result.isLeft(), isTrue);
-      result.fold((failure) {
-        expect(failure, isA<Failure>());
-        expect(failure.message, contains('action card not available'));
-      }, (_) => fail('Should not succeed'));
-    });
-
-    test('should use mandatory action card immediately', () async {
-      // Arrange
-      const gameStateId = 'test-game-id';
-      const playerId = 'player1';
-      const actionCardType = ActionCardType.turnAround;
-
-      final params = UseActionCardParams(
-        gameStateId: gameStateId,
-        playerId: playerId,
-        actionCardType: actionCardType,
-        targetData: null,
-      );
-
-      final expectedResponse = {
-        'valid': true,
-        'gameState': {
-          'turnDirection': 'counterClockwise', // Reversed from clockwise
-        },
-      };
-
-      when(
-        () => mockRepository.useActionCard(
-          gameStateId: gameStateId,
-          playerId: playerId,
-          actionCardType: actionCardType,
-          targetData: null,
-        ),
-      ).thenAnswer((_) async => expectedResponse);
-
-      // Act
-      final result = await useCase(params);
-
-      // Assert
-      expect(result.isRight(), isTrue);
-      result.fold((failure) => fail('Should not fail'), (response) {
-        expect(response['valid'], isTrue);
-        expect(
-          response['gameState']['turnDirection'],
-          equals('counterClockwise'),
-        );
-      });
-    });
-
-    test(
-      'should reverse turn direction multiple times with Demi-tour',
-      () async {
-        // Arrange
-        const gameStateId = 'test-game-id';
-        const playerId = 'player1';
-        const actionCardType = ActionCardType.turnAround;
-
-        final params = UseActionCardParams(
-          gameStateId: gameStateId,
-          playerId: playerId,
-          actionCardType: actionCardType,
-          targetData: null,
-        );
-
-        final expectedResponse = {
-          'valid': true,
-          'gameState': {
-            'turnDirection': 'clockwise', // Reversed from counterClockwise
+    test('should enable strategic action card usage for competitive gameplay disruption', () async {
+      // Test behavior: Action cards create strategic disruptions that affect game flow,
+      // player turns, and competitive dynamics
+      
+      final actionCardScenarios = [
+        // Scenario 1: Skip card disrupts opponent's turn
+        {
+          'description': 'skip opponent turn for strategic advantage',
+          'gameStateId': 'competitive-match-123',
+          'playerId': 'strategic-player-456',
+          'actionCardType': ActionCardType.skip,
+          'targetData': null,
+          'mockResponse': {
+            'valid': true,
+            'gameState': {
+              'currentPlayerIndex': 2,  // Skips to player after target
+              'skippedPlayerId': 'opponent-789',
+              'nextPlayerId': 'ally-012',
+              'turnFlow': 'disrupted',
+            },
           },
-        };
-
+          'expectedBehavior': (Map<String, dynamic> response) {
+            expect(response['valid'], true,
+              reason: 'Skip card should successfully disrupt turn order');
+            expect(response['gameState']['turnFlow'], 'disrupted',
+              reason: 'Turn flow should be strategically disrupted');
+            expect(response['gameState']['skippedPlayerId'], 'opponent-789',
+              reason: 'Target opponent should lose their turn');
+          },
+        },
+        
+        // Scenario 2: Turn around reverses game direction
+        {
+          'description': 'reverse turn direction for tactical repositioning',
+          'gameStateId': 'tournament-arena-456',
+          'playerId': 'tactician-789',
+          'actionCardType': ActionCardType.turnAround,
+          'targetData': null,
+          'mockResponse': {
+            'valid': true,
+            'gameState': {
+              'turnDirection': 'counterClockwise',
+              'previousDirection': 'clockwise',
+              'playersAffected': ['player1', 'player2', 'player3', 'player4'],
+              'strategicImpact': 'high',
+            },
+          },
+          'expectedBehavior': (Map<String, dynamic> response) {
+            expect(response['gameState']['turnDirection'], 'counterClockwise',
+              reason: 'Direction should reverse for tactical advantage');
+            expect(response['gameState']['strategicImpact'], 'high',
+              reason: 'Turn reversal has high strategic impact');
+          },
+        },
+        
+        // Scenario 3: Teleportation swaps strategic positions
+        {
+          'description': 'teleport cards between strategic positions',
+          'gameStateId': 'strategic-game-789',
+          'playerId': 'master-player-012',
+          'actionCardType': ActionCardType.teleport,
+          'targetData': {
+            'position1': {'row': 0, 'col': 0, 'value': 12},  // High card
+            'position2': {'row': 2, 'col': 3, 'value': -2},  // Bonus card
+          },
+          'mockResponse': {
+            'valid': true,
+            'gameState': {
+              'cards_swapped': true,
+              'strategic_value': 'optimal',
+              'score_impact': -14,  // Significant improvement
+            },
+          },
+          'expectedBehavior': (Map<String, dynamic> response) {
+            expect(response['gameState']['cards_swapped'], true,
+              reason: 'Cards should swap for strategic repositioning');
+            expect(response['gameState']['strategic_value'], 'optimal',
+              reason: 'Swap should create optimal positioning');
+            expect(response['gameState']['score_impact'] < 0, true,
+              reason: 'Strategic swap should improve score');
+          },
+        },
+        
+        // Scenario 4: Shield reaction blocks opponent action
+        {
+          'description': 'shield blocks incoming attack action',
+          'gameStateId': 'defensive-match-345',
+          'playerId': 'defender-678',
+          'actionCardType': ActionCardType.shield,
+          'targetData': {'blocking': 'freeze_attempt'},
+          'mockResponse': {
+            'valid': true,
+            'gameState': {
+              'shield_activated': true,
+              'blocked_action': 'freeze',
+              'defensive_play': 'successful',
+              'turn_preserved': true,
+            },
+          },
+          'expectedBehavior': (Map<String, dynamic> response) {
+            expect(response['gameState']['shield_activated'], true,
+              reason: 'Shield should activate as defensive reaction');
+            expect(response['gameState']['turn_preserved'], true,
+              reason: 'Shield should preserve player agency');
+          },
+        },
+      ];
+      
+      // Execute action card scenarios
+      for (final scenario in actionCardScenarios) {
         when(
           () => mockRepository.useActionCard(
-            gameStateId: gameStateId,
-            playerId: playerId,
-            actionCardType: actionCardType,
-            targetData: null,
+            gameStateId: scenario['gameStateId'] as String,
+            playerId: scenario['playerId'] as String,
+            actionCardType: scenario['actionCardType'] as ActionCardType,
+            targetData: scenario['targetData'] as Map<String, dynamic>?,
           ),
-        ).thenAnswer((_) async => expectedResponse);
-
-        // Act
-        final result = await useCase(params);
-
-        // Assert
-        expect(result.isRight(), isTrue);
-        result.fold((failure) => fail('Should not fail'), (response) {
-          expect(response['valid'], isTrue);
-          expect(response['gameState']['turnDirection'], equals('clockwise'));
-        });
-      },
-    );
-
-    test('should validate target data for cards that require it', () async {
-      // Arrange
-      const gameStateId = 'test-game-id';
-      const playerId = 'player1';
-      const actionCardType = ActionCardType.teleport;
-
-      final params = UseActionCardParams(
-        gameStateId: gameStateId,
-        playerId: playerId,
-        actionCardType: actionCardType,
-        targetData: null, // Missing required target data
-      );
-
-      final expectedResponse = {'valid': false, 'error': 'invalid positions'};
-
-      when(
-        () => mockRepository.useActionCard(
-          gameStateId: gameStateId,
-          playerId: playerId,
-          actionCardType: actionCardType,
-          targetData: null,
-        ),
-      ).thenAnswer((_) async => expectedResponse);
-
-      // Act
-      final result = await useCase(params);
-
-      // Assert
-      expect(result.isLeft(), isTrue);
-      result.fold((failure) {
-        expect(failure, isA<Failure>());
-        expect(failure.message, contains('invalid positions'));
-      }, (_) => fail('Should not succeed'));
-    });
-
-    test(
-      'should handle teleportation action card with valid targets',
-      () async {
-        // Arrange
-        const gameStateId = 'test-game-id';
-        const playerId = 'player1';
-        const actionCardType = ActionCardType.teleport;
-
-        final targetData = {
-          'position1': {'row': 0, 'col': 0},
-          'position2': {'row': 1, 'col': 1},
-        };
-
-        final params = UseActionCardParams(
-          gameStateId: gameStateId,
-          playerId: playerId,
-          actionCardType: actionCardType,
-          targetData: targetData,
+        ).thenAnswer((_) async => scenario['mockResponse'] as Map<String, dynamic>);
+        
+        final result = await useCase(UseActionCardParams(
+          gameStateId: scenario['gameStateId'] as String,
+          playerId: scenario['playerId'] as String,
+          actionCardType: scenario['actionCardType'] as ActionCardType,
+          targetData: scenario['targetData'] as Map<String, dynamic>?,
+        ));
+        
+        expect(result.isRight(), true,
+          reason: 'Scenario "${scenario['description']}" should succeed');
+        
+        result.fold(
+          (failure) => fail('Should not fail for "${scenario['description']}"'),
+          (response) => (scenario['expectedBehavior'] as Function)(response),
         );
-
-        final expectedResponse = {
-          'valid': true,
-          'gameState': {'cards_swapped': true},
-        };
-
+      }
+      
+      // Validation scenarios - improper usage
+      final validationScenarios = [
+        {
+          'description': 'card not in player hand',
+          'gameStateId': 'invalid-game-111',
+          'playerId': 'cheater-999',
+          'actionCardType': ActionCardType.freeze,
+          'targetData': {'target': 'opponent-123'},
+          'mockResponse': {
+            'valid': false,
+            'error': 'action card not available',
+            'reason': 'player does not possess this card',
+          },
+        },
+        {
+          'description': 'not player turn for non-reaction card',
+          'gameStateId': 'turn-order-222',
+          'playerId': 'impatient-888',
+          'actionCardType': ActionCardType.skip,
+          'targetData': null,
+          'mockResponse': {
+            'valid': false,
+            'error': 'not your turn',
+            'reason': 'skip requires active turn',
+          },
+        },
+        {
+          'description': 'missing required target data',
+          'gameStateId': 'incomplete-333',
+          'playerId': 'careless-777',
+          'actionCardType': ActionCardType.teleport,
+          'targetData': null,
+          'mockResponse': {
+            'valid': false,
+            'error': 'invalid positions',
+            'reason': 'teleport requires two positions',
+          },
+        },
+      ];
+      
+      for (final validation in validationScenarios) {
         when(
           () => mockRepository.useActionCard(
-            gameStateId: gameStateId,
-            playerId: playerId,
-            actionCardType: actionCardType,
-            targetData: targetData,
+            gameStateId: validation['gameStateId'] as String,
+            playerId: validation['playerId'] as String,
+            actionCardType: validation['actionCardType'] as ActionCardType,
+            targetData: validation['targetData'] as Map<String, dynamic>?,
           ),
-        ).thenAnswer((_) async => expectedResponse);
-
-        // Act
-        final result = await useCase(params);
-
-        // Assert
-        expect(result.isRight(), isTrue);
-        result.fold((failure) => fail('Should not fail'), (response) {
-          expect(response['valid'], isTrue);
-          expect(response['gameState']['cards_swapped'], isTrue);
-        });
-      },
-    );
-
-    test('should not allow using action card when not player turn', () async {
-      // Arrange
-      const gameStateId = 'test-game-id';
-      const playerId = 'player1';
-      const actionCardType = ActionCardType.teleport;
-
-      final params = UseActionCardParams(
-        gameStateId: gameStateId,
-        playerId: playerId,
-        actionCardType: actionCardType,
-        targetData: null,
-      );
-
-      final expectedResponse = {'valid': false, 'error': 'not your turn'};
-
-      when(
-        () => mockRepository.useActionCard(
-          gameStateId: gameStateId,
-          playerId: playerId,
-          actionCardType: actionCardType,
-          targetData: null,
-        ),
-      ).thenAnswer((_) async => expectedResponse);
-
-      // Act
-      final result = await useCase(params);
-
-      // Assert
-      expect(result.isLeft(), isTrue);
-      result.fold((failure) {
-        expect(failure, isA<Failure>());
-        expect(failure.message, contains('not your turn'));
-      }, (_) => fail('Should not succeed'));
-    });
-
-    test('should allow reaction cards outside of turn', () async {
-      // Arrange
-      const gameStateId = 'test-game-id';
-      const playerId = 'player1';
-      const actionCardType = ActionCardType.shield;
-
-      final params = UseActionCardParams(
-        gameStateId: gameStateId,
-        playerId: playerId,
-        actionCardType: actionCardType,
-        targetData: null,
-      );
-
-      final expectedResponse = {
-        'valid': true,
-        'gameState': {'shield_activated': true},
-      };
-
-      when(
-        () => mockRepository.useActionCard(
-          gameStateId: gameStateId,
-          playerId: playerId,
-          actionCardType: actionCardType,
-          targetData: null,
-        ),
-      ).thenAnswer((_) async => expectedResponse);
-
-      // Act
-      final result = await useCase(params);
-
-      // Assert
-      expect(result.isRight(), isTrue);
-      result.fold((failure) => fail('Should not fail'), (response) {
-        expect(response['valid'], isTrue);
-        expect(response['gameState']['shield_activated'], isTrue);
-      });
+        ).thenAnswer((_) async => validation['mockResponse'] as Map<String, dynamic>);
+        
+        final result = await useCase(UseActionCardParams(
+          gameStateId: validation['gameStateId'] as String,
+          playerId: validation['playerId'] as String,
+          actionCardType: validation['actionCardType'] as ActionCardType,
+          targetData: validation['targetData'] as Map<String, dynamic>?,
+        ));
+        
+        expect(result.isLeft(), true,
+          reason: 'Validation "${validation['description']}" should fail');
+        
+        result.fold(
+          (failure) {
+            expect(failure.message, contains((validation['mockResponse'] as Map)['error']),
+              reason: 'Should fail with appropriate error for ${validation['description']}');
+          },
+          (_) => fail('Should not succeed for ${validation['description']}'),
+        );
+      }
     });
   });
 }

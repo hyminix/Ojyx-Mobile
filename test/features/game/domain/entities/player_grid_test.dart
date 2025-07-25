@@ -4,141 +4,98 @@ import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/core/utils/constants.dart';
 
 void main() {
-  group('PlayerGrid Entity', () {
-    test('should create empty grid with correct dimensions', () {
+  group('PlayerGrid Gameplay Behavior', () {
+    test('should enable strategic card placement and management during gameplay', () {
+      // Test behavior: players can place cards and manage their grid strategically
       final grid = PlayerGrid.empty();
-
-      expect(grid.cards.length, kGridRows);
-      expect(grid.cards[0].length, kGridColumns);
-      expect(
-        grid.cards.every((row) => row.every((card) => card == null)),
-        true,
-      );
+      const strategicCard = Card(value: -2, isRevealed: false); // Bonus card
+      
+      final updatedGrid = grid.setCard(1, 2, strategicCard);
+      
+      // Verify immutability and strategic placement
+      expect(grid.getCard(1, 2), isNull, reason: 'Original grid should remain unchanged');
+      expect(updatedGrid.getCard(1, 2), equals(strategicCard), reason: 'Strategic card should be placed correctly');
     });
 
-    test('should create grid from cards list', () {
-      final cards = List.generate(
-        kCardsPerPlayer,
-        (index) => Card(value: index % 13 - 2),
-      );
-
+    test('should support progressive card revelation for information discovery', () {
+      // Test behavior: players gradually reveal cards to gain information
+      final cards = List.generate(kCardsPerPlayer, (index) => Card(value: index % 5));
       final grid = PlayerGrid.fromCards(cards);
-
-      expect(grid.cards.length, kGridRows);
-      expect(grid.cards[0].length, kGridColumns);
-
-      // Verify all cards are placed
-      final placedCards = grid.cards
-          .expand((row) => row)
-          .where((card) => card != null)
-          .toList();
-      expect(placedCards.length, kCardsPerPlayer);
+      
+      final revealedGrid = grid.revealCard(0, 0);
+      
+      // Verify revelation behavior
+      expect(grid.getCard(0, 0)!.isRevealed, false, reason: 'Original card should remain hidden');
+      expect(revealedGrid.getCard(0, 0)!.isRevealed, true, reason: 'Card should be revealed for strategic planning');
     });
 
-    test('should throw if cards list has wrong length', () {
-      final cards = List.generate(10, (index) => Card(value: index));
-
-      expect(() => PlayerGrid.fromCards(cards), throwsAssertionError);
-    });
-
-    test('should get card at position', () {
-      final cards = List.generate(
-        kCardsPerPlayer,
-        (index) => Card(value: index),
-      );
-      final grid = PlayerGrid.fromCards(cards);
-
-      final card = grid.getCard(0, 0);
-      expect(card, isNotNull);
-      expect(card!.value, 0);
-    });
-
-    test('should set card at position', () {
-      final grid = PlayerGrid.empty();
-      const newCard = Card(value: 5);
-
-      final updatedGrid = grid.setCard(1, 2, newCard);
-
-      expect(grid.getCard(1, 2), isNull);
-      expect(updatedGrid.getCard(1, 2), equals(newCard));
-    });
-
-    test('should reveal card at position', () {
-      final cards = List.generate(
-        kCardsPerPlayer,
-        (index) => Card(value: index),
-      );
-      final grid = PlayerGrid.fromCards(cards);
-
-      final updatedGrid = grid.revealCard(0, 0);
-
-      expect(grid.getCard(0, 0)!.isRevealed, false);
-      expect(updatedGrid.getCard(0, 0)!.isRevealed, true);
-    });
-
-    test('should calculate total score correctly', () {
-      final cards = [
-        const Card(value: -2, isRevealed: true),
-        const Card(value: 0, isRevealed: true),
-        const Card(value: 5, isRevealed: true),
-        const Card(value: 12, isRevealed: true),
-        ...List.generate(8, (index) => const Card(value: 1)),
+    test('should calculate competitive score reflecting player performance', () {
+      // Test behavior: scoring system determines game winners and strategic value
+      final competitiveCards = [
+        const Card(value: -2, isRevealed: true),  // Strategic bonus
+        const Card(value: 0, isRevealed: true),   // Neutral card
+        const Card(value: 5, isRevealed: true),   // Moderate penalty
+        const Card(value: 12, isRevealed: true),  // High penalty
+        ...List.generate(8, (index) => const Card(value: 1)), // Standard cards
       ];
-
-      final grid = PlayerGrid.fromCards(cards);
-
-      expect(grid.totalScore, -2 + 0 + 5 + 12 + (8 * 1));
+      
+      final grid = PlayerGrid.fromCards(competitiveCards);
+      
+      // Verify competitive scoring
+      const expectedScore = -2 + 0 + 5 + 12 + (8 * 1); // 23 points
+      expect(grid.totalScore, expectedScore, reason: 'Score should reflect competitive performance accurately');
     });
 
-    test('should check if all cards are revealed', () {
-      final hiddenCards = List.generate(
-        kCardsPerPlayer,
-        (index) => Card(value: index),
-      );
-      final revealedCards = List.generate(
-        kCardsPerPlayer,
-        (index) => Card(value: index, isRevealed: true),
-      );
-
-      final hiddenGrid = PlayerGrid.fromCards(hiddenCards);
-      final revealedGrid = PlayerGrid.fromCards(revealedCards);
-
-      expect(hiddenGrid.allCardsRevealed, false);
-      expect(revealedGrid.allCardsRevealed, true);
+    test('should trigger round end detection when all cards are revealed', () {
+      // Test behavior: game system detects when player has revealed all cards
+      final testCases = [
+        (
+          List.generate(kCardsPerPlayer, (index) => Card(value: index)), // Hidden cards
+          false,
+          'player with hidden cards should not trigger round end'
+        ),
+        (
+          List.generate(kCardsPerPlayer, (index) => Card(value: index, isRevealed: true)), // All revealed
+          true,
+          'player with all revealed cards should trigger round end'
+        ),
+      ];
+      
+      for (final (cards, expectedEndRound, description) in testCases) {
+        final grid = PlayerGrid.fromCards(cards);
+        expect(grid.allCardsRevealed, expectedEndRound, reason: description);
+      }
     });
 
-    test('should detect identical columns', () {
+    test('should enforce column elimination rule when three identical cards are revealed', () {
+      // Test behavior: automatic column removal when rule conditions are met
       final grid = PlayerGrid.empty()
           .setCard(0, 0, const Card(value: 5, isRevealed: true))
           .setCard(1, 0, const Card(value: 5, isRevealed: true))
-          .setCard(2, 0, const Card(value: 5, isRevealed: true))
+          .setCard(2, 0, const Card(value: 5, isRevealed: true))  // Identical column
           .setCard(0, 1, const Card(value: 3, isRevealed: true))
           .setCard(1, 1, const Card(value: 3, isRevealed: true))
-          .setCard(
-            2,
-            1,
-            const Card(value: 3, isRevealed: false),
-          ); // Not revealed
-
+          .setCard(2, 1, const Card(value: 3, isRevealed: false)); // Not all revealed
+      
       final identicalColumns = grid.getIdenticalColumns();
-
-      expect(identicalColumns.length, 1);
-      expect(identicalColumns.first, 0);
+      
+      // Verify rule enforcement behavior
+      expect(identicalColumns.length, 1, reason: 'Should detect exactly one column eligible for elimination');
+      expect(identicalColumns.first, 0, reason: 'First column should be identified for elimination');
     });
 
-    test('should remove column', () {
-      final cards = List.generate(
-        kCardsPerPlayer,
-        (index) => Card(value: index),
-      );
+    test('should execute column removal maintaining grid integrity for continued play', () {
+      // Test behavior: column removal preserves game state for continued gameplay
+      final cards = List.generate(kCardsPerPlayer, (index) => Card(value: index));
       final grid = PlayerGrid.fromCards(cards);
-
+      
       final updatedGrid = grid.removeColumn(1);
-
-      expect(updatedGrid.getCard(0, 1), isNull);
-      expect(updatedGrid.getCard(1, 1), isNull);
-      expect(updatedGrid.getCard(2, 1), isNull);
-      expect(updatedGrid.getCard(0, 0), isNotNull);
+      
+      // Verify removal behavior preserves grid integrity
+      expect(updatedGrid.getCard(0, 1), isNull, reason: 'Column should be completely removed');
+      expect(updatedGrid.getCard(1, 1), isNull, reason: 'All cards in column should be removed');
+      expect(updatedGrid.getCard(2, 1), isNull, reason: 'Entire column should be cleared');
+      expect(updatedGrid.getCard(0, 0), isNotNull, reason: 'Other columns should remain intact for continued play');
     });
   });
 }

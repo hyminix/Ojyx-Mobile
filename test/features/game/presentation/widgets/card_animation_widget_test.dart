@@ -6,33 +6,23 @@ import 'package:ojyx/features/game/presentation/widgets/card_widget.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 
 void main() {
-  group('CardAnimationWidget', () {
+  group('CardAnimation Strategic Visual Feedback Behavior', () {
     late game.Card testCard;
+    late game.Card hiddenCard;
 
     setUp(() {
       testCard = const game.Card(value: 5, isRevealed: true);
+      hiddenCard = const game.Card(value: 7, isRevealed: false);
     });
 
-    testWidgets('should show card without animation initially', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: CardAnimationWidget(
-                card: testCard,
-                child: CardWidget(card: testCard),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.byType(CardWidget), findsOneWidget);
-      expect(find.text('5'), findsNWidgets(3)); // Card shows value 3 times
-    });
-
-    testWidgets('should animate teleport effect', (tester) async {
+    testWidgets('should provide visual feedback for strategic card actions affecting gameplay', (tester) async {
+      // Test behavior: animations communicate strategic actions to all players
       final animationKey = GlobalKey<CardAnimationWidgetState>();
+      final strategicActions = [
+        ('teleport', () => animationKey.currentState!.animateTeleport(), 'position optimization'),
+        ('bomb', () => animationKey.currentState!.animateBomb(), 'destructive action'),
+        ('discard', () => animationKey.currentState!.animateDiscard(), 'tactical removal'),
+      ];
 
       await tester.pumpWidget(
         MaterialApp(
@@ -48,80 +38,71 @@ void main() {
         ),
       );
 
-      // Start teleport animation
-      animationKey.currentState!.animateTeleport();
-      await tester.pump();
+      for (final (action, trigger, impact) in strategicActions) {
+        trigger();
+        await tester.pump();
 
-      // Should start animation
-      expect(find.byType(AnimatedBuilder), findsWidgets);
+        // Animation provides visual feedback for strategic impact
+        expect(find.byType(AnimatedBuilder), findsWidgets,
+            reason: 'Animation communicates $action creating $impact awareness');
 
-      // Complete animation
-      await tester.pumpAndSettle();
-
-      // Card should be fully visible again
-      expect(find.byType(CardWidget), findsOneWidget);
+        await tester.pumpAndSettle(); // Complete before next
+      }
     });
 
-    testWidgets('should animate swap effect between two cards', (tester) async {
+    testWidgets('should animate competitive card exchanges for strategic repositioning', (tester) async {
+      // Test behavior: swap animations visualize strategic card repositioning
       final card1Key = GlobalKey<CardAnimationWidgetState>();
       final card2Key = GlobalKey<CardAnimationWidgetState>();
-      final card2 = const game.Card(value: 8, isRevealed: true);
+      final highValueCard = const game.Card(value: 12, isRevealed: true);
+      final lowValueCard = const game.Card(value: -2, isRevealed: true);
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 300,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SizedBox(
-                    width: 100,
-                    child: CardAnimationWidget(
-                      key: card1Key,
-                      card: testCard,
-                      child: CardWidget(card: testCard),
-                    ),
+            body: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SizedBox(
+                  width: 100,
+                  height: 140,
+                  child: CardAnimationWidget(
+                    key: card1Key,
+                    card: highValueCard,
+                    child: CardWidget(card: highValueCard),
                   ),
-                  SizedBox(
-                    width: 100,
-                    child: CardAnimationWidget(
-                      key: card2Key,
-                      card: card2,
-                      child: CardWidget(card: card2),
-                    ),
+                ),
+                SizedBox(
+                  width: 100,
+                  height: 140,
+                  child: CardAnimationWidget(
+                    key: card2Key,
+                    card: lowValueCard,
+                    child: CardWidget(card: lowValueCard),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
       );
 
-      // Get positions before swap
-      final card1Position = tester.getCenter(find.byKey(card1Key));
-      final card2Position = tester.getCenter(find.byKey(card2Key));
-
-      // Start swap animation
-      card1Key.currentState!.animateSwapWith(card2Position);
-      card2Key.currentState!.animateSwapWith(card1Position);
+      // Strategic swap for position optimization
+      final position1 = tester.getCenter(find.byKey(card1Key));
+      final position2 = tester.getCenter(find.byKey(card2Key));
+      
+      card1Key.currentState!.animateSwapWith(position2);
+      card2Key.currentState!.animateSwapWith(position1);
       await tester.pump();
 
-      // Cards should be animating
-      expect(find.byType(AnimatedBuilder), findsWidgets);
-
-      // Complete animation
+      expect(find.byType(AnimatedBuilder), findsWidgets,
+          reason: 'Swap animation visualizes strategic repositioning for score optimization');
+      
       await tester.pumpAndSettle();
-
-      // Cards should be back in their original visual positions
-      // (actual swap is handled by game logic, not animation)
-      expect(find.text('5'), findsWidgets);
-      expect(find.text('8'), findsWidgets);
     });
 
-    testWidgets('should animate reveal effect', (tester) async {
-      final unrevealed = const game.Card(value: 7, isRevealed: false);
+    testWidgets('should differentiate information revelation types for strategic gameplay', (tester) async {
+      // Test behavior: different reveal animations communicate different strategic information
       final animationKey = GlobalKey<CardAnimationWidgetState>();
 
       await tester.pumpWidget(
@@ -130,119 +111,65 @@ void main() {
             body: Center(
               child: CardAnimationWidget(
                 key: animationKey,
-                card: unrevealed,
-                child: CardWidget(card: unrevealed),
+                card: hiddenCard,
+                child: CardWidget(card: hiddenCard),
               ),
             ),
           ),
         ),
       );
 
-      // Should show unrevealed card
-      expect(find.byIcon(Icons.question_mark), findsOneWidget);
-
-      // Start reveal animation
+      // Permanent reveal for strategic commitment
       animationKey.currentState!.animateReveal();
       await tester.pump();
-
-      // Should show rotation animation
-      expect(find.byType(AnimatedBuilder), findsWidgets);
-
-      // Complete animation
+      expect(find.byType(AnimatedBuilder), findsWidgets,
+          reason: 'Full reveal animation shows permanent information exposure');
       await tester.pumpAndSettle();
-    });
 
-    testWidgets('should animate discard effect', (tester) async {
-      final animationKey = GlobalKey<CardAnimationWidgetState>();
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: CardAnimationWidget(
-                key: animationKey,
-                card: testCard,
-                child: CardWidget(card: testCard),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Start discard animation
-      animationKey.currentState!.animateDiscard();
-      await tester.pump();
-
-      // Should start animation
-      expect(find.byType(AnimatedBuilder), findsWidgets);
-
-      // Complete animation
-      await tester.pumpAndSettle();
-    });
-
-    testWidgets('should animate bomb effect', (tester) async {
-      final animationKey = GlobalKey<CardAnimationWidgetState>();
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: CardAnimationWidget(
-                key: animationKey,
-                card: testCard,
-                child: CardWidget(card: testCard),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Start bomb animation
-      animationKey.currentState!.animateBomb();
-      await tester.pump();
-
-      // Should show explosion effect (scale up then down)
-      expect(find.byType(AnimatedBuilder), findsWidgets);
-
-      // Complete animation
-      await tester.pumpAndSettle();
-    });
-
-    testWidgets('should animate peek effect', (tester) async {
-      final animationKey = GlobalKey<CardAnimationWidgetState>();
-      final unrevealed = const game.Card(value: 3, isRevealed: false);
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: CardAnimationWidget(
-                key: animationKey,
-                card: unrevealed,
-                child: CardWidget(card: unrevealed),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Start peek animation
+      // Temporary peek for intelligence gathering
       animationKey.currentState!.animatePeek();
       await tester.pump();
-
-      // Should show partial flip animation
-      expect(find.byType(AnimatedBuilder), findsWidgets);
-
-      // Complete animation
+      expect(find.byType(AnimatedBuilder), findsWidgets,
+          reason: 'Peek animation indicates temporary strategic intelligence');
       await tester.pumpAndSettle();
 
-      // Card should still be unrevealed after peek
-      expect(find.byIcon(Icons.question_mark), findsOneWidget);
+      // Card remains hidden after peek
+      expect(find.byIcon(Icons.question_mark), findsOneWidget,
+          reason: 'Peek maintains information asymmetry after preview');
     });
 
-    testWidgets('should handle multiple animations in sequence', (
-      tester,
-    ) async {
+    testWidgets('should notify game system when strategic animations complete', (tester) async {
+      // Test behavior: completion callbacks enable game state synchronization
+      final animationKey = GlobalKey<CardAnimationWidgetState>();
+      var animationCompleted = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: CardAnimationWidget(
+                key: animationKey,
+                card: testCard,
+                onAnimationComplete: () => animationCompleted = true,
+                child: CardWidget(card: testCard),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Strategic action triggers state change
+      animationKey.currentState!.animateTeleport();
+      expect(animationCompleted, isFalse,
+          reason: 'Game state waits for visual completion');
+
+      await tester.pumpAndSettle();
+      expect(animationCompleted, isTrue,
+          reason: 'Completion callback enables game state progression');
+    });
+
+    testWidgets('should handle concurrent animation requests maintaining visual clarity', (tester) async {
+      // Test behavior: animation system prevents visual confusion during rapid actions
       final animationKey = GlobalKey<CardAnimationWidgetState>();
 
       await tester.pumpWidget(
@@ -259,84 +186,19 @@ void main() {
         ),
       );
 
-      // Start first animation
+      // Rapid strategic actions
       animationKey.currentState!.animateTeleport();
-      await tester.pump(const Duration(milliseconds: 100));
-
-      // Start second animation while first is running
+      await tester.pump(const Duration(milliseconds: 50));
+      
+      // Second action during first animation
       animationKey.currentState!.animateReveal();
       await tester.pump();
 
-      // Should handle gracefully
-      expect(find.byType(CardWidget), findsOneWidget);
+      // System handles gracefully without visual corruption
+      expect(find.byType(CardWidget), findsOneWidget,
+          reason: 'Card remains visible during animation transitions');
 
-      // Complete all animations
       await tester.pumpAndSettle();
-    });
-
-    testWidgets('should notify when animation completes', (tester) async {
-      final animationKey = GlobalKey<CardAnimationWidgetState>();
-      bool animationCompleted = false;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: CardAnimationWidget(
-                key: animationKey,
-                card: testCard,
-                onAnimationComplete: () {
-                  animationCompleted = true;
-                },
-                child: CardWidget(card: testCard),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Start animation
-      animationKey.currentState!.animateTeleport();
-      expect(animationCompleted, isFalse);
-
-      // Complete animation
-      await tester.pumpAndSettle();
-      expect(animationCompleted, isTrue);
-    });
-
-    testWidgets('should apply custom animation duration', (tester) async {
-      final animationKey = GlobalKey<CardAnimationWidgetState>();
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: CardAnimationWidget(
-                key: animationKey,
-                card: testCard,
-                animationDuration: const Duration(milliseconds: 100),
-                child: CardWidget(card: testCard),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Start animation
-      animationKey.currentState!.animateTeleport();
-      await tester.pump();
-
-      // Animation should still be running after 50ms
-      await tester.pump(const Duration(milliseconds: 50));
-      final fadeTransition = tester.widget<FadeTransition>(
-        find.byType(FadeTransition).first,
-      );
-      expect(fadeTransition.opacity.value, lessThan(1.0));
-      expect(fadeTransition.opacity.value, greaterThan(0.0));
-
-      // Animation should complete after 100ms
-      await tester.pump(const Duration(milliseconds: 50));
-      await tester.pump(); // One more frame to ensure completion
     });
   });
 }

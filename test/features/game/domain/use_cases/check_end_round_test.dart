@@ -12,21 +12,6 @@ void main() {
     checkEndRound = CheckEndRound();
   });
 
-  // Helper to create a full grid with specific values
-  PlayerGrid createFullGrid(List<int> values) {
-    var grid = PlayerGrid.empty();
-    int valueIndex = 0;
-
-    for (int row = 0; row < 3; row++) {
-      for (int col = 0; col < 4; col++) {
-        final value = valueIndex < values.length ? values[valueIndex] : 0;
-        grid = grid.placeCard(Card(value: value, isRevealed: true), row, col);
-        valueIndex++;
-      }
-    }
-
-    return grid;
-  }
 
   group('CheckEndRound UseCase', () {
     test('should continue to next player when not in last round', () async {
@@ -67,242 +52,152 @@ void main() {
       });
     });
 
-    test(
-      'should end round when last player finished their last turn',
-      () async {
-        // Create players with different scores - fill all 12 positions
-        var grid1 = PlayerGrid.empty();
-        var grid2 = PlayerGrid.empty();
-        var grid3 = PlayerGrid.empty();
-
-        // Fill grid1 with cards totaling 6
-        grid1 = grid1.placeCard(const Card(value: 5, isRevealed: true), 0, 0);
-        grid1 = grid1.placeCard(const Card(value: 3, isRevealed: true), 0, 1);
-        grid1 = grid1.placeCard(const Card(value: -2, isRevealed: true), 1, 0);
-        // Fill remaining positions with 0-value cards
-        for (int row = 0; row < 3; row++) {
-          for (int col = 0; col < 4; col++) {
-            if (grid1.cards[row][col] == null) {
-              grid1 = grid1.placeCard(
-                const Card(value: 0, isRevealed: true),
-                row,
-                col,
-              );
-            }
-          }
-        }
-
-        // Fill grid2 with cards totaling 18
-        grid2 = grid2.placeCard(const Card(value: 10, isRevealed: true), 0, 0);
-        grid2 = grid2.placeCard(const Card(value: 8, isRevealed: true), 0, 1);
-        // Fill remaining with 0s
-        for (int row = 0; row < 3; row++) {
-          for (int col = 0; col < 4; col++) {
-            if (grid2.cards[row][col] == null) {
-              grid2 = grid2.placeCard(
-                const Card(value: 0, isRevealed: true),
-                row,
-                col,
-              );
-            }
-          }
-        }
-
-        // Fill grid3 with cards totaling 3
-        grid3 = grid3.placeCard(const Card(value: 2, isRevealed: true), 0, 0);
-        grid3 = grid3.placeCard(const Card(value: 1, isRevealed: true), 0, 1);
-        // Fill remaining with 0s
-        for (int row = 0; row < 3; row++) {
-          for (int col = 0; col < 4; col++) {
-            if (grid3.cards[row][col] == null) {
-              grid3 = grid3.placeCard(
-                const Card(value: 0, isRevealed: true),
-                row,
-                col,
-              );
-            }
-          }
-        }
-
-        final players = [
-          GamePlayer(
-            id: 'player1',
-            name: 'GamePlayer 1',
-            grid: grid1,
-            isHost: true,
-          ),
-          GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
-          GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: grid3),
-        ];
-
-        final gameState = GameState.initial(roomId: 'room123', players: players)
-            .copyWith(
-              status: GameStatus.lastRound,
-              currentPlayerIndex: 2, // Last player
-              endRoundInitiator: 'player1',
-            );
-
-        final result = await checkEndRound(
-          CheckEndRoundParams(gameState: gameState),
-        );
-
-        expect(result.isRight(), true);
-
-        result.fold((failure) => fail('Should not fail'), (newState) {
-          // Should end the round
-          expect(newState.status, GameStatus.finished);
-
-          // Check scores are calculated
-          // GamePlayer 1 is initiator with score 6, player 3 has lowest (3)
-          // So player 1 gets double penalty
-          expect(newState.players[0].currentScore, 12); // (5 + 3 + (-2)) * 2
-          expect(newState.players[1].currentScore, 18); // 10 + 8 + 0s
-          expect(newState.players[2].currentScore, 3); // 2 + 1 + 0s (lowest)
-        });
-      },
-    );
-
-    test(
-      'should apply double penalty if initiator does not have lowest score',
-      () async {
-        // Initiator has higher score than another player
-        var grid1 = PlayerGrid.empty();
-        var grid2 = PlayerGrid.empty();
-
-        // Fill grid1 with total score 20
-        grid1 = grid1.placeCard(const Card(value: 10, isRevealed: true), 0, 0);
-        grid1 = grid1.placeCard(const Card(value: 10, isRevealed: true), 0, 1);
-        // Fill remaining with 0s
-        for (int row = 0; row < 3; row++) {
-          for (int col = 0; col < 4; col++) {
-            if (grid1.cards[row][col] == null) {
-              grid1 = grid1.placeCard(
-                const Card(value: 0, isRevealed: true),
-                row,
-                col,
-              );
-            }
-          }
-        }
-
-        // Fill grid2 with total score 5
-        grid2 = grid2.placeCard(const Card(value: 2, isRevealed: true), 0, 0);
-        grid2 = grid2.placeCard(const Card(value: 3, isRevealed: true), 0, 1);
-        // Fill remaining with 0s
-        for (int row = 0; row < 3; row++) {
-          for (int col = 0; col < 4; col++) {
-            if (grid2.cards[row][col] == null) {
-              grid2 = grid2.placeCard(
-                const Card(value: 0, isRevealed: true),
-                row,
-                col,
-              );
-            }
-          }
-        }
-
-        final players = [
-          GamePlayer(
-            id: 'player1',
-            name: 'GamePlayer 1',
-            grid: grid1,
-            isHost: true,
-          ),
-          GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
-        ];
-
-        final gameState = GameState.initial(roomId: 'room123', players: players)
-            .copyWith(
-              status: GameStatus.lastRound,
-              currentPlayerIndex: 1, // Last player
-              endRoundInitiator:
-                  'player1', // Initiator who doesn't have lowest score
-            );
-
-        final result = await checkEndRound(
-          CheckEndRoundParams(gameState: gameState),
-        );
-
-        expect(result.isRight(), true);
-
-        result.fold((failure) => fail('Should not fail'), (newState) {
-          // Initiator should have double penalty
-          expect(newState.players[0].currentScore, 40); // 20 * 2
-          expect(newState.players[1].currentScore, 5); // No penalty
-        });
-      },
-    );
-
-    test('should not apply penalty if initiator has lowest score', () async {
-      // Initiator has lowest score
-      final grid1 = createFullGrid([1, 2]); // Score: 3 (lowest)
-      final grid2 = createFullGrid([10, 8]); // Score: 18
-
+    test('should end game when last player of last round completes turn', () async {
+      // Arrange: Game in last round with simple scores
       final players = [
         GamePlayer(
           id: 'player1',
-          name: 'GamePlayer 1',
-          grid: grid1,
+          name: 'Round Initiator',
+          grid: PlayerGrid.empty()
+              .placeCard(const Card(value: 5, isRevealed: true), 0, 0)
+              .placeCard(const Card(value: 3, isRevealed: true), 0, 1),
           isHost: true,
         ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
+        GamePlayer(
+          id: 'player2',
+          name: 'Higher Score Player',
+          grid: PlayerGrid.empty()
+              .placeCard(const Card(value: 10, isRevealed: true), 0, 0)
+              .placeCard(const Card(value: 8, isRevealed: true), 0, 1),
+        ),
+        GamePlayer(
+          id: 'player3',
+          name: 'Lowest Score Player',
+          grid: PlayerGrid.empty()
+              .placeCard(const Card(value: 2, isRevealed: true), 0, 0)
+              .placeCard(const Card(value: 1, isRevealed: true), 0, 1),
+        ),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
           .copyWith(
             status: GameStatus.lastRound,
-            currentPlayerIndex: 1,
-            endRoundInitiator: 'player1', // Initiator with lowest score
+            currentPlayerIndex: 2, // Last player's turn
+            endRoundInitiator: 'player1',
           );
 
+      // Act: Check if round ends
       final result = await checkEndRound(
         CheckEndRoundParams(gameState: gameState),
       );
 
+      // Assert: Game should finish and apply double penalty rule
       expect(result.isRight(), true);
+      result.fold((failure) => fail('Should not fail'), (finalState) {
+        expect(finalState.status, GameStatus.finished);
+        
+        // Initiator should get double penalty for not having lowest score
+        expect(finalState.players[0].currentScore, 16); // (5 + 3) * 2
+        expect(finalState.players[1].currentScore, 18); // 10 + 8
+        expect(finalState.players[2].currentScore, 3);  // 2 + 1 (lowest)
+      });
+    });
 
-      result.fold((failure) => fail('Should not fail'), (newState) {
-        // No penalty applied
-        expect(newState.players[0].currentScore, 3);
-        expect(newState.players[1].currentScore, 18);
+
+    test('should handle double penalty rule correctly for round initiator', () async {
+      // Arrange: Test both penalty scenarios
+      // Scenario 1: Initiator with lowest score (no penalty)
+      final winnersGrid = PlayerGrid.empty()
+          .placeCard(const Card(value: 1, isRevealed: true), 0, 0)
+          .placeCard(const Card(value: 2, isRevealed: true), 0, 1);
+      
+      final losersGrid = PlayerGrid.empty()
+          .placeCard(const Card(value: 10, isRevealed: true), 0, 0)
+          .placeCard(const Card(value: 8, isRevealed: true), 0, 1);
+
+      // Test no penalty when initiator has lowest score
+      final scenarioA = GameState.initial(
+        roomId: 'room123',
+        players: [
+          GamePlayer(id: 'winner', name: 'Winner Initiator', grid: winnersGrid, isHost: true),
+          GamePlayer(id: 'loser', name: 'High Score Player', grid: losersGrid),
+        ],
+      ).copyWith(
+        status: GameStatus.lastRound,
+        currentPlayerIndex: 1,
+        endRoundInitiator: 'winner',
+      );
+
+      final resultA = await checkEndRound(CheckEndRoundParams(gameState: scenarioA));
+      
+      // Test double penalty when initiator doesn't have lowest score
+      final scenarioB = GameState.initial(
+        roomId: 'room123',
+        players: [
+          GamePlayer(id: 'loser', name: 'Loser Initiator', grid: losersGrid, isHost: true),
+          GamePlayer(id: 'winner', name: 'Low Score Player', grid: winnersGrid),
+        ],
+      ).copyWith(
+        status: GameStatus.lastRound,
+        currentPlayerIndex: 1,
+        endRoundInitiator: 'loser',
+      );
+
+      final resultB = await checkEndRound(CheckEndRoundParams(gameState: scenarioB));
+
+      // Assert both scenarios
+      expect(resultA.isRight() && resultB.isRight(), true);
+      
+      resultA.fold((failure) => fail('Should not fail'), (stateA) {
+        // No penalty when initiator has lowest score
+        expect(stateA.players[0].currentScore, 3);  // 1 + 2
+        expect(stateA.players[1].currentScore, 18); // 10 + 8
+      });
+      
+      resultB.fold((failure) => fail('Should not fail'), (stateB) {
+        // Double penalty when initiator doesn't have lowest score
+        expect(stateB.players[0].currentScore, 36); // (10 + 8) * 2
+        expect(stateB.players[1].currentScore, 3);  // 1 + 2
       });
     });
 
     test('should handle tied lowest scores correctly', () async {
-      // Two players with same lowest score
-      final grid1 = createFullGrid([2, 3]); // Score: 5
-      final grid2 = createFullGrid([1, 4]); // Score: 5 (tied)
-      final grid3 = createFullGrid([10]); // Score: 10
+      // Arrange: Players with tied lowest scores
+      final tiedGrid1 = PlayerGrid.empty()
+          .placeCard(const Card(value: 2, isRevealed: true), 0, 0)
+          .placeCard(const Card(value: 3, isRevealed: true), 0, 1);
+      
+      final tiedGrid2 = PlayerGrid.empty()
+          .placeCard(const Card(value: 1, isRevealed: true), 0, 0)
+          .placeCard(const Card(value: 4, isRevealed: true), 0, 1);
+      
+      final highGrid = PlayerGrid.empty()
+          .placeCard(const Card(value: 10, isRevealed: true), 0, 0);
 
       final players = [
-        GamePlayer(
-          id: 'player1',
-          name: 'GamePlayer 1',
-          grid: grid1,
-          isHost: true,
-        ),
-        GamePlayer(id: 'player2', name: 'GamePlayer 2', grid: grid2),
-        GamePlayer(id: 'player3', name: 'GamePlayer 3', grid: grid3),
+        GamePlayer(id: 'tied1', name: 'Tied Player 1', grid: tiedGrid1, isHost: true),
+        GamePlayer(id: 'tied2', name: 'Tied Player 2', grid: tiedGrid2),
+        GamePlayer(id: 'high', name: 'High Score Initiator', grid: highGrid),
       ];
 
       final gameState = GameState.initial(roomId: 'room123', players: players)
           .copyWith(
             status: GameStatus.lastRound,
             currentPlayerIndex: 2,
-            endRoundInitiator: 'player3', // Initiator doesn't have lowest
+            endRoundInitiator: 'high', // Initiator with highest score
           );
 
+      // Act: Check end round
       final result = await checkEndRound(
         CheckEndRoundParams(gameState: gameState),
       );
 
+      // Assert: Initiator gets penalty despite ties
       expect(result.isRight(), true);
-
       result.fold((failure) => fail('Should not fail'), (newState) {
-        // Initiator should have penalty (not tied for lowest)
-        expect(newState.players[2].currentScore, 20); // 10 * 2
-        expect(newState.players[0].currentScore, 5);
-        expect(newState.players[1].currentScore, 5);
+        expect(newState.players[2].currentScore, 20); // 10 * 2 (penalty)
+        expect(newState.players[0].currentScore, 5);  // 2 + 3 (tied)
+        expect(newState.players[1].currentScore, 5);  // 1 + 4 (tied)
       });
     });
 

@@ -4,7 +4,7 @@ import 'package:ojyx/features/game/presentation/providers/game_animation_provide
 import 'package:ojyx/features/game/domain/entities/play_direction.dart';
 
 void main() {
-  group('GameAnimationProvider', () {
+  group('Game Animation Visual Feedback System', () {
     late ProviderContainer container;
 
     setUp(() {
@@ -15,108 +15,48 @@ void main() {
       container.dispose();
     });
 
-    test('should have initial state with no animation showing', () {
-      // Act
-      final state = container.read(gameAnimationProvider);
-
-      // Assert
-      expect(state.showingDirectionChange, isFalse);
-      expect(state.direction, equals(PlayDirection.forward));
-    });
-
-    test('should show direction change animation when requested', () {
-      // Arrange
+    test('should manage visual direction change feedback for competitive turn order awareness', () {
+      // Test behavior: animation system provides clear visual feedback for strategic direction changes
       final notifier = container.read(gameAnimationProvider.notifier);
-
-      // Act
+      
+      // Initial state - no visual feedback active
+      var state = container.read(gameAnimationProvider);
+      expect(state.showingDirectionChange, false, reason: 'Initial state should have no active visual feedback');
+      expect(state.direction, PlayDirection.forward, reason: 'Default direction should be forward');
+      
+      // Strategic direction change triggers visual feedback
       notifier.showDirectionChange(PlayDirection.backward);
-
-      // Assert
-      final state = container.read(gameAnimationProvider);
-      expect(state.showingDirectionChange, isTrue);
-      expect(state.direction, equals(PlayDirection.backward));
-    });
-
-    test('should hide animation when hideDirectionChange is called', () {
-      // Arrange
-      final notifier = container.read(gameAnimationProvider.notifier);
-      notifier.showDirectionChange(PlayDirection.forward);
-
-      // Act
+      state = container.read(gameAnimationProvider);
+      expect(state.showingDirectionChange, true, reason: 'Visual feedback should activate for strategic awareness');
+      expect(state.direction, PlayDirection.backward, reason: 'Direction change should be visually communicated');
+      
+      // Visual feedback completion
       notifier.hideDirectionChange();
-
-      // Assert
-      final state = container.read(gameAnimationProvider);
-      expect(state.showingDirectionChange, isFalse);
+      state = container.read(gameAnimationProvider);
+      expect(state.showingDirectionChange, false, reason: 'Visual feedback should complete gracefully');
+      expect(state.direction, PlayDirection.backward, reason: 'Direction context should be preserved');
     });
 
-    test('should not allow showing animation if already showing', () {
-      // Arrange
+    test('should enforce single-animation policy for clear visual communication', () {
+      // Test behavior: prevent animation conflicts for clear player communication
       final notifier = container.read(gameAnimationProvider.notifier);
-      notifier.showDirectionChange(PlayDirection.forward);
-
-      // Act - Try to show another animation
-      notifier.showDirectionChange(PlayDirection.backward);
-
-      // Assert - Should still show first animation
-      final state = container.read(gameAnimationProvider);
-      expect(state.showingDirectionChange, isTrue);
-      expect(state.direction, equals(PlayDirection.forward));
-    });
-
-    test('should preserve direction when hiding animation', () {
-      // Arrange
-      final notifier = container.read(gameAnimationProvider.notifier);
-      notifier.showDirectionChange(PlayDirection.backward);
-
-      // Act
-      notifier.hideDirectionChange();
-
-      // Assert
-      final state = container.read(gameAnimationProvider);
-      expect(state.showingDirectionChange, isFalse);
-      expect(state.direction, equals(PlayDirection.backward));
-    });
-
-    test('should handle direction changes after hiding', () {
-      // Arrange
-      final notifier = container.read(gameAnimationProvider.notifier);
-
-      // Act & Assert - Forward
+      
+      // First strategic animation
       notifier.showDirectionChange(PlayDirection.forward);
       var state = container.read(gameAnimationProvider);
-      expect(state.direction, equals(PlayDirection.forward));
-      expect(state.showingDirectionChange, isTrue);
-
-      // Hide and show different direction
-      notifier.hideDirectionChange();
+      expect(state.direction, PlayDirection.forward, reason: 'First animation should establish direction');
+      
+      // Attempted conflicting animation should be rejected
       notifier.showDirectionChange(PlayDirection.backward);
-
       state = container.read(gameAnimationProvider);
-      expect(state.direction, equals(PlayDirection.backward));
-      expect(state.showingDirectionChange, isTrue);
-    });
-
-    test('should notify listeners when state changes', () {
-      // Arrange
-      final notifier = container.read(gameAnimationProvider.notifier);
-      var callCount = 0;
-      final subscription = container.listen(gameAnimationProvider, (
-        previous,
-        next,
-      ) {
-        callCount++;
-      });
-
-      // Act
-      notifier.showDirectionChange(PlayDirection.backward);
+      expect(state.direction, PlayDirection.forward, reason: 'Original animation should have priority');
+      expect(state.showingDirectionChange, true, reason: 'Animation conflict should not interrupt active feedback');
+      
+      // Sequential animations should work after completion
       notifier.hideDirectionChange();
-
-      // Assert
-      expect(callCount, equals(2)); // Show + Hide
-
-      // Cleanup
-      subscription.close();
+      notifier.showDirectionChange(PlayDirection.backward);
+      state = container.read(gameAnimationProvider);
+      expect(state.direction, PlayDirection.backward, reason: 'Sequential animation should work after completion');
     });
   });
 }

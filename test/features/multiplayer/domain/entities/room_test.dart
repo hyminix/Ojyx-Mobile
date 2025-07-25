@@ -2,114 +2,94 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
 
 void main() {
-  group('Room Entity', () {
-    test('should create a valid room with waiting status', () {
-      // Arrange & Act
-      final room = Room(
-        id: 'room-123',
-        creatorId: 'user-123',
-        playerIds: ['user-123'],
+  group('Room Behavior for Competitive Multiplayer Gaming Coordination', () {
+    test('should enable complete room lifecycle management for strategic competitive multiplayer gaming', () {
+      // Test behavior: room entity supports full competitive gaming workflow from creation to completion
+      
+      final competitiveTimestamp = DateTime.now();
+      
+      // Room creation for competitive gameplay
+      final newCompetitiveRoom = Room(
+        id: 'strategic-arena-789',
+        creatorId: 'tournament-host-456',
+        playerIds: ['tournament-host-456'],
         status: RoomStatus.waiting,
-        maxPlayers: 4,
-        createdAt: DateTime.now(),
+        maxPlayers: 6,
+        createdAt: competitiveTimestamp,
       );
 
-      // Assert
-      expect(room.id, 'room-123');
-      expect(room.creatorId, 'user-123');
-      expect(room.playerIds, contains('user-123'));
-      expect(room.status, RoomStatus.waiting);
-      expect(room.maxPlayers, 4);
-      expect(room.currentGameId, isNull);
-    });
-
-    test('should add player to room', () {
-      // Arrange
-      final room = Room(
-        id: 'room-123',
-        creatorId: 'user-123',
-        playerIds: ['user-123'],
-        status: RoomStatus.waiting,
-        maxPlayers: 4,
-        createdAt: DateTime.now(),
+      expect(newCompetitiveRoom.id, 'strategic-arena-789', reason: 'Room should be uniquely identified for competitive tracking');
+      expect(newCompetitiveRoom.creatorId, 'tournament-host-456', reason: 'Host should be established for competitive game control');
+      expect(newCompetitiveRoom.playerIds, ['tournament-host-456'], reason: 'Creator should be initial participant in competitive room');
+      expect(newCompetitiveRoom.status, RoomStatus.waiting, reason: 'New rooms should be ready to accept competitive participants');
+      expect(newCompetitiveRoom.maxPlayers, 6, reason: 'Capacity should enable strategic group competitive gameplay');
+      expect(newCompetitiveRoom.currentGameId, isNull, reason: 'Unstarted rooms should not have active game references');
+      
+      // Player joining for competitive participation
+      final expandedCompetitiveRoom = newCompetitiveRoom.copyWith(
+        playerIds: [...newCompetitiveRoom.playerIds, 'strategic-competitor-123', 'tactical-player-789'],
       );
 
-      // Act
-      final updatedRoom = room.copyWith(
-        playerIds: [...room.playerIds, 'user-456'],
-      );
-
-      // Assert
-      expect(updatedRoom.playerIds.length, 2);
-      expect(updatedRoom.playerIds, contains('user-456'));
-    });
-
-    test('should change status to inGame when game starts', () {
-      // Arrange
-      final room = Room(
-        id: 'room-123',
-        creatorId: 'user-123',
-        playerIds: ['user-123', 'user-456'],
-        status: RoomStatus.waiting,
-        maxPlayers: 4,
-        createdAt: DateTime.now(),
-      );
-
-      // Act
-      final updatedRoom = room.copyWith(
+      expect(expandedCompetitiveRoom.playerIds.length, 3, reason: 'Room should expand to accommodate strategic competitive participants');
+      expect(expandedCompetitiveRoom.playerIds, contains('strategic-competitor-123'), reason: 'New competitors should be properly registered');
+      expect(expandedCompetitiveRoom.playerIds, contains('tactical-player-789'), reason: 'All strategic players should be tracked for competitive coordination');
+      
+      // Game initialization for competitive match start
+      final activeCompetitiveRoom = expandedCompetitiveRoom.copyWith(
         status: RoomStatus.inGame,
-        currentGameId: 'game-123',
+        currentGameId: 'tournament-match-555',
       );
 
-      // Assert
-      expect(updatedRoom.status, RoomStatus.inGame);
-      expect(updatedRoom.currentGameId, 'game-123');
+      expect(activeCompetitiveRoom.status, RoomStatus.inGame, reason: 'Room should transition to active state for competitive gameplay');
+      expect(activeCompetitiveRoom.currentGameId, 'tournament-match-555', reason: 'Active game reference should enable competitive match coordination');
+      
+      // Room completion for competitive archival
+      final completedCompetitiveRoom = activeCompetitiveRoom.copyWith(
+        status: RoomStatus.finished,
+        updatedAt: competitiveTimestamp.add(const Duration(hours: 1)),
+      );
+      
+      expect(completedCompetitiveRoom.status, RoomStatus.finished, reason: 'Completed rooms should reflect finished state for proper competitive archival');
+      expect(completedCompetitiveRoom.updatedAt?.isAfter(competitiveTimestamp), true, reason: 'Completion timestamp should enable accurate competitive duration tracking');
     });
-
-    test('should support value equality', () {
-      // Arrange
-      final now = DateTime.now();
-      final room1 = Room(
-        id: 'room-123',
-        creatorId: 'user-123',
-        playerIds: ['user-123'],
-        status: RoomStatus.waiting,
+    
+    test('should maintain room identity and support persistence for multiplayer game continuity', () {
+      // Test behavior: room entity ensures consistent identity and persistence across competitive sessions
+      
+      final persistenceTimestamp = DateTime.now();
+      
+      // Identical room creation for value equality verification
+      final originalCompetitiveRoom = Room(
+        id: 'persistent-competitive-arena-123',
+        creatorId: 'persistent-host-456',
+        playerIds: ['persistent-host-456', 'competitive-player-789'],
+        status: RoomStatus.inGame,
         maxPlayers: 4,
-        createdAt: now,
+        currentGameId: 'persistent-match-555',
+        createdAt: persistenceTimestamp,
+        updatedAt: persistenceTimestamp,
       );
-      final room2 = Room(
-        id: 'room-123',
-        creatorId: 'user-123',
-        playerIds: ['user-123'],
-        status: RoomStatus.waiting,
+      
+      final duplicateCompetitiveRoom = Room(
+        id: 'persistent-competitive-arena-123',
+        creatorId: 'persistent-host-456',
+        playerIds: ['persistent-host-456', 'competitive-player-789'],
+        status: RoomStatus.inGame,
         maxPlayers: 4,
-        createdAt: now,
-      );
-
-      // Assert
-      expect(room1, equals(room2));
-    });
-
-    test('should serialize to/from JSON', () {
-      // Arrange
-      final now = DateTime.now();
-      final room = Room(
-        id: 'room-123',
-        creatorId: 'user-123',
-        playerIds: ['user-123', 'user-456'],
-        status: RoomStatus.waiting,
-        maxPlayers: 4,
-        currentGameId: 'game-123',
-        createdAt: now,
-        updatedAt: now,
+        currentGameId: 'persistent-match-555',
+        createdAt: persistenceTimestamp,
+        updatedAt: persistenceTimestamp,
       );
 
-      // Act
-      final json = room.toJson();
-      final deserializedRoom = Room.fromJson(json);
+      expect(originalCompetitiveRoom, duplicateCompetitiveRoom, reason: 'Identical rooms should maintain value equality for consistent competitive state management');
+      
+      // Serialization for network persistence and synchronization
+      final serializedRoomData = originalCompetitiveRoom.toJson();
+      final deserializedRoom = Room.fromJson(serializedRoomData);
 
-      // Assert
-      expect(deserializedRoom, equals(room));
+      expect(deserializedRoom, originalCompetitiveRoom, reason: 'Room serialization should preserve all competitive state data for multiplayer continuity');
+      expect(deserializedRoom.playerIds.length, 2, reason: 'All competitive participants should be preserved through persistence');
+      expect(deserializedRoom.currentGameId, 'persistent-match-555', reason: 'Active game references should survive serialization for session continuity');
     });
   });
 }

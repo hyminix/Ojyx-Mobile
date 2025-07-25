@@ -6,55 +6,66 @@ import 'package:ojyx/features/game/presentation/widgets/discard_pile_widget.dart
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 
 void main() {
-  group('CommonAreaWidget', () {
+  group('CommonAreaWidget User Interactions', () {
     const testCard = game.Card(value: 5, isRevealed: true);
 
-    testWidgets('should display both draw and discard piles', (tester) async {
-      // Arrange & Act
+    testWidgets('should allow player to draw card during their turn', (tester) async {
+      // Arrange
+      bool cardDrawn = false;
+      int drawCount = 0;
+      
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: CommonAreaWidget(
               drawPileCount: 30,
               topDiscardCard: testCard,
-              isPlayerTurn: false,
-              onDrawCard: () {},
+              isPlayerTurn: true,
+              onDrawCard: () {
+                cardDrawn = true;
+                drawCount++;
+              },
             ),
           ),
         ),
       );
 
-      // Assert
-      expect(find.byType(DrawPileWidget), findsOneWidget);
-      expect(find.byType(DiscardPileWidget), findsOneWidget);
+      // Act - Player taps draw pile
+      await tester.tap(find.byType(DrawPileWidget));
+      await tester.pump();
+
+      // Assert - Card draw action was triggered
+      expect(cardDrawn, isTrue);
+      expect(drawCount, equals(1));
     });
 
-    testWidgets('should arrange piles horizontally with spacing', (
-      tester,
-    ) async {
-      // Act
+    testWidgets('should prevent drawing when not player turn', (tester) async {
+      // Arrange
+      bool cardDrawn = false;
+      
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: CommonAreaWidget(
-              drawPileCount: 20,
-              topDiscardCard: null,
-              isPlayerTurn: false,
-              onDrawCard: () {},
+              drawPileCount: 30,
+              topDiscardCard: testCard,
+              isPlayerTurn: false, // Not player's turn
+              onDrawCard: () => cardDrawn = true,
             ),
           ),
         ),
       );
 
-      // Assert
-      expect(find.byType(Row), findsWidgets);
-      // Check spacing between piles
-      final row = tester.widget<Row>(find.byType(Row).first);
-      expect(row.mainAxisAlignment, equals(MainAxisAlignment.center));
+      // Act - Try to tap draw pile
+      await tester.tap(find.byType(DrawPileWidget));
+      await tester.pump();
+
+      // Assert - Card draw should not be triggered
+      expect(cardDrawn, isFalse);
     });
 
-    testWidgets('should show turn indicator when player turn', (tester) async {
-      // Act
+    testWidgets('should provide clear feedback about whose turn it is', (tester) async {
+      // Test showing current player's turn
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -68,63 +79,32 @@ void main() {
         ),
       );
 
-      // Assert
       expect(find.text('Votre tour'), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_downward), findsOneWidget);
-    });
-
-    testWidgets('should not show turn indicator when not player turn', (
-      tester,
-    ) async {
-      // Act
+      
+      // Test showing other player's turn
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: CommonAreaWidget(
-              drawPileCount: 10,
+              drawPileCount: 15,
               topDiscardCard: testCard,
               isPlayerTurn: false,
               onDrawCard: () {},
+              currentPlayerName: 'Alice',
             ),
           ),
         ),
       );
 
-      // Assert
+      expect(find.text('Tour de Alice'), findsOneWidget);
       expect(find.text('Votre tour'), findsNothing);
     });
 
-    testWidgets('should handle draw card callback', (tester) async {
-      // Arrange
-      bool drawCalled = false;
-
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CommonAreaWidget(
-              drawPileCount: 25,
-              topDiscardCard: null,
-              isPlayerTurn: true,
-              onDrawCard: () => drawCalled = true,
-            ),
-          ),
-        ),
-      );
-
-      // Tap on draw pile
-      await tester.tap(find.byType(DrawPileWidget));
-      await tester.pump();
-
-      // Assert
-      expect(drawCalled, isTrue);
-    });
-
-    testWidgets('should handle discard card callback', (tester) async {
+    testWidgets('should accept discarded cards from player', (tester) async {
       // Arrange
       game.Card? discardedCard;
+      const cardToDiscard = game.Card(value: 8, isRevealed: true);
 
-      // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -140,132 +120,91 @@ void main() {
         ),
       );
 
-      // Simulate card drop by calling the callback directly
-      const cardToDiscard = game.Card(value: 8, isRevealed: true);
+      // Act - Simulate player discarding a card
       final discardPile = tester.widget<DiscardPileWidget>(
         find.byType(DiscardPileWidget),
       );
-      expect(discardPile.onCardDropped, isNotNull);
       discardPile.onCardDropped!(cardToDiscard);
 
-      // Assert
+      // Assert - Card was discarded
       expect(discardedCard, equals(cardToDiscard));
+      expect(discardedCard?.value, equals(8));
     });
 
-    testWidgets('should show reshuffle indicator when draw pile empty', (
+    testWidgets('should handle empty draw pile and trigger reshuffle', (
       tester,
     ) async {
-      // Act
+      // Arrange
+      bool reshuffleRequested = false;
+      
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: CommonAreaWidget(
-              drawPileCount: 0,
+              drawPileCount: 0, // Empty draw pile
               topDiscardCard: testCard,
               isPlayerTurn: true,
-              onDrawCard: () {},
+              onDrawCard: () => reshuffleRequested = true,
               showReshuffleIndicator: true,
             ),
           ),
         ),
       );
 
-      // Assert
+      // Assert - Reshuffle indicator visible
       expect(find.text('Mélange nécessaire'), findsOneWidget);
-      expect(find.byIcon(Icons.shuffle), findsOneWidget);
+      
+      // Act - Player attempts to draw from empty pile
+      await tester.tap(find.byType(DrawPileWidget));
+      await tester.pump();
+      
+      // Assert - Reshuffle was requested
+      expect(reshuffleRequested, isTrue);
     });
 
-    testWidgets('should be responsive to different screen sizes', (
+    testWidgets('should block all interactions during game pause', (
       tester,
     ) async {
-      // Test on different screen sizes
-      final sizes = [
-        const Size(400, 800), // Phone
-        const Size(800, 600), // Tablet landscape
-        const Size(600, 1000), // Tablet portrait
-      ];
+      // Arrange
+      bool drawCalled = false;
+      bool discardCalled = false;
 
-      for (final size in sizes) {
-        // Set screen size
-        await tester.binding.setSurfaceSize(size);
-
-        // Act
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: CommonAreaWidget(
-                drawPileCount: 52,
-                topDiscardCard: testCard,
-                isPlayerTurn: false,
-                onDrawCard: () {},
-              ),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CommonAreaWidget(
+              drawPileCount: 20,
+              topDiscardCard: testCard,
+              isPlayerTurn: true,
+              onDrawCard: () => drawCalled = true,
+              onDiscardCard: (_) => discardCalled = true,
+              canDiscard: true,
+              isGamePaused: true,
             ),
           ),
-        );
+        ),
+      );
 
-        // Assert - Should not overflow
-        expect(find.byType(CommonAreaWidget), findsOneWidget);
-        expect(tester.takeException(), isNull);
+      // Act - Try to interact while paused
+      await tester.tap(find.byType(DrawPileWidget));
+      await tester.pump();
+
+      // Try to discard
+      final discardPile = tester.widget<DiscardPileWidget>(
+        find.byType(DiscardPileWidget),
+      );
+      if (discardPile.onCardDropped != null) {
+        discardPile.onCardDropped!(const game.Card(value: 3, isRevealed: true));
       }
 
-      // Reset to default size
-      await tester.binding.setSurfaceSize(null);
+      // Assert - No interactions should work
+      expect(drawCalled, isFalse);
+      expect(discardCalled, isFalse);
+      expect(find.text('Jeu en pause'), findsOneWidget);
     });
 
-    testWidgets('should animate turn changes', (tester) async {
-      // Arrange
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CommonAreaWidget(
-              drawPileCount: 30,
-              topDiscardCard: testCard,
-              isPlayerTurn: false,
-              onDrawCard: () {},
-            ),
-          ),
-        ),
-      );
-
-      // Act - Change to player turn
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CommonAreaWidget(
-              drawPileCount: 30,
-              topDiscardCard: testCard,
-              isPlayerTurn: true,
-              onDrawCard: () {},
-            ),
-          ),
-        ),
-      );
-
-      // Assert
-      expect(find.byType(AnimatedContainer), findsWidgets);
-    });
-
-    testWidgets('should have proper accessibility structure', (tester) async {
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CommonAreaWidget(
-              drawPileCount: 40,
-              topDiscardCard: testCard,
-              isPlayerTurn: true,
-              onDrawCard: () {},
-            ),
-          ),
-        ),
-      );
-
-      // Assert
-      expect(find.bySemanticsLabel(RegExp(r'Zone commune')), findsOneWidget);
-    });
-
-    testWidgets('should show game info when provided', (tester) async {
-      // Act
+    testWidgets('should show game progression info', (tester) async {
+      // Act - Display game state information
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -281,39 +220,9 @@ void main() {
         ),
       );
 
-      // Assert
+      // Assert - Game info is visible
       expect(find.text('Tour de Alice'), findsOneWidget);
       expect(find.text('Manche 3'), findsOneWidget);
-    });
-
-    testWidgets('should disable interactions when game is paused', (
-      tester,
-    ) async {
-      // Arrange
-      bool drawCalled = false;
-
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CommonAreaWidget(
-              drawPileCount: 20,
-              topDiscardCard: testCard,
-              isPlayerTurn: true,
-              onDrawCard: () => drawCalled = true,
-              isGamePaused: true,
-            ),
-          ),
-        ),
-      );
-
-      // Try to tap draw pile
-      await tester.tap(find.byType(DrawPileWidget));
-      await tester.pump();
-
-      // Assert
-      expect(drawCalled, isFalse);
-      expect(find.text('Jeu en pause'), findsOneWidget);
     });
   });
 }

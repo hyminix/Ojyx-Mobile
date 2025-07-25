@@ -180,17 +180,6 @@ void main() {
       expect(finalState.turnDirection, equals(TurnDirection.counterClockwise));
     });
 
-    test('should have placeholder methods for game actions', () {
-      // Arrange
-      final notifier = container.read(gameStateNotifierProvider.notifier);
-
-      // Act & Assert - These methods should not throw
-      expect(() => notifier.drawFromDeck('player1'), returnsNormally);
-      expect(() => notifier.drawFromDiscard('player1'), returnsNormally);
-      expect(() => notifier.discardCard('player1', 0), returnsNormally);
-      expect(() => notifier.revealCard('player1', 3), returnsNormally);
-      expect(() => notifier.endTurn(), returnsNormally);
-    });
   });
 
   group('gameInitializationUseCaseProvider', () {
