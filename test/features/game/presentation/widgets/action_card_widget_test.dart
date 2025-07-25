@@ -49,70 +49,67 @@ void main() {
       expect(find.byType(Card), findsOneWidget);
     });
 
-    testWidgets('should show timing indicator for immediate cards', (
+    testWidgets('should show correct timing indicators for all card timings', (
       tester,
     ) async {
-      // Arrange
-      const immediateCard = ActionCard(
-        id: 'test-card',
-        type: ActionCardType.turnAround,
-        name: 'Demi-tour',
-        description: 'Inversez le sens du jeu',
-        timing: ActionTiming.immediate,
-        target: ActionTarget.none,
-      );
+      // Test data for all timing types
+      final timingTestCases = [
+        (
+          card: const ActionCard(
+            id: 'immediate-card',
+            type: ActionCardType.turnAround,
+            name: 'Demi-tour',
+            description: 'Inversez le sens du jeu',
+            timing: ActionTiming.immediate,
+            target: ActionTarget.none,
+          ),
+          expectedIcon: Icons.flash_on,
+          expectedText: 'Immédiate',
+        ),
+        (
+          card: const ActionCard(
+            id: 'optional-card',
+            type: ActionCardType.skip,
+            name: 'Saut',
+            description: 'Le prochain joueur passe son tour',
+            timing: ActionTiming.optional,
+            target: ActionTarget.none,
+          ),
+          expectedIcon: Icons.schedule,
+          expectedText: 'Optionnelle',
+        ),
+        (
+          card: const ActionCard(
+            id: 'reactive-card',
+            type: ActionCardType.shield,
+            name: 'Bouclier',
+            description: 'Protégez-vous des attaques',
+            timing: ActionTiming.reactive,
+            target: ActionTarget.self,
+          ),
+          expectedIcon: Icons.shield,
+          expectedText: 'Réactive',
+        ),
+      ];
 
-      // Act
-      await tester.pumpWidget(createTestWidget(immediateCard));
-
-      // Assert
-      expect(
-        find.byIcon(Icons.flash_on),
-        findsOneWidget,
-      ); // Immediate indicator
-      expect(find.text('Immédiate'), findsOneWidget);
-    });
-
-    testWidgets('should show timing indicator for optional cards', (
-      tester,
-    ) async {
-      // Arrange
-      const optionalCard = ActionCard(
-        id: 'test-card',
-        type: ActionCardType.skip,
-        name: 'Saut',
-        description: 'Le prochain joueur passe son tour',
-        timing: ActionTiming.optional,
-        target: ActionTarget.none,
-      );
-
-      // Act
-      await tester.pumpWidget(createTestWidget(optionalCard));
-
-      // Assert
-      expect(find.byIcon(Icons.schedule), findsOneWidget); // Optional indicator
-      expect(find.text('Optionnelle'), findsOneWidget);
-    });
-
-    testWidgets('should show timing indicator for reactive cards', (
-      tester,
-    ) async {
-      // Arrange
-      const reactiveCard = ActionCard(
-        id: 'test-card',
-        type: ActionCardType.shield,
-        name: 'Bouclier',
-        description: 'Protégez-vous des attaques',
-        timing: ActionTiming.reactive,
-        target: ActionTarget.self,
-      );
-
-      // Act
-      await tester.pumpWidget(createTestWidget(reactiveCard));
-
-      // Assert
-      expect(find.byIcon(Icons.shield), findsOneWidget); // Reactive indicator
-      expect(find.text('Réactive'), findsOneWidget);
+      // Test each timing type
+      for (final testCase in timingTestCases) {
+        await tester.pumpWidget(createTestWidget(testCase.card));
+        
+        expect(
+          find.byIcon(testCase.expectedIcon),
+          findsOneWidget,
+          reason: 'Should show ${testCase.expectedIcon} for ${testCase.card.timing} timing',
+        );
+        expect(
+          find.text(testCase.expectedText),
+          findsOneWidget,
+          reason: 'Should show "${testCase.expectedText}" for ${testCase.card.timing} timing',
+        );
+        
+        // Clear the widget tree for next test
+        await tester.pumpWidget(Container());
+      }
     });
 
     testWidgets('should be tappable when selectable', (tester) async {
@@ -205,115 +202,100 @@ void main() {
       expect(find.byType(SnackBar), findsOneWidget);
     });
 
-    testWidgets('should use correct color for different card types', (
+    testWidgets('should display correct styling based on card category', (
       tester,
     ) async {
-      // Test movement card (teleport)
-      const teleportCard = ActionCard(
-        id: 'test-card-1',
-        type: ActionCardType.teleport,
-        name: 'Téléportation',
-        description: 'Échangez deux cartes',
-        timing: ActionTiming.optional,
-        target: ActionTarget.self,
-      );
-
-      await tester.pumpWidget(createTestWidget(teleportCard));
-      var container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(Card),
-          matching: find.byType(Container).first,
+      // Test data for different card categories
+      final categoryTestCases = [
+        // Movement cards
+        (
+          card: const ActionCard(
+            id: 'teleport-card',
+            type: ActionCardType.teleport,
+            name: 'Téléportation',
+            description: 'Échangez deux cartes',
+            timing: ActionTiming.optional,
+            target: ActionTarget.self,
+          ),
+          expectedColor: Colors.blue.shade50,
+          category: 'movement',
         ),
-      );
-      expect(
-        (container.decoration as BoxDecoration).color,
-        equals(Colors.blue.shade50),
-      );
-
-      // Test attack card (steal)
-      const stealCard = ActionCard(
-        id: 'test-card-2',
-        type: ActionCardType.steal,
-        name: 'Vol',
-        description: 'Volez une carte action',
-        timing: ActionTiming.optional,
-        target: ActionTarget.singleOpponent,
-      );
-
-      await tester.pumpWidget(createTestWidget(stealCard));
-      container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(Card),
-          matching: find.byType(Container).first,
+        // Attack cards
+        (
+          card: const ActionCard(
+            id: 'steal-card',
+            type: ActionCardType.steal,
+            name: 'Vol',
+            description: 'Volez une carte action',
+            timing: ActionTiming.optional,
+            target: ActionTarget.singleOpponent,
+          ),
+          expectedColor: Colors.red.shade50,
+          category: 'attack',
         ),
-      );
-      expect(
-        (container.decoration as BoxDecoration).color,
-        equals(Colors.red.shade50),
-      );
-
-      // Test utility card (draw)
-      const drawCard = ActionCard(
-        id: 'test-card-3',
-        type: ActionCardType.draw,
-        name: 'Pioche',
-        description: 'Piochez 2 cartes actions',
-        timing: ActionTiming.optional,
-        target: ActionTarget.deck,
-      );
-
-      await tester.pumpWidget(createTestWidget(drawCard));
-      container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(Card),
-          matching: find.byType(Container).first,
+        // Utility cards
+        (
+          card: const ActionCard(
+            id: 'draw-card',
+            type: ActionCardType.draw,
+            name: 'Pioche',
+            description: 'Piochez 2 cartes actions',
+            timing: ActionTiming.optional,
+            target: ActionTarget.deck,
+          ),
+          expectedColor: Colors.green.shade50,
+          category: 'utility',
         ),
-      );
-      expect(
-        (container.decoration as BoxDecoration).color,
-        equals(Colors.green.shade50),
-      );
-    });
+      ];
 
-    testWidgets('should show target icon based on target type', (tester) async {
-      // Test self target
-      const selfCard = ActionCard(
-        id: 'test-card-1',
-        type: ActionCardType.shield,
-        name: 'Bouclier',
-        description: 'Protégez-vous',
-        timing: ActionTiming.reactive,
-        target: ActionTarget.self,
-      );
+      // Target icon test cases
+      final targetIconTestCases = [
+        (target: ActionTarget.self, expectedIcon: Icons.person),
+        (target: ActionTarget.singleOpponent, expectedIcon: Icons.person_pin),
+        (target: ActionTarget.allOpponents, expectedIcon: Icons.groups),
+      ];
 
-      await tester.pumpWidget(createTestWidget(selfCard));
-      expect(find.byIcon(Icons.person), findsOneWidget);
+      // Test card colors by category
+      for (final testCase in categoryTestCases) {
+        await tester.pumpWidget(createTestWidget(testCase.card));
+        
+        final container = tester.widget<Container>(
+          find.descendant(
+            of: find.byType(Card),
+            matching: find.byType(Container).first,
+          ),
+        );
+        
+        expect(
+          (container.decoration as BoxDecoration).color,
+          equals(testCase.expectedColor),
+          reason: '${testCase.category} cards should have ${testCase.expectedColor} background',
+        );
+        
+        await tester.pumpWidget(Container());
+      }
 
-      // Test single opponent target
-      const singleCard = ActionCard(
-        id: 'test-card-2',
-        type: ActionCardType.steal,
-        name: 'Vol',
-        description: 'Volez une carte',
-        timing: ActionTiming.optional,
-        target: ActionTarget.singleOpponent,
-      );
-
-      await tester.pumpWidget(createTestWidget(singleCard));
-      expect(find.byIcon(Icons.person_pin), findsOneWidget);
-
-      // Test all opponents target
-      const allCard = ActionCard(
-        id: 'test-card-3',
-        type: ActionCardType.reveal,
-        name: 'Révélation',
-        description: 'Révélez une carte',
-        timing: ActionTiming.optional,
-        target: ActionTarget.allOpponents,
-      );
-
-      await tester.pumpWidget(createTestWidget(allCard));
-      expect(find.byIcon(Icons.groups), findsOneWidget);
+      // Test target icons
+      for (final testCase in targetIconTestCases) {
+        final card = ActionCard(
+          id: 'test-${testCase.target}',
+          type: ActionCardType.shield,
+          name: 'Test Card',
+          description: 'Test Description',
+          timing: ActionTiming.optional,
+          target: testCase.target,
+        );
+        
+        await tester.pumpWidget(createTestWidget(card));
+        
+        expect(
+          find.byIcon(testCase.expectedIcon),
+          findsOneWidget,
+          reason: 'Cards targeting ${testCase.target} should show ${testCase.expectedIcon}',
+        );
+        
+        await tester.pumpWidget(Container());
+      }
     });
 
     testWidgets('should be properly sized for mobile', (tester) async {

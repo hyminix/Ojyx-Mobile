@@ -1,3 +1,11 @@
+/// Legacy test helpers - consider migrating to the new helpers in /test/helpers/
+/// 
+/// For new tests, prefer using:
+/// - /test/helpers/test_builders.dart for entity creation
+/// - /test/helpers/test_matchers.dart for assertions
+/// - /test/helpers/test_scenarios.dart for common scenarios
+/// - /test/helpers/index.dart for convenient single import
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

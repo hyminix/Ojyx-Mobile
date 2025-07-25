@@ -20,9 +20,5 @@ void main() {
       container.dispose();
     });
 
-    test('provider should be of correct type', () {
-      // Verify the provider is correctly typed
-      expect(supabaseClientProvider, isA<Provider<SupabaseClient>>());
-    });
   });
 }

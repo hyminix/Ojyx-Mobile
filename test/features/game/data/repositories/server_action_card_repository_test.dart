@@ -49,75 +49,19 @@ void main() {
       });
     });
 
-    group('deprecated methods', () {
-      test('getPlayerActionCards should throw UnsupportedError', () {
-        expect(
-          () => repository.getPlayerActionCards('player1'),
-          throwsA(isA<UnsupportedError>()),
-        );
-      });
+    test('should throw UnsupportedError for deprecated client-side methods', () {
+      const testCard = ActionCard(
+        id: 'test', type: ActionCardType.peek, name: 'Test', description: 'Test',
+        timing: ActionTiming.optional, target: ActionTarget.self,
+      );
 
-      test('addActionCardToPlayer should throw UnsupportedError', () {
-        const card = ActionCard(
-          id: 'test',
-          type: ActionCardType.peek,
-          name: 'Test',
-          description: 'Test',
-          timing: ActionTiming.optional,
-          target: ActionTarget.self,
-        );
-
-        expect(
-          () => repository.addActionCardToPlayer('player1', card),
-          throwsA(isA<UnsupportedError>()),
-        );
-      });
-
-      test('removeActionCardFromPlayer should throw UnsupportedError', () {
-        const card = ActionCard(
-          id: 'test',
-          type: ActionCardType.peek,
-          name: 'Test',
-          description: 'Test',
-          timing: ActionTiming.optional,
-          target: ActionTarget.self,
-        );
-
-        expect(
-          () => repository.removeActionCardFromPlayer('player1', card),
-          throwsA(isA<UnsupportedError>()),
-        );
-      });
-
-      test('drawActionCard should throw UnsupportedError', () {
-        expect(
-          () => repository.drawActionCard(),
-          throwsA(isA<UnsupportedError>()),
-        );
-      });
-
-      test('discardActionCard should throw UnsupportedError', () {
-        const card = ActionCard(
-          id: 'test',
-          type: ActionCardType.peek,
-          name: 'Test',
-          description: 'Test',
-          timing: ActionTiming.optional,
-          target: ActionTarget.self,
-        );
-
-        expect(
-          () => repository.discardActionCard(card),
-          throwsA(isA<UnsupportedError>()),
-        );
-      });
-
-      test('shuffleActionCards should throw UnsupportedError', () {
-        expect(
-          () => repository.shuffleActionCards(),
-          throwsA(isA<UnsupportedError>()),
-        );
-      });
+      // All deprecated methods should throw UnsupportedError
+      expect(() => repository.getPlayerActionCards('player1'), throwsA(isA<UnsupportedError>()));
+      expect(() => repository.addActionCardToPlayer('player1', testCard), throwsA(isA<UnsupportedError>()));
+      expect(() => repository.removeActionCardFromPlayer('player1', testCard), throwsA(isA<UnsupportedError>()));
+      expect(() => repository.drawActionCard(), throwsA(isA<UnsupportedError>()));
+      expect(() => repository.discardActionCard(testCard), throwsA(isA<UnsupportedError>()));
+      expect(() => repository.shuffleActionCards(), throwsA(isA<UnsupportedError>()));
     });
 
     group('helper methods', () {
@@ -149,72 +93,33 @@ void main() {
         }
       });
 
-      test('isImmediateAction should identify immediate actions', () {
+      test('should correctly identify action timing types', () {
         const immediateCard = ActionCard(
-          id: 'test',
-          type: ActionCardType.turnAround,
-          name: 'Test',
-          description: 'Test',
-          timing: ActionTiming.immediate,
-          target: ActionTarget.none,
+          id: 'immediate', type: ActionCardType.turnAround, name: 'Immediate', description: 'Test',
+          timing: ActionTiming.immediate, target: ActionTarget.none,
         );
-
         const optionalCard = ActionCard(
-          id: 'test2',
-          type: ActionCardType.peek,
-          name: 'Test2',
-          description: 'Test2',
-          timing: ActionTiming.optional,
-          target: ActionTarget.self,
+          id: 'optional', type: ActionCardType.peek, name: 'Optional', description: 'Test',
+          timing: ActionTiming.optional, target: ActionTarget.self,
+        );
+        const reactiveCard = ActionCard(
+          id: 'reactive', type: ActionCardType.shield, name: 'Reactive', description: 'Test',
+          timing: ActionTiming.reactive, target: ActionTarget.none,
         );
 
+        // Test immediate action detection
         expect(repository.isImmediateAction(immediateCard), isTrue);
         expect(repository.isImmediateAction(optionalCard), isFalse);
-      });
+        expect(repository.isImmediateAction(reactiveCard), isFalse);
 
-      test('isOptionalAction should identify optional actions', () {
-        const optionalCard = ActionCard(
-          id: 'test',
-          type: ActionCardType.peek,
-          name: 'Test',
-          description: 'Test',
-          timing: ActionTiming.optional,
-          target: ActionTarget.self,
-        );
-
-        const immediateCard = ActionCard(
-          id: 'test2',
-          type: ActionCardType.turnAround,
-          name: 'Test2',
-          description: 'Test2',
-          timing: ActionTiming.immediate,
-          target: ActionTarget.none,
-        );
-
+        // Test optional action detection
         expect(repository.isOptionalAction(optionalCard), isTrue);
         expect(repository.isOptionalAction(immediateCard), isFalse);
-      });
+        expect(repository.isOptionalAction(reactiveCard), isFalse);
 
-      test('isReactiveAction should identify reactive actions', () {
-        const reactiveCard = ActionCard(
-          id: 'test',
-          type: ActionCardType.shield,
-          name: 'Test',
-          description: 'Test',
-          timing: ActionTiming.reactive,
-          target: ActionTarget.none,
-        );
-
-        const optionalCard = ActionCard(
-          id: 'test2',
-          type: ActionCardType.peek,
-          name: 'Test2',
-          description: 'Test2',
-          timing: ActionTiming.optional,
-          target: ActionTarget.self,
-        );
-
+        // Test reactive action detection
         expect(repository.isReactiveAction(reactiveCard), isTrue);
+        expect(repository.isReactiveAction(immediateCard), isFalse);
         expect(repository.isReactiveAction(optionalCard), isFalse);
       });
     });

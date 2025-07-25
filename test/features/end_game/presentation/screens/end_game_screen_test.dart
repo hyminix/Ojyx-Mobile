@@ -112,22 +112,16 @@ void main() {
       expect(find.text('Error: Exception: Test error'), findsOneWidget);
     });
 
-    testWidgets('should display round number', (tester) async {
+    testWidgets('should display all required UI elements with correct content', (tester) async {
       await tester.pumpWidget(createTestWidget());
 
+      // Verify round information display
       expect(find.text('Round 1 Results'), findsOneWidget);
-    });
-
-    testWidgets('should display winner announcement', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-
+      
+      // Verify winner announcement
       expect(find.text('🏆 Charlie wins!'), findsOneWidget);
-    });
 
-    testWidgets('should display all players in ranked order', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-
-      // Find rank positions
+      // Verify ranked player display
       final rank1 = find.text('1st');
       final rank2 = find.text('2nd');
       final rank3 = find.text('3rd');
@@ -141,11 +135,18 @@ void main() {
       expect(find.text('Alice'), findsOneWidget);
       expect(find.text('Bob'), findsOneWidget);
 
-      // Verify scores are displayed
+      // Verify scores are displayed correctly
       expect(find.text('20 points'), findsOneWidget);
       expect(find.text('25 points'), findsOneWidget);
       expect(find.text('30 points'), findsOneWidget);
+
+      // Verify voting section display
+      expect(find.text('Continue Playing?'), findsOneWidget);
+      expect(find.text('Vote to Continue'), findsOneWidget);
+      expect(find.text('End Game'), findsOneWidget);
     });
+
+
 
     testWidgets('should highlight round initiator with penalty', (
       tester,
@@ -166,13 +167,6 @@ void main() {
       expect(find.text('50 points'), findsOneWidget); // 25 * 2
     });
 
-    testWidgets('should display voting section', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-
-      expect(find.text('Continue Playing?'), findsOneWidget);
-      expect(find.text('Vote to Continue'), findsOneWidget);
-      expect(find.text('End Game'), findsOneWidget);
-    });
 
     testWidgets('should handle vote to continue tap', (tester) async {
       bool voteToContinueCalled = false;

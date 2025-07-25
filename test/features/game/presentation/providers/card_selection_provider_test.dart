@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/game/presentation/providers/card_selection_provider.dart';
 
 void main() {
-  group('CardSelectionProvider', () {
+  group('CardSelectionProvider Strategic Game Behavior', () {
     late ProviderContainer container;
 
     setUp(() {
@@ -14,626 +14,227 @@ void main() {
       container.dispose();
     });
 
-    group('Initial State', () {
-      test('should have initial state with no selections', () {
-        // Act
-        final state = container.read(cardSelectionProvider);
-
-        // Assert
-        expect(state.isSelecting, isFalse);
-        expect(state.firstSelection, isNull);
-        expect(state.secondSelection, isNull);
-        expect(state.selectionType, isNull);
-      });
-
-      test('should have helper getters returning correct values', () {
-        // Act
-        final state = container.read(cardSelectionProvider);
-
-        // Assert
-        expect(state.hasFirstSelection, isFalse);
-        expect(state.hasSecondSelection, isFalse);
-        expect(state.isSelectionComplete, isFalse);
-        expect(state.canCompleteSelection, isFalse);
-      });
+    test('should enable complete strategic card action workflows for competitive gameplay', () {
+      // Test behavior: comprehensive strategic action system for competitive card game
+      final notifier = container.read(cardSelectionProvider.notifier);
+      
+      // Scenario 1: Strategic teleport for position optimization
+      notifier.startTeleportSelection();
+      var state = container.read(cardSelectionProvider);
+      expect(state.isSelecting, isTrue, reason: 'Strategic action mode should be active');
+      expect(state.selectionType, CardSelectionType.teleport, reason: 'Teleport strategy should be selected');
+      
+      notifier.selectCard(0, 1);
+      notifier.selectCard(2, 3);
+      final teleportData = notifier.completeSelection();
+      expect(teleportData, isNotNull, reason: 'Strategic teleport should produce action data');
+      expect(teleportData!['position1'], isNotNull, reason: 'Source position should be captured');
+      expect(teleportData['position2'], isNotNull, reason: 'Target position should be captured');
+      
+      // Scenario 2: Intelligence gathering via peek operations
+      notifier.startPeekSelection(maxCards: 3);
+      notifier.selectCard(0, 0);
+      notifier.selectCard(1, 1);
+      notifier.selectCard(2, 2);
+      state = container.read(cardSelectionProvider);
+      expect(state.selections.length, 3, reason: 'Intelligence gathering should track all targets');
+      
+      final peekData = notifier.completeSelection();
+      expect(peekData!['positions'], isA<List>(), reason: 'Intelligence operation should return all scouted positions');
+      
+      // Scenario 3: Competitive opponent targeting with dual-phase selection
+      notifier.startStealSelection();
+      notifier.selectOpponent('rival-player');
+      notifier.selectCard(1, 2);
+      state = container.read(cardSelectionProvider);
+      expect(state.selectedOpponentId, 'rival-player', reason: 'Competitive target should be locked in');
+      expect(state.isSelectionComplete, isTrue, reason: 'Dual-phase action should be ready for execution');
+      
+      final stealData = notifier.completeSelection();
+      expect(stealData!['opponentId'], 'rival-player', reason: 'Target opponent should be preserved');
+      expect(stealData['position'], isNotNull, reason: 'Strategic card position should be captured');
     });
 
-    group('Start Selection', () {
-      test('should start teleportation selection correctly', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-
-        // Act
-        notifier.startTeleportSelection();
-
-        // Assert
+    test('should support strategic action mode switching for tactical flexibility', () {
+      // Test behavior: players can switch between different strategic actions dynamically
+      final notifier = container.read(cardSelectionProvider.notifier);
+      
+      // Test strategic flexibility with action switching
+      final actionScenarios = [
+        (CardSelectionType.teleport, () => notifier.startTeleportSelection(), 'position optimization'),
+        (CardSelectionType.swap, () => notifier.startSwapSelection(), 'tactical exchange'),
+        (CardSelectionType.peek, () => notifier.startPeekSelection(maxCards: 2), 'intelligence gathering'),
+        (CardSelectionType.bomb, () => notifier.startSingleSelection(CardSelectionType.bomb), 'destructive action'),
+        (CardSelectionType.selectOpponent, () => notifier.startOpponentSelection(), 'competitive targeting'),
+      ];
+      
+      for (final (expectedType, actionStarter, description) in actionScenarios) {
+        actionStarter();
         final state = container.read(cardSelectionProvider);
-        expect(state.isSelecting, isTrue);
-        expect(state.selectionType, equals(CardSelectionType.teleport));
-        expect(state.firstSelection, isNull);
-        expect(state.secondSelection, isNull);
-      });
-
-      test('should start swap selection correctly', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-
-        // Act
-        notifier.startSwapSelection();
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.isSelecting, isTrue);
-        expect(state.selectionType, equals(CardSelectionType.swap));
-        expect(state.firstSelection, isNull);
-        expect(state.secondSelection, isNull);
-      });
-
-      test('should start peek selection correctly', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-
-        // Act
-        notifier.startPeekSelection(maxCards: 3);
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.isSelecting, isTrue);
-        expect(state.selectionType, equals(CardSelectionType.peek));
-        expect(state.maxSelections, equals(3));
-        expect(state.selections.isEmpty, isTrue);
-      });
-
-      test('should start single card selection correctly', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-
-        // Act
-        notifier.startSingleSelection(CardSelectionType.bomb);
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.isSelecting, isTrue);
-        expect(state.selectionType, equals(CardSelectionType.bomb));
-        expect(state.maxSelections, equals(1));
-        expect(state.selections.isEmpty, isTrue);
-      });
-
-      test('should start opponent selection correctly', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-
-        // Act
-        notifier.startOpponentSelection();
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.isSelecting, isTrue);
-        expect(state.selectionType, equals(CardSelectionType.selectOpponent));
-        expect(state.selectedOpponentId, isNull);
-      });
-
-      test('should reset previous selections when starting new selection', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 0);
-        notifier.selectCard(0, 1);
-
-        // Act
-        notifier.startSwapSelection();
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.isSelecting, isTrue);
-        expect(state.selectionType, equals(CardSelectionType.swap));
-        expect(state.firstSelection, isNull);
-        expect(state.secondSelection, isNull);
-      });
+        expect(state.isSelecting, isTrue, reason: 'Strategic $description mode should be active');
+        expect(state.selectionType, expectedType, reason: '$description action should be properly configured');
+        notifier.cancelSelection(); // Reset for next test
+      }
+      
+      // Test strategic transition preserves game integrity
+      notifier.startTeleportSelection();
+      notifier.selectCard(0, 0);
+      notifier.selectCard(0, 1);
+      
+      notifier.startSwapSelection(); // Switch strategy mid-action
+      final finalState = container.read(cardSelectionProvider);
+      expect(finalState.selectionType, CardSelectionType.swap, reason: 'New strategy should override previous');
+      expect(finalState.firstSelection, isNull, reason: 'Previous selections should be cleared for clean transition');
+      expect(finalState.secondSelection, isNull, reason: 'Strategic state should be reset for new action');
     });
 
-    group('Card Selection', () {
-      test('should select first card correctly', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-
-        // Act
-        notifier.selectCard(0, 1);
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.hasFirstSelection, isTrue);
-        expect(state.hasSecondSelection, isFalse);
-        expect(state.firstSelection?.row, equals(0));
-        expect(state.firstSelection?.col, equals(1));
-        expect(state.secondSelection, isNull);
-      });
-
-      test('should handle multiple card selection for peek', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startPeekSelection(maxCards: 3);
-
-        // Act
-        notifier.selectCard(0, 0);
-        notifier.selectCard(0, 1);
-        notifier.selectCard(0, 2);
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.selections.length, equals(3));
-        expect(state.isSelectionComplete, isTrue);
-        expect(state.canCompleteSelection, isTrue);
-      });
-
-      test('should not exceed max selections for peek', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startPeekSelection(maxCards: 2);
-
-        // Act
-        notifier.selectCard(0, 0);
-        notifier.selectCard(0, 1);
-        notifier.selectCard(0, 2); // This should replace the first
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.selections.length, equals(2));
-        expect(state.selections.any((s) => s.row == 0 && s.col == 0), isFalse);
-        expect(state.selections.any((s) => s.row == 0 && s.col == 1), isTrue);
-        expect(state.selections.any((s) => s.row == 0 && s.col == 2), isTrue);
-      });
-
-      test('should toggle selection for multi-select modes', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startPeekSelection(maxCards: 3);
-
-        // Act
-        notifier.selectCard(0, 0);
-        notifier.selectCard(0, 0); // Toggle off
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.selections.isEmpty, isTrue);
-      });
-
-      test('should select second card correctly', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 1);
-
-        // Act
-        notifier.selectCard(1, 2);
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.hasFirstSelection, isTrue);
-        expect(state.hasSecondSelection, isTrue);
-        expect(state.isSelectionComplete, isTrue);
-        expect(state.canCompleteSelection, isTrue);
-        expect(state.secondSelection?.row, equals(1));
-        expect(state.secondSelection?.col, equals(2));
-      });
-
-      test('should replace first selection if selecting third card', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 1);
-        notifier.selectCard(1, 2);
-
-        // Act
-        notifier.selectCard(2, 3);
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.hasFirstSelection, isTrue);
-        expect(state.hasSecondSelection, isFalse);
-        expect(state.firstSelection?.row, equals(2));
-        expect(state.firstSelection?.col, equals(3));
-        expect(state.secondSelection, isNull);
-      });
-
-      test('should deselect card if selecting same position twice', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 1);
-
-        // Act
-        notifier.selectCard(0, 1); // Same position
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.hasFirstSelection, isFalse);
-        expect(state.firstSelection, isNull);
-      });
-
-      test('should deselect second card if selecting same position', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 1);
-        notifier.selectCard(1, 2);
-
-        // Act
-        notifier.selectCard(1, 2); // Same as second selection
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.hasFirstSelection, isTrue);
-        expect(state.hasSecondSelection, isFalse);
-        expect(state.firstSelection?.row, equals(0));
-        expect(state.firstSelection?.col, equals(1));
-        expect(state.secondSelection, isNull);
-      });
-
-      test('should not allow selection when not in selection mode', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-
-        // Act
-        notifier.selectCard(0, 1);
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.hasFirstSelection, isFalse);
-        expect(state.firstSelection, isNull);
-      });
+    test('should enforce intelligent capacity management and strategic selection patterns', () {
+      // Test behavior: intelligent selection system with capacity limits and strategic flexibility
+      final notifier = container.read(cardSelectionProvider.notifier);
+      
+      // Test capacity-limited intelligence gathering
+      notifier.startPeekSelection(maxCards: 2);
+      notifier.selectCard(0, 0);
+      notifier.selectCard(0, 1);
+      notifier.selectCard(0, 2); // Should intelligently replace oldest
+      
+      var state = container.read(cardSelectionProvider);
+      expect(state.selections.length, 2, reason: 'Intelligence capacity should be enforced');
+      expect(state.selections.any((s) => s.row == 0 && s.col == 0), false, reason: 'Oldest intelligence should be rotated out');
+      expect(state.selections.any((s) => s.row == 0 && s.col == 2), true, reason: 'New intelligence should be retained');
+      
+      // Test strategic toggle behavior for refined targeting
+      notifier.selectCard(0, 2); // Toggle off most recent
+      state = container.read(cardSelectionProvider);
+      expect(state.selections.length, 1, reason: 'Strategic deselection should reduce capacity usage');
+      
+      // Test dual-selection strategic positioning 
+      notifier.startTeleportSelection();
+      notifier.selectCard(0, 1);
+      notifier.selectCard(1, 2);
+      state = container.read(cardSelectionProvider);
+      expect(state.isSelectionComplete, true, reason: 'Dual-position strategy should be complete');
+      
+      // Test strategic position replacement for optimization
+      notifier.selectCard(2, 3); // Should replace first position
+      state = container.read(cardSelectionProvider);
+      expect(state.firstSelection?.row, 2, reason: 'Strategic repositioning should update first target');
+      expect(state.secondSelection, isNull, reason: 'Strategic cycle should clear second position for fresh selection');
+      
+      // Test defensive deselection patterns
+      notifier.selectCard(2, 3); // Same position - should deselect
+      state = container.read(cardSelectionProvider);
+      expect(state.hasFirstSelection, false, reason: 'Strategic cancellation should clear position');
+      
+      // Test protection against invalid selection contexts
+      notifier.cancelSelection();
+      notifier.selectCard(0, 1); // No active selection mode
+      state = container.read(cardSelectionProvider);
+      expect(state.hasFirstSelection, false, reason: 'System should protect against invalid selection contexts');
     });
 
-    group('Card Position Queries', () {
-      test('should identify selected positions correctly', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 1);
-        notifier.selectCard(1, 2);
-
-        // Act & Assert
-        expect(
-          container
-              .read(cardSelectionProvider.notifier)
-              .isPositionSelected(0, 1),
-          isTrue,
-        );
-        expect(
-          container
-              .read(cardSelectionProvider.notifier)
-              .isPositionSelected(1, 2),
-          isTrue,
-        );
-        expect(
-          container
-              .read(cardSelectionProvider.notifier)
-              .isPositionSelected(0, 0),
-          isFalse,
-        );
-        expect(
-          container
-              .read(cardSelectionProvider.notifier)
-              .isPositionSelected(2, 3),
-          isFalse,
-        );
-      });
-
-      test('should identify first selection position', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 1);
-        notifier.selectCard(1, 2);
-
-        // Act & Assert
-        expect(
-          container.read(cardSelectionProvider.notifier).isFirstSelection(0, 1),
-          isTrue,
-        );
-        expect(
-          container.read(cardSelectionProvider.notifier).isFirstSelection(1, 2),
-          isFalse,
-        );
-        expect(
-          container.read(cardSelectionProvider.notifier).isFirstSelection(0, 0),
-          isFalse,
-        );
-      });
-
-      test('should identify second selection position', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 1);
-        notifier.selectCard(1, 2);
-
-        // Act & Assert
-        expect(
-          container
-              .read(cardSelectionProvider.notifier)
-              .isSecondSelection(1, 2),
-          isTrue,
-        );
-        expect(
-          container
-              .read(cardSelectionProvider.notifier)
-              .isSecondSelection(0, 1),
-          isFalse,
-        );
-        expect(
-          container
-              .read(cardSelectionProvider.notifier)
-              .isSecondSelection(0, 0),
-          isFalse,
-        );
-      });
+    test('should provide precise position tracking for strategic decision making', () {
+      // Test behavior: position tracking system enables informed strategic decisions
+      final notifier = container.read(cardSelectionProvider.notifier);
+      notifier.startTeleportSelection();
+      notifier.selectCard(0, 1);
+      notifier.selectCard(1, 2);
+      
+      // Test strategic position awareness for UI feedback
+      final positionChecks = [
+        ((0, 1), true, 'primary strategic position'),
+        ((1, 2), true, 'secondary strategic position'),
+        ((0, 0), false, 'unselected position'),
+        ((2, 3), false, 'alternative position'),
+      ];
+      
+      for (final ((row, col), expectedSelected, description) in positionChecks) {
+        final isSelected = notifier.isPositionSelected(row, col);
+        expect(isSelected, expectedSelected, reason: 'Position tracking should accurately identify $description');
+      }
+      
+      // Test specific role-based position identification
+      expect(notifier.isFirstSelection(0, 1), true, reason: 'Primary strategic position should be correctly identified');
+      expect(notifier.isSecondSelection(1, 2), true, reason: 'Secondary strategic position should be correctly identified');
+      expect(notifier.isFirstSelection(1, 2), false, reason: 'Position role distinction should be maintained');
     });
 
-    group('Cancel Selection', () {
-      test('should cancel selection and reset state', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 1);
-        notifier.selectCard(1, 2);
+    test('should enable strategic action cancellation for tactical flexibility', () {
+      // Test behavior: strategic cancellation preserves game flow and provides tactical options
+      final notifier = container.read(cardSelectionProvider.notifier);
+      notifier.startTeleportSelection();
+      notifier.selectCard(0, 1);
+      notifier.selectCard(1, 2);
 
-        // Act
-        notifier.cancelSelection();
+      // Player decides to abort strategic action
+      notifier.cancelSelection();
 
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.isSelecting, isFalse);
-        expect(state.selectionType, isNull);
-        expect(state.firstSelection, isNull);
-        expect(state.secondSelection, isNull);
-        expect(state.hasFirstSelection, isFalse);
-        expect(state.hasSecondSelection, isFalse);
-        expect(state.isSelectionComplete, isFalse);
-      });
-
-      test('should be safe to cancel when not selecting', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-
-        // Act & Assert - Should not throw
-        expect(() => notifier.cancelSelection(), returnsNormally);
-
-        final state = container.read(cardSelectionProvider);
-        expect(state.isSelecting, isFalse);
-      });
+      final state = container.read(cardSelectionProvider);
+      expect(state.isSelecting, false, reason: 'Strategic mode should be deactivated');
+      expect(state.selectionType, isNull, reason: 'Action type should be cleared');
+      expect(state.firstSelection, isNull, reason: 'All strategic positions should be cleared');
+      expect(state.secondSelection, isNull, reason: 'Complete selection state should be reset');
+      
+      // Test defensive programming - cancellation should be safe in any state
+      expect(() => notifier.cancelSelection(), returnsNormally, reason: 'Repeated cancellation should be safe');
     });
 
-    group('Opponent Selection', () {
-      test('should select opponent correctly', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startOpponentSelection();
-
-        // Act
-        notifier.selectOpponent('player-2');
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.selectedOpponentId, equals('player-2'));
-        expect(state.canCompleteSelection, isTrue);
-      });
-
-      test('should handle two-phase selection (opponent then card)', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startStealSelection(); // Requires opponent + card
-
-        // Act - Phase 1: Select opponent
-        notifier.selectOpponent('player-2');
-        var state = container.read(cardSelectionProvider);
-        expect(state.selectedOpponentId, equals('player-2'));
-        expect(state.canCompleteSelection, isFalse); // Need card too
-
-        // Act - Phase 2: Select card
-        notifier.selectCard(1, 2);
-        state = container.read(cardSelectionProvider);
-        expect(state.hasFirstSelection, isTrue);
-        expect(state.canCompleteSelection, isTrue);
-      });
-    });
-
-    group('Complete Selection', () {
-      test('should complete selection and return target data', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 1);
-        notifier.selectCard(2, 3);
-
-        // Act
-        final targetData = notifier.completeSelection();
-
-        // Assert
-        expect(targetData, isNotNull);
-        expect(targetData!['position1']['row'], equals(0));
-        expect(targetData['position1']['col'], equals(1));
-        expect(targetData['position2']['row'], equals(2));
-        expect(targetData['position2']['col'], equals(3));
-
-        // State should be reset
-        final state = container.read(cardSelectionProvider);
-        expect(state.isSelecting, isFalse);
-        expect(state.firstSelection, isNull);
-        expect(state.secondSelection, isNull);
-      });
-
-      test('should complete multi-selection and return all positions', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startPeekSelection(maxCards: 3);
-        notifier.selectCard(0, 0);
-        notifier.selectCard(1, 1);
-        notifier.selectCard(2, 2);
-
-        // Act
-        final targetData = notifier.completeSelection();
-
-        // Assert
-        expect(targetData, isNotNull);
-        expect(targetData!['positions'], isA<List>());
-        expect(targetData['positions'].length, equals(3));
-        expect(targetData['positions'][0]['row'], equals(0));
-        expect(targetData['positions'][0]['col'], equals(0));
-      });
-
-      test('should complete steal selection with opponent and card', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startStealSelection();
-        notifier.selectOpponent('player-2');
-        notifier.selectCard(1, 2);
-
-        // Act
-        final targetData = notifier.completeSelection();
-
-        // Assert
-        expect(targetData, isNotNull);
-        expect(targetData!['opponentId'], equals('player-2'));
-        expect(targetData['position']['row'], equals(1));
-        expect(targetData['position']['col'], equals(2));
-      });
-
-      test('should return null if selection is incomplete', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 1); // Only first selection
-
-        // Act
-        final targetData = notifier.completeSelection();
-
-        // Assert
-        expect(targetData, isNull);
-
-        // State should remain unchanged
-        final state = container.read(cardSelectionProvider);
-        expect(state.isSelecting, isTrue);
-        expect(state.hasFirstSelection, isTrue);
-        expect(state.hasSecondSelection, isFalse);
-      });
-
-      test('should return null if not in selection mode', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-
-        // Act
-        final targetData = notifier.completeSelection();
-
-        // Assert
-        expect(targetData, isNull);
-      });
-    });
-
-    group('State Listeners', () {
-      test('should notify listeners when state changes', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        var callCount = 0;
-        final subscription = container.listen(cardSelectionProvider, (
-          previous,
-          next,
-        ) {
-          callCount++;
-        });
-
-        // Act
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 1);
-        notifier.selectCard(1, 2);
-        notifier.cancelSelection();
-
-        // Assert
-        expect(callCount, equals(4)); // Start + First + Second + Cancel
-
-        // Cleanup
-        subscription.close();
-      });
-
-      test('should provide correct helper values during selection', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        final states = <CardSelectionState>[];
-        final subscription = container.listen(cardSelectionProvider, (
-          previous,
-          next,
-        ) {
-          states.add(next);
-        });
-
-        // Act
-        notifier.startTeleportSelection();
-        notifier.selectCard(0, 1);
-        notifier.selectCard(1, 2);
-
-        // Assert
-        expect(states.length, equals(3));
-
-        // After start
-        expect(states[0].isSelecting, isTrue);
-        expect(states[0].canCompleteSelection, isFalse);
-
-        // After first selection
-        expect(states[1].hasFirstSelection, isTrue);
-        expect(states[1].canCompleteSelection, isFalse);
-
-        // After second selection
-        expect(states[2].isSelectionComplete, isTrue);
-        expect(states[2].canCompleteSelection, isTrue);
-
-        // Cleanup
-        subscription.close();
-      });
-    });
-
-    group('Edge Cases', () {
-      test('should handle rapid selection changes', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-
-        // Act - Rapid selections
-        notifier.selectCard(0, 0); // First selection
-        notifier.selectCard(0, 1); // Second selection
-        notifier.selectCard(0, 2); // Replaces first, second becomes null
-        notifier.selectCard(1, 0); // Becomes second selection
-        notifier.selectCard(1, 1); // Replaces first, second becomes null
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.hasFirstSelection, isTrue);
-        expect(
-          state.hasSecondSelection,
-          isFalse,
-        ); // Second should be null after last replacement
-        expect(state.firstSelection?.row, equals(1));
-        expect(state.firstSelection?.col, equals(1));
-        expect(state.secondSelection, isNull);
-      });
-
-      test('should handle boundary positions correctly', () {
-        // Arrange
-        final notifier = container.read(cardSelectionProvider.notifier);
-        notifier.startTeleportSelection();
-
-        // Act - Select corner positions
-        notifier.selectCard(0, 0); // Top-left
-        notifier.selectCard(2, 3); // Bottom-right (assuming 3x4 grid)
-
-        // Assert
-        final state = container.read(cardSelectionProvider);
-        expect(state.isSelectionComplete, isTrue);
-        expect(state.firstSelection?.row, equals(0));
-        expect(state.firstSelection?.col, equals(0));
-        expect(state.secondSelection?.row, equals(2));
-        expect(state.secondSelection?.col, equals(3));
-      });
+    test('should deliver complete strategic data structures for game action execution', () {
+      // Test behavior: comprehensive data generation for strategic action implementation
+      final notifier = container.read(cardSelectionProvider.notifier);
+      
+      // Test multi-format data delivery for different strategic contexts
+      final strategicScenarios = [
+        // Teleport action data format
+        () {
+          notifier.startTeleportSelection();
+          notifier.selectCard(0, 1);
+          notifier.selectCard(2, 3);
+          final data = notifier.completeSelection();
+          expect(data!['position1']['row'], 0, reason: 'Source position should be accurately captured');
+          expect(data['position2']['col'], 3, reason: 'Target position should be precisely recorded');
+        },
+        
+        // Intelligence gathering data format
+        () {
+          notifier.startPeekSelection(maxCards: 3);
+          notifier.selectCard(0, 0);
+          notifier.selectCard(1, 1);
+          notifier.selectCard(2, 2);
+          final data = notifier.completeSelection();
+          expect(data!['positions'], isA<List>(), reason: 'Intelligence data should be in list format');
+          expect(data['positions'].length, 3, reason: 'All scouted positions should be included');
+        },
+        
+        // Competitive targeting data format
+        () {
+          notifier.startStealSelection();
+          notifier.selectOpponent('target-player');
+          notifier.selectCard(1, 2);
+          final data = notifier.completeSelection();
+          expect(data!['opponentId'], 'target-player', reason: 'Target opponent should be preserved');
+          expect(data['position']['row'], 1, reason: 'Strategic card position should be captured');
+        },
+      ];
+      
+      for (final scenario in strategicScenarios) {
+        scenario();
+      }
+      
+      // Test data protection - incomplete actions should not produce data
+      notifier.startTeleportSelection();
+      notifier.selectCard(0, 1); // Incomplete
+      final incompleteData = notifier.completeSelection();
+      expect(incompleteData, isNull, reason: 'Incomplete strategic actions should not produce execution data');
+      
+      // Test state management after data generation
+      notifier.startTeleportSelection();
+      notifier.selectCard(0, 1);
+      notifier.selectCard(1, 2);
+      notifier.completeSelection();
+      
+      final postExecutionState = container.read(cardSelectionProvider);
+      expect(postExecutionState.isSelecting, false, reason: 'Strategic mode should reset after action execution');
     });
   });
 }

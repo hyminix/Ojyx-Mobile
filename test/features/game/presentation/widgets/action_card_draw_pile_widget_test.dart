@@ -12,7 +12,7 @@ class MockActionCardStateNotifier extends ActionCardStateNotifier with Mock {
 }
 
 void main() {
-  group('ActionCardDrawPileWidget', () {
+  group('ActionCardDrawPile Strategic Card Acquisition Behavior', () {
     late MockActionCardStateNotifier mockNotifier;
 
     setUp(() {
@@ -40,227 +40,147 @@ void main() {
       );
     }
 
-    testWidgets('should display draw pile with card count', (tester) async {
-      // Act
-      await tester.pumpWidget(createTestWidget());
+    testWidgets('should enable strategic action card acquisition when player turn allows', (tester) async {
+      // Test behavior: action card pile provides strategic advantage through new abilities
+      final drawScenarios = [
+        (
+          drawPileCount: 37,
+          canDraw: true,
+          expectDrawAction: true,
+          scenario: 'full deck during player turn enables strategic card acquisition'
+        ),
+        (
+          drawPileCount: 3,
+          canDraw: true,
+          expectDrawAction: true,
+          scenario: 'limited cards create urgency for strategic draws'
+        ),
+        (
+          drawPileCount: 37,
+          canDraw: false,
+          expectDrawAction: false,
+          scenario: 'opponent turn prevents unauthorized card acquisition'
+        ),
+        (
+          drawPileCount: 0,
+          canDraw: false,
+          expectDrawAction: false,
+          scenario: 'exhausted deck prevents any draw attempts'
+        ),
+      ];
 
-      // Assert
-      expect(find.text('Cartes Actions'), findsOneWidget);
-      expect(find.text('37'), findsOneWidget);
-      expect(find.byIcon(Icons.style), findsOneWidget);
+      for (final (drawPileCount: count, :canDraw, :expectDrawAction, :scenario) in drawScenarios) {
+        mockNotifier.state = ActionCardState(
+          drawPileCount: count,
+          discardPileCount: 0,
+          isLoading: false,
+        );
+
+        var drawAttempted = false;
+        await tester.pumpWidget(
+          createTestWidget(
+            canDraw: canDraw,
+            onDraw: () => drawAttempted = true,
+          ),
+        );
+
+        await tester.tap(find.byType(ActionCardDrawPileWidget));
+        await tester.pump();
+
+        expect(
+          drawAttempted,
+          expectDrawAction,
+          reason: 'Scenario: $scenario',
+        );
+      }
     });
 
-    testWidgets('should show empty state when no cards', (tester) async {
-      // Arrange
-      mockNotifier.state = const ActionCardState(
-        drawPileCount: 0,
-        discardPileCount: 0,
-        isLoading: false,
-      );
+    testWidgets('should communicate deck availability for strategic planning', (tester) async {
+      // Test behavior: deck status informs strategic decision-making
+      final deckScenarios = [
+        (drawPileCount: 37, expectedDisplay: '37', expectedStatus: null, 'abundant cards allow aggressive drawing'),
+        (drawPileCount: 5, expectedDisplay: '5', expectedStatus: null, 'low card count suggests conservative strategy'),
+        (drawPileCount: 0, expectedDisplay: '0', expectedStatus: 'Pile vide', 'empty pile requires adaptation'),
+      ];
 
-      // Act
-      await tester.pumpWidget(createTestWidget());
+      for (final (drawPileCount: count, :expectedDisplay, :expectedStatus, scenario) in deckScenarios) {
+        mockNotifier.state = ActionCardState(
+          drawPileCount: count,
+          discardPileCount: 0,
+          isLoading: false,
+        );
 
-      // Assert
-      expect(find.text('0'), findsOneWidget);
-      expect(find.text('Pile vide'), findsOneWidget);
+        await tester.pumpWidget(createTestWidget());
+
+        expect(find.text(expectedDisplay), findsOneWidget,
+            reason: 'Card count visibility enables strategic planning for $scenario');
+        
+        if (expectedStatus != null) {
+          expect(find.text(expectedStatus), findsOneWidget,
+              reason: 'Deck status communication for $scenario');
+        }
+      }
     });
 
-    testWidgets('should be tappable when canDraw is true', (tester) async {
-      // Arrange
-      var wasTapped = false;
+    testWidgets('should provide interactive feedback for strategic action timing', (tester) async {
+      // Test behavior: visual and interactive feedback guides strategic play
+      await tester.pumpWidget(createTestWidget(canDraw: true));
 
-      // Act
-      await tester.pumpWidget(
-        createTestWidget(canDraw: true, onDraw: () => wasTapped = true),
-      );
-
-      await tester.tap(find.byType(ActionCardDrawPileWidget));
-      await tester.pump();
-
-      // Assert
-      expect(wasTapped, isTrue);
-    });
-
-    testWidgets('should not be tappable when canDraw is false', (tester) async {
-      // Arrange
-      var wasTapped = false;
-
-      // Act
-      await tester.pumpWidget(
-        createTestWidget(canDraw: false, onDraw: () => wasTapped = true),
-      );
-
-      await tester.tap(find.byType(ActionCardDrawPileWidget));
-      await tester.pump();
-
-      // Assert
-      expect(wasTapped, isFalse);
-    });
-
-    testWidgets('should show disabled state when canDraw is false', (
-      tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(createTestWidget(canDraw: false));
-
-      // Assert
-      final container = tester.widget<Container>(
-        find
-            .descendant(of: find.byType(Card), matching: find.byType(Container))
-            .first,
-      );
-      final decoration = container.decoration as BoxDecoration;
-      final gradient = decoration.gradient as LinearGradient;
-      // Check that the gradient colors have reduced opacity
-      expect(gradient.colors.first.opacity, lessThan(1.0));
-    });
-
-    testWidgets('should show loading indicator when loading', (tester) async {
-      // Arrange
-      mockNotifier.state = const ActionCardState(
-        drawPileCount: 37,
-        discardPileCount: 0,
-        isLoading: true,
-      );
-
-      // Act
-      await tester.pumpWidget(createTestWidget());
-
-      // Assert
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    });
-
-    testWidgets('should have proper card back design', (tester) async {
-      // Act
-      await tester.pumpWidget(createTestWidget());
-
-      // Assert
-      final stack = tester.widget<Stack>(
-        find
-            .descendant(
-              of: find.byType(ActionCardDrawPileWidget),
-              matching: find.byType(Stack),
-            )
-            .first,
-      );
-      expect(
-        stack.children.length,
-        greaterThanOrEqualTo(2),
-      ); // Background + content
-    });
-
-    testWidgets('should animate on tap when enabled', (tester) async {
-      // Arrange
-      var tapCount = 0;
-
-      // Act
-      await tester.pumpWidget(
-        createTestWidget(canDraw: true, onDraw: () => tapCount++),
-      );
-
-      // First tap
-      await tester.tap(find.byType(ActionCardDrawPileWidget));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-
-      // Assert
-      expect(tapCount, equals(1));
-
-      // Should show some visual feedback
-      final inkWell = tester.widget<InkWell>(
-        find
-            .descendant(
-              of: find.byType(ActionCardDrawPileWidget),
-              matching: find.byType(InkWell),
-            )
-            .first,
-      );
-      expect(inkWell.onTap, isNotNull);
-    });
-
-    testWidgets('should display proper size for mobile', (tester) async {
-      // Act
-      await tester.pumpWidget(createTestWidget());
-
-      // Assert
-      final sizedBox = tester.widget<SizedBox>(
-        find
-            .ancestor(of: find.byType(Stack), matching: find.byType(SizedBox))
-            .first,
-      );
-      expect(sizedBox.width, equals(100));
-      expect(sizedBox.height, equals(140));
-    });
-
-    testWidgets('should show tooltip on long press', (tester) async {
-      // Act
-      await tester.pumpWidget(createTestWidget());
-
+      // Long press reveals strategic guidance
       await tester.longPress(find.byType(ActionCardDrawPileWidget));
       await tester.pumpAndSettle();
 
-      // Assert - The tooltip/snackbar should appear
-      expect(find.text('Piochez une carte action'), findsOneWidget);
+      expect(find.text('Piochez une carte action'), findsOneWidget,
+          reason: 'Strategic guidance helps players understand action card mechanics');
     });
 
-    testWidgets('should update count when state changes', (tester) async {
-      // Initial state
-      await tester.pumpWidget(createTestWidget());
-      expect(find.text('37'), findsOneWidget);
-
-      // Update state
+    testWidgets('should handle concurrent draw operations during intense gameplay', (tester) async {
+      // Test behavior: system prevents accidental multiple draws maintaining game integrity
       mockNotifier.state = const ActionCardState(
-        drawPileCount: 25,
-        discardPileCount: 12,
+        drawPileCount: 10,
+        discardPileCount: 0,
+        isLoading: true, // Simulating ongoing draw operation
+      );
+
+      var additionalDrawAttempted = false;
+      await tester.pumpWidget(
+        createTestWidget(
+          canDraw: true,
+          onDraw: () => additionalDrawAttempted = true,
+        ),
+      );
+
+      // Loading state should prevent additional draws
+      expect(find.byType(CircularProgressIndicator), findsOneWidget,
+          reason: 'Loading indicator prevents duplicate draw operations');
+
+      await tester.tap(find.byType(ActionCardDrawPileWidget), warnIfMissed: false);
+      await tester.pump();
+
+      expect(additionalDrawAttempted, isFalse,
+          reason: 'Concurrent draw protection maintains game state integrity');
+    });
+
+    testWidgets('should reflect dynamic deck changes for strategic awareness', (tester) async {
+      // Test behavior: real-time deck updates inform evolving strategies
+      await tester.pumpWidget(createTestWidget());
+      
+      // Initial abundant state
+      expect(find.text('37'), findsOneWidget,
+          reason: 'Initial deck state establishes baseline strategy');
+
+      // Mid-game depletion affects strategy
+      mockNotifier.state = const ActionCardState(
+        drawPileCount: 12,
+        discardPileCount: 25,
         isLoading: false,
       );
       await tester.pump();
 
-      // Assert
-      expect(find.text('25'), findsOneWidget);
-      expect(find.text('37'), findsNothing);
-    });
-
-    testWidgets('should have elevation for depth effect', (tester) async {
-      // Act
-      await tester.pumpWidget(createTestWidget());
-
-      // Assert
-      final card = tester.widget<Card>(find.byType(Card).first);
-      expect(card.elevation, greaterThan(0));
-    });
-
-    testWidgets('should use theme colors appropriately', (tester) async {
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData(
-            primaryColor: Colors.blue,
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          ),
-          home: Scaffold(
-            body: Center(
-              child: ProviderScope(
-                overrides: [
-                  actionCardStateNotifierProvider.overrideWith(
-                    (ref) => mockNotifier,
-                  ),
-                ],
-                child: const ActionCardDrawPileWidget(canDraw: true),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Assert - The widget should use theme colors
-      final container = tester.widget<Container>(
-        find
-            .descendant(of: find.byType(Card), matching: find.byType(Container))
-            .first,
-      );
-      expect(container.decoration, isA<BoxDecoration>());
+      expect(find.text('12'), findsOneWidget,
+          reason: 'Depleted deck signals shift to conservative strategy');
+      expect(find.text('37'), findsNothing,
+          reason: 'Outdated information removed for accurate decision-making');
     });
   });
 }

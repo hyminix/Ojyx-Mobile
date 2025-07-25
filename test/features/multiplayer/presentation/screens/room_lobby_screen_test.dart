@@ -88,525 +88,340 @@ void main() {
     );
   }
 
-  group('RoomLobbyScreen', () {
+  group('Competitive Room Lobby for Strategic Multiplayer Gaming Coordination', () {
     const testRoomId = 'room12345678';
 
-    testWidgets('should display app bar with correct title', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('should provide comprehensive competitive room lobby experience for strategic multiplayer gaming preparation', (WidgetTester tester) async {
+      // Test behavior: lobby provides complete competitive room management for strategic gaming coordination
+      
       setLargeScreenSize(tester);
-
-      setLargeScreenSize(tester);
-
-      // Arrange
-      final room = createTestRoom();
-
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
-          currentUserId: 'user123',
-        ),
+      const competitiveHostId = 'tournament-organizer-789';
+      const strategicParticipantId = 'competitive-player-456';
+      
+      final competitiveRoomWaiting = Room(
+        id: testRoomId,
+        creatorId: competitiveHostId,
+        playerIds: [competitiveHostId, strategicParticipantId],
+        status: RoomStatus.waiting,
+        maxPlayers: 4,
       );
-      await tester.pump();
+      
+      final competitiveRoomReadyToStart = competitiveRoomWaiting.copyWith(
+        playerIds: [competitiveHostId, strategicParticipantId, 'strategic-competitor-111'],
+      );
 
-      // Assert
-      expect(find.text('Salle d\'attente'), findsOneWidget);
-      expect(find.byType(AppBar), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+      when(() => mockRoomRepository.leaveRoom(
+            roomId: testRoomId,
+            playerId: strategicParticipantId,
+          )).thenAnswer((_) async {});
+
+      // Room information display behavior - competitive context awareness
+      await tester.pumpWidget(createWidgetUnderTest(
+        roomId: testRoomId,
+        room: competitiveRoomWaiting,
+        currentUserId: strategicParticipantId,
+      ));
+      await tester.pump();
+      
+      expect(find.text('Salle d\'attente'), findsOneWidget, reason: 'Should display competitive lobby header');
+      expect(find.byType(AppBar), findsOneWidget, reason: 'Should provide navigation structure for competitive interface');
+      expect(find.byIcon(Icons.arrow_back), findsOneWidget, reason: 'Should enable competitive room exit');
+      expect(find.text('Partie #room1234'), findsOneWidget, reason: 'Should display competitive room identification');
+      expect(find.text('En attente'), findsOneWidget, reason: 'Should indicate competitive room status');
+      expect(find.text('Joueurs'), findsOneWidget, reason: 'Should provide competitive participant section');
+      expect(find.text('2/4'), findsOneWidget, reason: 'Should show competitive participant count for strategic planning');
+      expect(find.byIcon(Icons.meeting_room), findsOneWidget, reason: 'Should use room icon for competitive context');
+
+      // Competitive participant display behavior - enable strategic awareness
+      expect(find.text('Joueur 1'), findsOneWidget, reason: 'Should display host as first competitive participant');
+      expect(find.text('Vous'), findsOneWidget, reason: 'Should identify current user in competitive roster');
+      expect(find.text('En attente...'), findsNWidgets(2), reason: 'Should indicate available competitive slots');
+      expect(find.text('Créateur'), findsOneWidget, reason: 'Should identify competitive room host');
+      expect(find.text('Joueur'), findsOneWidget, reason: 'Should identify competitive participants');
+      expect(find.byIcon(Icons.star), findsOneWidget, reason: 'Should display host authority icon for competitive control');
+      expect(find.byIcon(Icons.person), findsOneWidget, reason: 'Should show participant icon for competitive identification');
+      expect(find.byIcon(Icons.person_outline), findsNWidgets(2), reason: 'Should indicate empty competitive slots');
+
+      // Participant state management behavior - competitive coordination
+      expect(find.text('En attente du créateur...'), findsOneWidget, reason: 'Should inform participants about competitive game launch dependency');
+      expect(find.byType(LinearProgressIndicator), findsOneWidget, reason: 'Should display waiting indicator for competitive coordination');
+      expect(find.text('Lancer la partie'), findsNothing, reason: 'Should hide game launch action for non-host competitive participants');
+
+      // Competitive room exit behavior - participant management
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+      
+      verify(() => mockRoomRepository.leaveRoom(
+            roomId: testRoomId,
+            playerId: strategicParticipantId,
+          )).called(1);
+      expect(find.text('Home Screen'), findsOneWidget, reason: 'Should navigate to home after competitive room exit');
     });
 
-    testWidgets('should show loading state', (WidgetTester tester) async {
-      setLargeScreenSize(tester);
+    group('should handle competitive host controls for strategic game management', () {
+      testWidgets('when sufficient participants are available for competitive launch', (WidgetTester tester) async {
+        // Test behavior: host can launch competitive games when strategic conditions are met
+        
+        setLargeScreenSize(tester);
+        const competitiveHostId = 'tournament-organizer-789';
+        
+        final readyCompetitiveRoom = Room(
+          id: testRoomId,
+          creatorId: competitiveHostId,
+          playerIds: [competitiveHostId, 'strategic-competitor-123'],
+          status: RoomStatus.waiting,
+          maxPlayers: 4,
+        );
 
-      setLargeScreenSize(tester);
+        await tester.pumpWidget(createWidgetUnderTest(
+          roomId: testRoomId,
+          room: readyCompetitiveRoom,
+          currentUserId: competitiveHostId,
+        ));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pump();
 
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
+        expect(find.text('Lancer la partie'), findsOneWidget, reason: 'Should provide competitive game launch action for host');
+        expect(find.byIcon(Icons.play_arrow), findsOneWidget, reason: 'Should display launch icon for competitive game start');
+
+        // Competitive game launch behavior
+        await tester.tap(find.text('Lancer la partie'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Game $testRoomId'), findsOneWidget, reason: 'Should navigate to competitive game interface');
+      });
+
+      testWidgets('when insufficient participants prevent competitive launch', (WidgetTester tester) async {
+        // Test behavior: host receives clear feedback about competitive launch constraints
+        
+        setLargeScreenSize(tester);
+        const competitiveHostId = 'tournament-organizer-789';
+        
+        final insufficientCompetitiveRoom = Room(
+          id: testRoomId,
+          creatorId: competitiveHostId,
+          playerIds: [competitiveHostId],
+          status: RoomStatus.waiting,
+          maxPlayers: 4,
+        );
+
+        await tester.pumpWidget(createWidgetUnderTest(
+          roomId: testRoomId,
+          room: insufficientCompetitiveRoom,
+          currentUserId: competitiveHostId,
+        ));
+        await tester.pump();
+
+        expect(find.text('En attente de joueurs (minimum 2)'), findsOneWidget, reason: 'Should inform host about competitive participant requirements');
+        expect(find.text('Lancer la partie'), findsNothing, reason: 'Should hide launch action when competitive requirements unmet');
+      });
+
+      testWidgets('when excessive participants exceed competitive balance limits', (WidgetTester tester) async {
+        // Test behavior: host receives feedback about competitive balance constraints
+        
+        setLargeScreenSize(tester);
+        const competitiveHostId = 'tournament-organizer-789';
+        
+        final excessiveCompetitiveRoom = Room(
+          id: testRoomId,
+          creatorId: competitiveHostId,
+          playerIds: [competitiveHostId, 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9'],
+          status: RoomStatus.waiting,
+          maxPlayers: 10,
+        );
+
+        await tester.pumpWidget(createWidgetUnderTest(
+          roomId: testRoomId,
+          room: excessiveCompetitiveRoom,
+          currentUserId: competitiveHostId,
+        ));
+        await tester.pump();
+
+        expect(find.text('En attente de joueurs (minimum 2)'), findsOneWidget, reason: 'Should indicate competitive constraints when participant count exceeds strategic balance');
+      });
+    });
+
+    group('should display accurate competitive room status information for strategic awareness', () {
+      testWidgets('across all competitive room states', (WidgetTester tester) async {
+        // Test behavior: lobby displays precise status information for competitive gaming coordination
+        
+        setLargeScreenSize(tester);
+        
+        final competitiveStatusTests = [
+          (RoomStatus.waiting, 'En attente'),
+          (RoomStatus.inGame, 'En cours'),
+          (RoomStatus.finished, 'Terminée'),
+          (RoomStatus.cancelled, 'Annulée'),
+        ];
+
+        for (final (status, expectedText) in competitiveStatusTests) {
+          final competitiveRoom = createTestRoom(status: status);
+
+          await tester.pumpWidget(createWidgetUnderTest(
+            roomId: testRoomId,
+            room: competitiveRoom,
+            currentUserId: 'creator1',
+          ));
+          await tester.pump();
+
+          expect(find.text(expectedText), findsOneWidget, reason: 'Should display accurate competitive status: $expectedText');
+
+          await tester.pumpWidget(Container());
+        }
+      });
+
+      testWidgets('for maximum competitive capacity scenarios', (WidgetTester tester) async {
+        // Test behavior: lobby handles maximum competitive capacity display accurately
+        
+        setLargeScreenSize(tester);
+        
+        final maxCapacityCompetitiveRoom = Room(
+          id: testRoomId,
+          creatorId: 'creator1',
+          playerIds: ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'],
+          status: RoomStatus.waiting,
+          maxPlayers: 6,
+        );
+
+        await tester.pumpWidget(createWidgetUnderTest(
+          roomId: testRoomId,
+          room: maxCapacityCompetitiveRoom,
+          currentUserId: 'p3',
+        ));
+        await tester.pump();
+
+        expect(find.text('6/6'), findsOneWidget, reason: 'Should display accurate maximum competitive capacity');
+        expect(find.byType(ListTile), findsNWidgets(6), reason: 'Should show exactly maximum competitive participants');
+        expect(find.text('En attente...'), findsNothing, reason: 'Should not show empty slots when competitive capacity reached');
+      });
+    });
+
+    group('should handle competitive lobby errors and edge cases gracefully', () {
+      testWidgets('when competitive room data loading fails', (WidgetTester tester) async {
+        // Test behavior: lobby provides clear error feedback for competitive infrastructure issues
+        
+        setLargeScreenSize(tester);
+        
+        await tester.pumpWidget(createWidgetUnderTest(
           roomId: testRoomId,
           isLoading: true,
           currentUserId: 'user123',
-        ),
-      );
-      await tester.pump();
+        ));
+        await tester.pump();
+        
+        expect(find.byType(CircularProgressIndicator), findsOneWidget, reason: 'Should display loading indicator during competitive room data retrieval');
+      });
 
-      // Assert
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    });
-
-    testWidgets('should show error state', (WidgetTester tester) async {
-      setLargeScreenSize(tester);
-
-      setLargeScreenSize(tester);
-
-      // Arrange
-      const errorMessage = 'Room not found';
-
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
+      testWidgets('when competitive room infrastructure encounters errors', (WidgetTester tester) async {
+        // Test behavior: lobby handles infrastructure failures with appropriate user guidance
+        
+        setLargeScreenSize(tester);
+        const infrastructureError = 'Competitive room infrastructure temporarily unavailable';
+        
+        await tester.pumpWidget(createWidgetUnderTest(
           roomId: testRoomId,
-          error: Exception(errorMessage),
+          error: Exception(infrastructureError),
           currentUserId: 'user123',
-        ),
-      );
-      await tester.pump();
+        ));
+        await tester.pump();
+        
+        expect(find.text('Erreur: Exception: $infrastructureError'), findsOneWidget, reason: 'Should display specific competitive infrastructure error information');
+        expect(find.text('Retour à l\'accueil'), findsOneWidget, reason: 'Should provide navigation option for competitive error recovery');
+        expect(find.byIcon(Icons.error_outline), findsOneWidget, reason: 'Should use error icon for competitive infrastructure failure indication');
+        
+        await tester.tap(find.text('Retour à l\'accueil'));
+        await tester.pumpAndSettle();
+        
+        expect(find.text('Home Screen'), findsOneWidget, reason: 'Should navigate to home for competitive error recovery');
+      });
 
-      // Assert
-      expect(find.text('Erreur: Exception: $errorMessage'), findsOneWidget);
-      expect(find.text('Retour à l\'accueil'), findsOneWidget);
-      expect(find.byIcon(Icons.error_outline), findsOneWidget);
-    });
-
-    testWidgets('should display room information correctly', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      final room = createTestRoom(
-        id: 'room123456789',
-        status: RoomStatus.waiting,
-        playerIds: ['creator1', 'player2'],
-        maxPlayers: 4,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
+      testWidgets('when anonymous users participate in competitive rooms', (WidgetTester tester) async {
+        // Test behavior: lobby handles anonymous competitive participation gracefully
+        
+        setLargeScreenSize(tester);
+        final competitiveRoom = createTestRoom();
+        
+        await tester.pumpWidget(createWidgetUnderTest(
           roomId: testRoomId,
-          room: room,
-          currentUserId: 'creator1',
-        ),
-      );
-      await tester.pump();
-
-      // Assert
-      expect(find.text('Partie #room1234'), findsOneWidget);
-      expect(find.text('En attente'), findsOneWidget);
-      expect(find.text('Joueurs'), findsOneWidget);
-      expect(find.text('2/4'), findsOneWidget);
-      expect(find.byIcon(Icons.meeting_room), findsOneWidget);
-    });
-
-    testWidgets('should display players list correctly', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      final room = createTestRoom(
-        creatorId: 'creator1',
-        playerIds: ['creator1', 'player2'],
-        maxPlayers: 4,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
-          currentUserId: 'player2',
-        ),
-      );
-      await tester.pump();
-
-      // Assert
-      expect(find.text('Joueur 1'), findsOneWidget);
-      expect(find.text('Vous'), findsOneWidget);
-      expect(find.text('En attente...'), findsNWidgets(2)); // 2 empty slots
-      expect(find.text('Créateur'), findsOneWidget);
-      expect(find.text('Joueur'), findsOneWidget);
-      expect(find.byIcon(Icons.star), findsOneWidget); // Host icon
-      expect(find.byIcon(Icons.person), findsOneWidget); // Player icon
-      expect(
-        find.byIcon(Icons.person_outline),
-        findsNWidgets(2),
-      ); // Empty slots
-    });
-
-    testWidgets('should show start button for creator when can start', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      final room = createTestRoom(
-        creatorId: 'creator1',
-        playerIds: ['creator1', 'player2'],
-        maxPlayers: 4,
-        status: RoomStatus.waiting,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
-          currentUserId: 'creator1',
-        ),
-      );
-
-      // Multiple pumps to ensure Stream is processed
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump();
-
-      // Debug: Check what's actually rendered
-      // First check if we're in the right state
-      expect(find.byType(RoomLobbyScreen), findsOneWidget);
-      expect(
-        find.byType(CircularProgressIndicator),
-        findsNothing,
-        reason: 'Should not be loading',
-      );
-
-      // Check if the room info is displayed
-      expect(
-        find.text('Partie #${testRoomId.substring(0, 8)}'),
-        findsOneWidget,
-        reason: 'Room ID should be displayed',
-      );
-
-      // Check player count
-      expect(
-        find.text('2/4'),
-        findsOneWidget,
-        reason: 'Player count should be displayed',
-      );
-
-      // Assert
-      expect(find.text('Lancer la partie'), findsOneWidget);
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
-
-      // Instead of looking for the button itself, verify the text is in the correct state
-      // and that it's tappable (which means the button is enabled)
-      final launcherTextFinder = find.text('Lancer la partie');
-      expect(launcherTextFinder, findsOneWidget);
-
-      // Try to tap it to verify it's enabled
-      await tester.tap(launcherTextFinder);
-      await tester.pump();
-      // If we can tap it without error, the button is enabled
-    });
-
-    testWidgets('should disable start button when not enough players', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      final room = createTestRoom(
-        creatorId: 'creator1',
-        playerIds: ['creator1'], // Only 1 player
-        maxPlayers: 4,
-        status: RoomStatus.waiting,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
-          currentUserId: 'creator1',
-        ),
-      );
-      await tester.pump();
-
-      // Assert
-      expect(find.text('En attente de joueurs (minimum 2)'), findsOneWidget);
-
-      // The button should be present but disabled
-      // We know it's disabled if we see the "En attente de joueurs" text
-      // which only appears when canStart is false
-    });
-
-    testWidgets('should show waiting message for non-creator', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      final room = createTestRoom(
-        creatorId: 'creator1',
-        playerIds: ['creator1', 'player2'],
-        maxPlayers: 4,
-        status: RoomStatus.waiting,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
-          currentUserId: 'player2',
-        ),
-      );
-      await tester.pump();
-
-      // Assert
-      expect(find.text('En attente du créateur...'), findsOneWidget);
-      expect(find.byType(LinearProgressIndicator), findsOneWidget);
-      expect(find.text('Lancer la partie'), findsNothing);
-    });
-
-    testWidgets('should start game when button pressed', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      final room = createTestRoom(
-        creatorId: 'creator1',
-        playerIds: ['creator1', 'player2'],
-        maxPlayers: 4,
-        status: RoomStatus.waiting,
-      );
-
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
-          currentUserId: 'creator1',
-        ),
-      );
-      await tester.pump();
-
-      // Act
-      await tester.tap(find.text('Lancer la partie'));
-      await tester.pumpAndSettle();
-
-      // Assert - should navigate to game screen
-      expect(find.text('Game $testRoomId'), findsOneWidget);
-    });
-
-    testWidgets('should leave room when back button pressed', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      const currentUserId = 'player2';
-      final room = createTestRoom(
-        creatorId: 'creator1',
-        playerIds: ['creator1', currentUserId],
-        maxPlayers: 4,
-      );
-
-      when(
-        () => mockRoomRepository.leaveRoom(
-          roomId: testRoomId,
-          playerId: currentUserId,
-        ),
-      ).thenAnswer((_) async {});
-
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
-          currentUserId: currentUserId,
-        ),
-      );
-      await tester.pump();
-
-      // Act
-      await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
-
-      // Assert
-      verify(
-        () => mockRoomRepository.leaveRoom(
-          roomId: testRoomId,
-          playerId: currentUserId,
-        ),
-      ).called(1);
-
-      expect(find.text('Home Screen'), findsOneWidget);
-    });
-
-    testWidgets('should handle back button without user ID', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      final room = createTestRoom();
-
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
+          room: competitiveRoom,
           currentUserId: null,
-        ),
-      );
-      await tester.pump();
-
-      // Act
-      await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
-
-      // Assert - should still navigate but not call leaveRoom
-      verifyNever(
-        () => mockRoomRepository.leaveRoom(
-          roomId: any(named: 'roomId'),
-          playerId: any(named: 'playerId'),
-        ),
-      );
-
-      expect(find.text('Home Screen'), findsOneWidget);
+        ));
+        await tester.pump();
+        
+        await tester.tap(find.byIcon(Icons.arrow_back));
+        await tester.pumpAndSettle();
+        
+        verifyNever(() => mockRoomRepository.leaveRoom(
+              roomId: any(named: 'roomId'),
+              playerId: any(named: 'playerId'),
+            ));
+        expect(find.text('Home Screen'), findsOneWidget, reason: 'Should handle anonymous competitive room exit without repository calls');
+      });
     });
 
-    testWidgets('should display correct status colors and text', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Test different room statuses
-      final statusTests = [
-        (RoomStatus.waiting, 'En attente'),
-        (RoomStatus.inGame, 'En cours'),
-        (RoomStatus.finished, 'Terminée'),
-        (RoomStatus.cancelled, 'Annulée'),
-      ];
-
-      for (final (status, expectedText) in statusTests) {
-        final room = createTestRoom(status: status);
-
-        await tester.pumpWidget(
-          createWidgetUnderTest(
-            roomId: testRoomId,
-            room: room,
-            currentUserId: 'creator1',
-          ),
+    group('should prevent competitive actions for inappropriate room states', () {
+      testWidgets('when competitive room is already in active game state', (WidgetTester tester) async {
+        // Test behavior: lobby prevents inappropriate actions for ongoing competitive games
+        
+        setLargeScreenSize(tester);
+        
+        final activeCompetitiveRoom = Room(
+          id: testRoomId,
+          creatorId: 'creator1',
+          playerIds: ['creator1', 'player2'],
+          status: RoomStatus.inGame,
+          maxPlayers: 4,
         );
+
+        await tester.pumpWidget(createWidgetUnderTest(
+          roomId: testRoomId,
+          room: activeCompetitiveRoom,
+          currentUserId: 'creator1',
+        ));
         await tester.pump();
 
-        expect(find.text(expectedText), findsOneWidget);
-
-        // Clean up for next iteration
-        await tester.pumpWidget(Container());
-      }
+        expect(find.text('Lancer la partie'), findsNothing, reason: 'Should not show launch action for active competitive games');
+        expect(find.text('En attente du créateur...'), findsNothing, reason: 'Should not show waiting message for active competitive games');
+      });
     });
 
-    testWidgets('should not show start button for non-waiting rooms', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('should maintain proper competitive styling and user identification for strategic gaming interface', (WidgetTester tester) async {
+      // Test behavior: lobby provides polished interface suitable for competitive gaming coordination
+      
       setLargeScreenSize(tester);
-
-      // Arrange
-      final room = createTestRoom(
+      
+      final styledCompetitiveRoom = Room(
+        id: testRoomId,
         creatorId: 'creator1',
         playerIds: ['creator1', 'player2'],
-        status: RoomStatus.inGame,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
-          currentUserId: 'creator1',
-        ),
-      );
-      await tester.pump();
-
-      // Assert
-      expect(find.text('Lancer la partie'), findsNothing);
-      expect(find.text('En attente du créateur...'), findsNothing);
-    });
-
-    testWidgets('should highlight current user correctly', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      final room = createTestRoom(
-        creatorId: 'creator1',
-        playerIds: ['creator1', 'player2'],
+        status: RoomStatus.waiting,
         maxPlayers: 4,
       );
 
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
-          currentUserId: 'player2',
-        ),
-      );
+      await tester.pumpWidget(createWidgetUnderTest(
+        roomId: testRoomId,
+        room: styledCompetitiveRoom,
+        currentUserId: 'player2',
+      ));
       await tester.pump();
 
-      // Assert
-      expect(find.text('Vous'), findsOneWidget);
-      expect(
-        find.text('Joueur 1'),
-        findsOneWidget,
-      ); // Creator shown as Joueur 1
-
-      // Check that current user has different styling
+      expect(find.byType(SafeArea), findsWidgets, reason: 'Should respect device boundaries for competitive interface safety');
+      expect(find.byType(Card), findsNWidgets(2), reason: 'Should use card layout for organized competitive information presentation');
+      expect(find.byType(CircleAvatar), findsAtLeastNWidgets(1), reason: 'Should display participant avatars for competitive visual identification');
+      
+      // Current user highlighting behavior for competitive awareness
+      expect(find.text('Vous'), findsOneWidget, reason: 'Should clearly identify current competitive participant');
+      expect(find.text('Joueur 1'), findsOneWidget, reason: 'Should identify other competitive participants appropriately');
+      
       final listTiles = tester.widgetList<ListTile>(find.byType(ListTile));
       final currentUserTile = listTiles.firstWhere(
         (tile) => (tile.title as Text).data == 'Vous',
       );
       final titleStyle = (currentUserTile.title as Text).style;
-      expect(titleStyle?.fontWeight, FontWeight.bold);
-    });
-
-    testWidgets('should handle max players correctly', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      final room = createTestRoom(
-        playerIds: ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'],
-        maxPlayers: 6,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
-          currentUserId: 'p3',
-        ),
-      );
-      await tester.pump();
-
-      // Assert
-      expect(find.text('6/6'), findsOneWidget);
-      expect(find.byType(ListTile), findsNWidgets(6)); // Exactly 6 tiles
-      expect(find.text('En attente...'), findsNothing); // No empty slots
-    });
-
-    testWidgets('should apply correct styling', (WidgetTester tester) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      final room = createTestRoom();
-
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
-          currentUserId: 'creator1',
-        ),
-      );
-      await tester.pump();
-
-      // Assert
-      expect(find.byType(SafeArea), findsWidgets);
-      expect(
-        find.byType(Card),
-        findsNWidgets(2),
-      ); // Room info card + players card
-      expect(find.byType(CircleAvatar), findsAtLeastNWidgets(1));
-
-      // Check proper padding - find the padding that has EdgeInsets.all(24)
+      expect(titleStyle?.fontWeight, FontWeight.bold, reason: 'Should highlight current competitive participant with bold styling');
+      
+      // Proper spacing for competitive interface comfort
       final paddings = tester.widgetList<Padding>(
         find.descendant(
           of: find.byType(SafeArea),
@@ -616,61 +431,7 @@ void main() {
       final hasPadding24 = paddings.any(
         (p) => p.padding == const EdgeInsets.all(24.0),
       );
-      expect(hasPadding24, isTrue);
-    });
-
-    testWidgets('should navigate to home on error button press', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          error: Exception('Test error'),
-          currentUserId: 'user123',
-        ),
-      );
-      await tester.pump();
-
-      // Act
-      await tester.tap(find.text('Retour à l\'accueil'));
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text('Home Screen'), findsOneWidget);
-    });
-
-    testWidgets('should disable start for too many players', (
-      WidgetTester tester,
-    ) async {
-      setLargeScreenSize(tester);
-
-      // Arrange - Test with 9 players (over the limit of 8)
-      final room = createTestRoom(
-        creatorId: 'creator1',
-        playerIds: ['creator1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9'],
-        maxPlayers: 10,
-        status: RoomStatus.waiting,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          roomId: testRoomId,
-          room: room,
-          currentUserId: 'creator1',
-        ),
-      );
-      await tester.pump();
-
-      // Assert - should be disabled due to too many players (>8)
-      // With 9 players (>8), canStart is false, so the button shows disabled message
-      expect(find.text('En attente de joueurs (minimum 2)'), findsOneWidget);
-
-      // The button should be present but disabled
-      // We know it's disabled if we see the "En attente de joueurs" text
+      expect(hasPadding24, isTrue, reason: 'Should apply proper padding for competitive interface comfort');
     });
   });
 }

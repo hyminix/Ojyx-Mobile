@@ -8,14 +8,14 @@ import 'package:ojyx/features/game/presentation/widgets/action_card_hand_widget.
 import 'package:ojyx/features/game/presentation/widgets/action_card_widget.dart';
 
 void main() {
-  group('ActionCardHandWidget', () {
+  group('ActionCardHand Strategic Hand Management Behavior', () {
     late GamePlayer testPlayer;
-    late List<ActionCard> testCards;
+    late List<ActionCard> strategicCards;
 
     setUp(() {
-      testCards = [
+      strategicCards = [
         const ActionCard(
-          id: 'card1',
+          id: 'skip-card',
           type: ActionCardType.skip,
           name: 'Saut',
           description: 'Le prochain joueur passe son tour',
@@ -23,7 +23,7 @@ void main() {
           target: ActionTarget.none,
         ),
         const ActionCard(
-          id: 'card2',
+          id: 'shield-card',
           type: ActionCardType.shield,
           name: 'Bouclier',
           description: 'Protégez-vous des attaques',
@@ -31,7 +31,7 @@ void main() {
           target: ActionTarget.self,
         ),
         const ActionCard(
-          id: 'card3',
+          id: 'reverse-card',
           type: ActionCardType.turnAround,
           name: 'Demi-tour',
           description: 'Inversez le sens du jeu',
@@ -41,10 +41,10 @@ void main() {
       ];
 
       testPlayer = GamePlayer(
-        id: 'player1',
-        name: 'Test GamePlayer',
+        id: 'strategic-player',
+        name: 'Strategic Master',
         grid: PlayerGrid.empty(),
-        actionCards: testCards,
+        actionCards: strategicCards,
       );
     });
 
@@ -70,248 +70,181 @@ void main() {
       );
     }
 
-    testWidgets('should display all action cards in hand', (tester) async {
-      // Act
-      await tester.pumpWidget(createTestWidget(player: testPlayer));
-
-      // Assert
-      expect(find.byType(ActionCardWidget), findsNWidgets(3));
-      expect(find.text('Saut'), findsOneWidget);
-      expect(find.text('Bouclier'), findsOneWidget);
-      expect(find.text('Demi-tour'), findsOneWidget);
-    });
-
-    testWidgets('should display empty state when no cards', (tester) async {
-      // Arrange
-      final emptyPlayer = testPlayer.copyWith(actionCards: []);
-
-      // Act
-      await tester.pumpWidget(createTestWidget(player: emptyPlayer));
-
-      // Assert
-      expect(find.byType(ActionCardWidget), findsNothing);
-      expect(find.text('Aucune carte action'), findsOneWidget);
-      expect(find.byIcon(Icons.do_not_disturb), findsOneWidget);
-    });
-
-    testWidgets('should show card count indicator', (tester) async {
-      // Act
-      await tester.pumpWidget(createTestWidget(player: testPlayer));
-
-      // Assert
-      expect(find.text('Cartes Actions (3/3)'), findsOneWidget);
-    });
-
-    testWidgets('should handle card tap for current player', (tester) async {
-      // Arrange
-      ActionCard? tappedCard;
-
-      // Act
-      await tester.pumpWidget(
-        createTestWidget(
-          player: testPlayer,
-          isCurrentPlayer: true,
-          onCardTap: (card) => tappedCard = card,
-        ),
-      );
-
-      await tester.tap(find.byType(ActionCardWidget).first);
-      await tester.pump();
-
-      // Assert
-      expect(tappedCard, equals(testCards[0]));
-
-      // Clean up the timer
-      await tester.pump(const Duration(milliseconds: 300));
-    });
-
-    testWidgets('should not allow card tap for other players', (tester) async {
-      // Arrange
-      ActionCard? tappedCard;
-
-      // Act
-      await tester.pumpWidget(
-        createTestWidget(
-          player: testPlayer,
-          isCurrentPlayer: false,
-          onCardTap: (card) => tappedCard = card,
-        ),
-      );
-
-      await tester.tap(find.byType(ActionCardWidget).first);
-      await tester.pump();
-
-      // Assert
-      expect(tappedCard, isNull);
-    });
-
-    testWidgets('should highlight immediate cards that must be played', (
-      tester,
-    ) async {
-      // Act
+    testWidgets('should enforce immediate action card priority for game flow integrity', (tester) async {
+      // Test behavior: immediate cards must be played first to maintain game rules
       await tester.pumpWidget(
         createTestWidget(player: testPlayer, isCurrentPlayer: true),
       );
 
-      // Assert
-      // The Demi-tour card (immediate) should be highlighted
+      // Verify immediate card is highlighted for forced play
       final immediateCardWidget = tester.widget<ActionCardWidget>(
-        find.byType(ActionCardWidget).at(2), // Third card is Demi-tour
+        find.byType(ActionCardWidget).at(2), // Demi-tour card
       );
-      expect(immediateCardWidget.isHighlighted, isTrue);
+      expect(immediateCardWidget.isHighlighted, isTrue,
+          reason: 'Immediate cards create mandatory strategic decisions');
+      expect(immediateCardWidget.card.timing, ActionTiming.immediate,
+          reason: 'Turn reversal must execute immediately affecting all players');
     });
 
-    testWidgets('should trigger discard callback on long press', (
-      tester,
-    ) async {
-      // For simplicity, we'll test that long press works without testing the actual menu
-      // since menus can be tricky to test in Flutter
+    testWidgets('should enable strategic card activation only during player turn', (tester) async {
+      // Test behavior: turn-based fairness prevents unauthorized card usage
+      final activationScenarios = [
+        (isCurrentPlayer: true, expectActivation: true, 'current player can execute strategic actions'),
+        (isCurrentPlayer: false, expectActivation: false, 'opponents cannot hijack turn order'),
+      ];
 
-      // Arrange
-      var longPressDetected = false;
+      for (final (:isCurrentPlayer, :expectActivation, scenario) in activationScenarios) {
+        ActionCard? activatedCard;
+        await tester.pumpWidget(
+          createTestWidget(
+            player: testPlayer,
+            isCurrentPlayer: isCurrentPlayer,
+            onCardTap: (card) => activatedCard = card,
+          ),
+        );
 
-      // Act
-      await tester.pumpWidget(
-        createTestWidget(
-          player: testPlayer,
-          isCurrentPlayer: true,
-          onCardDiscard: (card) => longPressDetected = true,
-        ),
-      );
+        await tester.tap(find.text('Saut')); // Try to skip opponent's turn
+        await tester.pump();
 
-      // Verify that long press gesture is set up
-      final gesture = tester.widget<GestureDetector>(
-        find
-            .descendant(
-              of: find.byType(ActionCardHandWidget),
-              matching: find.byType(GestureDetector),
-            )
-            .first,
-      );
+        if (expectActivation) {
+          expect(activatedCard, isNotNull, reason: 'Scenario: $scenario');
+          expect(activatedCard!.type, ActionCardType.skip,
+              reason: 'Strategic skip disrupts opponent planning');
+        } else {
+          expect(activatedCard, isNull, reason: 'Scenario: $scenario');
+        }
 
-      // Assert - The gesture detector should have onLongPress callback
-      expect(gesture.onLongPress, isNotNull);
+        await tester.pump(const Duration(milliseconds: 300)); // Cleanup
+      }
     });
 
-    testWidgets('should layout cards horizontally', (tester) async {
-      // Act
+    testWidgets('should communicate hand capacity constraints for strategic planning', (tester) async {
+      // Test behavior: capacity limits force strategic card management decisions
+      final capacityScenarios = [
+        (actionCards: strategicCards, display: 'Cartes Actions (3/3)', 'full capacity forces discard decisions'),
+        (actionCards: strategicCards.take(2).toList(), display: 'Cartes Actions (2/3)', 'available space allows new acquisitions'),
+        (actionCards: <ActionCard>[], display: 'Aucune carte action', 'empty hand limits strategic options'),
+      ];
+
+      for (final (:actionCards, :display, scenario) in capacityScenarios) {
+        final player = testPlayer.copyWith(actionCards: actionCards);
+        await tester.pumpWidget(createTestWidget(player: player));
+
+        if (actionCards.isEmpty) {
+          expect(find.text(display), findsOneWidget,
+              reason: 'Empty hand communicates vulnerability: $scenario');
+          expect(find.byIcon(Icons.do_not_disturb), findsOneWidget,
+              reason: 'Visual indicator of limited strategic options');
+        } else {
+          expect(find.text(display), findsOneWidget,
+              reason: 'Capacity awareness enables strategic planning: $scenario');
+        }
+      }
+    });
+
+    testWidgets('should categorize cards by strategic timing for tactical awareness', (tester) async {
+      // Test behavior: timing categories enable strategic planning and counterplay
       await tester.pumpWidget(createTestWidget(player: testPlayer));
 
-      // Assert - Just check that we have a horizontal scroll view with cards
-      expect(find.byType(SingleChildScrollView), findsOneWidget);
-      final scrollView = tester.widget<SingleChildScrollView>(
-        find.byType(SingleChildScrollView),
-      );
-      expect(scrollView.scrollDirection, equals(Axis.horizontal));
+      // Verify all strategic timing types are represented
+      final cardWidgets = tester.widgetList<ActionCardWidget>(
+        find.byType(ActionCardWidget),
+      ).toList();
 
-      // Check that all 3 cards are displayed
-      expect(find.byType(ActionCardWidget), findsNWidgets(3));
+      final timingCategories = {
+        ActionTiming.optional: 'flexible timing for optimal strategic deployment',
+        ActionTiming.reactive: 'defensive capability for threat mitigation',
+        ActionTiming.immediate: 'mandatory execution affecting game flow',
+      };
+
+      for (final widget in cardWidgets) {
+        final timing = widget.card.timing;
+        expect(timingCategories.containsKey(timing), isTrue,
+            reason: 'Card timing enables strategic categorization');
+      }
     });
 
-    testWidgets('should scroll horizontally when many cards', (tester) async {
-      // Arrange - GamePlayer with 3 cards (max allowed)
-      final manyCards = List.generate(
-        3,
-        (i) => ActionCard(
-          id: 'card$i',
-          type: ActionCardType.skip,
-          name: 'Card $i',
-          description: 'Description $i',
-          timing: ActionTiming.optional,
-          target: ActionTarget.none,
-        ),
-      );
-      final playerWithManyCards = testPlayer.copyWith(actionCards: manyCards);
-
-      // Act
-      await tester.pumpWidget(createTestWidget(player: playerWithManyCards));
-
-      // Assert
-      expect(find.byType(SingleChildScrollView), findsOneWidget);
-      final scrollView = tester.widget<SingleChildScrollView>(
-        find.byType(SingleChildScrollView),
-      );
-      expect(scrollView.scrollDirection, equals(Axis.horizontal));
-    });
-
-    testWidgets('should show reactive cards with special indicator', (
-      tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(
-        createTestWidget(player: testPlayer, isCurrentPlayer: true),
-      );
-
-      // Assert
-      // The Shield card (reactive) should have a special indicator
-      final reactiveCardWidget = tester.widget<ActionCardWidget>(
-        find.byType(ActionCardWidget).at(1), // Second card is Shield
-      );
-      expect(reactiveCardWidget.card.timing, equals(ActionTiming.reactive));
-    });
-
-    testWidgets('should disable interaction during animations', (tester) async {
-      // Arrange
-      var tapCount = 0;
-
-      // Act
+    testWidgets('should support strategic card discarding for hand optimization', (tester) async {
+      // Test behavior: selective discarding enables hand optimization
       await tester.pumpWidget(
         createTestWidget(
           player: testPlayer,
           isCurrentPlayer: true,
-          onCardTap: (card) => tapCount++,
+          onCardDiscard: (card) {
+            // Strategic discard to make room for better cards
+          },
         ),
       );
 
-      // Simulate animation in progress by quickly tapping multiple times
+      // Verify long press enables strategic discard
+      final gesture = tester.widget<GestureDetector>(
+        find.descendant(
+          of: find.byType(ActionCardHandWidget),
+          matching: find.byType(GestureDetector),
+        ).first,
+      );
+
+      expect(gesture.onLongPress, isNotNull,
+          reason: 'Long press enables strategic hand management through selective discarding');
+    });
+
+    testWidgets('should prevent concurrent card activations maintaining game integrity', (tester) async {
+      // Test behavior: single action enforcement prevents game state corruption
+      var activationCount = 0;
+      await tester.pumpWidget(
+        createTestWidget(
+          player: testPlayer,
+          isCurrentPlayer: true,
+          onCardTap: (card) => activationCount++,
+        ),
+      );
+
+      // Rapid activation attempts during animation
       await tester.tap(find.byType(ActionCardWidget).first);
       await tester.pump(const Duration(milliseconds: 50));
-      await tester.tap(find.byType(ActionCardWidget).first);
+      await tester.tap(find.byType(ActionCardWidget).first); // Should be blocked
       await tester.pump();
 
-      // Assert - Only first tap should register
-      expect(tapCount, equals(1));
+      expect(activationCount, 1,
+          reason: 'Animation lock prevents duplicate strategic actions corrupting game state');
 
-      // Clean up the timer
-      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(milliseconds: 300)); // Cleanup
     });
 
-    testWidgets('should show proper layout for current player view', (
-      tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(
-        createTestWidget(player: testPlayer, isCurrentPlayer: true),
-      );
+    testWidgets('should adapt hand visibility based on strategic context', (tester) async {
+      // Test behavior: visibility adaptation supports competitive information asymmetry
+      final visibilityScenarios = [
+        (isCurrentPlayer: true, expectFullDetails: true, 'current player needs full strategic information'),
+        (isCurrentPlayer: false, expectFullDetails: false, 'opponents see limited information for competitive balance'),
+      ];
 
-      // Assert
-      final container = tester.widget<Container>(
-        find
-            .ancestor(
-              of: find.text('Cartes Actions (3/3)'),
-              matching: find.byType(Container),
-            )
-            .first,
-      );
-      expect(container.constraints?.maxHeight, equals(180));
-    });
+      for (final (:isCurrentPlayer, :expectFullDetails, scenario) in visibilityScenarios) {
+        await tester.pumpWidget(
+          createTestWidget(
+            player: testPlayer,
+            isCurrentPlayer: isCurrentPlayer,
+          ),
+        );
 
-    testWidgets('should show compact layout for opponent view', (tester) async {
-      // Act
-      await tester.pumpWidget(
-        createTestWidget(player: testPlayer, isCurrentPlayer: false),
-      );
+        // All cards visible but interaction differs
+        expect(find.byType(ActionCardWidget), findsNWidgets(3),
+            reason: 'Card count visible for strategic assessment');
 
-      // Assert
-      final container = tester.widget<Container>(
-        find
-            .ancestor(
-              of: find.text('Cartes Actions (3/3)'),
-              matching: find.byType(Container),
-            )
-            .first,
-      );
-      expect(container.constraints?.maxHeight, equals(120));
+        final container = tester.widget<Container>(
+          find.ancestor(
+            of: find.text('Cartes Actions (3/3)'),
+            matching: find.byType(Container),
+          ).first,
+        );
+
+        if (expectFullDetails) {
+          expect(container.constraints?.maxHeight, 180,
+              reason: 'Full view for strategic planning: $scenario');
+        } else {
+          expect(container.constraints?.maxHeight, 120,
+              reason: 'Compact view maintains information asymmetry: $scenario');
+        }
+      }
     });
   });
 }

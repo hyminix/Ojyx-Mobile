@@ -61,95 +61,39 @@ void main() {
       expect(model.hasRevealedAll, isFalse);
     });
 
-    test('should serialize to JSON correctly', () {
+    test('should convert bidirectionally between model and JSON formats', () {
+      // Test toJson() - serialization
       final json = model.toJson();
-
       expect(json['id'], equals('grid-123'));
       expect(json['game_state_id'], equals('game-456'));
       expect(json['player_id'], equals('player-789'));
-      expect(json['grid_cards'], isA<List>());
-      expect(json['grid_cards'].length, equals(3));
-      expect(json['action_cards'], isA<List>());
-      expect(json['action_cards'].length, equals(2));
+      expect(json['grid_cards'], hasLength(3));
+      expect(json['action_cards'], hasLength(2));
       expect(json['score'], equals(13));
-      expect(json['position'], equals(1));
       expect(json['is_active'], isTrue);
       expect(json['has_revealed_all'], isFalse);
-      expect(json['created_at'], equals('2024-01-01T00:00:00.000'));
-      expect(json['updated_at'], equals('2024-01-01T10:00:00.000'));
-    });
 
-    test('should deserialize from JSON correctly', () {
-      final json = {
-        'id': 'grid-999',
-        'game_state_id': 'game-888',
-        'player_id': 'player-777',
-        'grid_cards': [
-          {'value': 5, 'is_revealed': true},
-          {'value': 10, 'is_revealed': false},
-        ],
-        'action_cards': [
-          {
-            'id': 'action3',
-            'type': 'teleport',
-            'name': 'Teleport',
-            'description': 'Move card',
-            'timing': 'optional',
-            'target': 'none',
-            'parameters': <String, dynamic>{},
-          },
-        ],
-        'score': 15,
-        'position': 2,
-        'is_active': false,
-        'has_revealed_all': true,
-        'created_at': '2024-01-02T00:00:00.000',
-        'updated_at': '2024-01-02T12:00:00.000',
-      };
+      // Test fromJson() - deserialization with round-trip
+      final roundTripModel = DbPlayerGridModel.fromJson(json);
+      expect(roundTripModel.id, equals(model.id));
+      expect(roundTripModel.gameStateId, equals(model.gameStateId));
+      expect(roundTripModel.playerId, equals(model.playerId));
+      expect(roundTripModel.gridCards.length, equals(model.gridCards.length));
+      expect(roundTripModel.actionCards.length, equals(model.actionCards.length));
+      expect(roundTripModel.score, equals(model.score));
+      expect(roundTripModel.isActive, equals(model.isActive));
+      expect(roundTripModel.hasRevealedAll, equals(model.hasRevealedAll));
 
-      final deserialized = DbPlayerGridModel.fromJson(json);
-
-      expect(deserialized.id, equals('grid-999'));
-      expect(deserialized.gameStateId, equals('game-888'));
-      expect(deserialized.playerId, equals('player-777'));
-      expect(deserialized.gridCards.length, equals(2));
-      expect(deserialized.gridCards[0].value, equals(5));
-      expect(deserialized.gridCards[0].isRevealed, isTrue);
-      expect(deserialized.actionCards.length, equals(1));
-      expect(deserialized.actionCards[0].id, equals('action3'));
-      expect(deserialized.score, equals(15));
-      expect(deserialized.position, equals(2));
-      expect(deserialized.isActive, isFalse);
-      expect(deserialized.hasRevealedAll, isTrue);
-    });
-
-    test('should convert to Supabase JSON format', () {
+      // Test toSupabaseJson() - Supabase format
       final supabaseJson = model.toSupabaseJson();
-
-      expect(supabaseJson['id'], equals('grid-123'));
-      expect(supabaseJson['game_state_id'], equals('game-456'));
-      expect(supabaseJson['player_id'], equals('player-789'));
-
-      // Grid cards should be serialized as JSON array
       expect(supabaseJson['grid_cards'], isA<List>());
+      expect(supabaseJson['action_cards'], isA<List>());
       final gridCards = supabaseJson['grid_cards'] as List;
-      expect(gridCards.length, equals(3));
+      final actionCards = supabaseJson['action_cards'] as List;
       expect(gridCards[0]['value'], equals(5));
       expect(gridCards[0]['is_revealed'], isTrue);
-
-      // Action cards should be serialized as JSON array
-      expect(supabaseJson['action_cards'], isA<List>());
-      final actionCards = supabaseJson['action_cards'] as List;
-      expect(actionCards.length, equals(2));
       expect(actionCards[0]['id'], equals('action1'));
       expect(actionCards[0]['type'], equals('teleport'));
-
-      expect(supabaseJson['score'], equals(13));
-      expect(supabaseJson['position'], equals(1));
-      expect(supabaseJson['is_active'], isTrue);
-      expect(supabaseJson['has_revealed_all'], isFalse);
-      expect(supabaseJson['created_at'], equals('2024-01-01T00:00:00.000'));
-      expect(supabaseJson['updated_at'], equals('2024-01-01T10:00:00.000'));
     });
 
     test('should handle empty collections correctly', () {

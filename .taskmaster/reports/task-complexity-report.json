@@ -1,0 +1,118 @@
+{
+	"meta": {
+		"generatedAt": "2025-07-25T08:11:33.535Z",
+		"tasksAnalyzed": 15,
+		"totalTasks": 15,
+		"analysisCount": 15,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"complexityScore": 8,
+			"recommendedSubtasks": 12,
+			"expansionPrompt": "Décomposer le refactoring des entités Player en étapes granulaires incluant la création des entités GamePlayer et LobbyPlayer avec Freezed, la suppression de toute sérialisation du domaine, l'implémentation des mappers bidirectionnels, et la mise à jour progressive de tous les use cases et repositories. Chaque sous-tâche doit être testable indépendamment avec une approche TDD stricte.",
+			"reasoning": "Tâche très complexe impliquant une refonte architecturale majeure. Nécessite de toucher plusieurs couches (domain, data, presentation), créer de nouvelles entités, implémenter des mappers, et mettre à jour de nombreux fichiers. La séparation en 12 sous-tâches permet une approche incrémentale avec validation à chaque étape."
+		},
+		{
+			"taskId": 2,
+			"complexityScore": 6,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Diviser la migration de DbPlayerGrid en étapes incluant le déplacement physique du fichier, la création de l'entité PlayerGrid pure, l'implémentation des mappers, l'adaptation des requêtes Supabase, et la mise à jour de toutes les références. Chaque étape doit maintenir les tests verts et respecter les principes Clean Architecture.",
+			"reasoning": "Migration structurelle importante mais plus ciblée que la tâche 1. Implique le déplacement de fichiers, la création d'une nouvelle entité, et l'adaptation du code existant. 8 sous-tâches permettent une migration progressive sans casser l'existant."
+		},
+		{
+			"taskId": 3,
+			"complexityScore": 9,
+			"recommendedSubtasks": 15,
+			"expansionPrompt": "Créer les mappers GameState complets en analysant d'abord tous les champs manquants, puis en implémentant la conversion pour chaque type de donnée (primitifs, objets, collections). Inclure la gestion des cas edge, les valeurs par défaut, et les tests exhaustifs de round-trip. Chaque mapper de sous-objet doit être testé indépendamment.",
+			"reasoning": "Tâche très complexe car GameState est l'entité centrale avec de nombreux sous-objets et collections. Nécessite une analyse approfondie, la gestion de cas complexes, et des tests exhaustifs. 15 sous-tâches permettent de traiter chaque aspect du mapping séparément."
+		},
+		{
+			"taskId": 4,
+			"complexityScore": 4,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Configurer le gameStateRepositoryProvider en créant d'abord le fichier provider, puis en définissant les dépendances nécessaires (datasource provider), en vérifiant l'implémentation du repository, et en mettant à jour les use cases. Inclure les tests d'injection pour chaque étape.",
+			"reasoning": "Configuration relativement simple mais critique pour l'injection de dépendances. Suit un pattern établi de Riverpod. 5 sous-tâches suffisent pour couvrir la création, configuration et intégration."
+		},
+		{
+			"taskId": 5,
+			"complexityScore": 7,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "Corriger l'injection des dépendances en identifiant d'abord tous les use cases problématiques, puis en les refactorisant un par un pour utiliser les repositories via Riverpod. Créer les providers nécessaires et mettre à jour les widgets consommateurs. Valider avec des tests unitaires utilisant des mocks.",
+			"reasoning": "Refactoring transversal touchant de nombreux use cases. Nécessite une approche systématique pour identifier et corriger chaque violation du DIP. 10 sous-tâches permettent de traiter les use cases par groupes logiques."
+		},
+		{
+			"taskId": 6,
+			"complexityScore": 9,
+			"recommendedSubtasks": 14,
+			"expansionPrompt": "Implémenter la migration complète des ActionCards vers Supabase en créant d'abord le datasource avec les opérations CRUD, puis le modèle avec sérialisation, les mappers, le repository, la migration des données, le cache local avec synchronisation, et la gestion des conflits. Inclure les tests d'intégration et de synchronisation pour chaque composant.",
+			"reasoning": "Migration complexe impliquant base de données, synchronisation temps réel, cache local, et gestion de conflits. Nécessite une implémentation robuste avec de nombreux cas à gérer. 14 sous-tâches permettent une approche progressive avec validation à chaque étape."
+		},
+		{
+			"taskId": 7,
+			"complexityScore": 8,
+			"recommendedSubtasks": 11,
+			"expansionPrompt": "Développer les fonctions PostgreSQL en créant d'abord use_action_card avec validation, puis les fonctions de validation et d'application des effets par type de carte. Implémenter les triggers, la gestion du stock maximum, et les logs d'audit. Utiliser pgTAP pour tester chaque fonction avec différents scénarios.",
+			"reasoning": "Développement backend complexe nécessitant expertise PostgreSQL et logique métier. Chaque type de carte a ses propres règles. 11 sous-tâches permettent de développer et tester chaque fonction indépendamment."
+		},
+		{
+			"taskId": 8,
+			"complexityScore": 7,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "Réparer les tests par catégories en analysant d'abord tous les échecs, puis en les groupant par type (entités, mappers, providers). Corriger les fixtures et mocks par batch, en priorisant les tests critiques du gameplay. Chaque batch doit être validé avant de passer au suivant.",
+			"reasoning": "Volume important de tests à corriger nécessitant une approche méthodique. Les changements d'architecture impactent différents types de tests. 10 sous-tâches permettent de traiter les tests par groupes cohérents."
+		},
+		{
+			"taskId": 9,
+			"complexityScore": 5,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Réactiver les tests UI en renommant d'abord les fichiers, puis en migrant chaque test vers Riverpod 2.x. Adapter les providers, gérer l'asynchronicité, et vérifier les golden tests. Chaque fichier de test doit être migré et validé indépendamment.",
+			"reasoning": "Migration technique mais limitée à 3 fichiers. Nécessite connaissance de Riverpod 2.x et des patterns de test. 6 sous-tâches permettent de traiter chaque fichier avec validation."
+		},
+		{
+			"taskId": 10,
+			"complexityScore": 6,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Optimiser la couverture en générant d'abord le rapport détaillé, puis en identifiant les gaps prioritaires. Écrire les tests manquants par module en ciblant les branches non couvertes et les cas limites. Configurer le CI pour maintenir le seuil de 80%.",
+			"reasoning": "Analyse et amélioration systématique nécessitant identification des gaps et écriture de nombreux tests. 8 sous-tâches permettent une approche modulaire avec focus sur les zones critiques."
+		},
+		{
+			"taskId": 11,
+			"complexityScore": 7,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Implémenter les animations en créant d'abord les controllers pour les révélations de cartes, puis les Hero animations, les transitions d'état, les effets de glissement, et les particules. Optimiser les performances et respecter les guidelines Material Design. Chaque type d'animation doit être testé pour les performances.",
+			"reasoning": "Développement UI complexe nécessitant expertise en animations Flutter et attention aux performances. 9 sous-tâches permettent d'implémenter chaque type d'animation avec optimisation."
+		},
+		{
+			"taskId": 12,
+			"complexityScore": 9,
+			"recommendedSubtasks": 13,
+			"expansionPrompt": "Développer le mode offline en implémentant d'abord le cache local, puis la queue d'actions, le service de synchronisation avec gestion de conflits, la détection réseau, et la logique de retry. Inclure l'UI de statut et les limites de stockage. Tester chaque composant avec des scénarios de déconnexion.",
+			"reasoning": "Fonctionnalité très complexe impliquant cache, synchronisation, gestion de conflits, et UI. Nombreux cas edge à gérer. 13 sous-tâches permettent une implémentation robuste avec tests approfondis."
+		},
+		{
+			"taskId": 13,
+			"complexityScore": 8,
+			"recommendedSubtasks": 11,
+			"expansionPrompt": "Configurer l'environnement production en créant d'abord les flavors Flutter, puis la gestion des secrets, l'optimisation des assets, l'obfuscation, l'App Bundle, les métadonnées Play Store, et les deep links. Chaque configuration doit être testée sur un build de production.",
+			"reasoning": "Configuration complexe touchant build, sécurité, optimisation, et distribution. Nombreux aspects techniques à couvrir. 11 sous-tâches permettent de traiter chaque aspect de la configuration production."
+		},
+		{
+			"taskId": 14,
+			"complexityScore": 7,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "Mettre en place le CI/CD en étendant les workflows GitHub Actions pour les builds release, configurant Fastlane, implémentant le versioning automatique, et gérant les déploiements Play Store. Inclure les notifications et la gestion des environnements. Tester chaque étape du pipeline.",
+			"reasoning": "Pipeline complexe avec multiples outils et étapes. Nécessite configuration précise et tests approfondis. 10 sous-tâches permettent de construire le pipeline progressivement avec validation."
+		},
+		{
+			"taskId": 15,
+			"complexityScore": 6,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Configurer le monitoring en implémentant d'abord Sentry avec environnements, puis Firebase Analytics et Crashlytics, les dashboards custom, le performance monitoring, les health checks, et les alertes. Inclure la conformité GDPR et les tests de chaque intégration.",
+			"reasoning": "Intégration de multiples services de monitoring avec considérations GDPR. Configuration technique mais bien documentée. 9 sous-tâches permettent d'intégrer chaque service avec validation."
+		}
+	]
+}

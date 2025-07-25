@@ -3,187 +3,67 @@ import 'package:ojyx/features/game/domain/entities/player_state.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 
 void main() {
-  group('PlayerState', () {
-    test('should create a valid PlayerState', () {
-      // Arrange
-      final cards = List<game.Card?>.generate(12, (index) {
-        if (index < 6) {
-          return game.Card(value: index + 1, isRevealed: index < 3);
-        }
-        return null;
-      });
-
-      // Act
-      final playerState = PlayerState(
-        playerId: 'test-player-123',
-        cards: cards,
-        currentScore: 25,
-        revealedCount: 3,
-        identicalColumns: [0, 2],
-        hasFinished: false,
-      );
-
-      // Assert
-      expect(playerState.playerId, equals('test-player-123'));
-      expect(playerState.cards.length, equals(12));
-      expect(playerState.currentScore, equals(25));
-      expect(playerState.revealedCount, equals(3));
-      expect(playerState.identicalColumns, equals([0, 2]));
-      expect(playerState.hasFinished, isFalse);
-    });
-
-    test('should handle empty card list', () {
-      // Act
-      final playerState = PlayerState(
-        playerId: 'empty-player',
-        cards: List<game.Card?>.filled(12, null),
-        currentScore: 0,
-        revealedCount: 0,
-        identicalColumns: [],
-        hasFinished: false,
-      );
-
-      // Assert
-      expect(playerState.cards.every((card) => card == null), isTrue);
-      expect(playerState.currentScore, equals(0));
-      expect(playerState.revealedCount, equals(0));
-      expect(playerState.identicalColumns, isEmpty);
-    });
-
-    test('should support value equality', () {
-      // Arrange
-      final cards = [
-        game.Card(value: 5, isRevealed: true),
-        ...List.filled(11, null),
+  group('PlayerState Game Behavior', () {
+    test('should track player progress and strategic state throughout gameplay', () {
+      // Test behavior: comprehensive state tracking for competitive gameplay
+      final gameStateScenarios = [
+        // (cards, score, revealed, columns, finished, description)
+        (
+          List<game.Card?>.generate(12, (i) => i < 6 ? game.Card(value: i + 1, isRevealed: i < 3) : null),
+          25,
+          3,
+          [0, 2],
+          false,
+          'active player with partial progress'
+        ),
+        (
+          List<game.Card?>.filled(12, null),
+          0,
+          0,
+          const <int>[],
+          false,
+          'new player starting game'
+        ),
+        (
+          List<game.Card?>.filled(12, null),
+          45,
+          12,
+          const <int>[],
+          true,
+          'player who finished round'
+        ),
+        (
+          List<game.Card?>.filled(12, null),
+          0,
+          12,
+          [0, 1, 3],
+          false,
+          'player with multiple column eliminations'
+        ),
       ];
 
-      final state1 = PlayerState(
-        playerId: 'player-1',
-        cards: cards,
-        currentScore: 5,
-        revealedCount: 1,
-        identicalColumns: [],
-        hasFinished: false,
-      );
+      for (final (cards, score, revealed, columns, finished, description) in gameStateScenarios) {
+        final playerState = PlayerState(
+          playerId: 'player-${gameStateScenarios.indexOf((cards, score, revealed, columns, finished, description))}',
+          cards: cards,
+          currentScore: score,
+          revealedCount: revealed,
+          identicalColumns: columns,
+          hasFinished: finished,
+        );
 
-      final state2 = PlayerState(
-        playerId: 'player-1',
-        cards: cards,
-        currentScore: 5,
-        revealedCount: 1,
-        identicalColumns: [],
-        hasFinished: false,
-      );
-
-      // Assert
-      expect(state1, equals(state2));
+        // Verify state tracking behavior
+        expect(playerState.currentScore, score, reason: 'Score should track competitive performance for $description');
+        expect(playerState.revealedCount, revealed, reason: 'Revealed count should track game progress for $description');
+        expect(playerState.identicalColumns, columns, reason: 'Column tracking should support rule enforcement for $description');
+        expect(playerState.hasFinished, finished, reason: 'Finish status should control turn sequence for $description');
+      }
     });
 
-    test('should be different when properties differ', () {
-      // Arrange
-      final cards = List<game.Card?>.filled(12, null);
-
-      final state1 = PlayerState(
-        playerId: 'player-1',
-        cards: cards,
-        currentScore: 10,
-        revealedCount: 0,
-        identicalColumns: [],
-        hasFinished: false,
-      );
-
-      final state2 = PlayerState(
-        playerId: 'player-1',
-        cards: cards,
-        currentScore: 20, // Different score
-        revealedCount: 0,
-        identicalColumns: [],
-        hasFinished: false,
-      );
-
-      // Assert
-      expect(state1, isNot(equals(state2)));
-    });
-
-    test('should handle finished state', () {
-      // Act
-      final playerState = PlayerState(
-        playerId: 'finished-player',
-        cards: List<game.Card?>.filled(12, null),
-        currentScore: 45,
-        revealedCount: 12,
-        identicalColumns: [],
-        hasFinished: true,
-      );
-
-      // Assert
-      expect(playerState.hasFinished, isTrue);
-      expect(playerState.revealedCount, equals(12));
-    });
-
-    test('should handle multiple identical columns', () {
-      // Act
-      final playerState = PlayerState(
-        playerId: 'columns-player',
-        cards: List<game.Card?>.filled(12, null),
-        currentScore: 0,
-        revealedCount: 12,
-        identicalColumns: [0, 1, 3], // 3 columns are identical
-        hasFinished: false,
-      );
-
-      // Assert
-      expect(playerState.identicalColumns.length, equals(3));
-      expect(playerState.identicalColumns, contains(0));
-      expect(playerState.identicalColumns, contains(1));
-      expect(playerState.identicalColumns, contains(3));
-    });
-
-    test('should serialize to/from JSON', () {
-      // Arrange
-      final cards = [
-        game.Card(value: 7, isRevealed: true),
-        ...List.filled(11, null),
-      ];
-
+    test('should support immutable state transitions for reliable game updates', () {
+      // Test behavior: state mutations preserve game integrity through immutability
       final originalState = PlayerState(
-        playerId: 'json-player',
-        cards: cards,
-        currentScore: 7,
-        revealedCount: 1,
-        identicalColumns: [2],
-        hasFinished: false,
-      );
-
-      // Act
-      final json = originalState.toJson();
-      final deserializedState = PlayerState.fromJson(json);
-
-      // Assert
-      expect(deserializedState.playerId, equals(originalState.playerId));
-      expect(
-        deserializedState.currentScore,
-        equals(originalState.currentScore),
-      );
-      expect(
-        deserializedState.revealedCount,
-        equals(originalState.revealedCount),
-      );
-      expect(
-        deserializedState.identicalColumns,
-        equals(originalState.identicalColumns),
-      );
-      expect(deserializedState.hasFinished, equals(originalState.hasFinished));
-      expect(
-        deserializedState.cards.length,
-        equals(originalState.cards.length),
-      );
-    });
-
-    test('should create a copy with copyWith', () {
-      // Arrange
-      final originalState = PlayerState(
-        playerId: 'original-player',
+        playerId: 'transitioning-player',
         cards: List<game.Card?>.filled(12, null),
         currentScore: 30,
         revealedCount: 5,
@@ -191,37 +71,75 @@ void main() {
         hasFinished: false,
       );
 
-      // Act
-      final copiedState = originalState.copyWith(
+      final updatedState = originalState.copyWith(
         currentScore: 25,
         hasFinished: true,
       );
 
-      // Assert
-      expect(copiedState.playerId, equals(originalState.playerId));
-      expect(copiedState.cards, equals(originalState.cards));
-      expect(copiedState.currentScore, equals(25));
-      expect(copiedState.revealedCount, equals(originalState.revealedCount));
-      expect(
-        copiedState.identicalColumns,
-        equals(originalState.identicalColumns),
-      );
-      expect(copiedState.hasFinished, isTrue);
+      // Verify immutable transition behavior
+      expect(originalState.currentScore, 30, reason: 'Original state should remain unchanged');
+      expect(originalState.hasFinished, false, reason: 'Original completion status preserved');
+      
+      expect(updatedState.playerId, originalState.playerId, reason: 'Player identity preserved across transitions');
+      expect(updatedState.currentScore, 25, reason: 'Score updated for competitive ranking');
+      expect(updatedState.hasFinished, true, reason: 'Game completion status updated correctly');
+      expect(updatedState.revealedCount, originalState.revealedCount, reason: 'Unchanged properties preserved');
     });
 
-    test('should validate cards list length', () {
-      // Act & Assert
-      expect(
-        () => PlayerState(
-          playerId: 'invalid-player',
-          cards: [null, null], // Only 2 cards instead of 12
-          currentScore: 0,
-          revealedCount: 0,
-          identicalColumns: [],
-          hasFinished: false,
-        ),
-        returnsNormally, // Should not throw, but app should validate elsewhere
+    test('should maintain value equality for consistent game state comparison', () {
+      // Test behavior: state comparison enables reliable game synchronization
+      final gameCard = game.Card(value: 5, isRevealed: true);
+      final cards = [gameCard, ...List.filled(11, null)];
+
+      final state1 = PlayerState(
+        playerId: 'comparison-player',
+        cards: cards,
+        currentScore: 5,
+        revealedCount: 1,
+        identicalColumns: [],
+        hasFinished: false,
       );
+
+      final state2 = PlayerState(
+        playerId: 'comparison-player',
+        cards: cards,
+        currentScore: 5,
+        revealedCount: 1,
+        identicalColumns: [],
+        hasFinished: false,
+      );
+
+      final differentState = state1.copyWith(currentScore: 20);
+
+      // Verify equality behavior for game synchronization
+      expect(state1, equals(state2), reason: 'Identical states should be equal for sync verification');
+      expect(state1, isNot(equals(differentState)), reason: 'Different states should be detected for update propagation');
+    });
+
+    test('should serialize state for network synchronization in multiplayer games', () {
+      // Test behavior: state persistence enables multiplayer game continuity
+      final gameCard = game.Card(value: 7, isRevealed: true);
+      final cards = [gameCard, ...List.filled(11, null)];
+
+      final originalState = PlayerState(
+        playerId: 'network-player',
+        cards: cards,
+        currentScore: 7,
+        revealedCount: 1,
+        identicalColumns: [2],
+        hasFinished: false,
+      );
+
+      final json = originalState.toJson();
+      final restoredState = PlayerState.fromJson(json);
+
+      // Verify serialization preserves game state for network sync
+      expect(restoredState.playerId, originalState.playerId, reason: 'Player identity preserved across network');
+      expect(restoredState.currentScore, originalState.currentScore, reason: 'Competitive score preserved');
+      expect(restoredState.revealedCount, originalState.revealedCount, reason: 'Game progress preserved');
+      expect(restoredState.identicalColumns, originalState.identicalColumns, reason: 'Rule state preserved');
+      expect(restoredState.hasFinished, originalState.hasFinished, reason: 'Completion status preserved');
+      expect(restoredState.cards.length, originalState.cards.length, reason: 'Card data structure preserved');
     });
   });
 }

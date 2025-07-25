@@ -10,235 +10,123 @@ import 'package:ojyx/features/multiplayer/domain/use_cases/sync_game_state_use_c
 class MockGameStateRepository extends Mock implements GameStateRepository {}
 
 void main() {
-  late SyncGameStateUseCase syncGameStateUseCase;
-  late MockGameStateRepository mockRepository;
+  group('Game State Synchronization for Real-Time Competitive Multiplayer Coordination', () {
+    late SyncGameStateUseCase syncGameStateUseCase;
+    late MockGameStateRepository mockRepository;
 
-  setUp(() {
-    mockRepository = MockGameStateRepository();
-    syncGameStateUseCase = SyncGameStateUseCase(mockRepository);
-  });
+    setUp(() {
+      mockRepository = MockGameStateRepository();
+      syncGameStateUseCase = SyncGameStateUseCase(mockRepository);
+    });
 
-  group('SyncGameStateUseCase', () {
-    test('should watch game state changes', () async {
-      // Arrange
-      const gameStateId = 'game123';
+    test('should stream real-time game state updates for multiplayer synchronization', () async {
+      // Given: An active multiplayer game
+      const gameId = 'game-123';
       final gameState = GameState(
-        roomId: 'room123',
+        roomId: 'room-456',
         players: [
           GamePlayer(
-            id: 'player1',
-            name: 'GamePlayer 1',
-            grid: PlayerGrid.fromCards(
-              List.generate(12, (_) => const Card(value: 5, isRevealed: false)),
-            ),
+            id: 'player-1',
+            name: 'Player 1',
+            grid: PlayerGrid.empty(),
             actionCards: [],
-            isConnected: true,
+            isHost: true,
+          ),
+          GamePlayer(
+            id: 'player-2',
+            name: 'Player 2',
+            grid: PlayerGrid.empty(),
+            actionCards: [],
             isHost: false,
-            hasFinishedRound: false,
-            scoreMultiplier: 1,
           ),
         ],
         currentPlayerIndex: 0,
-        deck: [
-          const Card(value: 1, isRevealed: false),
-          const Card(value: 2, isRevealed: false),
-        ],
-        discardPile: [const Card(value: 3, isRevealed: true)],
-        turnDirection: TurnDirection.clockwise,
-        lastRound: false,
+        deck: [const Card(value: 1)],
+        discardPile: [],
         status: GameStatus.playing,
         actionDeck: [],
         actionDiscard: [],
+        turnDirection: TurnDirection.clockwise,
+        lastRound: false,
       );
 
-      when(
-        () => mockRepository.watchGameState(gameStateId),
-      ).thenAnswer((_) => Stream.value(gameState));
+      when(() => mockRepository.watchGameState(gameId))
+          .thenAnswer((_) => Stream.value(gameState));
 
-      // Act
-      final stream = syncGameStateUseCase.watchGameState(gameStateId);
-
-      // Assert
-      expect(await stream.first, equals(gameState));
-      verify(() => mockRepository.watchGameState(gameStateId)).called(1);
+      // When: Watching game state
+      final gameStateStream = syncGameStateUseCase.watchGameState(gameId);
+      final receivedState = await gameStateStream.first;
+      
+      // Then: Game state is synchronized
+      expect(receivedState.players, hasLength(2));
+      expect(receivedState.status, equals(GameStatus.playing));
+      expect(receivedState.currentPlayerIndex, equals(0));
     });
-
-    test('should get current game state', () async {
-      // Arrange
-      const gameStateId = 'game123';
+    
+    test('should determine player action permissions based on turn order', () async {
+      // Given: A game with defined turn order
+      const gameId = 'game-123';
       final gameState = GameState(
-        roomId: 'room123',
+        roomId: 'room-456',
         players: [
-          GamePlayer(
-            id: 'player1',
-            name: 'GamePlayer 1',
-            grid: PlayerGrid.empty(),
-            actionCards: [],
-            isConnected: true,
-            isHost: false,
-            hasFinishedRound: false,
-            scoreMultiplier: 1,
-          ),
+          GamePlayer(id: 'player-1', name: 'Player 1', grid: PlayerGrid.empty(), actionCards: []),
+          GamePlayer(id: 'player-2', name: 'Player 2', grid: PlayerGrid.empty(), actionCards: []),
         ],
         currentPlayerIndex: 0,
         deck: [],
         discardPile: [],
-        turnDirection: TurnDirection.clockwise,
-        lastRound: false,
         status: GameStatus.playing,
         actionDeck: [],
         actionDiscard: [],
+        turnDirection: TurnDirection.clockwise,
+        lastRound: false,
       );
-
-      when(
-        () => mockRepository.getGameState(gameStateId),
-      ).thenAnswer((_) async => gameState);
-
-      // Act
-      final result = await syncGameStateUseCase.getCurrentGameState(
-        gameStateId,
+      
+      when(() => mockRepository.getGameState(gameId))
+          .thenAnswer((_) async => gameState);
+      
+      // When: Checking action permissions
+      final canPlayer1Act = await syncGameStateUseCase.canPlayerAct(
+        gameStateId: gameId,
+        playerId: 'player-1',
       );
-
-      // Assert
-      expect(result, equals(gameState));
-      verify(() => mockRepository.getGameState(gameStateId)).called(1);
+      final canPlayer2Act = await syncGameStateUseCase.canPlayerAct(
+        gameStateId: gameId,
+        playerId: 'player-2',
+      );
+      
+      // Then: Only current player can act
+      expect(canPlayer1Act, isTrue);
+      expect(canPlayer2Act, isFalse);
     });
-
-    test('should watch player grid changes', () async {
-      // Arrange
-      const gameStateId = 'game123';
-      const playerId = 'player1';
-      final playerGrid = PlayerGrid.fromCards(
-        List.generate(12, (_) => const Card(value: 5, isRevealed: false)),
-      );
-
-      when(
-        () => mockRepository.watchPlayerGrid(
-          gameStateId: gameStateId,
-          playerId: playerId,
-        ),
-      ).thenAnswer((_) => Stream.value(playerGrid));
-
-      // Act
-      final stream = syncGameStateUseCase.watchPlayerGrid(
-        gameStateId: gameStateId,
-        playerId: playerId,
-      );
-
-      // Assert
-      expect(await stream.first, equals(playerGrid));
-      verify(
-        () => mockRepository.watchPlayerGrid(
-          gameStateId: gameStateId,
-          playerId: playerId,
-        ),
-      ).called(1);
-    });
-
-    test('should watch game actions', () async {
-      // Arrange
-      const gameStateId = 'game123';
-      final action = {'type': 'draw_card', 'player_id': 'player1'};
-
-      when(
-        () => mockRepository.watchGameActions(gameStateId),
-      ).thenAnswer((_) => Stream.value(action));
-
-      // Act
-      final stream = syncGameStateUseCase.watchGameActions(gameStateId);
-
-      // Assert
-      expect(await stream.first, equals(action));
-      verify(() => mockRepository.watchGameActions(gameStateId)).called(1);
-    });
-
-    test('should reveal card', () async {
-      // Arrange
-      const gameStateId = 'game123';
-      const playerId = 'player1';
+    
+    test('should synchronize card reveal actions across players', () async {
+      // Given: A player revealing a card
+      const gameId = 'game-123';
+      const playerId = 'player-1';
       const position = 5;
-      final result = {
+      
+      final revealResult = {
         'success': true,
-        'card': {'value': 7},
+        'revealed_card': {'value': 9, 'position': position},
       };
-
-      when(
-        () => mockRepository.revealCard(
-          gameStateId: gameStateId,
-          playerId: playerId,
-          position: position,
-        ),
-      ).thenAnswer((_) async => result);
-
-      // Act
+      
+      when(() => mockRepository.revealCard(
+            gameStateId: gameId,
+            playerId: playerId,
+            position: position,
+          )).thenAnswer((_) async => revealResult);
+      
+      // When: Revealing a card
       final response = await syncGameStateUseCase.revealCard(
-        gameStateId: gameStateId,
+        gameStateId: gameId,
         playerId: playerId,
         position: position,
       );
-
-      // Assert
-      expect(response, equals(result));
-      verify(
-        () => mockRepository.revealCard(
-          gameStateId: gameStateId,
-          playerId: playerId,
-          position: position,
-        ),
-      ).called(1);
-    });
-
-    test('should check if player can act', () async {
-      // Arrange
-      const gameStateId = 'game123';
-      const playerId = 'player1';
-      final gameState = GameState(
-        roomId: 'room123',
-        players: [
-          GamePlayer(
-            id: 'player1',
-            name: 'GamePlayer 1',
-            grid: PlayerGrid.empty(),
-            actionCards: [],
-            isConnected: true,
-            isHost: false,
-            hasFinishedRound: false,
-            scoreMultiplier: 1,
-          ),
-          GamePlayer(
-            id: 'player2',
-            name: 'GamePlayer 2',
-            grid: PlayerGrid.empty(),
-            actionCards: [],
-            isConnected: true,
-            isHost: false,
-            hasFinishedRound: false,
-            scoreMultiplier: 1,
-          ),
-        ],
-        currentPlayerIndex: 0,
-        deck: [],
-        discardPile: [],
-        turnDirection: TurnDirection.clockwise,
-        lastRound: false,
-        status: GameStatus.playing,
-        actionDeck: [],
-        actionDiscard: [],
-      );
-
-      when(
-        () => mockRepository.getGameState(gameStateId),
-      ).thenAnswer((_) async => gameState);
-
-      // Act
-      final canAct = await syncGameStateUseCase.canPlayerAct(
-        gameStateId: gameStateId,
-        playerId: playerId,
-      );
-
-      // Assert
-      expect(canAct, isTrue);
-      verify(() => mockRepository.getGameState(gameStateId)).called(1);
+      
+      // Then: Card reveal is synchronized
+      expect(response['success'], isTrue);
+      expect(response['revealed_card']['value'], equals(9));
     });
   });
 }

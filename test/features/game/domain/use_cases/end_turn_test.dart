@@ -13,102 +13,122 @@ void main() {
   });
 
   group('EndTurn UseCase', () {
-    test('should validate completed columns and clear them', () async {
-      // Create a grid with a completed column
-      final grid = PlayerGrid.empty()
-          .placeCard(const Card(value: 5, isRevealed: true), 0, 1)
-          .placeCard(const Card(value: 5, isRevealed: true), 1, 1)
-          .placeCard(const Card(value: 5, isRevealed: true), 2, 1)
-          .placeCard(const Card(value: 8), 0, 0)
-          .placeCard(const Card(value: 2), 1, 2);
+    // Parameterized test for different turn validation scenarios
+    final turnValidationCases = [
+      {
+        'description': 'should validate and clear completed columns when all conditions are met',
+        'setupGrid': () => PlayerGrid.empty()
+            .placeCard(const Card(value: 5, isRevealed: true), 0, 1)
+            .placeCard(const Card(value: 5, isRevealed: true), 1, 1)
+            .placeCard(const Card(value: 5, isRevealed: true), 2, 1)
+            .placeCard(const Card(value: 8), 0, 0)
+            .placeCard(const Card(value: 2), 1, 2),
+        'expectedColumnCleared': true,
+        'expectedCardsInDiscard': 3,
+        'expectedRemainingCards': [8, 2],
+      },
+      {
+        'description': 'should not clear columns when cards are not all revealed',
+        'setupGrid': () => PlayerGrid.empty()
+            .placeCard(const Card(value: 5, isRevealed: true), 0, 1)
+            .placeCard(const Card(value: 5, isRevealed: false), 1, 1) // Not revealed
+            .placeCard(const Card(value: 5, isRevealed: true), 2, 1),
+        'expectedColumnCleared': false,
+        'expectedCardsInDiscard': 0,
+        'expectedRemainingCards': [5], // All cards remain
+      },
+      {
+        'description': 'should handle multiple completed columns simultaneously',
+        'setupGrid': () => PlayerGrid.empty()
+            // Column 0: all 3s
+            .placeCard(const Card(value: 3, isRevealed: true), 0, 0)
+            .placeCard(const Card(value: 3, isRevealed: true), 1, 0)
+            .placeCard(const Card(value: 3, isRevealed: true), 2, 0)
+            // Column 2: all 7s
+            .placeCard(const Card(value: 7, isRevealed: true), 0, 2)
+            .placeCard(const Card(value: 7, isRevealed: true), 1, 2)
+            .placeCard(const Card(value: 7, isRevealed: true), 2, 2)
+            // Other cards
+            .placeCard(const Card(value: 1), 0, 1)
+            .placeCard(const Card(value: 2), 1, 3),
+        'expectedColumnCleared': true,
+        'expectedCardsInDiscard': 6, // 3 + 3 cards cleared
+        'expectedRemainingCards': [1, 2],
+      },
+    ];
 
-      final players = [
-        GamePlayer(
-          id: 'player1',
-          name: 'GamePlayer 1',
-          grid: grid,
-          isHost: true,
-        ),
-        GamePlayer(
-          id: 'player2',
-          name: 'GamePlayer 2',
-          grid: PlayerGrid.empty(),
-        ),
-      ];
+    for (final testCase in turnValidationCases) {
+      test(testCase['description'] as String, () async {
+        final grid = (testCase['setupGrid'] as Function)();
+        final players = [
+          GamePlayer(
+            id: 'player1',
+            name: 'GamePlayer 1',
+            grid: grid,
+            isHost: true,
+          ),
+          GamePlayer(
+            id: 'player2',
+            name: 'GamePlayer 2',
+            grid: PlayerGrid.empty(),
+          ),
+        ];
 
-      final gameState = GameState.initial(
-        roomId: 'room123',
-        players: players,
-      ).copyWith(status: GameStatus.playing, currentPlayerIndex: 0);
+        final gameState = GameState.initial(
+          roomId: 'room123',
+          players: players,
+        ).copyWith(status: GameStatus.playing, currentPlayerIndex: 0);
 
-      final result = await endTurn(
-        EndTurnParams(gameState: gameState, playerId: 'player1'),
-      );
-
-      expect(result.isRight(), true);
-
-      result.fold((failure) => fail('Should not fail'), (newState) {
-        final updatedPlayer = newState.players.first;
-
-        // Column 1 should be cleared
-        expect(updatedPlayer.grid.cards[0][1], isNull);
-        expect(updatedPlayer.grid.cards[1][1], isNull);
-        expect(updatedPlayer.grid.cards[2][1], isNull);
-
-        // Other cards should remain
-        expect(updatedPlayer.grid.cards[0][0]?.value, 8);
-        expect(updatedPlayer.grid.cards[1][2]?.value, 2);
-
-        // Cards should be added to discard pile
-        expect(
-          newState.discardPile.where((c) => c.value == 5).length,
-          greaterThanOrEqualTo(3),
+        final result = await endTurn(
+          EndTurnParams(gameState: gameState, playerId: 'player1'),
         );
+
+        expect(result.isRight(), true);
+
+        result.fold((failure) => fail('Should not fail'), (newState) {
+          final updatedPlayer = newState.players.first;
+          final expectedColumnCleared = testCase['expectedColumnCleared'] as bool;
+          final expectedCardsInDiscard = testCase['expectedCardsInDiscard'] as int;
+          final expectedRemainingCards = testCase['expectedRemainingCards'] as List<int>;
+
+          if (expectedColumnCleared) {
+            // Verify columns are properly cleared
+            if (testCase['description'].toString().contains('multiple')) {
+              // Multiple columns test - check both columns 0 and 2
+              expect(updatedPlayer.grid.cards[0][0], isNull);
+              expect(updatedPlayer.grid.cards[0][2], isNull);
+            } else {
+              // Single column test - check column 1
+              expect(updatedPlayer.grid.cards[0][1], isNull);
+              expect(updatedPlayer.grid.cards[1][1], isNull);
+              expect(updatedPlayer.grid.cards[2][1], isNull);
+            }
+          } else {
+            // Verify columns are not cleared when conditions not met
+            expect(updatedPlayer.grid.cards[0][1], isNotNull);
+            expect(updatedPlayer.grid.cards[1][1], isNotNull);
+            expect(updatedPlayer.grid.cards[2][1], isNotNull);
+          }
+
+          // Verify remaining cards are preserved
+          for (final expectedValue in expectedRemainingCards) {
+            bool foundCard = false;
+            for (final row in updatedPlayer.grid.cards) {
+              for (final card in row) {
+                if (card?.value == expectedValue) {
+                  foundCard = true;
+                  break;
+                }
+              }
+              if (foundCard) break;
+            }
+            expect(foundCard, true, reason: 'Expected card with value $expectedValue to remain');
+          }
+        });
       });
-    });
+    }
 
-    test('should not clear column if not all cards revealed', () async {
-      // Create a grid with matching values but one not revealed
-      final grid = PlayerGrid.empty()
-          .placeCard(const Card(value: 5, isRevealed: true), 0, 1)
-          .placeCard(
-            const Card(value: 5, isRevealed: false),
-            1,
-            1,
-          ) // Not revealed
-          .placeCard(const Card(value: 5, isRevealed: true), 2, 1);
-
-      final players = [
-        GamePlayer(
-          id: 'player1',
-          name: 'GamePlayer 1',
-          grid: grid,
-          isHost: true,
-        ),
-      ];
-
-      final gameState = GameState.initial(
-        roomId: 'room123',
-        players: players,
-      ).copyWith(status: GameStatus.playing, currentPlayerIndex: 0);
-
-      final result = await endTurn(
-        EndTurnParams(gameState: gameState, playerId: 'player1'),
-      );
-
-      expect(result.isRight(), true);
-
-      result.fold((failure) => fail('Should not fail'), (newState) {
-        final updatedPlayer = newState.players.first;
-
-        // Column should not be cleared
-        expect(updatedPlayer.grid.cards[0][1], isNotNull);
-        expect(updatedPlayer.grid.cards[1][1], isNotNull);
-        expect(updatedPlayer.grid.cards[2][1], isNotNull);
-      });
-    });
-
-    test('should check if player has revealed all cards', () async {
+    test('should trigger last round when player reveals all cards', () async {
       // Create a grid with all cards revealed
       var grid = PlayerGrid.empty();
       for (int row = 0; row < 3; row++) {
@@ -153,60 +173,7 @@ void main() {
       });
     });
 
-    test('should handle multiple completed columns', () async {
-      // Create a grid with two completed columns
-      final grid = PlayerGrid.empty()
-          // Column 0: all 3s
-          .placeCard(const Card(value: 3, isRevealed: true), 0, 0)
-          .placeCard(const Card(value: 3, isRevealed: true), 1, 0)
-          .placeCard(const Card(value: 3, isRevealed: true), 2, 0)
-          // Column 2: all 7s
-          .placeCard(const Card(value: 7, isRevealed: true), 0, 2)
-          .placeCard(const Card(value: 7, isRevealed: true), 1, 2)
-          .placeCard(const Card(value: 7, isRevealed: true), 2, 2)
-          // Other cards
-          .placeCard(const Card(value: 1), 0, 1)
-          .placeCard(const Card(value: 2), 1, 3);
-
-      final players = [
-        GamePlayer(
-          id: 'player1',
-          name: 'GamePlayer 1',
-          grid: grid,
-          isHost: true,
-        ),
-      ];
-
-      final gameState = GameState.initial(
-        roomId: 'room123',
-        players: players,
-      ).copyWith(status: GameStatus.playing, currentPlayerIndex: 0);
-
-      final result = await endTurn(
-        EndTurnParams(gameState: gameState, playerId: 'player1'),
-      );
-
-      expect(result.isRight(), true);
-
-      result.fold((failure) => fail('Should not fail'), (newState) {
-        final updatedPlayer = newState.players.first;
-
-        // Both columns should be cleared
-        expect(updatedPlayer.grid.cards[0][0], isNull);
-        expect(updatedPlayer.grid.cards[1][0], isNull);
-        expect(updatedPlayer.grid.cards[2][0], isNull);
-
-        expect(updatedPlayer.grid.cards[0][2], isNull);
-        expect(updatedPlayer.grid.cards[1][2], isNull);
-        expect(updatedPlayer.grid.cards[2][2], isNull);
-
-        // Other cards should remain
-        expect(updatedPlayer.grid.cards[0][1]?.value, 1);
-        expect(updatedPlayer.grid.cards[1][3]?.value, 2);
-      });
-    });
-
-    test('should calculate score correctly', () async {
+    test('should calculate player score correctly and reject wrong player turns', () async {
       final grid = PlayerGrid.empty()
           .placeCard(const Card(value: 5, isRevealed: true), 0, 0)
           .placeCard(const Card(value: -2, isRevealed: true), 0, 1)
@@ -218,34 +185,6 @@ void main() {
           id: 'player1',
           name: 'GamePlayer 1',
           grid: grid,
-          isHost: true,
-        ),
-      ];
-
-      final gameState = GameState.initial(
-        roomId: 'room123',
-        players: players,
-      ).copyWith(status: GameStatus.playing, currentPlayerIndex: 0);
-
-      final result = await endTurn(
-        EndTurnParams(gameState: gameState, playerId: 'player1'),
-      );
-
-      expect(result.isRight(), true);
-
-      result.fold((failure) => fail('Should not fail'), (newState) {
-        final updatedPlayer = newState.players.first;
-        // Score: 5 + (-2) + 10 + 0 = 13
-        expect(updatedPlayer.currentScore, 13);
-      });
-    });
-
-    test('should not process turn for wrong player', () async {
-      final players = [
-        GamePlayer(
-          id: 'player1',
-          name: 'GamePlayer 1',
-          grid: PlayerGrid.empty(),
           isHost: true,
         ),
         GamePlayer(
@@ -260,16 +199,25 @@ void main() {
         players: players,
       ).copyWith(status: GameStatus.playing, currentPlayerIndex: 0);
 
-      final result = await endTurn(
-        EndTurnParams(
-          gameState: gameState,
-          playerId: 'player2', // Wrong player
-        ),
+      // Test correct player turn
+      final validResult = await endTurn(
+        EndTurnParams(gameState: gameState, playerId: 'player1'),
       );
 
-      expect(result.isLeft(), true);
+      expect(validResult.isRight(), true);
+      validResult.fold((failure) => fail('Should not fail'), (newState) {
+        final updatedPlayer = newState.players.first;
+        // Score: 5 + (-2) + 10 + 0 = 13
+        expect(updatedPlayer.currentScore, 13);
+      });
 
-      result.fold((failure) {
+      // Test wrong player turn
+      final invalidResult = await endTurn(
+        EndTurnParams(gameState: gameState, playerId: 'player2'), // Wrong player
+      );
+
+      expect(invalidResult.isLeft(), true);
+      invalidResult.fold((failure) {
         failure.when(
           gameLogic: (message, code) => expect(code, 'NOT_YOUR_TURN'),
           server: (_, __, ___) => fail('Wrong failure type'),

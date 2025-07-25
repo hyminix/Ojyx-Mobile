@@ -7,11 +7,11 @@ import 'package:ojyx/features/game/domain/entities/play_direction.dart';
 import 'package:ojyx/features/game/presentation/providers/game_animation_provider.dart';
 
 void main() {
-  group('GameAnimationOverlay', () {
-    testWidgets('should show direction change animation when triggered', (
+  group('GameAnimationOverlay Strategic Visual Communication Behavior', () {
+    testWidgets('should communicate strategic turn direction changes affecting all players', (
       tester,
     ) async {
-      // Act
+      // Test behavior: direction changes impact strategic planning for all participants
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -20,7 +20,7 @@ void main() {
                 children: [
                   Container(color: Colors.blue),
                   const GameAnimationOverlay(
-                    child: Center(child: Text('Game Content')),
+                    child: Center(child: Text('Strategic Game Board')),
                   ),
                 ],
               ),
@@ -29,7 +29,7 @@ void main() {
         ),
       );
 
-      // Trigger animation
+      // Strategic reversal action triggers animation
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameAnimationOverlay)),
       );
@@ -38,12 +38,12 @@ void main() {
           .showDirectionChange(PlayDirection.forward);
       await tester.pump();
 
-      // Assert
-      expect(find.byType(DirectionChangeAnimation), findsOneWidget);
+      expect(find.byType(DirectionChangeAnimation), findsOneWidget,
+          reason: 'Direction change animation communicates strategic shift to all players');
     });
 
-    testWidgets('should show game content when no animation', (tester) async {
-      // Act
+    testWidgets('should maintain strategic gameplay visibility during normal play', (tester) async {
+      // Test behavior: gameplay remains unobstructed without active animations
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -51,7 +51,7 @@ void main() {
               body: Stack(
                 children: [
                   const GameAnimationOverlay(
-                    child: Center(child: Text('Game Content')),
+                    child: Center(child: Text('Strategic Game Board')),
                   ),
                 ],
               ),
@@ -60,13 +60,14 @@ void main() {
         ),
       );
 
-      // Assert
-      expect(find.text('Game Content'), findsOneWidget);
-      expect(find.byType(DirectionChangeAnimation), findsNothing);
+      expect(find.text('Strategic Game Board'), findsOneWidget,
+          reason: 'Game board remains visible for continuous strategic planning');
+      expect(find.byType(DirectionChangeAnimation), findsNothing,
+          reason: 'No visual disruption during standard gameplay');
     });
 
-    testWidgets('should remove animation after completion', (tester) async {
-      // Act
+    testWidgets('should ensure strategic communication completes before gameplay resumes', (tester) async {
+      // Test behavior: animation lifecycle ensures all players see strategic changes
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -74,7 +75,7 @@ void main() {
               body: Stack(
                 children: [
                   const GameAnimationOverlay(
-                    child: Center(child: Text('Game Content')),
+                    child: Center(child: Text('Strategic Game Board')),
                   ),
                 ],
               ),
@@ -83,7 +84,7 @@ void main() {
         ),
       );
 
-      // Trigger animation
+      // Strategic reversal affects turn order
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameAnimationOverlay)),
       );
@@ -92,18 +93,18 @@ void main() {
           .showDirectionChange(PlayDirection.backward);
       await tester.pump();
 
-      // Animation should be visible
-      expect(find.byType(DirectionChangeAnimation), findsOneWidget);
+      expect(find.byType(DirectionChangeAnimation), findsOneWidget,
+          reason: 'Strategic change notification active for all players');
 
-      // Wait for animation to complete
+      // Strategic communication completes
       await tester.pumpAndSettle(const Duration(seconds: 3));
 
-      // Animation should be gone
-      expect(find.byType(DirectionChangeAnimation), findsNothing);
+      expect(find.byType(DirectionChangeAnimation), findsNothing,
+          reason: 'Gameplay resumes after strategic communication completes');
     });
 
-    testWidgets('should stack animations on top of content', (tester) async {
-      // Act
+    testWidgets('should overlay strategic notifications without disrupting game state visibility', (tester) async {
+      // Test behavior: critical game information remains visible during animations
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -111,7 +112,7 @@ void main() {
               body: GameAnimationOverlay(
                 child: Container(
                   color: Colors.red,
-                  child: const Center(child: Text('Game Content')),
+                  child: const Center(child: Text('Active Game State')),
                 ),
               ),
             ),
@@ -119,7 +120,7 @@ void main() {
         ),
       );
 
-      // Trigger animation
+      // Strategic action triggers overlay notification
       final container = ProviderScope.containerOf(
         tester.element(find.byType(GameAnimationOverlay)),
       );
@@ -128,27 +129,32 @@ void main() {
           .showDirectionChange(PlayDirection.forward);
       await tester.pump();
 
-      // Assert - Both content and animation should be visible
-      expect(find.text('Game Content'), findsOneWidget);
-      expect(find.byType(DirectionChangeAnimation), findsOneWidget);
+      // Both strategic state and notification visible
+      expect(find.text('Active Game State'), findsOneWidget,
+          reason: 'Game state remains visible for strategic continuity');
+      expect(find.byType(DirectionChangeAnimation), findsOneWidget,
+          reason: 'Strategic notification overlays without blocking');
 
-      // Animation should be on top (later in the widget tree)
+      // Proper layering ensures visibility hierarchy
       final stack = tester.widget<Stack>(find.byType(Stack).first);
-      expect(stack.children.length, equals(2));
-      expect(stack.children.first, isA<Container>());
-      expect(stack.children.last, isA<Positioned>());
+      expect(stack.children.length, equals(2),
+          reason: 'Dual-layer system maintains game state and notifications');
+      expect(stack.children.first, isA<Container>(),
+          reason: 'Base layer preserves game state');
+      expect(stack.children.last, isA<Positioned>(),
+          reason: 'Overlay layer communicates strategic changes');
     });
 
-    testWidgets('should handle multiple animation requests gracefully', (
+    testWidgets('should manage rapid strategic actions preventing visual confusion', (
       tester,
     ) async {
-      // Act
+      // Test behavior: system handles multiple strategic changes maintaining clarity
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
               body: const GameAnimationOverlay(
-                child: Center(child: Text('Game Content')),
+                child: Center(child: Text('Strategic Game Board')),
               ),
             ),
           ),
@@ -159,7 +165,7 @@ void main() {
         tester.element(find.byType(GameAnimationOverlay)),
       );
 
-      // Trigger multiple animations quickly
+      // Rapid strategic reversals in competitive play
       container
           .read(gameAnimationProvider.notifier)
           .showDirectionChange(PlayDirection.forward);
@@ -170,18 +176,18 @@ void main() {
           .showDirectionChange(PlayDirection.backward);
       await tester.pump();
 
-      // Should still only show one animation
-      expect(find.byType(DirectionChangeAnimation), findsOneWidget);
+      expect(find.byType(DirectionChangeAnimation), findsOneWidget,
+          reason: 'Single clear notification prevents strategic confusion during rapid changes');
     });
 
-    testWidgets('should pass correct direction to animation', (tester) async {
-      // Act
+    testWidgets('should accurately communicate strategic direction changes for turn planning', (tester) async {
+      // Test behavior: precise direction communication enables strategic adaptation
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
               body: const GameAnimationOverlay(
-                child: Center(child: Text('Game Content')),
+                child: Center(child: Text('Strategic Game Board')),
               ),
             ),
           ),
@@ -192,17 +198,18 @@ void main() {
         tester.element(find.byType(GameAnimationOverlay)),
       );
 
-      // Trigger with backward direction
+      // Strategic reversal changes turn order
       container
           .read(gameAnimationProvider.notifier)
           .showDirectionChange(PlayDirection.backward);
       await tester.pump();
 
-      // Check the animation has correct direction
+      // Verify accurate strategic information
       final animation = tester.widget<DirectionChangeAnimation>(
         find.byType(DirectionChangeAnimation),
       );
-      expect(animation.direction, equals(PlayDirection.backward));
+      expect(animation.direction, equals(PlayDirection.backward),
+          reason: 'Accurate direction enables players to adapt turn strategies');
     });
   });
 }

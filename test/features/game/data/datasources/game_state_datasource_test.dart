@@ -4,27 +4,6 @@ import 'package:ojyx/features/game/data/models/game_state_model.dart';
 
 void main() {
   group('GameStateDataSource', () {
-    test('should define interface for game state operations', () {
-      // This test verifies the interface structure
-
-      // The datasource should support these operations:
-      final expectedMethods = [
-        'createGameState',
-        'getGameState',
-        'updateGameState',
-        'deleteGameState',
-        'getGameStateByRoom',
-        'watchGameState',
-        'createPlayerGrid',
-        'updatePlayerGrid',
-        'getPlayerGrids',
-        'watchPlayerGrids',
-      ];
-
-      // Test that interface is well-defined
-      expect(expectedMethods.length, greaterThan(0));
-    });
-
     test('should handle game state creation', () async {
       // Test game state creation parameters
       const gameStateData = {
