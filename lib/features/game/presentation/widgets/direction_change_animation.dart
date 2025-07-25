@@ -134,7 +134,7 @@ class _DirectionChangeAnimationState extends State<DirectionChangeAnimation>
                   color: colorScheme.primaryContainer,
                   boxShadow: [
                     BoxShadow(
-                      color: colorScheme.primary.withOpacity(0.3),
+                      color: colorScheme.primary.withAlpha((0.3 * 255).round()),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),

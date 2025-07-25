@@ -24,7 +24,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
     try {
       // Check if game is in progress
       if (params.gameState.status != GameStatus.playing) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'Game is not in progress',
             code: 'GAME_NOT_IN_PROGRESS',
@@ -35,7 +35,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
       // Check if it's the player's turn
       final currentPlayer = params.gameState.currentPlayer;
       if (currentPlayer.id != params.playerId) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'It is not your turn',
             code: 'NOT_YOUR_TURN',
@@ -45,7 +45,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
 
       // Check if player has already drawn a card this turn
       if (params.gameState.drawnCard != null) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'You have already drawn a card this turn',
             code: 'ALREADY_DRAWN',
@@ -58,7 +58,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
         (p) => p.id == params.playerId,
       );
       if (playerIndex == -1) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'GamePlayer not found',
             code: 'PLAYER_NOT_FOUND',
@@ -70,7 +70,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
 
       // Check if player can draw more action cards
       if (player.actionCards.length >= kMaxActionCardsInHand) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message:
                 'You cannot draw more action cards (max $kMaxActionCardsInHand)',
@@ -82,7 +82,7 @@ class DrawActionCardUseCase extends UseCase<GameState, DrawActionCardParams> {
       // Draw an action card from the repository
       final drawnCard = await _repository.drawActionCard();
       if (drawnCard == null) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'No action cards available in the deck',
             code: 'NO_ACTION_CARDS',

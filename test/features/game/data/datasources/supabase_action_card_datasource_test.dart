@@ -41,12 +41,16 @@ void main() {
         // Verify the deck provides enough variety and balance
         final totalCards = expectedDistribution.values.reduce((a, b) => a + b);
         expect(totalCards, 34); // Sufficient cards for multiple game rounds
-        
+
         // Verify most common cards are utility cards (teleport, skip, peek)
-        final utilityCards = expectedDistribution[ActionCardType.teleport]! +
+        final utilityCards =
+            expectedDistribution[ActionCardType.teleport]! +
             expectedDistribution[ActionCardType.skip]! +
             expectedDistribution[ActionCardType.peek]!;
-        expect(utilityCards > totalCards / 3, true); // More than 1/3 should be utility
+        expect(
+          utilityCards > totalCards / 3,
+          true,
+        ); // More than 1/3 should be utility
       });
     });
   });

@@ -1,0 +1,14 @@
+# Dependency Overrides Template for Ojyx Migration
+# Copy these overrides to pubspec.yaml when needed
+
+# For Freezed 3.x migration (Phase 4)
+dependency_overrides:
+  analyzer: ^8.0.0
+  _fe_analyzer_shared: ^86.0.0
+  
+# Additional overrides if needed:
+# build: ^3.0.0  # If build_runner conflicts
+# source_gen: ^3.0.0  # If source generation fails
+
+# Note: Remove overrides after successful migration
+# to avoid masking future conflicts

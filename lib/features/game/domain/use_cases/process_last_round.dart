@@ -22,7 +22,7 @@ class ProcessLastRound implements UseCase<GameState, ProcessLastRoundParams> {
         return Right(gameState);
       }
 
-      var updatedPlayers = List<GamePlayer>.from(gameState.players);
+      final updatedPlayers = List<GamePlayer>.from(gameState.players);
 
       // Reveal all cards for all players except the initiator
       for (int i = 0; i < updatedPlayers.length; i++) {

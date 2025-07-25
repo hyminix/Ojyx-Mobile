@@ -29,7 +29,7 @@ class DistributeCards implements UseCase<GameState, DistributeCardsParams> {
       final requiredCards =
           gameState.players.length * kCardsPerPlayer + 1; // +1 for discard
       if (deck.length < requiredCards) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'Not enough cards in deck for distribution',
             code: 'INSUFFICIENT_CARDS',
@@ -44,7 +44,7 @@ class DistributeCards implements UseCase<GameState, DistributeCardsParams> {
         // Take 12 cards from deck
         for (int i = 0; i < kCardsPerPlayer; i++) {
           if (deck.isEmpty) {
-            return Left(
+            return const Left(
               Failure.gameLogic(
                 message: 'Deck ran out of cards during distribution',
                 code: 'DECK_EMPTY',
@@ -71,7 +71,7 @@ class DistributeCards implements UseCase<GameState, DistributeCardsParams> {
 
       // Create initial discard pile
       if (deck.isEmpty) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'No cards left for discard pile',
             code: 'DECK_EMPTY',

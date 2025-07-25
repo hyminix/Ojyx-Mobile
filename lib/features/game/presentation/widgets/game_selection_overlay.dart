@@ -77,7 +77,7 @@ class _GameSelectionOverlayState extends ConsumerState<GameSelectionOverlay>
             child: GestureDetector(
               onTap: () => selectionNotifier.cancelSelection(),
               child: Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withAlpha((0.5 * 255).round()),
                 child: Center(
                   child: GestureDetector(
                     onTap: () {}, // Prevent tap through
@@ -193,7 +193,9 @@ class _GameSelectionOverlayState extends ConsumerState<GameSelectionOverlay>
                                   radius: 24,
                                   backgroundColor: isSelected
                                       ? theme.colorScheme.primary
-                                      : theme.colorScheme.surfaceVariant,
+                                      : theme
+                                            .colorScheme
+                                            .surfaceContainerHighest,
                                   foregroundColor: isSelected
                                       ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,

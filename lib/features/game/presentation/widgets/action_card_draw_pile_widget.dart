@@ -35,7 +35,9 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    colorScheme.primary.withOpacity(canDraw ? 1.0 : 0.5),
+                    colorScheme.primary.withValues(
+                      opacity: canDraw ? 1.0 : 0.5,
+                    ),
                     colorScheme.primaryContainer.withOpacity(
                       canDraw ? 1.0 : 0.5,
                     ),
@@ -59,7 +61,9 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
                         Icon(
                           Icons.style,
                           size: 32,
-                          color: Colors.white.withOpacity(canDraw ? 1.0 : 0.6),
+                          color: Colors.white.withValues(
+                            opacity: canDraw ? 1.0 : 0.6,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -87,7 +91,7 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
                           Text(
                             'Pile vide',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withAlpha((0.8 * 255).round()),
                               fontSize: 10,
                             ),
                           ),
@@ -109,7 +113,7 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
         borderRadius: BorderRadius.circular(12),
         child: CustomPaint(
           painter: _CardBackPatternPainter(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withAlpha((0.1 * 255).round()),
           ),
         ),
       ),

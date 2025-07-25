@@ -3,7 +3,6 @@ import 'package:ojyx/features/global_scores/domain/entities/global_score.dart';
 import 'package:ojyx/features/global_scores/domain/repositories/global_score_repository.dart';
 import 'package:ojyx/features/global_scores/domain/use_cases/get_top_players.dart';
 import 'package:ojyx/core/errors/failures.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockGlobalScoreRepository extends Mock implements GlobalScoreRepository {}
@@ -19,7 +18,7 @@ void main() {
     });
 
     final testTopPlayers = [
-      PlayerStats(
+      const PlayerStats(
         playerId: 'player1',
         playerName: 'Alice',
         totalGamesPlayed: 50,
@@ -30,7 +29,7 @@ void main() {
         averagePosition: 1.2,
         totalRoundsPlayed: 250,
       ),
-      PlayerStats(
+      const PlayerStats(
         playerId: 'player2',
         playerName: 'Bob',
         totalGamesPlayed: 45,
@@ -41,7 +40,7 @@ void main() {
         averagePosition: 1.8,
         totalRoundsPlayed: 225,
       ),
-      PlayerStats(
+      const PlayerStats(
         playerId: 'player3',
         playerName: 'Charlie',
         totalGamesPlayed: 60,
@@ -133,7 +132,7 @@ void main() {
     test('should filter out players with no games', () async {
       final playersWithNoGames = [
         ...testTopPlayers,
-        PlayerStats(
+        const PlayerStats(
           playerId: 'player4',
           playerName: 'David',
           totalGamesPlayed: 0,

@@ -23,15 +23,15 @@ class EndTurn implements UseCase<GameState, EndTurnParams> {
 
       // Validate it's player's turn
       final currentPlayer = gameState.currentPlayer;
-      if (currentPlayer == null || currentPlayer.id != playerId) {
-        return Left(
+      if (currentPlayer.id != playerId) {
+        return const Left(
           Failure.gameLogic(message: 'Not your turn', code: 'NOT_YOUR_TURN'),
         );
       }
 
       // Process end of turn validations
-      var updatedPlayers = List<GamePlayer>.from(gameState.players);
-      var discardPile = List<Card>.from(gameState.discardPile);
+      final updatedPlayers = List<GamePlayer>.from(gameState.players);
+      final discardPile = List<Card>.from(gameState.discardPile);
 
       // Get current player index
       final playerIndex = gameState.players.indexWhere((p) => p.id == playerId);

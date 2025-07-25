@@ -274,10 +274,10 @@ void main() {
       final colorTestState = PlayerState(
         playerId: 'color-test',
         cards: [
-          game.Card(value: 1, isRevealed: true),
-          game.Card(value: 2, isRevealed: true),
-          game.Card(value: 3, isRevealed: true),
-          game.Card(value: 4, isRevealed: true),
+          const game.Card(value: 1, isRevealed: true),
+          const game.Card(value: 2, isRevealed: true),
+          const game.Card(value: 3, isRevealed: true),
+          const game.Card(value: 4, isRevealed: true),
           ...List.filled(8, null),
         ],
         currentScore: 10,

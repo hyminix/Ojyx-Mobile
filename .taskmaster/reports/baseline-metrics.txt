@@ -1,0 +1,17 @@
+Baseline Metrics - Fri Jul 25 20:16:03 CEST 2025
+================================
+
+Test Files: 113
+Test Directories: 97
+
+Test Execution Time:
+Total execution time: 76s
+
+Static Analysis Results:
+Errors: 10
+Warnings: 87
+Info: 265
+
+Code generation time: 54s
+
+Debug APK size: 

@@ -1,5 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:ojyx/features/multiplayer/data/datasources/supabase_room_datasource.dart';
 import 'package:ojyx/features/multiplayer/data/datasources/supabase_room_datasource_impl.dart';
@@ -11,7 +10,6 @@ import 'package:ojyx/features/multiplayer/domain/use_cases/join_room_use_case.da
 import 'package:ojyx/features/multiplayer/domain/use_cases/sync_game_state_use_case.dart';
 import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
 import 'package:ojyx/features/multiplayer/domain/entities/room_event.dart';
-import 'package:ojyx/features/game/domain/use_cases/game_initialization_use_case.dart';
 import 'package:ojyx/features/game/presentation/providers/game_state_notifier.dart';
 import 'package:ojyx/features/game/presentation/providers/repository_providers.dart';
 import 'package:ojyx/core/providers/supabase_provider.dart';

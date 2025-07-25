@@ -1,16 +1,16 @@
 /// Legacy test helpers - consider migrating to the new helpers in /test/helpers/
-/// 
+///
 /// For new tests, prefer using:
 /// - /test/helpers/test_builders.dart for entity creation
 /// - /test/helpers/test_matchers.dart for assertions
 /// - /test/helpers/test_scenarios.dart for common scenarios
 /// - /test/helpers/index.dart for convenient single import
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ojyx/core/providers/supabase_provider.dart';
-import 'package:ojyx/features/game/data/repositories/supabase_game_state_repository.dart';
 import 'package:ojyx/features/game/domain/repositories/game_state_repository.dart';
 import 'package:ojyx/features/game/presentation/providers/repository_providers.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
@@ -66,7 +66,7 @@ GameState createTestGameState({
           100,
           (i) => domain.Card(value: i % 13 - 2, isRevealed: false),
         ),
-    discardPile: discardPile ?? [domain.Card(value: 5, isRevealed: true)],
+    discardPile: discardPile ?? [const domain.Card(value: 5, isRevealed: true)],
     currentPlayerIndex: currentPlayerIndex ?? 0,
     turnDirection: turnDirection ?? TurnDirection.clockwise,
     lastRound: lastRound ?? false,

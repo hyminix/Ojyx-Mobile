@@ -326,14 +326,14 @@ void main() {
 
     testWidgets('should handle empty player list gracefully', (tester) async {
       await tester.pumpWidget(
-        ProviderScope(
+        const ProviderScope(
           child: MaterialApp(
             home: Scaffold(
               body: Stack(
                 children: [
-                  const Center(child: Text('Game Content')),
+                  Center(child: Text('Game Content')),
                   GameSelectionOverlay(
-                    players: const [],
+                    players: [],
                     currentPlayerId: 'player-1',
                   ),
                 ],

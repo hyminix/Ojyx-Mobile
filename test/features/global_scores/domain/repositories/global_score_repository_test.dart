@@ -208,7 +208,7 @@ void main() {
     group('getTopPlayers', () {
       test('should return top players by win rate', () async {
         final topPlayers = [
-          PlayerStats(
+          const PlayerStats(
             playerId: 'player1',
             playerName: 'Alice',
             totalGamesPlayed: 10,
@@ -219,7 +219,7 @@ void main() {
             averagePosition: 1.5,
             totalRoundsPlayed: 45,
           ),
-          PlayerStats(
+          const PlayerStats(
             playerId: 'player2',
             playerName: 'Bob',
             totalGamesPlayed: 15,

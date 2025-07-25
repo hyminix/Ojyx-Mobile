@@ -17,7 +17,7 @@ void main() {
   });
 
   group('ActionCardRepositoryImpl', () {
-    final testCard = ActionCard(
+    final testCard = const ActionCard(
       id: 'test-1',
       type: ActionCardType.teleport,
       name: 'Téléportation',
@@ -29,7 +29,9 @@ void main() {
     test('should return available action cards when requested', () async {
       // Arrange
       final expectedCards = [testCard];
-      when(() => mockDataSource.getAvailableActionCards()).thenAnswer((_) async => expectedCards);
+      when(
+        () => mockDataSource.getAvailableActionCards(),
+      ).thenAnswer((_) async => expectedCards);
 
       // Act
       final result = await repository.getAvailableActionCards();
@@ -45,7 +47,9 @@ void main() {
       // Arrange
       final playerId = 'player1';
       final expectedCards = [testCard];
-      when(() => mockDataSource.getPlayerActionCards(playerId)).thenAnswer((_) async => expectedCards);
+      when(
+        () => mockDataSource.getPlayerActionCards(playerId),
+      ).thenAnswer((_) async => expectedCards);
 
       // Act
       final result = await repository.getPlayerActionCards(playerId);
@@ -59,7 +63,9 @@ void main() {
     test('should successfully add action card to player', () async {
       // Arrange
       final playerId = 'player1';
-      when(() => mockDataSource.addActionCardToPlayer(playerId, testCard)).thenAnswer((_) async {});
+      when(
+        () => mockDataSource.addActionCardToPlayer(playerId, testCard),
+      ).thenAnswer((_) async {});
 
       // Act & Assert - Should complete without error
       await expectLater(
@@ -71,7 +77,9 @@ void main() {
     test('should successfully remove action card from player', () async {
       // Arrange
       final playerId = 'player1';
-      when(() => mockDataSource.removeActionCardFromPlayer(playerId, testCard)).thenAnswer((_) async {});
+      when(
+        () => mockDataSource.removeActionCardFromPlayer(playerId, testCard),
+      ).thenAnswer((_) async {});
 
       // Act & Assert - Should complete without error
       await expectLater(
@@ -82,7 +90,9 @@ void main() {
 
     test('should return drawn action card when available', () async {
       // Arrange
-      when(() => mockDataSource.drawActionCard()).thenAnswer((_) async => testCard);
+      when(
+        () => mockDataSource.drawActionCard(),
+      ).thenAnswer((_) async => testCard);
 
       // Act
       final result = await repository.drawActionCard();
@@ -106,13 +116,12 @@ void main() {
 
     test('should successfully discard action card', () async {
       // Arrange
-      when(() => mockDataSource.discardActionCard(testCard)).thenAnswer((_) async {});
+      when(
+        () => mockDataSource.discardActionCard(testCard),
+      ).thenAnswer((_) async {});
 
       // Act & Assert - Should complete without error
-      await expectLater(
-        repository.discardActionCard(testCard),
-        completes,
-      );
+      await expectLater(repository.discardActionCard(testCard), completes);
     });
 
     test('should successfully shuffle action cards', () async {
@@ -120,10 +129,7 @@ void main() {
       when(() => mockDataSource.shuffleActionCards()).thenAnswer((_) async {});
 
       // Act & Assert - Should complete without error
-      await expectLater(
-        repository.shuffleActionCards(),
-        completes,
-      );
+      await expectLater(repository.shuffleActionCards(), completes);
     });
 
     test(

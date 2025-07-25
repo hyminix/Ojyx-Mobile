@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:ojyx/features/game/presentation/providers/game_state_notifier.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
@@ -179,7 +178,6 @@ void main() {
       expect(finalState.currentPlayerIndex, equals(1));
       expect(finalState.turnDirection, equals(TurnDirection.counterClockwise));
     });
-
   });
 
   group('gameInitializationUseCaseProvider', () {

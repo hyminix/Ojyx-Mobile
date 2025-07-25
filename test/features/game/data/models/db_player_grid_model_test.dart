@@ -79,7 +79,10 @@ void main() {
       expect(roundTripModel.gameStateId, equals(model.gameStateId));
       expect(roundTripModel.playerId, equals(model.playerId));
       expect(roundTripModel.gridCards.length, equals(model.gridCards.length));
-      expect(roundTripModel.actionCards.length, equals(model.actionCards.length));
+      expect(
+        roundTripModel.actionCards.length,
+        equals(model.actionCards.length),
+      );
       expect(roundTripModel.score, equals(model.score));
       expect(roundTripModel.isActive, equals(model.isActive));
       expect(roundTripModel.hasRevealedAll, equals(model.hasRevealedAll));

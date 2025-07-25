@@ -1,0 +1,432 @@
+Analyzing Ojyx...                                               
+
+   info • 'setExtra' is deprecated and shouldn't be used. Use Contexts instead. Additional data is deprecated in favor of structured Contexts and should be avoided when possible • lib/core/config/sentry_config.dart:61:19 • deprecated_member_use
+   info • 'setExtra' is deprecated and shouldn't be used. Use Contexts instead. Additional data is deprecated in favor of structured Contexts and should be avoided when possible • lib/core/config/sentry_config.dart:79:19 • deprecated_member_use
+   info • 'CurrentUserIdRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/auth/presentation/providers/auth_provider.dart:39:23 • deprecated_member_use_from_same_package
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/end_game/presentation/screens/end_game_screen.dart:28:57 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/end_game/presentation/widgets/player_score_card.dart:57:34 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/end_game/presentation/widgets/player_score_card.dart:97:47 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/end_game/presentation/widgets/winner_announcement.dart:15:29 • deprecated_member_use
+   info • Local variables should be final • lib/features/game/domain/use_cases/check_end_round.dart:34:7 • prefer_final_locals
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/discard_card.dart:39:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/discard_card.dart:40:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/discard_card.dart:46:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/discard_card.dart:47:11 • prefer_const_constructors
+   info • Local variables should be final • lib/features/game/domain/use_cases/discard_card.dart:65:7 • prefer_final_locals
+   info • Local variables should be final • lib/features/game/domain/use_cases/discard_card.dart:66:7 • prefer_final_locals
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/discard_card.dart:78:18 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/discard_card.dart:79:13 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/discard_card.dart:95:18 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/discard_card.dart:96:13 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/distribute_cards.dart:32:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/distribute_cards.dart:33:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/distribute_cards.dart:47:20 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/distribute_cards.dart:48:15 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/distribute_cards.dart:74:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/distribute_cards.dart:75:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_action_card_use_case.dart:27:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_action_card_use_case.dart:28:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_action_card_use_case.dart:38:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_action_card_use_case.dart:39:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_action_card_use_case.dart:48:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_action_card_use_case.dart:49:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_action_card_use_case.dart:61:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_action_card_use_case.dart:62:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_action_card_use_case.dart:73:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_action_card_use_case.dart:74:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_action_card_use_case.dart:85:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_action_card_use_case.dart:86:11 • prefer_const_constructors
+warning • The operand can't be 'null', so the condition is always 'false' • lib/features/game/domain/use_cases/draw_card.dart:30:25 • unnecessary_null_comparison
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_card.dart:31:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_card.dart:32:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_card.dart:38:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_card.dart:39:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_card.dart:49:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_card.dart:50:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_card.dart:75:18 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_card.dart:76:13 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_card.dart:90:18 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/draw_card.dart:91:13 • prefer_const_constructors
+warning • The operand can't be 'null', so the condition is always 'false' • lib/features/game/domain/use_cases/end_turn.dart:26:25 • unnecessary_null_comparison
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/end_turn.dart:27:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/end_turn.dart:28:11 • prefer_const_constructors
+   info • Local variables should be final • lib/features/game/domain/use_cases/end_turn.dart:33:7 • prefer_final_locals
+   info • Local variables should be final • lib/features/game/domain/use_cases/end_turn.dart:34:7 • prefer_final_locals
+   info • Local variables should be final • lib/features/game/domain/use_cases/process_last_round.dart:25:7 • prefer_final_locals
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/reveal_initial_cards.dart:46:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/reveal_initial_cards.dart:47:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/start_game.dart:32:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/start_game.dart:33:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/start_game.dart:44:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/domain/use_cases/start_game.dart:45:11 • prefer_const_constructors
+warning • Unused import: '../../domain/entities/game_state.dart' • lib/features/game/presentation/providers/action_card_providers.dart:13:8 • unused_import
+   info • 'ActionCardLocalDataSourceRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/action_card_providers.dart:23:3 • deprecated_member_use_from_same_package
+   info • 'ActionCardRepositoryRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/action_card_providers.dart:29:43 • deprecated_member_use_from_same_package
+   info • 'SupabaseActionCardRepositoryRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/action_card_providers.dart:37:3 • deprecated_member_use_from_same_package
+   info • 'UseActionCardUseCaseRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/action_card_providers.dart:46:43 • deprecated_member_use_from_same_package
+   info • 'PlayerActionCardsRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/action_card_providers.dart:53:3 • deprecated_member_use_from_same_package
+   info • 'CanUseActionCardRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/action_card_providers.dart:64:3 • deprecated_member_use_from_same_package
+   info • 'GameInitializationUseCaseRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/game_state_notifier.dart:49:3 • deprecated_member_use_from_same_package
+   info • 'GameStateRepositoryRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/repository_providers.dart:12:41 • deprecated_member_use_from_same_package
+   info • 'ServerActionCardRepositoryRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/repository_providers.dart:19:3 • deprecated_member_use_from_same_package
+   info • Use 'const' with the constructor to improve performance • lib/features/game/presentation/screens/game_screen.dart:85:20 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/presentation/screens/game_screen.dart:85:34 • prefer_const_constructors
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/action_card_draw_pile_widget.dart:38:41 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/action_card_draw_pile_widget.dart:39:50 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/action_card_draw_pile_widget.dart:62:47 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/action_card_draw_pile_widget.dart:68:49 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/action_card_draw_pile_widget.dart:90:51 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/action_card_draw_pile_widget.dart:112:33 • deprecated_member_use
+   info • Use 'const' with the constructor to improve performance • lib/features/game/presentation/widgets/action_card_hand_widget.dart:149:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/game/presentation/widgets/action_card_hand_widget.dart:151:18 • prefer_const_constructors
+warning • The value of the field '_targetPosition' isn't used • lib/features/game/presentation/widgets/card_animation_widget.dart:36:11 • unused_field
+warning • The declaration '_runAnimation' isn't referenced • lib/features/game/presentation/widgets/card_animation_widget.dart:100:16 • unused_element
+warning • The value of the local variable 'theme' isn't used • lib/features/game/presentation/widgets/common_area_widget.dart:34:11 • unused_local_variable
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/common_area_widget.dart:95:61 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/common_area_widget.dart:104:50 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/common_area_widget.dart:110:52 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/common_area_widget.dart:120:50 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/common_area_widget.dart:126:52 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/common_area_widget.dart:141:42 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/common_area_widget.dart:143:61 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/common_area_widget.dart:172:40 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/common_area_widget.dart:174:59 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/common_area_widget.dart:201:45 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/common_area_widget.dart:204:47 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/direction_change_animation.dart:137:50 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/discard_pile_widget.dart:81:57 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/discard_pile_widget.dart:87:62 • deprecated_member_use
+   info • 'onWillAccept' is deprecated and shouldn't be used. Use onWillAcceptWithDetails instead. This callback is similar to onWillAcceptWithDetails but does not provide drag details. This feature was deprecated after v3.14.0-0.2.pre • lib/features/game/presentation/widgets/discard_pile_widget.dart:107:9 • deprecated_member_use
+   info • 'onAccept' is deprecated and shouldn't be used. Use onAcceptWithDetails instead. This callback is similar to onAcceptWithDetails but does not provide drag details. This feature was deprecated after v3.14.0-0.2.pre • lib/features/game/presentation/widgets/discard_pile_widget.dart:111:9 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/discard_pile_widget.dart:152:44 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/discard_pile_widget.dart:164:48 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/discard_pile_widget.dart:170:50 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/discard_pile_widget.dart:191:35 • deprecated_member_use
+warning • The value of the field '_scaleAnimation' isn't used • lib/features/game/presentation/widgets/draw_pile_widget.dart:22:26 • unused_field
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/draw_pile_widget.dart:165:35 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/draw_pile_widget.dart:172:48 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/draw_pile_widget.dart:199:56 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/draw_pile_widget.dart:207:58 • deprecated_member_use
+warning • Unused import: '../../domain/entities/card_position.dart' • lib/features/game/presentation/widgets/enhanced_player_grid.dart:5:8 • unused_import
+warning • Unused import: 'player_grid_widget.dart' • lib/features/game/presentation/widgets/enhanced_player_grid.dart:7:8 • unused_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/game_selection_overlay.dart:80:37 • deprecated_member_use
+   info • 'surfaceVariant' is deprecated and shouldn't be used. Use surfaceContainerHighest instead. This feature was deprecated after v3.18.0-0.1.pre • lib/features/game/presentation/widgets/game_selection_overlay.dart:196:59 • deprecated_member_use
+warning • Unused import: 'card_widget.dart' • lib/features/game/presentation/widgets/opponent_grid_widget.dart:4:8 • unused_import
+warning • Unused import: 'action_card_hand_widget.dart' • lib/features/game/presentation/widgets/opponents_view_widget.dart:7:8 • unused_import
+warning • Unused import: '../../domain/entities/card.dart' • lib/features/game/presentation/widgets/player_grid_widget.dart:3:8 • unused_import
+   info • 'surfaceVariant' is deprecated and shouldn't be used. Use surfaceContainerHighest instead. This feature was deprecated after v3.18.0-0.1.pre • lib/features/game/presentation/widgets/player_grid_with_selection.dart:219:37 • deprecated_member_use
+warning • Unused import: '../../domain/entities/game_player.dart' • lib/features/game/presentation/widgets/turn_info_widget.dart:3:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • lib/features/game/presentation/widgets/turn_info_widget.dart:88:22 • prefer_const_constructors
+warning • The value of the field '_highlightColor' isn't used • lib/features/game/presentation/widgets/visual_feedback_widget.dart:38:9 • unused_field
+warning • The value of the field '_pulseIntensity' isn't used • lib/features/game/presentation/widgets/visual_feedback_widget.dart:42:10 • unused_field
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/visual_feedback_widget.dart:129:22 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/visual_feedback_widget.dart:324:30 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/visual_feedback_widget.dart:333:30 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/global_scores/presentation/screens/leaderboard_screen.dart:129:51 • deprecated_member_use
+   info • 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre • lib/features/home/presentation/screens/home_screen.dart:21:45 • deprecated_member_use
+   info • 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre • lib/features/home/presentation/screens/home_screen.dart:54:39 • deprecated_member_use
+warning • Unused import: '../../domain/entities/room_event.dart' • lib/features/multiplayer/data/datasources/supabase_room_datasource.dart:3:8 • unused_import
+warning • Unused import: '../../../game/data/models/game_state_model.dart' • lib/features/multiplayer/data/datasources/supabase_room_datasource.dart:4:8 • unused_import
+warning • Unused import: '../../../game/domain/entities/game_state.dart' • lib/features/multiplayer/domain/entities/room.dart:2:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/card.dart' • lib/features/multiplayer/domain/entities/room_event.dart:3:8 • unused_import
+warning • Unused import: '../../../game/domain/entities/game_player.dart' • lib/features/multiplayer/domain/use_cases/sync_game_state_use_case.dart:3:8 • unused_import
+warning • Unused import: '../../../game/domain/entities/game_state.dart' • lib/features/multiplayer/presentation/providers/multiplayer_game_notifier.dart:4:8 • unused_import
+warning • Unused import: '../../../game/domain/entities/card.dart' • lib/features/multiplayer/presentation/providers/multiplayer_game_notifier.dart:5:8 • unused_import
+warning • The value of the field '_syncUseCase' isn't used • lib/features/multiplayer/presentation/providers/multiplayer_game_notifier.dart:17:29 • unused_field
+warning • Unused import: 'package:supabase_flutter/supabase_flutter.dart' • lib/features/multiplayer/presentation/providers/room_providers.dart:2:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/use_cases/game_initialization_use_case.dart' • lib/features/multiplayer/presentation/providers/room_providers.dart:14:8 • unused_import
+   info • 'SupabaseRoomDatasourceRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:22:47 • deprecated_member_use_from_same_package
+   info • 'RoomDatasourceRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:28:31 • deprecated_member_use_from_same_package
+   info • 'RoomRepositoryRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:34:31 • deprecated_member_use_from_same_package
+   info • 'CreateRoomUseCaseRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:43:37 • deprecated_member_use_from_same_package
+   info • 'JoinRoomUseCaseRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:49:33 • deprecated_member_use_from_same_package
+   info • 'SyncGameStateUseCaseRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:55:43 • deprecated_member_use_from_same_package
+   info • 'CurrentRoomRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:61:26 • deprecated_member_use_from_same_package
+   info • 'RoomEventsRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:67:30 • deprecated_member_use_from_same_package
+   info • 'AvailableRoomsRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:73:35 • deprecated_member_use_from_same_package
+   info • Use 'const' with the constructor to improve performance • test/core/errors/failures_test.dart:52:27 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/core/errors/failures_test.dart:62:27 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/core/errors/failures_test.dart:72:27 • prefer_const_constructors
+   info • Dangling library doc comment • test/core/helpers/test_helpers.dart:1:1 • dangling_library_doc_comments
+warning • Unused import: 'package:ojyx/features/game/data/repositories/supabase_game_state_repository.dart' • test/core/helpers/test_helpers.dart:13:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • test/core/helpers/test_helpers.dart:69:34 • prefer_const_constructors
+warning • Unused import: 'package:supabase_flutter/supabase_flutter.dart' • test/core/providers/supabase_provider_test.dart:4:8 • unused_import
+   info • The imported package 'riverpod' isn't a dependency of the importing package • test/features/end_game/presentation/integration/save_global_score_integration_test.dart:5:8 • depend_on_referenced_packages
+warning • Unused import: 'package:ojyx/features/game/domain/entities/action_card.dart' • test/features/end_game/presentation/integration/save_global_score_integration_test.dart:6:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • test/features/end_game/presentation/integration/save_global_score_integration_test.dart:70:22 • prefer_const_constructors
+warning • The value of the local variable 'mockRoom' isn't used • test/features/end_game/presentation/providers/end_game_provider_test.dart:31:15 • unused_local_variable
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • test/features/end_game/presentation/widgets/player_score_card_test.dart:262:47 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • test/features/end_game/presentation/widgets/player_score_card_test.dart:301:52 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • test/features/end_game/presentation/widgets/player_score_card_test.dart:340:53 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • test/features/end_game/presentation/widgets/winner_announcement_test.dart:74:45 • deprecated_member_use
+   info • Use 'const' with the constructor to improve performance • test/features/game/data/datasources/action_card_local_datasource_impl_test.dart:14:23 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/data/datasources/action_card_local_datasource_impl_test.dart:23:23 • prefer_const_constructors
+warning • Unnecessary type check; the result is always 'true' • test/features/game/data/datasources/action_card_local_datasource_impl_test.dart:38:36 • unnecessary_type_check
+   info • Use 'const' with the constructor to improve performance • test/features/game/data/datasources/action_card_local_datasource_impl_test.dart:100:25 • prefer_const_constructors
+warning • Unused import: 'package:ojyx/features/game/data/datasources/game_state_datasource.dart' • test/features/game/data/datasources/game_state_datasource_test.dart:2:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/data/models/game_state_model.dart' • test/features/game/data/datasources/game_state_datasource_test.dart:3:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • test/features/game/data/models/game_state_model_mapping_test.dart:24:19 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/data/models/game_state_model_mapping_test.dart:56:19 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/data/models/game_state_model_mapping_test.dart:234:23 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/data/models/game_state_model_mapping_test.dart:270:43 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/data/models/game_state_model_mapping_test.dart:279:43 • prefer_const_constructors
+warning • The value of the local variable 'testGameState' isn't used • test/features/game/data/models/game_state_model_test.dart:11:20 • unused_local_variable
+   info • Use 'const' with the constructor to improve performance • test/features/game/data/models/game_state_model_test.dart:119:23 • prefer_const_constructors
+warning • Unused import: 'package:ojyx/features/game/data/models/db_player_grid_model.dart' • test/features/game/data/models/player_grid_model_test.dart:3:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/card.dart' • test/features/game/data/models/player_grid_model_test.dart:4:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/action_card.dart' • test/features/game/data/models/player_grid_model_test.dart:5:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/player_grid.dart' • test/features/game/data/models/player_grid_model_test.dart:6:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • test/features/game/data/repositories/action_card_repository_impl_test.dart:20:22 • prefer_const_constructors
+warning • The value of the local variable 'testGameStateId' isn't used • test/features/game/data/repositories/supabase_action_card_repository_test.dart:19:9 • unused_local_variable
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/entities/card_position_test.dart:10:10 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/entities/card_position_test.dart:11:10 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/entities/card_position_test.dart:12:10 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/entities/card_position_test.dart:13:10 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/entities/card_position_test.dart:14:10 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/entities/card_position_test.dart:15:10 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/entities/card_test.dart:69:20 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/entities/card_test.dart:71:20 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/entities/card_test.dart:73:20 • prefer_const_constructors
+warning • Unused import: 'package:ojyx/features/game/domain/entities/action_card.dart' • test/features/game/domain/entities/game_state_test.dart:6:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/entities/player_state_test.dart:91:24 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/entities/player_state_test.dart:121:24 • prefer_const_constructors
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:138:23 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:138:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:139:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:139:28 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:140:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:141:31 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:142:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:143:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:143:28 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:182:23 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:182:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:183:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:183:28 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:184:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:185:31 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:186:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:187:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:187:28 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:222:23 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:222:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:223:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:223:28 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:224:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:225:31 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:226:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:227:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:227:28 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:262:23 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:262:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:263:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:263:28 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:264:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:265:31 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:266:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:267:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:267:28 • unnecessary_underscores
+   info • Don't invoke 'print' in production code • test/features/game/domain/use_cases/discard_card_test.dart:347:34 • avoid_print
+warning • The declaration '_hasCardInDiscard' isn't referenced • test/features/game/domain/use_cases/distribute_cards_test.dart:31:6 • unused_element
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/use_cases/draw_action_card_use_case_test.dart:32:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/use_cases/draw_action_card_use_case_test.dart:40:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/use_cases/draw_action_card_use_case_test.dart:48:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/use_cases/draw_action_card_use_case_test.dart:83:25 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/use_cases/draw_action_card_use_case_test.dart:163:22 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/domain/use_cases/draw_action_card_use_case_test.dart:209:31 • prefer_const_constructors
+warning • The value of the local variable 'expectedCardsInDiscard' isn't used • test/features/game/domain/use_cases/end_turn_test.dart:91:17 • unused_local_variable
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/end_turn_test.dart:223:23 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/end_turn_test.dart:223:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/end_turn_test.dart:224:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/end_turn_test.dart:224:28 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/end_turn_test.dart:225:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/end_turn_test.dart:226:31 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/end_turn_test.dart:227:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/end_turn_test.dart:228:24 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/end_turn_test.dart:228:28 • unnecessary_underscores
+warning • The value of the local variable 'revealedCount' isn't used • test/features/game/domain/use_cases/process_last_round_test.dart:102:17 • unused_local_variable
+   info • Statements in an if should be enclosed in a block • test/features/game/domain/use_cases/process_last_round_test.dart:107:40 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • test/features/game/domain/use_cases/process_last_round_test.dart:108:24 • curly_braces_in_flow_control_structures
+warning • The '!' will have no effect because the receiver can't be null • test/features/game/domain/use_cases/start_game_test.dart:57:45 • unnecessary_non_null_assertion
+warning • The '!' will have no effect because the receiver can't be null • test/features/game/domain/use_cases/start_game_test.dart:58:45 • unnecessary_non_null_assertion
+warning • Unused import: 'package:ojyx/features/game/domain/entities/game_state.dart' • test/features/game/domain/use_cases/use_action_card_use_case_test.dart:4:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/game_player.dart' • test/features/game/domain/use_cases/use_action_card_use_case_test.dart:5:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/player_grid.dart' • test/features/game/domain/use_cases/use_action_card_use_case_test.dart:6:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/card.dart' • test/features/game/domain/use_cases/use_action_card_use_case_test.dart:7:8 • unused_import
+warning • Unused import: 'package:ojyx/core/errors/failures.dart' • test/features/game/domain/use_cases/use_action_card_use_case_test.dart:10:8 • unused_import
+   info • The imported package 'riverpod' isn't a dependency of the importing package • test/features/game/presentation/providers/action_card_providers_test.dart:2:8 • depend_on_referenced_packages
+warning • Unused import: 'package:ojyx/features/game/domain/entities/card.dart' • test/features/game/presentation/providers/action_card_providers_test.dart:10:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/presentation/providers/game_state_notifier.dart' • test/features/game/presentation/providers/action_card_providers_test.dart:14:8 • unused_import
+warning • The value of the local variable 'updatedGameState' isn't used • test/features/game/presentation/providers/action_card_providers_test.dart:91:13 • unused_local_variable
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/providers/action_card_providers_test.dart:101:22 • prefer_const_constructors
+warning • The value of the local variable 'gameState' isn't used • test/features/game/presentation/providers/action_card_providers_test.dart:127:13 • unused_local_variable
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/providers/action_card_providers_test.dart:149:22 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/providers/action_card_providers_test.dart:149:27 • prefer_const_constructors
+   info • Local variables should be final • test/features/game/presentation/providers/action_card_providers_test.dart:246:7 • prefer_final_locals
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/providers/direction_observer_provider_test.dart:38:16 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/providers/direction_observer_provider_test.dart:38:32 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/providers/direction_observer_provider_test.dart:39:23 • prefer_const_constructors
+warning • Unused import: 'package:mocktail/mocktail.dart' • test/features/game/presentation/providers/game_state_notifier_test.dart:3:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/screens/game_screen_test.dart:204:22 • prefer_const_constructors
+warning • The value of the local variable 'expectedCount' isn't used • test/features/game/presentation/spectator_view_integration_test.dart:227:29 • unused_local_variable
+warning • The value of the local variable 'strategicProfile' isn't used • test/features/game/presentation/spectator_view_integration_test.dart:227:44 • unused_local_variable
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/spectator_view_integration_test.dart:279:33 • prefer_const_constructors
+warning • Unused import: 'package:flutter_riverpod/flutter_riverpod.dart' • test/features/game/presentation/widgets/card_animation_widget_test.dart:3:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/card_widget_test.dart:112:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/card_widget_test.dart:113:17 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/card_widget_test.dart:113:32 • prefer_const_constructors
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • test/features/game/presentation/widgets/discard_pile_widget_test.dart:90:63 • deprecated_member_use
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:48:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:49:18 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:50:19 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:51:21 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:72:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:73:18 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:74:19 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:75:21 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:153:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:154:18 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:155:19 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:186:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:187:18 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_animation_overlay_test.dart:188:19 • prefer_const_constructors
+warning • The value of the local variable 'opacityBefore' isn't used • test/features/game/presentation/widgets/game_selection_overlay_test.dart:224:13 • unused_local_variable
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_selection_overlay_test.dart:329:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_selection_overlay_test.dart:330:18 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_selection_overlay_test.dart:331:19 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_selection_overlay_test.dart:332:21 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/game_selection_overlay_test.dart:335:19 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/opponent_grid_widget_test.dart:277:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/opponent_grid_widget_test.dart:278:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/opponent_grid_widget_test.dart:279:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/opponent_grid_widget_test.dart:280:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/opponents_view_widget_test.dart:30:31 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/opponents_view_widget_test.dart:44:31 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/player_grid_widget_test.dart:79:29 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/player_grid_widget_test.dart:80:29 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/player_grid_widget_test.dart:218:21 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/player_hand_widget_test.dart:17:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/player_hand_widget_test.dart:22:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/player_hand_widget_test.dart:175:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/game/presentation/widgets/player_hand_widget_test.dart:182:11 • prefer_const_constructors
+warning • The operand can't be 'null', so the condition is always 'true' • test/features/game/presentation/widgets/player_hand_widget_test.dart:209:31 • unnecessary_null_comparison
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/entities/global_score_test.dart:219:21 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/repositories/global_score_repository_test.dart:211:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/repositories/global_score_repository_test.dart:222:11 • prefer_const_constructors
+warning • Unused import: 'package:fpdart/fpdart.dart' • test/features/global_scores/domain/use_cases/get_player_stats_test.dart:6:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/get_player_stats_test.dart:21:23 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/get_player_stats_test.dart:87:41 • prefer_const_constructors
+warning • Unused import: 'package:fpdart/fpdart.dart' • test/features/global_scores/domain/use_cases/get_top_players_test.dart:6:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/get_top_players_test.dart:22:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/get_top_players_test.dart:33:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/get_top_players_test.dart:44:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/get_top_players_test.dart:136:9 • prefer_const_constructors
+warning • Unused import: 'package:fpdart/fpdart.dart' • test/features/global_scores/domain/use_cases/save_global_score_test.dart:10:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:37:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:38:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:39:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:40:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:41:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:42:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:43:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:44:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:45:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:46:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:47:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:48:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:55:14 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:61:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:62:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:63:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:64:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:65:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:66:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:67:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:68:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:69:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:70:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:71:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:72:7 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/domain/use_cases/save_global_score_test.dart:284:34 • prefer_const_constructors
+warning • Unused import: 'package:fpdart/fpdart.dart' • test/features/global_scores/presentation/providers/global_score_providers_test.dart:10:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/presentation/providers/global_score_providers_test.dart:69:25 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/presentation/providers/global_score_providers_test.dart:120:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/presentation/providers/global_score_providers_test.dart:131:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/presentation/screens/leaderboard_screen_test.dart:22:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/presentation/screens/leaderboard_screen_test.dart:33:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/presentation/screens/leaderboard_screen_test.dart:44:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/presentation/screens/leaderboard_screen_test.dart:211:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/presentation/screens/leaderboard_screen_test.dart:222:9 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/global_scores/presentation/screens/leaderboard_screen_test.dart:233:9 • prefer_const_constructors
+warning • Unused import: 'package:ojyx/features/auth/presentation/providers/auth_provider.dart' • test/features/home/presentation/navigation_integration_test.dart:7:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/action_card.dart' • test/features/multiplayer/data/converters/game_state_converter_test.dart:7:8 • unused_import
+   info • Use 'const' with the constructor to improve performance • test/features/multiplayer/data/converters/game_state_converter_test.dart:39:12 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/multiplayer/data/converters/game_state_converter_test.dart:40:19 • prefer_const_constructors
+warning • Unused import: 'package:ojyx/features/multiplayer/data/models/player_model.dart' • test/features/multiplayer/data/datasources/supabase_player_datasource_test.dart:5:8 • unused_import
+warning • Unused import: 'package:ojyx/features/multiplayer/data/models/room_model.dart' • test/features/multiplayer/data/datasources/supabase_room_datasource_impl_test.dart:5:8 • unused_import
+warning • Unused import: 'package:ojyx/features/multiplayer/domain/entities/room_event.dart' • test/features/multiplayer/data/datasources/supabase_room_datasource_impl_test.dart:8:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/game_state.dart' • test/features/multiplayer/data/datasources/supabase_room_datasource_impl_test.dart:9:8 • unused_import
+warning • Unused import: 'package:ojyx/features/multiplayer/domain/datasources/room_datasource.dart' • test/features/multiplayer/data/repositories/room_repository_impl_test.dart:4:8 • unused_import
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:24:26 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:26:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:26:31 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:33:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:37:26 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:39:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:39:31 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:67:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:75:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:75:31 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:87:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:89:26 • unnecessary_underscores
+   info • Use 'const' with the constructor to improve performance • test/features/multiplayer/presentation/screens/create_room_screen_test.dart:62:41 • prefer_const_constructors
+warning • Dead code • test/features/multiplayer/presentation/screens/join_room_screen_test.dart:40:13 • dead_code
+   info • Use 'const' with the constructor to improve performance • test/features/multiplayer/presentation/screens/room_lobby_screen_test.dart:101:38 • prefer_const_constructors
+warning • The value of the local variable 'competitiveRoomReadyToStart' isn't used • test/features/multiplayer/presentation/screens/room_lobby_screen_test.dart:109:13 • unused_local_variable
+   info • Use 'const' with the constructor to improve performance • test/features/multiplayer/presentation/screens/room_lobby_screen_test.dart:168:38 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/multiplayer/presentation/screens/room_lobby_screen_test.dart:201:45 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/multiplayer/presentation/screens/room_lobby_screen_test.dart:226:42 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/multiplayer/presentation/screens/room_lobby_screen_test.dart:279:44 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/multiplayer/presentation/screens/room_lobby_screen_test.dart:369:39 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • test/features/multiplayer/presentation/screens/room_lobby_screen_test.dart:394:37 • prefer_const_constructors
+   info • Dangling library doc comment • test/helpers/index.dart:1:1 • dangling_library_doc_comments
+  error • The name 'MockGoRouter' is defined in the libraries 'file:///mnt/d/dev/Ojyx/test/helpers/test_helpers.dart' and 'file:///mnt/d/dev/Ojyx/test/helpers/test_mocks.dart' • test/helpers/index.dart:23:8 • ambiguous_export
+warning • Unused import: 'package:ojyx/features/game/domain/entities/deck_state.dart' • test/helpers/test_builders.dart:6:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/card_position.dart' • test/helpers/test_builders.dart:10:8 • unused_import
+warning • Unused import: 'package:ojyx/features/multiplayer/domain/entities/lobby_player.dart' • test/helpers/test_builders.dart:12:8 • unused_import
+warning • Unused import: 'package:ojyx/features/end_game/domain/entities/end_game_state.dart' • test/helpers/test_builders.dart:13:8 • unused_import
+warning • Unused import: 'package:ojyx/features/global_scores/domain/entities/global_score.dart' • test/helpers/test_builders.dart:14:8 • unused_import
+   info • The private field _description could be 'final' • test/helpers/test_builders.dart:45:10 • prefer_final_fields
+   info • The private field _actionDiscard could be 'final' • test/helpers/test_builders.dart:230:20 • prefer_final_fields
+  error • There's no constant named 'playing' in 'RoomStatus' • test/helpers/test_builders.dart:351:26 • undefined_enum_constant
+  error • The named parameter 'creatorId' is required, but there's no corresponding argument • test/helpers/test_builders.dart:362:19 • missing_required_argument
+  error • The named parameter 'hostId' isn't defined • test/helpers/test_builders.dart:364:9 • undefined_named_parameter
+  error • The named parameter 'gameStateJson' isn't defined • test/helpers/test_builders.dart:368:9 • undefined_named_parameter
+  error • The returned type 'void' isn't returnable from a 'Future<void>' function, as required by the closure's context • test/helpers/test_builders.dart:415:57 • return_of_invalid_type_from_closure
+  error • The getter 'isRevealed' isn't defined for the type 'List<Card?>' • test/helpers/test_matchers.dart:148:59 • undefined_getter
+  error • The getter 'isRevealed' isn't defined for the type 'List<Card?>' • test/helpers/test_matchers.dart:172:60 • undefined_getter
+  error • The getter 'value' isn't defined for the type 'List<Card?>' • test/helpers/test_matchers.dart:173:58 • undefined_getter
+  error • The getter 'value' isn't defined for the type 'List<Card?>' • test/helpers/test_matchers.dart:173:82 • undefined_getter
+warning • Unused import: 'dart:async' • test/helpers/test_mocks.dart:1:8 • unused_import
+warning • The field doesn't override an inherited getter or setter • test/helpers/test_mocks.dart:56:16 • override_on_non_overriding_member
+warning • The field doesn't override an inherited getter or setter • test/helpers/test_mocks.dart:68:17 • override_on_non_overriding_member
+warning • Unused import: 'package:ojyx/features/game/domain/entities/game_player.dart' • test/helpers/test_scenarios.dart:3:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/card.dart' • test/helpers/test_scenarios.dart:4:8 • unused_import
+   info • Statements in an if should be enclosed in a block • test/migration/linting_test.dart:19:39 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • test/migration/linting_test.dart:20:46 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • test/migration/linting_test.dart:21:43 • curly_braces_in_flow_control_structures
+   info • Don't invoke 'print' in production code • test/migration/linting_test.dart:24:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_test.dart:25:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_test.dart:26:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_test.dart:27:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/sdk_compatibility_test.dart:9:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/sdk_compatibility_test.dart:37:7 • avoid_print
+warning • Unused import: 'package:ojyx/features/game/domain/entities/game_player.dart' • test/mocks/mock_room_datasource.dart:6:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/player_grid.dart' • test/mocks/mock_room_datasource.dart:7:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/card.dart' • test/mocks/mock_room_datasource.dart:8:8 • unused_import
+warning • Unused import: 'package:ojyx/features/game/domain/entities/action_card.dart' • test/mocks/mock_room_datasource.dart:9:8 • unused_import
+   info • The import of 'package:postgrest/postgrest.dart' is unnecessary because all of the used elements are also provided by the import of 'package:supabase_flutter/supabase_flutter.dart' • test/mocks/mock_supabase.dart:4:8 • unnecessary_import
+   info • The imported package 'postgrest' isn't a dependency of the importing package • test/mocks/mock_supabase.dart:4:8 • depend_on_referenced_packages
+warning • The value of the field '_listeners' isn't used • test/mocks/mock_supabase.dart:22:31 • unused_field
+
+428 issues found. (ran in 26.8s)

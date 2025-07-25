@@ -1,0 +1,34 @@
+  Generating the build script.
+  Compiling the build script.
+  Reading the asset graph.
+  Creating the asset graph.
+  Doing initial build cleanup.
+  Deleting 46 declared outputs which already existed on disk.
+  Updating the asset graph.
+  Building, full build because builders changed.
+  0s riverpod_generator on 236 inputs; lib/core/config/env_config.dart
+  6s riverpod_generator on 236 inputs: 1 no-op; spent 6s sdk; lib/core/config/router_config.dart
+  20s riverpod_generator on 236 inputs: 1 output, 9 no-op; spent 11s analyzing, 6s sdk, 2s resolving; lib/features/end_game/domain/entities/end_game_state.dart
+  21s riverpod_generator on 236 inputs: 2 output, 49 no-op; spent 12s analyzing, 6s sdk, 2s resolving; lib/features/game/presentation/providers/card_selection_provider.dart
+  22s riverpod_generator on 236 inputs: 5 output, 104 no-op; spent 12s analyzing, 6s sdk, 2s resolving, 1s reading; lib/features/multiplayer/presentation/providers/room_providers.dart
+  23s riverpod_generator on 236 inputs: 6 output, 176 no-op; spent 12s analyzing, 6s sdk, 2s resolving, 2s reading; test/features/game/presentation/widgets/deck_and_discard_widget_test.dart
+  24s riverpod_generator on 236 inputs: 6 output, 230 no-op; spent 12s analyzing, 6s sdk, 3s reading, 2s resolving
+  0s freezed on 236 inputs; lib/core/config/env_config.dart
+  0s freezed on 236 inputs: 4 same, 18 no-op; lib/features/game/data/models/player_grid_model.dart
+  1s freezed on 236 inputs: 23 same, 213 no-op
+  0s json_serializable on 472 inputs; lib/core/config/env_config.dart
+  1s json_serializable on 472 inputs: 1 skipped, 2 no-op; lib/core/config/router_config.freezed.dart
+  7s json_serializable on 472 inputs: 2 skipped, 3 no-op; spent 6s analyzing; lib/core/config/sentry_config.freezed.dart
+  8s json_serializable on 472 inputs: 22 skipped, 8 output, 35 no-op; spent 6s analyzing; lib/features/game/domain/entities/game_state.freezed.dart
+  9s json_serializable on 472 inputs: 56 skipped, 10 output, 79 no-op; spent 7s analyzing, 1s resolving; lib/features/game/presentation/widgets/player_grid_widget.freezed.dart
+  11s json_serializable on 472 inputs: 91 skipped, 17 output, 121 no-op; spent 9s analyzing, 1s resolving; test/core/config/env_config_test.freezed.dart
+  12s json_serializable on 472 inputs: 128 skipped, 17 output, 158 no-op; spent 9s analyzing, 2s resolving; test/features/game/domain/entities/game_player_test.freezed.dart
+  13s json_serializable on 472 inputs: 158 skipped, 17 output, 188 no-op; spent 10s analyzing, 2s resolving; test/features/game/presentation/widgets/common_area_widget_test.freezed.dart
+  14s json_serializable on 472 inputs: 189 skipped, 17 output, 219 no-op; spent 10s analyzing, 2s resolving; test/features/multiplayer/data/datasources/supabase_room_datasource_impl_test.freezed.dart
+  15s json_serializable on 472 inputs: 213 skipped, 17 output, 242 no-op; spent 10s analyzing, 3s resolving
+  0s source_gen:combining_builder on 472 inputs; lib/core/config/env_config.dart
+  0s source_gen:combining_builder on 472 inputs: 130 skipped, 23 output, 154 no-op; test/features/game/domain/entities/player_grid_test.freezed.dart
+  1s source_gen:combining_builder on 472 inputs: 213 skipped, 23 output, 236 no-op
+  Running the post build.
+  Writing the asset graph.
+  Built with build_runner in 46s; wrote 69 outputs.

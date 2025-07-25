@@ -1,7 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/game_player.dart';
-import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
 import 'test_builders.dart';
@@ -18,18 +16,12 @@ class GameScenarios {
               .id('player1')
               .name('Alice')
               .host()
-              .grid(TestPlayerGrid()
-                  .revealCard(0)
-                  .revealCard(1)
-                  .build())
+              .grid(TestPlayerGrid().revealCard(0).revealCard(1).build())
               .build(),
           TestGamePlayer()
               .id('player2')
               .name('Bob')
-              .grid(TestPlayerGrid()
-                  .revealCard(0)
-                  .revealCard(1)
-                  .build())
+              .grid(TestPlayerGrid().revealCard(0).revealCard(1).build())
               .build(),
         ])
         .currentPlayer(0)
@@ -45,19 +37,27 @@ class GameScenarios {
               .id('player1')
               .name('Alice')
               .host()
-              .grid(TestPlayerGrid()
-                  .allRevealed()
-                  .build())
+              .grid(TestPlayerGrid().allRevealed().build())
               .build(),
           TestGamePlayer()
               .id('player2')
               .name('Bob')
-              .grid(TestPlayerGrid()
-                  .revealCard(0).revealCard(1).revealCard(2).revealCard(3)
-                  .revealCard(4).revealCard(5).revealCard(6).revealCard(7)
-                  .revealCard(8).revealCard(9).revealCard(10)
-                  // Card 11 still hidden - one more to go
-                  .build())
+              .grid(
+                TestPlayerGrid()
+                    .revealCard(0)
+                    .revealCard(1)
+                    .revealCard(2)
+                    .revealCard(3)
+                    .revealCard(4)
+                    .revealCard(5)
+                    .revealCard(6)
+                    .revealCard(7)
+                    .revealCard(8)
+                    .revealCard(9)
+                    .revealCard(10)
+                    // Card 11 still hidden - one more to go
+                    .build(),
+              )
               .build(),
         ])
         .currentPlayer(1)
@@ -73,19 +73,26 @@ class GameScenarios {
               .id('player1')
               .name('Alice')
               .host()
-              .grid(TestPlayerGrid()
-                  .allRevealed()
-                  .build())
+              .grid(TestPlayerGrid().allRevealed().build())
               .finishedRound()
               .build(),
           TestGamePlayer()
               .id('player2')
               .name('Bob')
-              .grid(TestPlayerGrid()
-                  .revealCard(0).revealCard(1).revealCard(2).revealCard(3)
-                  .revealCard(4).revealCard(5).revealCard(6).revealCard(7)
-                  .revealCard(8).revealCard(9)
-                  .build())
+              .grid(
+                TestPlayerGrid()
+                    .revealCard(0)
+                    .revealCard(1)
+                    .revealCard(2)
+                    .revealCard(3)
+                    .revealCard(4)
+                    .revealCard(5)
+                    .revealCard(6)
+                    .revealCard(7)
+                    .revealCard(8)
+                    .revealCard(9)
+                    .build(),
+              )
               .build(),
         ])
         .lastRound(initiator: 'player1')
@@ -112,16 +119,8 @@ class GameScenarios {
   static GameState gameWithDisconnectedPlayer() {
     return TestGameState()
         .players([
-          TestGamePlayer()
-              .id('player1')
-              .name('Alice')
-              .host()
-              .build(),
-          TestGamePlayer()
-              .id('player2')
-              .name('Bob')
-              .disconnected()
-              .build(),
+          TestGamePlayer().id('player1').name('Alice').host().build(),
+          TestGamePlayer().id('player2').name('Bob').disconnected().build(),
         ])
         .currentPlayer(0)
         .status(GameStatus.playing)
@@ -151,54 +150,50 @@ class GameScenarios {
         ])
         .build();
 
-    return TestGameState()
-        .players([
-          TestGamePlayer()
-              .id('player1')
-              .name('Alice')
-              .host()
-              .grid(gridWithCompletedColumn)
-              .build(),
-          TestGamePlayer()
-              .id('player2')
-              .name('Bob')
-              .build(),
-        ])
-        .build();
+    return TestGameState().players([
+      TestGamePlayer()
+          .id('player1')
+          .name('Alice')
+          .host()
+          .grid(gridWithCompletedColumn)
+          .build(),
+      TestGamePlayer().id('player2').name('Bob').build(),
+    ]).build();
   }
 
   /// Empty deck scenario (reshuffle needed)
   static GameState emptyDeckScenario() {
-    return TestGameState()
-        .emptyDeck()
-        .players([
-          TestGamePlayer().id('player1').name('Alice').host().build(),
-          TestGamePlayer().id('player2').name('Bob').build(),
-        ])
-        .build();
+    return TestGameState().emptyDeck().players([
+      TestGamePlayer().id('player1').name('Alice').host().build(),
+      TestGamePlayer().id('player2').name('Bob').build(),
+    ]).build();
   }
 
   /// Game with action cards
   static GameState gameWithActionCards() {
     final actionCards = [
-      TestActionCard().id('teleport1').type(ActionCardType.teleport).immediate().build(),
+      TestActionCard()
+          .id('teleport1')
+          .type(ActionCardType.teleport)
+          .immediate()
+          .build(),
       TestActionCard().id('peek1').type(ActionCardType.peek).optional().build(),
-      TestActionCard().id('shield1').type(ActionCardType.shield).reactive().build(),
+      TestActionCard()
+          .id('shield1')
+          .type(ActionCardType.shield)
+          .reactive()
+          .build(),
     ];
 
     return TestGameState()
         .players([
-          TestGamePlayer()
-              .id('player1')
-              .name('Alice')
-              .host()
-              .actionCards([actionCards[0]])
-              .build(),
-          TestGamePlayer()
-              .id('player2')
-              .name('Bob')
-              .actionCards([actionCards[1], actionCards[2]])
-              .build(),
+          TestGamePlayer().id('player1').name('Alice').host().actionCards([
+            actionCards[0],
+          ]).build(),
+          TestGamePlayer().id('player2').name('Bob').actionCards([
+            actionCards[1],
+            actionCards[2],
+          ]).build(),
         ])
         .actionCards(actionCards)
         .build();
@@ -262,7 +257,7 @@ class ActionCardScenarios {
           .immediate()
           .targetOpponent()
           .build(),
-      
+
       TestActionCard()
           .id('peek-basic')
           .type(ActionCardType.peek)
@@ -271,7 +266,7 @@ class ActionCardScenarios {
           .targetSelf()
           .parameters({'cardCount': 2})
           .build(),
-      
+
       TestActionCard()
           .id('shield-basic')
           .type(ActionCardType.shield)
@@ -280,7 +275,7 @@ class ActionCardScenarios {
           .targetSelf()
           .parameters({'duration': 1})
           .build(),
-      
+
       TestActionCard()
           .id('swap-basic')
           .type(ActionCardType.swap)
@@ -288,7 +283,7 @@ class ActionCardScenarios {
           .optional()
           .targetOpponent()
           .build(),
-      
+
       TestActionCard()
           .id('reverse-basic')
           .type(ActionCardType.reverse)
@@ -308,13 +303,13 @@ class ActionCardScenarios {
           .type(ActionCardType.reverse)
           .immediate()
           .build(),
-      
+
       TestActionCard()
           .id('reverse-2')
           .type(ActionCardType.reverse)
           .immediate()
           .build(),
-      
+
       // Reactive card with complex parameters
       TestActionCard()
           .id('shield-complex')
@@ -323,7 +318,7 @@ class ActionCardScenarios {
           .parameters({
             'duration': 3,
             'blockTypes': ['teleport', 'swap'],
-            'stackable': false
+            'stackable': false,
           })
           .build(),
     ];
@@ -335,7 +330,8 @@ class TestPatterns {
   /// Test that a behavior function produces expected results for multiple inputs
   static void testBehaviorWithCases<TInput, TOutput>({
     required String description,
-    required List<(TInput input, TOutput expected, String description)> testCases,
+    required List<(TInput input, TOutput expected, String description)>
+    testCases,
     required TOutput Function(TInput) behaviorFunction,
     Matcher Function(TOutput)? customMatcher,
   }) {
@@ -356,14 +352,19 @@ class TestPatterns {
   /// Test that an action produces expected state transitions
   static void testStateTransitions({
     required String actionDescription,
-    required List<(GameState initial, GameState expected, String scenario)> transitions,
+    required List<(GameState initial, GameState expected, String scenario)>
+    transitions,
     required GameState Function(GameState) actionFunction,
   }) {
     group('$actionDescription state transitions', () {
       for (final (initial, expected, scenario) in transitions) {
         test('should transition correctly when $scenario', () {
           final result = actionFunction(initial);
-          expect(result, expected, reason: 'State transition failed for scenario: $scenario');
+          expect(
+            result,
+            expected,
+            reason: 'State transition failed for scenario: $scenario',
+          );
         });
       }
     });

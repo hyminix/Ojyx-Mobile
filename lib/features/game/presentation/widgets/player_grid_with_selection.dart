@@ -216,7 +216,7 @@ class PlayerGridWithSelection extends ConsumerWidget {
           style: FilledButton.styleFrom(
             backgroundColor: selectionState.canCompleteSelection
                 ? theme.colorScheme.primary
-                : theme.colorScheme.surfaceVariant,
+                : theme.colorScheme.surfaceContainerHighest,
           ),
         ),
       ],

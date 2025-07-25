@@ -216,7 +216,7 @@ void main() {
     });
 
     test('should support json serialization', () {
-      final stats = PlayerStats(
+      final stats = const PlayerStats(
         playerId: 'player1',
         playerName: 'Alice',
         totalGamesPlayed: 10,

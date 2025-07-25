@@ -4,7 +4,6 @@ import '../../domain/entities/game_player.dart';
 import '../../domain/entities/player_state.dart';
 import '../../domain/entities/card.dart' as game_card;
 import 'opponent_grid_widget.dart';
-import 'action_card_hand_widget.dart';
 
 class OpponentsViewWidget extends StatelessWidget {
   final GameState gameState;

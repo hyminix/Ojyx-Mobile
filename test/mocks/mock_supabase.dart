@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:postgrest/postgrest.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
 

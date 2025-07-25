@@ -109,7 +109,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(body: CardWidget(card: card, isSelected: true)),
         ),
       );

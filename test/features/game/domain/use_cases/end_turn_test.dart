@@ -16,7 +16,8 @@ void main() {
     // Parameterized test for different turn validation scenarios
     final turnValidationCases = [
       {
-        'description': 'should validate and clear completed columns when all conditions are met',
+        'description':
+            'should validate and clear completed columns when all conditions are met',
         'setupGrid': () => PlayerGrid.empty()
             .placeCard(const Card(value: 5, isRevealed: true), 0, 1)
             .placeCard(const Card(value: 5, isRevealed: true), 1, 1)
@@ -28,17 +29,23 @@ void main() {
         'expectedRemainingCards': [8, 2],
       },
       {
-        'description': 'should not clear columns when cards are not all revealed',
+        'description':
+            'should not clear columns when cards are not all revealed',
         'setupGrid': () => PlayerGrid.empty()
             .placeCard(const Card(value: 5, isRevealed: true), 0, 1)
-            .placeCard(const Card(value: 5, isRevealed: false), 1, 1) // Not revealed
+            .placeCard(
+              const Card(value: 5, isRevealed: false),
+              1,
+              1,
+            ) // Not revealed
             .placeCard(const Card(value: 5, isRevealed: true), 2, 1),
         'expectedColumnCleared': false,
         'expectedCardsInDiscard': 0,
         'expectedRemainingCards': [5], // All cards remain
       },
       {
-        'description': 'should handle multiple completed columns simultaneously',
+        'description':
+            'should handle multiple completed columns simultaneously',
         'setupGrid': () => PlayerGrid.empty()
             // Column 0: all 3s
             .placeCard(const Card(value: 3, isRevealed: true), 0, 0)
@@ -87,9 +94,12 @@ void main() {
 
         result.fold((failure) => fail('Should not fail'), (newState) {
           final updatedPlayer = newState.players.first;
-          final expectedColumnCleared = testCase['expectedColumnCleared'] as bool;
-          final expectedCardsInDiscard = testCase['expectedCardsInDiscard'] as int;
-          final expectedRemainingCards = testCase['expectedRemainingCards'] as List<int>;
+          final expectedColumnCleared =
+              testCase['expectedColumnCleared'] as bool;
+          final expectedCardsInDiscard =
+              testCase['expectedCardsInDiscard'] as int;
+          final expectedRemainingCards =
+              testCase['expectedRemainingCards'] as List<int>;
 
           if (expectedColumnCleared) {
             // Verify columns are properly cleared
@@ -122,7 +132,11 @@ void main() {
               }
               if (foundCard) break;
             }
-            expect(foundCard, true, reason: 'Expected card with value $expectedValue to remain');
+            expect(
+              foundCard,
+              true,
+              reason: 'Expected card with value $expectedValue to remain',
+            );
           }
         });
       });
@@ -173,61 +187,67 @@ void main() {
       });
     });
 
-    test('should calculate player score correctly and reject wrong player turns', () async {
-      final grid = PlayerGrid.empty()
-          .placeCard(const Card(value: 5, isRevealed: true), 0, 0)
-          .placeCard(const Card(value: -2, isRevealed: true), 0, 1)
-          .placeCard(const Card(value: 10, isRevealed: false), 1, 0)
-          .placeCard(const Card(value: 0, isRevealed: true), 1, 1);
+    test(
+      'should calculate player score correctly and reject wrong player turns',
+      () async {
+        final grid = PlayerGrid.empty()
+            .placeCard(const Card(value: 5, isRevealed: true), 0, 0)
+            .placeCard(const Card(value: -2, isRevealed: true), 0, 1)
+            .placeCard(const Card(value: 10, isRevealed: false), 1, 0)
+            .placeCard(const Card(value: 0, isRevealed: true), 1, 1);
 
-      final players = [
-        GamePlayer(
-          id: 'player1',
-          name: 'GamePlayer 1',
-          grid: grid,
-          isHost: true,
-        ),
-        GamePlayer(
-          id: 'player2',
-          name: 'GamePlayer 2',
-          grid: PlayerGrid.empty(),
-        ),
-      ];
+        final players = [
+          GamePlayer(
+            id: 'player1',
+            name: 'GamePlayer 1',
+            grid: grid,
+            isHost: true,
+          ),
+          GamePlayer(
+            id: 'player2',
+            name: 'GamePlayer 2',
+            grid: PlayerGrid.empty(),
+          ),
+        ];
 
-      final gameState = GameState.initial(
-        roomId: 'room123',
-        players: players,
-      ).copyWith(status: GameStatus.playing, currentPlayerIndex: 0);
+        final gameState = GameState.initial(
+          roomId: 'room123',
+          players: players,
+        ).copyWith(status: GameStatus.playing, currentPlayerIndex: 0);
 
-      // Test correct player turn
-      final validResult = await endTurn(
-        EndTurnParams(gameState: gameState, playerId: 'player1'),
-      );
-
-      expect(validResult.isRight(), true);
-      validResult.fold((failure) => fail('Should not fail'), (newState) {
-        final updatedPlayer = newState.players.first;
-        // Score: 5 + (-2) + 10 + 0 = 13
-        expect(updatedPlayer.currentScore, 13);
-      });
-
-      // Test wrong player turn
-      final invalidResult = await endTurn(
-        EndTurnParams(gameState: gameState, playerId: 'player2'), // Wrong player
-      );
-
-      expect(invalidResult.isLeft(), true);
-      invalidResult.fold((failure) {
-        failure.when(
-          gameLogic: (message, code) => expect(code, 'NOT_YOUR_TURN'),
-          server: (_, __, ___) => fail('Wrong failure type'),
-          network: (_, __, ___) => fail('Wrong failure type'),
-          validation: (_, __) => fail('Wrong failure type'),
-          authentication: (_, __) => fail('Wrong failure type'),
-          timeout: (_, __) => fail('Wrong failure type'),
-          unknown: (_, __, ___) => fail('Wrong failure type'),
+        // Test correct player turn
+        final validResult = await endTurn(
+          EndTurnParams(gameState: gameState, playerId: 'player1'),
         );
-      }, (_) => fail('Should have failed'));
-    });
+
+        expect(validResult.isRight(), true);
+        validResult.fold((failure) => fail('Should not fail'), (newState) {
+          final updatedPlayer = newState.players.first;
+          // Score: 5 + (-2) + 10 + 0 = 13
+          expect(updatedPlayer.currentScore, 13);
+        });
+
+        // Test wrong player turn
+        final invalidResult = await endTurn(
+          EndTurnParams(
+            gameState: gameState,
+            playerId: 'player2',
+          ), // Wrong player
+        );
+
+        expect(invalidResult.isLeft(), true);
+        invalidResult.fold((failure) {
+          failure.when(
+            gameLogic: (message, code) => expect(code, 'NOT_YOUR_TURN'),
+            server: (_, _, __) => fail('Wrong failure type'),
+            network: (_, _, __) => fail('Wrong failure type'),
+            validation: (_, _) => fail('Wrong failure type'),
+            authentication: (_, _) => fail('Wrong failure type'),
+            timeout: (_, _) => fail('Wrong failure type'),
+            unknown: (_, _, __) => fail('Wrong failure type'),
+          );
+        }, (_) => fail('Should have failed'));
+      },
+    );
   });
 }

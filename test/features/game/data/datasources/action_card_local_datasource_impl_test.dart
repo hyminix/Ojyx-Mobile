@@ -11,7 +11,7 @@ void main() {
   });
 
   group('ActionCardLocalDataSourceImpl', () {
-    final testCard1 = ActionCard(
+    final testCard1 = const ActionCard(
       id: 'test-1',
       type: ActionCardType.teleport,
       name: 'Téléportation',
@@ -20,7 +20,7 @@ void main() {
       target: ActionTarget.self,
     );
 
-    final testCard2 = ActionCard(
+    final testCard2 = const ActionCard(
       id: 'test-2',
       type: ActionCardType.skip,
       name: 'Saut',
@@ -97,7 +97,7 @@ void main() {
         await dataSource.addActionCardToPlayer('player1', card);
       }
 
-      final extraCard = ActionCard(
+      final extraCard = const ActionCard(
         id: 'extra',
         type: ActionCardType.shield,
         name: 'Extra Card',

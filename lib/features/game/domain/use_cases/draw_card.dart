@@ -27,15 +27,15 @@ class DrawCard implements UseCase<GameState, DrawCardParams> {
 
       // Validate it's player's turn
       final currentPlayer = gameState.currentPlayer;
-      if (currentPlayer == null || currentPlayer.id != playerId) {
-        return Left(
+      if (currentPlayer.id != playerId) {
+        return const Left(
           Failure.gameLogic(message: 'Not your turn', code: 'NOT_YOUR_TURN'),
         );
       }
 
       // Check if already drawn
       if (gameState.drawnCard != null) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'Already drawn a card this turn',
             code: 'ALREADY_DRAWN',
@@ -46,7 +46,7 @@ class DrawCard implements UseCase<GameState, DrawCardParams> {
       // Validate game status
       if (gameState.status != GameStatus.playing &&
           gameState.status != GameStatus.drawPhase) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'Cannot draw card in current game status',
             code: 'INVALID_STATUS',
@@ -72,7 +72,7 @@ class DrawCard implements UseCase<GameState, DrawCardParams> {
         }
 
         if (deck.isEmpty) {
-          return Left(
+          return const Left(
             Failure.gameLogic(message: 'Deck is empty', code: 'DECK_EMPTY'),
           );
         }
@@ -87,7 +87,7 @@ class DrawCard implements UseCase<GameState, DrawCardParams> {
       } else {
         // Draw from discard pile
         if (gameState.discardPile.isEmpty) {
-          return Left(
+          return const Left(
             Failure.gameLogic(
               message: 'Discard pile is empty',
               code: 'DISCARD_EMPTY',

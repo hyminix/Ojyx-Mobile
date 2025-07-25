@@ -126,7 +126,7 @@ class VisualFeedbackWidgetState extends State<VisualFeedbackWidget>
     _highlightAnimation =
         ColorTween(
           begin: Colors.transparent,
-          end: color.withOpacity(0.3),
+          end: color.withAlpha((0.3 * 255).round()),
         ).animate(
           CurvedAnimation(
             parent: _highlightController,
@@ -321,7 +321,7 @@ class _RipplePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(opacity * 0.5)
+      ..color = Colors.white.withAlpha((opacity * 0.5 * 255).round())
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(position, radius, paint);
@@ -330,7 +330,7 @@ class _RipplePainter extends CustomPainter {
     paint
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0
-      ..color = Colors.white.withOpacity(opacity);
+      ..color = Colors.white.withAlpha((opacity * 255).round());
 
     canvas.drawCircle(position, radius, paint);
   }

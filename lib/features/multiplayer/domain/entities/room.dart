@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../../game/domain/entities/game_state.dart';
 
 part 'room.freezed.dart';
 part 'room.g.dart';

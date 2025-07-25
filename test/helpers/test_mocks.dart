@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:go_router/go_router.dart';
@@ -53,7 +52,7 @@ class FakeRoom extends Fake implements Room {
   final String id = 'test-room-id';
 
   @override
-  final String hostId = 'test-host-id';
+  final String creatorId = 'test-host-id';
 
   @override
   final int maxPlayers = 4;
@@ -65,7 +64,7 @@ class FakeRoom extends Fake implements Room {
   final RoomStatus status = RoomStatus.waiting;
 
   @override
-  final String? gameStateJson;
+  final String? currentGameId = null;
 
   @override
   final DateTime createdAt = DateTime.now();

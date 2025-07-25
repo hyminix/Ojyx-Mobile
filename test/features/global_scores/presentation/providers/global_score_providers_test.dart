@@ -7,7 +7,6 @@ import 'package:ojyx/features/global_scores/domain/use_cases/save_global_score.d
 import 'package:ojyx/features/global_scores/domain/use_cases/get_player_stats.dart';
 import 'package:ojyx/features/global_scores/domain/use_cases/get_top_players.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:fpdart/fpdart.dart';
 
 class MockGlobalScoreRepository extends Mock implements GlobalScoreRepository {}
 
@@ -66,7 +65,7 @@ void main() {
     });
 
     group('PlayerStatsProvider', () {
-      final testStats = PlayerStats(
+      final testStats = const PlayerStats(
         playerId: 'player1',
         playerName: 'Alice',
         totalGamesPlayed: 10,
@@ -117,7 +116,7 @@ void main() {
 
     group('TopPlayersProvider', () {
       final testTopPlayers = [
-        PlayerStats(
+        const PlayerStats(
           playerId: 'player1',
           playerName: 'Alice',
           totalGamesPlayed: 20,
@@ -128,7 +127,7 @@ void main() {
           averagePosition: 1.5,
           totalRoundsPlayed: 100,
         ),
-        PlayerStats(
+        const PlayerStats(
           playerId: 'player2',
           playerName: 'Bob',
           totalGamesPlayed: 15,

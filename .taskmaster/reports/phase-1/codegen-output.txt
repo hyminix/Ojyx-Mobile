@@ -1,0 +1,20 @@
+  Generating the build script.
+  Reading the asset graph.
+  Checking for updates.
+  Updating the asset graph.
+  Building, incremental build.
+  0s riverpod_generator on 237 inputs; lib/core/config/env_config.dart
+  0s riverpod_generator on 237 inputs: 1 skipped; lib/core/config/router_config.dart
+  0s riverpod_generator on 237 inputs: 236 skipped, 1 no-op
+  0s freezed on 237 inputs; lib/core/config/env_config.dart
+  0s freezed on 237 inputs: 236 skipped, 1 no-op
+  0s json_serializable on 474 inputs; lib/core/config/env_config.dart
+  14s json_serializable on 474 inputs: 20 skipped, 1 same; spent 11s analyzing, 2s resolving; lib/features/end_game/domain/entities/end_game_state.freezed.dart
+  15s json_serializable on 474 inputs: 396 skipped, 1 same; spent 11s analyzing, 2s resolving, 1s tracking; test/features/global_scores/data/models/global_score_model_test.freezed.dart
+  16s json_serializable on 474 inputs: 467 skipped, 1 same, 1 no-op; spent 12s analyzing, 2s resolving, 1s tracking; test/migration/sdk_compatibility_test.freezed.dart
+  17s json_serializable on 474 inputs: 472 skipped, 1 same, 1 no-op; spent 12s analyzing, 2s resolving, 1s tracking
+  0s source_gen:combining_builder on 474 inputs; lib/core/config/env_config.dart
+  0s source_gen:combining_builder on 474 inputs: 473 skipped, 1 no-op
+  Running the post build.
+  Writing the asset graph.
+  Built with build_runner in 22s; wrote 1 output.

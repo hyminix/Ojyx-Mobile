@@ -162,14 +162,14 @@ class _DrawPileWidgetState extends State<DrawPileWidget>
         boxShadow: [
           if (isTop) ...[
             BoxShadow(
-              color: Colors.black.withOpacity(0.2 * cardOpacity),
+              color: Colors.black.withAlpha((0.2 * cardOpacity * 255).round()),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
           ],
           if (showGlow)
             BoxShadow(
-              color: theme.colorScheme.primary.withOpacity(0.5),
+              color: theme.colorScheme.primary.withAlpha((0.5 * 255).round()),
               blurRadius: 16,
               spreadRadius: 2,
             ),
@@ -196,7 +196,7 @@ class _DrawPileWidgetState extends State<DrawPileWidget>
                 CustomPaint(
                   size: Size.infinite,
                   painter: _CardBackPainter(
-                    color: theme.colorScheme.onPrimary.withOpacity(0.1),
+                    color: theme.colorScheme.onPrimary.withAlpha((0.1 * 255).round()),
                   ),
                 ),
                 if (isTop && widget.cardCount == 0)
@@ -204,7 +204,9 @@ class _DrawPileWidgetState extends State<DrawPileWidget>
                     child: Icon(
                       Icons.close,
                       size: 40,
-                      color: theme.colorScheme.onPrimary.withOpacity(0.5),
+                      color: theme.colorScheme.onPrimary.withValues(
+                        opacity: 0.5,
+                      ),
                     ),
                   ),
               ],

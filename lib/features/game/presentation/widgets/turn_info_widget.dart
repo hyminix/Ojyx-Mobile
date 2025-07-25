@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/game_state.dart';
-import '../../domain/entities/game_player.dart';
 
 class TurnInfoWidget extends StatelessWidget {
   final GameState gameState;
@@ -85,9 +84,9 @@ class TurnInfoWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.orange),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
+                children: [
                   Icon(Icons.timer, size: 14, color: Colors.orange),
                   SizedBox(width: 4),
                   Text(

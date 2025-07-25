@@ -18,7 +18,7 @@ class HomeScreen extends ConsumerWidget {
             end: Alignment.bottomCenter,
             colors: [
               Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-              Theme.of(context).colorScheme.background,
+              Theme.of(context).colorScheme.surface,
             ],
           ),
         ),
@@ -51,7 +51,7 @@ class HomeScreen extends ConsumerWidget {
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Theme.of(
                           context,
-                        ).colorScheme.onBackground.withValues(alpha: 0.7),
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 48),

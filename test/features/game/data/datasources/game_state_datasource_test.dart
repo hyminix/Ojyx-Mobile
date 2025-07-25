@@ -1,6 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ojyx/features/game/data/datasources/game_state_datasource.dart';
-import 'package:ojyx/features/game/data/models/game_state_model.dart';
 
 void main() {
   group('GameStateDataSource', () {

@@ -92,7 +92,9 @@ class CommonAreaWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.2)),
+        border: Border.all(
+          color: theme.colorScheme.outline.withAlpha((0.2 * 255).round()),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -101,13 +103,13 @@ class CommonAreaWidget extends StatelessWidget {
             Icon(
               Icons.person,
               size: 16,
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
+              color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
             ),
             const SizedBox(width: 4),
             Text(
               'Tour de $currentPlayerName',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
               ),
             ),
           ],
@@ -117,13 +119,13 @@ class CommonAreaWidget extends StatelessWidget {
             Icon(
               Icons.flag,
               size: 16,
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
+              color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
             ),
             const SizedBox(width: 4),
             Text(
               'Manche $roundNumber',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
               ),
             ),
           ],
@@ -138,9 +140,11 @@ class CommonAreaWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withOpacity(0.1),
+        color: theme.colorScheme.primary.withAlpha((0.1 * 255).round()),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
+        border: Border.all(
+          color: theme.colorScheme.primary.withAlpha((0.3 * 255).round()),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -169,9 +173,11 @@ class CommonAreaWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: theme.colorScheme.error.withOpacity(0.1),
+        color: theme.colorScheme.error.withAlpha((0.1 * 255).round()),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: theme.colorScheme.error.withOpacity(0.3)),
+        border: Border.all(
+          color: theme.colorScheme.error.withAlpha((0.3 * 255).round()),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -198,10 +204,10 @@ class CommonAreaWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: theme.colorScheme.tertiary.withOpacity(0.1),
+          color: theme.colorScheme.tertiary.withAlpha((0.1 * 255).round()),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: theme.colorScheme.tertiary.withOpacity(0.3),
+            color: theme.colorScheme.tertiary.withAlpha((0.3 * 255).round()),
           ),
         ),
         child: Row(

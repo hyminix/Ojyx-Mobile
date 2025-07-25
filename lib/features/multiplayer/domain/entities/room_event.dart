@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
-import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/features/multiplayer/data/converters/game_state_converter.dart';
 
 part 'room_event.freezed.dart';

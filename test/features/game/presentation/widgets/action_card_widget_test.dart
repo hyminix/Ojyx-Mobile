@@ -95,18 +95,20 @@ void main() {
       // Test each timing type
       for (final testCase in timingTestCases) {
         await tester.pumpWidget(createTestWidget(testCase.card));
-        
+
         expect(
           find.byIcon(testCase.expectedIcon),
           findsOneWidget,
-          reason: 'Should show ${testCase.expectedIcon} for ${testCase.card.timing} timing',
+          reason:
+              'Should show ${testCase.expectedIcon} for ${testCase.card.timing} timing',
         );
         expect(
           find.text(testCase.expectedText),
           findsOneWidget,
-          reason: 'Should show "${testCase.expectedText}" for ${testCase.card.timing} timing',
+          reason:
+              'Should show "${testCase.expectedText}" for ${testCase.card.timing} timing',
         );
-        
+
         // Clear the widget tree for next test
         await tester.pumpWidget(Container());
       }
@@ -258,20 +260,21 @@ void main() {
       // Test card colors by category
       for (final testCase in categoryTestCases) {
         await tester.pumpWidget(createTestWidget(testCase.card));
-        
+
         final container = tester.widget<Container>(
           find.descendant(
             of: find.byType(Card),
             matching: find.byType(Container).first,
           ),
         );
-        
+
         expect(
           (container.decoration as BoxDecoration).color,
           equals(testCase.expectedColor),
-          reason: '${testCase.category} cards should have ${testCase.expectedColor} background',
+          reason:
+              '${testCase.category} cards should have ${testCase.expectedColor} background',
         );
-        
+
         await tester.pumpWidget(Container());
       }
 
@@ -285,15 +288,16 @@ void main() {
           timing: ActionTiming.optional,
           target: testCase.target,
         );
-        
+
         await tester.pumpWidget(createTestWidget(card));
-        
+
         expect(
           find.byIcon(testCase.expectedIcon),
           findsOneWidget,
-          reason: 'Cards targeting ${testCase.target} should show ${testCase.expectedIcon}',
+          reason:
+              'Cards targeting ${testCase.target} should show ${testCase.expectedIcon}',
         );
-        
+
         await tester.pumpWidget(Container());
       }
     });

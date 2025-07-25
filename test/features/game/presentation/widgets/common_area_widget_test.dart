@@ -9,11 +9,13 @@ void main() {
   group('CommonAreaWidget User Interactions', () {
     const testCard = game.Card(value: 5, isRevealed: true);
 
-    testWidgets('should allow player to draw card during their turn', (tester) async {
+    testWidgets('should allow player to draw card during their turn', (
+      tester,
+    ) async {
       // Arrange
       bool cardDrawn = false;
       int drawCount = 0;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -42,7 +44,7 @@ void main() {
     testWidgets('should prevent drawing when not player turn', (tester) async {
       // Arrange
       bool cardDrawn = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -64,7 +66,9 @@ void main() {
       expect(cardDrawn, isFalse);
     });
 
-    testWidgets('should provide clear feedback about whose turn it is', (tester) async {
+    testWidgets('should provide clear feedback about whose turn it is', (
+      tester,
+    ) async {
       // Test showing current player's turn
       await tester.pumpWidget(
         MaterialApp(
@@ -80,7 +84,7 @@ void main() {
       );
 
       expect(find.text('Votre tour'), findsOneWidget);
-      
+
       // Test showing other player's turn
       await tester.pumpWidget(
         MaterialApp(
@@ -136,7 +140,7 @@ void main() {
     ) async {
       // Arrange
       bool reshuffleRequested = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -153,11 +157,11 @@ void main() {
 
       // Assert - Reshuffle indicator visible
       expect(find.text('Mélange nécessaire'), findsOneWidget);
-      
+
       // Act - Player attempts to draw from empty pile
       await tester.tap(find.byType(DrawPileWidget));
       await tester.pump();
-      
+
       // Assert - Reshuffle was requested
       expect(reshuffleRequested, isTrue);
     });

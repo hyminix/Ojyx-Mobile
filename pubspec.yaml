@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.8.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -62,7 +62,7 @@ dev_dependencies:
     sdk: flutter
     
   # Linting
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   
   # Code Generation
   build_runner: ^2.4.13
@@ -77,6 +77,8 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+  riverpod: any
+  postgrest: any
 flutter:
 
   # The following line ensures that the Material Icons font is

@@ -3,7 +3,6 @@ import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
-import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/core/utils/constants.dart';
 
 void main() {
@@ -46,27 +45,36 @@ void main() {
       expect(gameState.currentPlayer.id, 'player1');
     });
 
-    test('should advance turn to next player in clockwise direction when turn ends', () {
-      final gameState = GameState.initial(roomId: 'room123', players: players);
+    test(
+      'should advance turn to next player in clockwise direction when turn ends',
+      () {
+        final gameState = GameState.initial(
+          roomId: 'room123',
+          players: players,
+        );
 
-      final nextState = gameState.nextPlayer();
+        final nextState = gameState.nextPlayer();
 
-      expect(nextState.currentPlayerIndex, 1);
-      expect(nextState.currentPlayer.id, 'player2');
-    });
+        expect(nextState.currentPlayerIndex, 1);
+        expect(nextState.currentPlayer.id, 'player2');
+      },
+    );
 
-    test('should advance turn to previous player when direction is counter-clockwise', () {
-      final gameState = GameState.initial(
-        roomId: 'room123',
-        players: players,
-        currentPlayerIndex: 1,
-      ).copyWith(turnDirection: TurnDirection.counterClockwise);
+    test(
+      'should advance turn to previous player when direction is counter-clockwise',
+      () {
+        final gameState = GameState.initial(
+          roomId: 'room123',
+          players: players,
+          currentPlayerIndex: 1,
+        ).copyWith(turnDirection: TurnDirection.counterClockwise);
 
-      final nextState = gameState.nextPlayer();
+        final nextState = gameState.nextPlayer();
 
-      expect(nextState.currentPlayerIndex, 0);
-      expect(nextState.currentPlayer.id, 'player1');
-    });
+        expect(nextState.currentPlayerIndex, 0);
+        expect(nextState.currentPlayer.id, 'player1');
+      },
+    );
 
     test('should loop back to first player when last player finishes turn', () {
       final gameState = GameState.initial(
@@ -90,25 +98,28 @@ void main() {
       expect(result.$2.deck.length, initialDeckSize - 1);
     });
 
-    test('should recycle discard pile into deck when no cards remain to draw', () {
-      const topDiscard = Card(value: 5);
-      final gameState = GameState.initial(roomId: 'room123', players: players)
-          .copyWith(
-            deck: [], // Empty deck
-            discardPile: [
-              topDiscard,
-              const Card(value: 3),
-              const Card(value: 7),
-            ],
-          );
+    test(
+      'should recycle discard pile into deck when no cards remain to draw',
+      () {
+        const topDiscard = Card(value: 5);
+        final gameState = GameState.initial(roomId: 'room123', players: players)
+            .copyWith(
+              deck: [], // Empty deck
+              discardPile: [
+                topDiscard,
+                const Card(value: 3),
+                const Card(value: 7),
+              ],
+            );
 
-      final result = gameState.drawCard();
+        final result = gameState.drawCard();
 
-      expect(result.$1, isNotNull);
-      expect(result.$2.deck.length, 1); // 2 cards reshuffled, 1 drawn
-      expect(result.$2.discardPile.length, 1);
-      expect(result.$2.discardPile.first, equals(topDiscard));
-    });
+        expect(result.$1, isNotNull);
+        expect(result.$2.deck.length, 1); // 2 cards reshuffled, 1 drawn
+        expect(result.$2.discardPile.length, 1);
+        expect(result.$2.discardPile.first, equals(topDiscard));
+      },
+    );
 
     test('should discard card', () {
       const card = Card(value: 8);
@@ -195,22 +206,31 @@ void main() {
 
     // === TESTS MERGED FROM game_state_clean_test.dart ===
 
-    test('should be a pure domain entity without JSON serialization coupling', () {
-      final gameState = GameState.initial(roomId: 'test-room', players: players);
-      
-      // Verify that GameState is a pure domain entity focused on behavior
-      expect(gameState.roomId, equals('test-room'));
-      expect(gameState.players, equals(players));
-      expect(gameState.currentPlayerIndex, equals(0));
-      
-      // Verify the entity maintains its domain characteristics
-      final type = gameState.runtimeType;
-      expect(type.toString(), contains('GameState'));
-    });
+    test(
+      'should be a pure domain entity without JSON serialization coupling',
+      () {
+        final gameState = GameState.initial(
+          roomId: 'test-room',
+          players: players,
+        );
+
+        // Verify that GameState is a pure domain entity focused on behavior
+        expect(gameState.roomId, equals('test-room'));
+        expect(gameState.players, equals(players));
+        expect(gameState.currentPlayerIndex, equals(0));
+
+        // Verify the entity maintains its domain characteristics
+        final type = gameState.runtimeType;
+        expect(type.toString(), contains('GameState'));
+      },
+    );
 
     test('should maintain all core business logic methods for game flow', () {
-      final gameState = GameState.initial(roomId: 'test-room', players: players);
-      
+      final gameState = GameState.initial(
+        roomId: 'test-room',
+        players: players,
+      );
+
       // Ensure all business logic is preserved and functional
       expect(gameState.currentPlayer, equals(players[0]));
       expect(gameState.canStart, isTrue);
@@ -238,18 +258,25 @@ void main() {
     });
 
     test('should work with immutability pattern using copyWith', () {
-      final gameState = GameState.initial(roomId: 'test-room', players: players);
-      
+      final gameState = GameState.initial(
+        roomId: 'test-room',
+        players: players,
+      );
+
       // Test that Freezed functionality works for immutable updates
       final copied = gameState.copyWith(currentPlayerIndex: 1);
       expect(copied.currentPlayerIndex, equals(1));
       expect(copied.roomId, equals(gameState.roomId));
-      expect(gameState.currentPlayerIndex, equals(0), reason: 'Original should remain unchanged');
+      expect(
+        gameState.currentPlayerIndex,
+        equals(0),
+        reason: 'Original should remain unchanged',
+      );
 
       // Test equality behavior for value objects using same deck
       final sameState = gameState.copyWith();
       expect(gameState, equals(sameState));
-      
+
       // Test that modified states are not equal
       final differentState = gameState.copyWith(currentPlayerIndex: 1);
       expect(gameState, isNot(equals(differentState)));

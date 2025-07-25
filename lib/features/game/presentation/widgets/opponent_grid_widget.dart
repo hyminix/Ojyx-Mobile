@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/player_state.dart';
 import '../../domain/entities/card.dart' as game;
-import 'card_widget.dart';
 import '../../../../core/utils/constants.dart';
 
 class OpponentGridWidget extends StatelessWidget {

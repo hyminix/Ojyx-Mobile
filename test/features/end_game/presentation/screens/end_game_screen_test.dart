@@ -112,41 +112,42 @@ void main() {
       expect(find.text('Error: Exception: Test error'), findsOneWidget);
     });
 
-    testWidgets('should display all required UI elements with correct content', (tester) async {
-      await tester.pumpWidget(createTestWidget());
+    testWidgets(
+      'should display all required UI elements with correct content',
+      (tester) async {
+        await tester.pumpWidget(createTestWidget());
 
-      // Verify round information display
-      expect(find.text('Round 1 Results'), findsOneWidget);
-      
-      // Verify winner announcement
-      expect(find.text('🏆 Charlie wins!'), findsOneWidget);
+        // Verify round information display
+        expect(find.text('Round 1 Results'), findsOneWidget);
 
-      // Verify ranked player display
-      final rank1 = find.text('1st');
-      final rank2 = find.text('2nd');
-      final rank3 = find.text('3rd');
+        // Verify winner announcement
+        expect(find.text('🏆 Charlie wins!'), findsOneWidget);
 
-      expect(rank1, findsOneWidget);
-      expect(rank2, findsOneWidget);
-      expect(rank3, findsOneWidget);
+        // Verify ranked player display
+        final rank1 = find.text('1st');
+        final rank2 = find.text('2nd');
+        final rank3 = find.text('3rd');
 
-      // Verify player names are in correct order
-      expect(find.text('Charlie'), findsOneWidget);
-      expect(find.text('Alice'), findsOneWidget);
-      expect(find.text('Bob'), findsOneWidget);
+        expect(rank1, findsOneWidget);
+        expect(rank2, findsOneWidget);
+        expect(rank3, findsOneWidget);
 
-      // Verify scores are displayed correctly
-      expect(find.text('20 points'), findsOneWidget);
-      expect(find.text('25 points'), findsOneWidget);
-      expect(find.text('30 points'), findsOneWidget);
+        // Verify player names are in correct order
+        expect(find.text('Charlie'), findsOneWidget);
+        expect(find.text('Alice'), findsOneWidget);
+        expect(find.text('Bob'), findsOneWidget);
 
-      // Verify voting section display
-      expect(find.text('Continue Playing?'), findsOneWidget);
-      expect(find.text('Vote to Continue'), findsOneWidget);
-      expect(find.text('End Game'), findsOneWidget);
-    });
+        // Verify scores are displayed correctly
+        expect(find.text('20 points'), findsOneWidget);
+        expect(find.text('25 points'), findsOneWidget);
+        expect(find.text('30 points'), findsOneWidget);
 
-
+        // Verify voting section display
+        expect(find.text('Continue Playing?'), findsOneWidget);
+        expect(find.text('Vote to Continue'), findsOneWidget);
+        expect(find.text('End Game'), findsOneWidget);
+      },
+    );
 
     testWidgets('should highlight round initiator with penalty', (
       tester,
@@ -166,7 +167,6 @@ void main() {
       expect(find.text('Score doubled!'), findsOneWidget);
       expect(find.text('50 points'), findsOneWidget); // 25 * 2
     });
-
 
     testWidgets('should handle vote to continue tap', (tester) async {
       bool voteToContinueCalled = false;

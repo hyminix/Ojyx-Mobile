@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/end_game/presentation/providers/end_game_provider.dart';
 import 'package:ojyx/features/game/presentation/providers/game_state_notifier.dart';
 import 'package:riverpod/riverpod.dart';
-import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/global_scores/domain/entities/global_score.dart';
@@ -67,7 +66,7 @@ void main() {
           grid: PlayerGrid.fromCards(
             List.generate(
               12,
-              (i) => game_card.Card(value: 12, isRevealed: true),
+              (i) => const game_card.Card(value: 12, isRevealed: true),
             ),
           ),
         ),

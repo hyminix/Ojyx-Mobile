@@ -1,8 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'dart:async';
 
-import '../../../game/domain/entities/game_state.dart';
-import '../../../game/domain/entities/card.dart';
 import '../../../game/domain/entities/action_card.dart';
 import '../../../game/presentation/providers/game_state_notifier.dart';
 import '../../domain/entities/room_event.dart';

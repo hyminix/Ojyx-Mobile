@@ -56,7 +56,10 @@ void main() {
       mockOpponent = MockPlayer();
 
       // Setup realistic game scenario with cards
-      testCards = List.generate(12, (index) => game.Card(value: index % 13 - 2));
+      testCards = List.generate(
+        12,
+        (index) => game.Card(value: index % 13 - 2),
+      );
       testGrid = PlayerGrid.fromCards(testCards);
 
       when(() => mockCurrentPlayer.id).thenReturn('current-user-id');
@@ -82,7 +85,9 @@ void main() {
 
       when(() => mockRoom.id).thenReturn('test-room-id');
       when(() => mockRoom.status).thenReturn(RoomStatus.inGame);
-      when(() => mockRoom.playerIds).thenReturn(['current-user-id', 'opponent-id']);
+      when(
+        () => mockRoom.playerIds,
+      ).thenReturn(['current-user-id', 'opponent-id']);
     });
 
     Widget createWidgetUnderTest({
@@ -201,7 +206,10 @@ void main() {
       // Act
       await tester.pumpWidget(
         createWidgetUnderTest(
-          roomAsync: AsyncValue.error('Failed to load room', StackTrace.empty),
+          roomAsync: const AsyncValue.error(
+            'Failed to load room',
+            StackTrace.empty,
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -265,99 +273,164 @@ void main() {
     });
 
     group('Strategic Teleportation Interactions', () {
-      testWidgets('should enable tactical card exchange through teleportation selection interface', (tester) async {
-        // Test behavior: teleportation provides strategic card positioning for competitive advantage
-        await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
-        await tester.pumpAndSettle();
+      testWidgets(
+        'should enable tactical card exchange through teleportation selection interface',
+        (tester) async {
+          // Test behavior: teleportation provides strategic card positioning for competitive advantage
+          await tester.pumpWidget(
+            createWidgetUnderTest(gameState: mockGameState),
+          );
+          await tester.pumpAndSettle();
 
-        // Initially normal gameplay interface
-        expect(find.byType(PlayerGridWidget), findsOneWidget);
-        expect(find.byType(PlayerGridWithSelection), findsNothing);
+          // Initially normal gameplay interface
+          expect(find.byType(PlayerGridWidget), findsOneWidget);
+          expect(find.byType(PlayerGridWithSelection), findsNothing);
 
-        final container = ProviderScope.containerOf(
-          tester.element(find.byType(GameScreen)),
-        );
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(GameScreen)),
+          );
 
-        // Strategic teleportation activation
-        container.read(cardSelectionProvider.notifier).startTeleportSelection();
-        await tester.pump();
+          // Strategic teleportation activation
+          container
+              .read(cardSelectionProvider.notifier)
+              .startTeleportSelection();
+          await tester.pump();
 
-        // Tactical selection interface should enable strategic positioning
-        expect(find.byType(PlayerGridWithSelection), findsOneWidget, reason: 'Strategic selection interface should activate');
-        expect(find.text('Sélectionnez la première carte à échanger'), findsOneWidget, reason: 'Clear tactical instructions for competitive play');
-      });
+          // Tactical selection interface should enable strategic positioning
+          expect(
+            find.byType(PlayerGridWithSelection),
+            findsOneWidget,
+            reason: 'Strategic selection interface should activate',
+          );
+          expect(
+            find.text('Sélectionnez la première carte à échanger'),
+            findsOneWidget,
+            reason: 'Clear tactical instructions for competitive play',
+          );
+        },
+      );
 
-      testWidgets('should execute complete strategic card exchange workflow for competitive positioning', (tester) async {
-        // Test behavior: full teleportation workflow enables tactical card repositioning
-        await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
-        await tester.pumpAndSettle();
+      testWidgets(
+        'should execute complete strategic card exchange workflow for competitive positioning',
+        (tester) async {
+          // Test behavior: full teleportation workflow enables tactical card repositioning
+          await tester.pumpWidget(
+            createWidgetUnderTest(gameState: mockGameState),
+          );
+          await tester.pumpAndSettle();
 
-        final container = ProviderScope.containerOf(
-          tester.element(find.byType(GameScreen)),
-        );
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(GameScreen)),
+          );
 
-        // Strategic workflow initiation
-        container.read(cardSelectionProvider.notifier).startTeleportSelection();
-        await tester.pump();
+          // Strategic workflow initiation
+          container
+              .read(cardSelectionProvider.notifier)
+              .startTeleportSelection();
+          await tester.pump();
 
-        // Tactical first card selection for positioning
-        container.read(cardSelectionProvider.notifier).selectCard(0, 0);
-        await tester.pump();
-        expect(find.text('Sélectionnez la deuxième carte à échanger'), findsOneWidget, reason: 'Progressive selection for strategic control');
+          // Tactical first card selection for positioning
+          container.read(cardSelectionProvider.notifier).selectCard(0, 0);
+          await tester.pump();
+          expect(
+            find.text('Sélectionnez la deuxième carte à échanger'),
+            findsOneWidget,
+            reason: 'Progressive selection for strategic control',
+          );
 
-        // Tactical second card selection completes strategy
-        container.read(cardSelectionProvider.notifier).selectCard(1, 2);
-        await tester.pump();
-        expect(find.text('Cartes sélectionnées - confirmez l\'échange'), findsOneWidget, reason: 'Strategic confirmation prevents accidental exchanges');
-        expect(find.text('Confirmer'), findsOneWidget, reason: 'Explicit tactical confirmation required');
-      });
+          // Tactical second card selection completes strategy
+          container.read(cardSelectionProvider.notifier).selectCard(1, 2);
+          await tester.pump();
+          expect(
+            find.text('Cartes sélectionnées - confirmez l\'échange'),
+            findsOneWidget,
+            reason: 'Strategic confirmation prevents accidental exchanges',
+          );
+          expect(
+            find.text('Confirmer'),
+            findsOneWidget,
+            reason: 'Explicit tactical confirmation required',
+          );
+        },
+      );
 
-      testWidgets('should provide strategic cancellation to preserve current positioning', (tester) async {
-        // Test behavior: cancellation prevents unwanted strategic changes
-        await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
-        await tester.pumpAndSettle();
+      testWidgets(
+        'should provide strategic cancellation to preserve current positioning',
+        (tester) async {
+          // Test behavior: cancellation prevents unwanted strategic changes
+          await tester.pumpWidget(
+            createWidgetUnderTest(gameState: mockGameState),
+          );
+          await tester.pumpAndSettle();
 
-        final container = ProviderScope.containerOf(
-          tester.element(find.byType(GameScreen)),
-        );
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(GameScreen)),
+          );
 
-        // Begin strategic selection process
-        container.read(cardSelectionProvider.notifier).startTeleportSelection();
-        container.read(cardSelectionProvider.notifier).selectCard(0, 0);
-        await tester.pump();
+          // Begin strategic selection process
+          container
+              .read(cardSelectionProvider.notifier)
+              .startTeleportSelection();
+          container.read(cardSelectionProvider.notifier).selectCard(0, 0);
+          await tester.pump();
 
-        // Strategic cancellation preserves current advantage
-        await tester.ensureVisible(find.text('Annuler'));
-        await tester.tap(find.text('Annuler'));
-        await tester.pump();
+          // Strategic cancellation preserves current advantage
+          await tester.ensureVisible(find.text('Annuler'));
+          await tester.tap(find.text('Annuler'));
+          await tester.pump();
 
-        expect(container.read(cardSelectionProvider).isSelecting, isFalse, reason: 'Strategic cancellation should preserve current state');
-        expect(find.byType(PlayerGridWidget), findsOneWidget, reason: 'Return to normal competitive interface');
-      });
+          expect(
+            container.read(cardSelectionProvider).isSelecting,
+            isFalse,
+            reason: 'Strategic cancellation should preserve current state',
+          );
+          expect(
+            find.byType(PlayerGridWidget),
+            findsOneWidget,
+            reason: 'Return to normal competitive interface',
+          );
+        },
+      );
 
-      testWidgets('should complete strategic exchange execution for competitive positioning optimization', (tester) async {
-        // Test behavior: teleportation execution provides immediate tactical advantage
-        await tester.pumpWidget(createWidgetUnderTest(gameState: mockGameState));
-        await tester.pumpAndSettle();
+      testWidgets(
+        'should complete strategic exchange execution for competitive positioning optimization',
+        (tester) async {
+          // Test behavior: teleportation execution provides immediate tactical advantage
+          await tester.pumpWidget(
+            createWidgetUnderTest(gameState: mockGameState),
+          );
+          await tester.pumpAndSettle();
 
-        final container = ProviderScope.containerOf(
-          tester.element(find.byType(GameScreen)),
-        );
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(GameScreen)),
+          );
 
-        // Execute complete strategic workflow
-        container.read(cardSelectionProvider.notifier).startTeleportSelection();
-        container.read(cardSelectionProvider.notifier).selectCard(0, 0);
-        container.read(cardSelectionProvider.notifier).selectCard(1, 2);
-        await tester.pump();
+          // Execute complete strategic workflow
+          container
+              .read(cardSelectionProvider.notifier)
+              .startTeleportSelection();
+          container.read(cardSelectionProvider.notifier).selectCard(0, 0);
+          container.read(cardSelectionProvider.notifier).selectCard(1, 2);
+          await tester.pump();
 
-        // Strategic execution completes positioning optimization
-        await tester.ensureVisible(find.text('Confirmer'));
-        await tester.tap(find.text('Confirmer'), warnIfMissed: false);
-        await tester.pump();
+          // Strategic execution completes positioning optimization
+          await tester.ensureVisible(find.text('Confirmer'));
+          await tester.tap(find.text('Confirmer'), warnIfMissed: false);
+          await tester.pump();
 
-        expect(container.read(cardSelectionProvider).isSelecting, isFalse, reason: 'Strategic execution should complete seamlessly');
-        expect(find.byType(PlayerGridWidget), findsOneWidget, reason: 'Return to normal competitive state after tactical maneuver');
-      });
+          expect(
+            container.read(cardSelectionProvider).isSelecting,
+            isFalse,
+            reason: 'Strategic execution should complete seamlessly',
+          );
+          expect(
+            find.byType(PlayerGridWidget),
+            findsOneWidget,
+            reason:
+                'Return to normal competitive state after tactical maneuver',
+          );
+        },
+      );
     });
   });
 }

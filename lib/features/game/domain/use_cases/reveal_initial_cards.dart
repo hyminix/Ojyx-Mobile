@@ -43,7 +43,7 @@ class RevealInitialCards
       );
 
       if (playerIndex == -1) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'GamePlayer not found',
             code: 'PLAYER_NOT_FOUND',

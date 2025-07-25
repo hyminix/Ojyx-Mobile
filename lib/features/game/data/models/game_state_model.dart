@@ -131,7 +131,7 @@ class GameStateModel with _$GameStateModel {
       turnNumber: turnNumber,
       roundNumber: roundNumber,
       gameData: gameData,
-      winnerId: gameState.status == GameStatus.finished 
+      winnerId: gameState.status == GameStatus.finished
           ? _calculateWinner(gameState.players, gameState.initiatorPlayerId)
           : null,
       endedAt: gameState.finishedAt,
@@ -329,7 +329,10 @@ class GameStateModel with _$GameStateModel {
   }
 
   /// Calculate the winner based on the lowest score, applying penalty to initiator if needed
-  static String? _calculateWinner(List<GamePlayer> players, String? initiatorPlayerId) {
+  static String? _calculateWinner(
+    List<GamePlayer> players,
+    String? initiatorPlayerId,
+  ) {
     if (players.isEmpty) return null;
 
     // Find the lowest score

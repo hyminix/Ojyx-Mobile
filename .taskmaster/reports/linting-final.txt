@@ -1,0 +1,102 @@
+Analyzing Ojyx...                                               
+
+   info • 'setExtra' is deprecated and shouldn't be used. Use Contexts instead. Additional data is deprecated in favor of structured Contexts and should be avoided when possible • lib/core/config/sentry_config.dart:61:19 • deprecated_member_use
+   info • 'setExtra' is deprecated and shouldn't be used. Use Contexts instead. Additional data is deprecated in favor of structured Contexts and should be avoided when possible • lib/core/config/sentry_config.dart:79:19 • deprecated_member_use
+   info • 'CurrentUserIdRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/auth/presentation/providers/auth_provider.dart:39:23 • deprecated_member_use_from_same_package
+   info • 'ActionCardLocalDataSourceRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/action_card_providers.dart:22:3 • deprecated_member_use_from_same_package
+   info • 'ActionCardRepositoryRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/action_card_providers.dart:28:43 • deprecated_member_use_from_same_package
+   info • 'SupabaseActionCardRepositoryRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/action_card_providers.dart:36:3 • deprecated_member_use_from_same_package
+   info • 'UseActionCardUseCaseRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/action_card_providers.dart:45:43 • deprecated_member_use_from_same_package
+   info • 'PlayerActionCardsRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/action_card_providers.dart:52:3 • deprecated_member_use_from_same_package
+   info • 'CanUseActionCardRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/action_card_providers.dart:63:3 • deprecated_member_use_from_same_package
+   info • 'GameInitializationUseCaseRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/game_state_notifier.dart:49:3 • deprecated_member_use_from_same_package
+   info • 'GameStateRepositoryRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/repository_providers.dart:12:41 • deprecated_member_use_from_same_package
+   info • 'ServerActionCardRepositoryRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/game/presentation/providers/repository_providers.dart:19:3 • deprecated_member_use_from_same_package
+  error • The named parameter 'opacity' isn't defined • lib/features/game/presentation/widgets/action_card_draw_pile_widget.dart:39:23 • undefined_named_parameter
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/action_card_draw_pile_widget.dart:41:50 • deprecated_member_use
+  error • The named parameter 'opacity' isn't defined • lib/features/game/presentation/widgets/action_card_draw_pile_widget.dart:65:29 • undefined_named_parameter
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/game/presentation/widgets/action_card_draw_pile_widget.dart:72:49 • deprecated_member_use
+warning • The value of the field '_targetPosition' isn't used • lib/features/game/presentation/widgets/card_animation_widget.dart:36:11 • unused_field
+warning • The declaration '_runAnimation' isn't referenced • lib/features/game/presentation/widgets/card_animation_widget.dart:100:16 • unused_element
+warning • The value of the local variable 'theme' isn't used • lib/features/game/presentation/widgets/common_area_widget.dart:34:11 • unused_local_variable
+  error • The named parameter 'opacity' isn't defined • lib/features/game/presentation/widgets/discard_pile_widget.dart:82:33 • undefined_named_parameter
+  error • The named parameter 'opacity' isn't defined • lib/features/game/presentation/widgets/discard_pile_widget.dart:90:31 • undefined_named_parameter
+  error • The argument type 'DragTargetDetails<Card>' can't be assigned to the parameter type 'Card'.  • lib/features/game/presentation/widgets/discard_pile_widget.dart:117:33 • argument_type_not_assignable
+warning • The value of the field '_scaleAnimation' isn't used • lib/features/game/presentation/widgets/draw_pile_widget.dart:22:26 • unused_field
+  error • The named parameter 'opacity' isn't defined • lib/features/game/presentation/widgets/draw_pile_widget.dart:208:25 • undefined_named_parameter
+warning • The value of the field '_highlightColor' isn't used • lib/features/game/presentation/widgets/visual_feedback_widget.dart:38:9 • unused_field
+warning • The value of the field '_pulseIntensity' isn't used • lib/features/game/presentation/widgets/visual_feedback_widget.dart:42:10 • unused_field
+warning • The value of the field '_syncUseCase' isn't used • lib/features/multiplayer/presentation/providers/multiplayer_game_notifier.dart:15:29 • unused_field
+   info • 'SupabaseRoomDatasourceRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:20:47 • deprecated_member_use_from_same_package
+   info • 'RoomDatasourceRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:26:31 • deprecated_member_use_from_same_package
+   info • 'RoomRepositoryRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:32:31 • deprecated_member_use_from_same_package
+   info • 'CreateRoomUseCaseRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:41:37 • deprecated_member_use_from_same_package
+   info • 'JoinRoomUseCaseRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:47:33 • deprecated_member_use_from_same_package
+   info • 'SyncGameStateUseCaseRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:53:43 • deprecated_member_use_from_same_package
+   info • 'CurrentRoomRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:59:26 • deprecated_member_use_from_same_package
+   info • 'RoomEventsRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:65:30 • deprecated_member_use_from_same_package
+   info • 'AvailableRoomsRef' is deprecated and shouldn't be used. Will be removed in 3.0. Use Ref instead • lib/features/multiplayer/presentation/providers/room_providers.dart:71:35 • deprecated_member_use_from_same_package
+warning • The value of the local variable 'mockRoom' isn't used • test/features/end_game/presentation/providers/end_game_provider_test.dart:31:15 • unused_local_variable
+warning • Unnecessary type check; the result is always 'true' • test/features/game/data/datasources/action_card_local_datasource_impl_test.dart:38:36 • unnecessary_type_check
+warning • The value of the local variable 'testGameState' isn't used • test/features/game/data/models/game_state_model_test.dart:11:20 • unused_local_variable
+warning • The value of the local variable 'testGameStateId' isn't used • test/features/game/data/repositories/supabase_action_card_repository_test.dart:19:9 • unused_local_variable
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:138:26 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:139:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:143:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:182:26 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:183:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:187:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:222:26 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:223:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:227:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:262:26 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:263:27 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/discard_card_test.dart:267:27 • unnecessary_underscores
+   info • Don't invoke 'print' in production code • test/features/game/domain/use_cases/discard_card_test.dart:347:34 • avoid_print
+warning • The declaration '_hasCardInDiscard' isn't referenced • test/features/game/domain/use_cases/distribute_cards_test.dart:31:6 • unused_element
+warning • The value of the local variable 'expectedCardsInDiscard' isn't used • test/features/game/domain/use_cases/end_turn_test.dart:99:17 • unused_local_variable
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/end_turn_test.dart:242:28 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/end_turn_test.dart:243:29 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/game/domain/use_cases/end_turn_test.dart:247:29 • unnecessary_underscores
+warning • The value of the local variable 'revealedCount' isn't used • test/features/game/domain/use_cases/process_last_round_test.dart:203:19 • unused_local_variable
+warning • The value of the local variable 'updatedGameState' isn't used • test/features/game/presentation/providers/action_card_providers_test.dart:91:15 • unused_local_variable
+warning • The value of the local variable 'gameState' isn't used • test/features/game/presentation/providers/action_card_providers_test.dart:125:13 • unused_local_variable
+warning • The value of the local variable 'expectedCount' isn't used • test/features/game/presentation/spectator_view_integration_test.dart:260:31 • unused_local_variable
+warning • The value of the local variable 'strategicProfile' isn't used • test/features/game/presentation/spectator_view_integration_test.dart:260:46 • unused_local_variable
+   info • 'opacity' is deprecated and shouldn't be used. Use .a • test/features/game/presentation/widgets/discard_pile_widget_test.dart:119:62 • deprecated_member_use
+warning • The value of the local variable 'opacityBefore' isn't used • test/features/game/presentation/widgets/game_selection_overlay_test.dart:224:13 • unused_local_variable
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:40:32 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:64:32 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • test/features/multiplayer/domain/entities/room_event_test.dart:115:32 • unnecessary_underscores
+warning • Dead code • test/features/multiplayer/presentation/screens/join_room_screen_test.dart:40:13 • dead_code
+warning • The value of the local variable 'competitiveRoomReadyToStart' isn't used • test/features/multiplayer/presentation/screens/room_lobby_screen_test.dart:111:15 • unused_local_variable
+warning • The receiver can't be null, so the null-aware operator '?.' is unnecessary • test/helpers/test_matchers.dart:151:58 • invalid_null_aware_operator
+  error • The getter 'isRevealed' isn't defined for the type 'List<Card?>' • test/helpers/test_matchers.dart:151:60 • undefined_getter
+warning • The receiver can't be null, so the null-aware operator '?.' is unnecessary • test/helpers/test_matchers.dart:175:59 • invalid_null_aware_operator
+  error • The getter 'isRevealed' isn't defined for the type 'List<Card?>' • test/helpers/test_matchers.dart:175:61 • undefined_getter
+warning • The operand can't be 'null', so the condition is always 'true' • test/helpers/test_matchers.dart:177:24 • unnecessary_null_comparison
+warning • The operand can't be 'null', so the condition is always 'true' • test/helpers/test_matchers.dart:177:50 • unnecessary_null_comparison
+  error • The getter 'value' isn't defined for the type 'List<Card?>' • test/helpers/test_matchers.dart:177:66 • undefined_getter
+warning • The '!' will have no effect because the receiver can't be null • test/helpers/test_matchers.dart:177:89 • unnecessary_non_null_assertion
+  error • The getter 'value' isn't defined for the type 'List<Card?>' • test/helpers/test_matchers.dart:177:91 • undefined_getter
+  error • 'gameStateJson' isn't a field in the enclosing class • test/helpers/test_mocks.dart:75:13 • initializing_formal_for_non_existent_field
+   info • Don't invoke 'print' in production code • test/migration/linting_comparison_test.dart:30:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_comparison_test.dart:31:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_comparison_test.dart:32:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_comparison_test.dart:33:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_comparison_test.dart:36:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_comparison_test.dart:39:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_comparison_test.dart:42:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_comparison_test.dart:61:9 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_comparison_test.dart:63:11 • avoid_print
+   info • Statements in an if should be enclosed in a block • test/migration/linting_test.dart:22:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • test/migration/linting_test.dart:24:11 • curly_braces_in_flow_control_structures
+   info • Don't invoke 'print' in production code • test/migration/linting_test.dart:27:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_test.dart:28:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_test.dart:29:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/linting_test.dart:30:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/sdk_compatibility_test.dart:9:7 • avoid_print
+   info • Don't invoke 'print' in production code • test/migration/sdk_compatibility_test.dart:57:7 • avoid_print
+warning • The value of the field '_listeners' isn't used • test/mocks/mock_supabase.dart:21:31 • unused_field
+
+98 issues found. (ran in 24.5s)

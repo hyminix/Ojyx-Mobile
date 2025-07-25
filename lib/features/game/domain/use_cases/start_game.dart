@@ -29,7 +29,7 @@ class StartGame implements UseCase<GameState, StartGameParams> {
 
       // Validate game can start
       if (!gameState.canStart) {
-        return Left(
+        return const Left(
           Failure.validation(
             message: 'Cannot start game',
             errors: {
@@ -41,7 +41,7 @@ class StartGame implements UseCase<GameState, StartGameParams> {
 
       // Check if game already started
       if (gameState.status != GameStatus.waitingToStart) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'Game has already started',
             code: 'GAME_ALREADY_STARTED',

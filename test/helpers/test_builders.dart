@@ -3,15 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
-import 'package:ojyx/features/game/domain/entities/deck_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
-import 'package:ojyx/features/game/domain/entities/card_position.dart';
 import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
-import 'package:ojyx/features/multiplayer/domain/entities/lobby_player.dart';
-import 'package:ojyx/features/end_game/domain/entities/end_game_state.dart';
-import 'package:ojyx/features/global_scores/domain/entities/global_score.dart';
 
 /// Builder pattern for creating test entities with sensible defaults
 /// Reduces duplication and improves test readability
@@ -42,7 +37,7 @@ class TestActionCardBuilder {
   String _id = 'test-action-card';
   ActionCardType _type = ActionCardType.teleport;
   String _name = 'Test Card';
-  String _description = 'Test action card';
+  final String _description = 'Test action card';
   ActionTiming _timing = ActionTiming.optional;
   ActionTarget _target = ActionTarget.self;
   Map<String, dynamic> _parameters = {};
@@ -93,14 +88,14 @@ class TestActionCardBuilder {
   }
 
   ActionCard build() => ActionCard(
-        id: _id,
-        type: _type,
-        name: _name,
-        description: _description,
-        timing: _timing,
-        target: _target,
-        parameters: _parameters,
-      );
+    id: _id,
+    type: _type,
+    name: _name,
+    description: _description,
+    timing: _timing,
+    target: _target,
+    parameters: _parameters,
+  );
 }
 
 class TestPlayerGridBuilder {
@@ -108,10 +103,7 @@ class TestPlayerGridBuilder {
 
   TestPlayerGridBuilder() {
     // Default 3x4 grid with some revealed cards
-    _cards = List.generate(
-      12,
-      (i) => TestCard().value(i % 13 - 2).build(),
-    );
+    _cards = List.generate(12, (i) => TestCard().value(i % 13 - 2).build());
     // Reveal first two cards by default
     _cards[0] = TestCard().value(_cards[0].value).revealed().build();
     _cards[1] = TestCard().value(_cards[1].value).revealed().build();
@@ -205,15 +197,15 @@ class TestGamePlayerBuilder {
   }
 
   GamePlayer build() => GamePlayer(
-        id: _id,
-        name: _name,
-        grid: _grid ?? TestPlayerGrid().build(),
-        actionCards: _actionCards,
-        isConnected: _isConnected,
-        isHost: _isHost,
-        hasFinishedRound: _hasFinishedRound,
-        scoreMultiplier: _scoreMultiplier,
-      );
+    id: _id,
+    name: _name,
+    grid: _grid ?? TestPlayerGrid().build(),
+    actionCards: _actionCards,
+    isConnected: _isConnected,
+    isHost: _isHost,
+    hasFinishedRound: _hasFinishedRound,
+    scoreMultiplier: _scoreMultiplier,
+  );
 }
 
 class TestGameStateBuilder {
@@ -227,7 +219,7 @@ class TestGameStateBuilder {
   String? _initiatorPlayerId;
   GameStatus _status = GameStatus.playing;
   List<ActionCard> _actionDeck = [];
-  List<ActionCard> _actionDiscard = [];
+  final List<ActionCard> _actionDiscard = [];
 
   TestGameStateBuilder() {
     // Default setup with 2 players and a standard deck
@@ -235,10 +227,7 @@ class TestGameStateBuilder {
       TestGamePlayer().id('player1').name('Player 1').host().build(),
       TestGamePlayer().id('player2').name('Player 2').build(),
     ];
-    _deck = List.generate(
-      52,
-      (i) => TestCard().value(i % 13 - 2).build(),
-    );
+    _deck = List.generate(52, (i) => TestCard().value(i % 13 - 2).build());
     _discardPile = [TestCard().value(5).revealed().build()];
   }
 
@@ -289,18 +278,18 @@ class TestGameStateBuilder {
   }
 
   GameState build() => GameState(
-        roomId: _roomId,
-        players: _players,
-        deck: _deck,
-        discardPile: _discardPile,
-        currentPlayerIndex: _currentPlayerIndex,
-        turnDirection: _turnDirection,
-        lastRound: _lastRound,
-        initiatorPlayerId: _initiatorPlayerId,
-        status: _status,
-        actionDeck: _actionDeck,
-        actionDiscard: _actionDiscard,
-      );
+    roomId: _roomId,
+    players: _players,
+    deck: _deck,
+    discardPile: _discardPile,
+    currentPlayerIndex: _currentPlayerIndex,
+    turnDirection: _turnDirection,
+    lastRound: _lastRound,
+    initiatorPlayerId: _initiatorPlayerId,
+    status: _status,
+    actionDeck: _actionDeck,
+    actionDiscard: _actionDiscard,
+  );
 }
 
 class TestRoomBuilder {
@@ -348,7 +337,7 @@ class TestRoomBuilder {
   }
 
   TestRoomBuilder playing() {
-    _status = RoomStatus.playing;
+    _status = RoomStatus.inGame;
     return this;
   }
 
@@ -360,23 +349,28 @@ class TestRoomBuilder {
   }
 
   Room build() => Room(
-        id: _id,
-        hostId: _hostId,
-        maxPlayers: _maxPlayers,
-        playerIds: _playerIds,
-        status: _status,
-        gameStateJson: _gameStateJson,
-        createdAt: _createdAt!,
-        updatedAt: _updatedAt!,
-      );
+    id: _id,
+    creatorId: _hostId,
+    maxPlayers: _maxPlayers,
+    playerIds: _playerIds,
+    status: _status,
+    currentGameId: _gameStateJson != null ? 'game-123' : null,
+    createdAt: _createdAt!,
+    updatedAt: _updatedAt!,
+  );
 }
 
 // Convenient static methods for quick access
 class TestCard extends TestCardBuilder {}
+
 class TestActionCard extends TestActionCardBuilder {}
+
 class TestPlayerGrid extends TestPlayerGridBuilder {}
+
 class TestGamePlayer extends TestGamePlayerBuilder {}
+
 class TestGameState extends TestGameStateBuilder {}
+
 class TestRoom extends TestRoomBuilder {}
 
 /// Helper function to create a test widget with providers
@@ -407,11 +401,14 @@ void testParameterized<T>(
 void testWidgetsParameterized<T>(
   String description,
   List<T> testCases,
-  void Function(WidgetTester tester, T testCase) testFunction, {
+  Future<void> Function(WidgetTester tester, T testCase) testFunction, {
   String Function(T)? caseDescription,
 }) {
   for (final testCase in testCases) {
     final caseDesc = caseDescription?.call(testCase) ?? testCase.toString();
-    testWidgets('$description - $caseDesc', (tester) => testFunction(tester, testCase));
+    testWidgets(
+      '$description - $caseDesc',
+      (tester) async => await testFunction(tester, testCase),
+    );
   }
 }

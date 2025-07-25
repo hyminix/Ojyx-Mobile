@@ -7,7 +7,6 @@ import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game_card;
 import 'package:ojyx/core/errors/failures.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockGlobalScoreRepository extends Mock implements GlobalScoreRepository {}
@@ -34,42 +33,42 @@ void main() {
     // Create test grids with specific scores
     // Alice: mix of cards to get score of 85
     final aliceCards = [
-      game_card.Card(value: 7, isRevealed: true),
-      game_card.Card(value: 7, isRevealed: true),
-      game_card.Card(value: 7, isRevealed: true),
-      game_card.Card(value: 7, isRevealed: true),
-      game_card.Card(value: 7, isRevealed: true),
-      game_card.Card(value: 7, isRevealed: true),
-      game_card.Card(value: 7, isRevealed: true),
-      game_card.Card(value: 7, isRevealed: true),
-      game_card.Card(value: 7, isRevealed: true),
-      game_card.Card(value: 7, isRevealed: true),
-      game_card.Card(value: 7, isRevealed: true),
-      game_card.Card(value: 8, isRevealed: true),
+      const game_card.Card(value: 7, isRevealed: true),
+      const game_card.Card(value: 7, isRevealed: true),
+      const game_card.Card(value: 7, isRevealed: true),
+      const game_card.Card(value: 7, isRevealed: true),
+      const game_card.Card(value: 7, isRevealed: true),
+      const game_card.Card(value: 7, isRevealed: true),
+      const game_card.Card(value: 7, isRevealed: true),
+      const game_card.Card(value: 7, isRevealed: true),
+      const game_card.Card(value: 7, isRevealed: true),
+      const game_card.Card(value: 7, isRevealed: true),
+      const game_card.Card(value: 7, isRevealed: true),
+      const game_card.Card(value: 8, isRevealed: true),
     ];
     final aliceGrid = PlayerGrid.fromCards(aliceCards); // Score: 7*11 + 8 = 85
 
     // Bob: cards to get score of 120
     final bobCards = List.generate(
       12,
-      (i) => game_card.Card(value: 10, isRevealed: true),
+      (i) => const game_card.Card(value: 10, isRevealed: true),
     );
     final bobGrid = PlayerGrid.fromCards(bobCards); // Score: 10 * 12 = 120
 
     // Charlie: cards to get score of 95
     final charlieCards = [
-      game_card.Card(value: 8, isRevealed: true),
-      game_card.Card(value: 8, isRevealed: true),
-      game_card.Card(value: 8, isRevealed: true),
-      game_card.Card(value: 8, isRevealed: true),
-      game_card.Card(value: 8, isRevealed: true),
-      game_card.Card(value: 8, isRevealed: true),
-      game_card.Card(value: 8, isRevealed: true),
-      game_card.Card(value: 8, isRevealed: true),
-      game_card.Card(value: 8, isRevealed: true),
-      game_card.Card(value: 8, isRevealed: true),
-      game_card.Card(value: 8, isRevealed: true),
-      game_card.Card(value: 7, isRevealed: true),
+      const game_card.Card(value: 8, isRevealed: true),
+      const game_card.Card(value: 8, isRevealed: true),
+      const game_card.Card(value: 8, isRevealed: true),
+      const game_card.Card(value: 8, isRevealed: true),
+      const game_card.Card(value: 8, isRevealed: true),
+      const game_card.Card(value: 8, isRevealed: true),
+      const game_card.Card(value: 8, isRevealed: true),
+      const game_card.Card(value: 8, isRevealed: true),
+      const game_card.Card(value: 8, isRevealed: true),
+      const game_card.Card(value: 8, isRevealed: true),
+      const game_card.Card(value: 8, isRevealed: true),
+      const game_card.Card(value: 7, isRevealed: true),
     ];
     final charlieGrid = PlayerGrid.fromCards(
       charlieCards,
@@ -281,7 +280,7 @@ void main() {
           expect(score.gameEndedAt!.isAfter(beforeCall), isTrue);
           expect(
             score.gameEndedAt!.isBefore(
-              DateTime.now().add(Duration(seconds: 1)),
+              DateTime.now().add(const Duration(seconds: 1)),
             ),
             isTrue,
           );

@@ -146,13 +146,13 @@ class _ActionCardHandWidgetState extends ConsumerState<ActionCardHandWidget> {
       context: context,
       position: position,
       items: [
-        PopupMenuItem(
+        const PopupMenuItem(
           value: 'discard',
           child: Row(
             children: [
-              const Icon(Icons.delete_outline, size: 20),
-              const SizedBox(width: 8),
-              const Text('Défausser'),
+              Icon(Icons.delete_outline, size: 20),
+              SizedBox(width: 8),
+              Text('Défausser'),
             ],
           ),
         ),

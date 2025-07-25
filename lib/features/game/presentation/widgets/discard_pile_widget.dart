@@ -78,13 +78,17 @@ class _DiscardPileWidgetState extends State<DiscardPileWidget> {
                       border: Border.all(
                         color: _isDragOver
                             ? theme.colorScheme.primary
-                            : theme.colorScheme.primary.withOpacity(0.5),
+                            : theme.colorScheme.primary.withValues(
+                                opacity: 0.5,
+                              ),
                         width: 3,
                       ),
                       boxShadow: [
                         if (_isDragOver)
                           BoxShadow(
-                            color: theme.colorScheme.primary.withOpacity(0.3),
+                            color: theme.colorScheme.primary.withValues(
+                              opacity: 0.3,
+                            ),
                             blurRadius: 12,
                             spreadRadius: 2,
                           ),
@@ -104,11 +108,11 @@ class _DiscardPileWidgetState extends State<DiscardPileWidget> {
 
     if (widget.onCardDropped != null && !isTestEnvironment) {
       content = DragTarget<game.Card>(
-        onWillAccept: (card) {
+        onWillAcceptWithDetails: (card) {
           setState(() => _isDragOver = true);
           return widget.canDiscard;
         },
-        onAccept: (card) {
+        onAcceptWithDetails: (card) {
           setState(() => _isDragOver = false);
           widget.onCardDropped!(card);
         },
@@ -149,7 +153,7 @@ class _DiscardPileWidgetState extends State<DiscardPileWidget> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.3),
+          color: theme.colorScheme.outline.withAlpha((0.3 * 255).round()),
           width: 2,
           strokeAlign: BorderSide.strokeAlignInside,
         ),
@@ -161,13 +165,13 @@ class _DiscardPileWidgetState extends State<DiscardPileWidget> {
           Icon(
             Icons.layers_clear,
             size: 32,
-            color: theme.colorScheme.onSurface.withOpacity(0.3),
+            color: theme.colorScheme.onSurface.withAlpha((0.3 * 255).round()),
           ),
           const SizedBox(height: 8),
           Text(
             'Défausse',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
+              color: theme.colorScheme.onSurface.withAlpha((0.5 * 255).round()),
             ),
           ),
         ],
@@ -188,7 +192,7 @@ class _DiscardPileWidgetState extends State<DiscardPileWidget> {
           color: theme.colorScheme.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withAlpha((0.2 * 255).round()),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),

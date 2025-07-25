@@ -54,7 +54,7 @@ class PlayerScoreCard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: rankColor.withOpacity(0.2),
+                color: rankColor.withAlpha((0.2 * 255).round()),
                 shape: BoxShape.circle,
                 border: Border.all(color: rankColor, width: 2),
               ),
@@ -94,7 +94,7 @@ class PlayerScoreCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.2),
+                            color: Colors.red.withAlpha((0.2 * 255).round()),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Text(

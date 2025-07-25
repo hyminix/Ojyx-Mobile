@@ -25,18 +25,30 @@ void main() {
 
     setUp(() {
       mockAnimationNotifier = MockGameAnimationNotifier();
-      when(() => mockAnimationNotifier.showDirectionChange(any())).thenReturn(null);
+      when(
+        () => mockAnimationNotifier.showDirectionChange(any()),
+      ).thenReturn(null);
 
       final mockPlayerGrid = PlayerGrid.empty();
       clockwiseState = GameState(
         roomId: 'room123',
         players: [
-          GamePlayer(id: 'p1', name: 'Player 1', grid: mockPlayerGrid, actionCards: []),
-          GamePlayer(id: 'p2', name: 'Player 2', grid: mockPlayerGrid, actionCards: []),
+          GamePlayer(
+            id: 'p1',
+            name: 'Player 1',
+            grid: mockPlayerGrid,
+            actionCards: [],
+          ),
+          GamePlayer(
+            id: 'p2',
+            name: 'Player 2',
+            grid: mockPlayerGrid,
+            actionCards: [],
+          ),
         ],
         currentPlayerIndex: 0,
-        deck: [Card(value: 5), Card(value: 3)],
-        discardPile: [Card(value: 2)],
+        deck: [const Card(value: 5), const Card(value: 3)],
+        discardPile: [const Card(value: 2)],
         actionDeck: [],
         actionDiscard: [],
         status: GameStatus.playing,
@@ -45,7 +57,9 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      counterClockwiseState = clockwiseState.copyWith(turnDirection: TurnDirection.counterClockwise);
+      counterClockwiseState = clockwiseState.copyWith(
+        turnDirection: TurnDirection.counterClockwise,
+      );
 
       container = ProviderContainer(
         overrides: [
@@ -59,60 +73,91 @@ void main() {
       container.dispose();
     });
 
-    test('should provide visual feedback for strategic direction changes affecting player turn order', () async {
-      // Test behavior: direction changes impact competitive turn sequence and require visual notification
-      container.read(directionObserverProvider);
-      
-      // Establish baseline game flow
-      container.read(gameStateNotifierProvider.notifier).loadState(clockwiseState);
-      await Future.delayed(Duration.zero);
-      
-      // Initialize direction tracking with neutral state change
-      container.read(gameStateNotifierProvider.notifier).updateState(
-        (state) => state.copyWith(currentPlayerIndex: 0),
-      );
-      await Future.delayed(Duration.zero);
-      
-      // Strategic action triggers turn order reversal
-      container.read(gameStateNotifierProvider.notifier).updateState((_) => counterClockwiseState);
-      await Future.delayed(Duration.zero);
-      
-      verify(() => mockAnimationNotifier.showDirectionChange(PlayDirection.backward)).called(1);
-      
-      // Verify protection against redundant visual feedback
-      container.read(gameStateNotifierProvider.notifier).updateState(
-        (state) => state.copyWith(currentPlayerIndex: 1), // Same direction
-      );
-      await Future.delayed(Duration.zero);
-      
-      verifyNever(() => mockAnimationNotifier.showDirectionChange(PlayDirection.backward));
-    });
+    test(
+      'should provide visual feedback for strategic direction changes affecting player turn order',
+      () async {
+        // Test behavior: direction changes impact competitive turn sequence and require visual notification
+        container.read(directionObserverProvider);
 
-    test('should track direction changes for competitive turn order management', () async {
-      // Given: A game with direction observer active
-      container.read(directionObserverProvider);
-      
-      // When: Direction changes from clockwise to counter-clockwise
-      container.read(gameStateNotifierProvider.notifier).loadState(clockwiseState);
-      await Future.delayed(Duration.zero);
-      
-      container.read(gameStateNotifierProvider.notifier).updateState(
-        (state) => state.copyWith(currentPlayerIndex: 0),
-      );
-      await Future.delayed(Duration.zero);
-      
-      container.read(gameStateNotifierProvider.notifier).updateState((_) => counterClockwiseState);
-      await Future.delayed(Duration.zero);
-      
-      // Then: Direction change is detected and notified
-      verify(() => mockAnimationNotifier.showDirectionChange(PlayDirection.backward)).called(1);
-      
-      // When: Direction changes back to clockwise
-      container.read(gameStateNotifierProvider.notifier).updateState((_) => clockwiseState);
-      await Future.delayed(Duration.zero);
-      
-      // Then: Return to normal flow is detected
-      verify(() => mockAnimationNotifier.showDirectionChange(PlayDirection.forward)).called(1);
-    });
+        // Establish baseline game flow
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .loadState(clockwiseState);
+        await Future.delayed(Duration.zero);
+
+        // Initialize direction tracking with neutral state change
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .updateState((state) => state.copyWith(currentPlayerIndex: 0));
+        await Future.delayed(Duration.zero);
+
+        // Strategic action triggers turn order reversal
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .updateState((_) => counterClockwiseState);
+        await Future.delayed(Duration.zero);
+
+        verify(
+          () =>
+              mockAnimationNotifier.showDirectionChange(PlayDirection.backward),
+        ).called(1);
+
+        // Verify protection against redundant visual feedback
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .updateState(
+              (state) =>
+                  state.copyWith(currentPlayerIndex: 1), // Same direction
+            );
+        await Future.delayed(Duration.zero);
+
+        verifyNever(
+          () =>
+              mockAnimationNotifier.showDirectionChange(PlayDirection.backward),
+        );
+      },
+    );
+
+    test(
+      'should track direction changes for competitive turn order management',
+      () async {
+        // Given: A game with direction observer active
+        container.read(directionObserverProvider);
+
+        // When: Direction changes from clockwise to counter-clockwise
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .loadState(clockwiseState);
+        await Future.delayed(Duration.zero);
+
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .updateState((state) => state.copyWith(currentPlayerIndex: 0));
+        await Future.delayed(Duration.zero);
+
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .updateState((_) => counterClockwiseState);
+        await Future.delayed(Duration.zero);
+
+        // Then: Direction change is detected and notified
+        verify(
+          () =>
+              mockAnimationNotifier.showDirectionChange(PlayDirection.backward),
+        ).called(1);
+
+        // When: Direction changes back to clockwise
+        container
+            .read(gameStateNotifierProvider.notifier)
+            .updateState((_) => clockwiseState);
+        await Future.delayed(Duration.zero);
+
+        // Then: Return to normal flow is detected
+        verify(
+          () =>
+              mockAnimationNotifier.showDirectionChange(PlayDirection.forward),
+        ).called(1);
+      },
+    );
   });
 }

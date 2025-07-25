@@ -21,15 +21,14 @@ void main() {
   });
 
   group('DrawActionCardUseCase', () {
-
     test(
       'should enable strategic action card acquisition and constraint management for enhanced competitive gameplay',
       () async {
         // Test behavior: Action card drawing system enables strategic gameplay with proper constraints
         // and validates game state conditions to maintain competitive balance
-        
+
         final strategicActionCards = [
-          ActionCard(
+          const ActionCard(
             id: 'turnaround-master',
             type: ActionCardType.turnAround,
             name: 'Demi-tour',
@@ -37,7 +36,7 @@ void main() {
             timing: ActionTiming.immediate,
             target: ActionTarget.none,
           ),
-          ActionCard(
+          const ActionCard(
             id: 'skip-tactical',
             type: ActionCardType.skip,
             name: 'Skip',
@@ -45,7 +44,7 @@ void main() {
             timing: ActionTiming.optional,
             target: ActionTarget.none,
           ),
-          ActionCard(
+          const ActionCard(
             id: 'freeze-strategic',
             type: ActionCardType.freeze,
             name: 'Freeze',
@@ -57,14 +56,19 @@ void main() {
 
         // Scenario 1: Valid draw with space in hand
         final competitiveGrid = PlayerGrid.fromCards(
-          List.generate(12, (i) => game_card.Card(value: i % 13 - 2, isRevealed: i < 2)),
+          List.generate(
+            12,
+            (i) => game_card.Card(value: i % 13 - 2, isRevealed: i < 2),
+          ),
         );
-        
+
         final strategicPlayer = GamePlayer(
           id: 'strategic-player-123',
           name: 'Tournament Champion',
           grid: competitiveGrid,
-          actionCards: [strategicActionCards[0]], // 1 card in hand, space for 2 more
+          actionCards: [
+            strategicActionCards[0],
+          ], // 1 card in hand, space for 2 more
         );
 
         final competitiveGameState = GameState(
@@ -79,8 +83,11 @@ void main() {
             ),
           ],
           currentPlayerIndex: 0,
-          deck: List.generate(50, (i) => game_card.Card(value: i % 13 - 2, isRevealed: false)),
-          discardPile: [game_card.Card(value: 5, isRevealed: true)],
+          deck: List.generate(
+            50,
+            (i) => game_card.Card(value: i % 13 - 2, isRevealed: false),
+          ),
+          discardPile: [const game_card.Card(value: 5, isRevealed: true)],
           actionDeck: strategicActionCards.sublist(1),
           actionDiscard: [],
           status: GameStatus.playing,
@@ -89,27 +96,40 @@ void main() {
           drawnCard: null, // No card drawn yet this turn
         );
 
-        when(() => mockRepository.drawActionCard())
-          .thenAnswer((_) async => strategicActionCards[1]);
-        when(() => mockRepository.addActionCardToPlayer('strategic-player-123', strategicActionCards[1]))
-          .thenAnswer((_) async {});
+        when(
+          () => mockRepository.drawActionCard(),
+        ).thenAnswer((_) async => strategicActionCards[1]);
+        when(
+          () => mockRepository.addActionCardToPlayer(
+            'strategic-player-123',
+            strategicActionCards[1],
+          ),
+        ).thenAnswer((_) async {});
 
         // Act: Strategic draw
-        final validDrawResult = await useCase(DrawActionCardParams(
-          playerId: 'strategic-player-123',
-          gameState: competitiveGameState,
-        ));
+        final validDrawResult = await useCase(
+          DrawActionCardParams(
+            playerId: 'strategic-player-123',
+            gameState: competitiveGameState,
+          ),
+        );
 
         // Assert: Successful strategic acquisition
         expect(validDrawResult.isRight(), true);
-        validDrawResult.fold(
-          (failure) => fail('Should allow valid draw'),
-          (updatedState) {
-            final updatedPlayer = updatedState.players.first;
-            expect(updatedPlayer.actionCards.length, 2, reason: 'Should have acquired new card');
-            expect(updatedPlayer.actionCards.any((card) => card.id == 'skip-tactical'), true);
-          },
-        );
+        validDrawResult.fold((failure) => fail('Should allow valid draw'), (
+          updatedState,
+        ) {
+          final updatedPlayer = updatedState.players.first;
+          expect(
+            updatedPlayer.actionCards.length,
+            2,
+            reason: 'Should have acquired new card',
+          );
+          expect(
+            updatedPlayer.actionCards.any((card) => card.id == 'skip-tactical'),
+            true,
+          );
+        });
 
         // Scenario 2: Constraint validation - hand full
         final fullHandState = competitiveGameState.copyWith(
@@ -131,10 +151,12 @@ void main() {
           ],
         );
 
-        final fullHandResult = await useCase(DrawActionCardParams(
-          playerId: 'strategic-player-123',
-          gameState: fullHandState,
-        ));
+        final fullHandResult = await useCase(
+          DrawActionCardParams(
+            playerId: 'strategic-player-123',
+            gameState: fullHandState,
+          ),
+        );
 
         expect(fullHandResult.isLeft(), true);
         fullHandResult.fold(
@@ -147,10 +169,12 @@ void main() {
           currentPlayerIndex: 1, // Other player's turn
         );
 
-        final wrongTurnResult = await useCase(DrawActionCardParams(
-          playerId: 'strategic-player-123',
-          gameState: wrongTurnState,
-        ));
+        final wrongTurnResult = await useCase(
+          DrawActionCardParams(
+            playerId: 'strategic-player-123',
+            gameState: wrongTurnState,
+          ),
+        );
 
         expect(wrongTurnResult.isLeft(), true);
         wrongTurnResult.fold(
@@ -160,13 +184,15 @@ void main() {
 
         // Scenario 4: Already drew card this turn
         final alreadyDrewState = competitiveGameState.copyWith(
-          drawnCard: game_card.Card(value: 7, isRevealed: true),
+          drawnCard: const game_card.Card(value: 7, isRevealed: true),
         );
 
-        final alreadyDrewResult = await useCase(DrawActionCardParams(
-          playerId: 'strategic-player-123',
-          gameState: alreadyDrewState,
-        ));
+        final alreadyDrewResult = await useCase(
+          DrawActionCardParams(
+            playerId: 'strategic-player-123',
+            gameState: alreadyDrewState,
+          ),
+        );
 
         expect(alreadyDrewResult.isLeft(), true);
         alreadyDrewResult.fold(
@@ -179,10 +205,12 @@ void main() {
           status: GameStatus.waitingToStart,
         );
 
-        final notPlayingResult = await useCase(DrawActionCardParams(
-          playerId: 'strategic-player-123',
-          gameState: notPlayingState,
-        ));
+        final notPlayingResult = await useCase(
+          DrawActionCardParams(
+            playerId: 'strategic-player-123',
+            gameState: notPlayingState,
+          ),
+        );
 
         expect(notPlayingResult.isLeft(), true);
         notPlayingResult.fold(
@@ -191,22 +219,26 @@ void main() {
         );
 
         // Scenario 6: Empty action deck
-        when(() => mockRepository.drawActionCard())
-          .thenAnswer((_) async => null);
+        when(
+          () => mockRepository.drawActionCard(),
+        ).thenAnswer((_) async => null);
 
-        final emptyDeckResult = await useCase(DrawActionCardParams(
-          playerId: 'strategic-player-123',
-          gameState: competitiveGameState,
-        ));
+        final emptyDeckResult = await useCase(
+          DrawActionCardParams(
+            playerId: 'strategic-player-123',
+            gameState: competitiveGameState,
+          ),
+        );
 
         expect(emptyDeckResult.isLeft(), true);
         emptyDeckResult.fold(
-          (failure) => expect(failure.message, contains('No action cards available')),
+          (failure) =>
+              expect(failure.message, contains('No action cards available')),
           (_) => fail('Should handle empty deck gracefully'),
         );
 
         // Scenario 7: Immediate action cards are added for later processing
-        final immediateCard = ActionCard(
+        final immediateCard = const ActionCard(
           id: 'immediate-turnaround',
           type: ActionCardType.turnAround,
           name: 'Demi-tour',
@@ -215,22 +247,34 @@ void main() {
           target: ActionTarget.none,
         );
 
-        when(() => mockRepository.drawActionCard())
-          .thenAnswer((_) async => immediateCard);
-        when(() => mockRepository.addActionCardToPlayer('strategic-player-123', immediateCard))
-          .thenAnswer((_) async {});
+        when(
+          () => mockRepository.drawActionCard(),
+        ).thenAnswer((_) async => immediateCard);
+        when(
+          () => mockRepository.addActionCardToPlayer(
+            'strategic-player-123',
+            immediateCard,
+          ),
+        ).thenAnswer((_) async {});
 
-        final immediateResult = await useCase(DrawActionCardParams(
-          playerId: 'strategic-player-123',
-          gameState: competitiveGameState,
-        ));
+        final immediateResult = await useCase(
+          DrawActionCardParams(
+            playerId: 'strategic-player-123',
+            gameState: competitiveGameState,
+          ),
+        );
 
         expect(immediateResult.isRight(), true);
         immediateResult.fold(
           (failure) => fail('Should handle immediate cards'),
           (updatedState) {
             final updatedPlayer = updatedState.players.first;
-            expect(updatedPlayer.actionCards.any((card) => card.timing == ActionTiming.immediate), true);
+            expect(
+              updatedPlayer.actionCards.any(
+                (card) => card.timing == ActionTiming.immediate,
+              ),
+              true,
+            );
             // Actual immediate effect processing happens in separate game flow
           },
         );

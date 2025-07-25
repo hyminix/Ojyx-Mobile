@@ -14,7 +14,7 @@ Matcher hasCardValue(int expectedValue) => _HasCardValue(expectedValue);
 
 class _HasCardValue extends Matcher {
   final int expectedValue;
-  
+
   const _HasCardValue(this.expectedValue);
 
   @override
@@ -57,11 +57,12 @@ class _IsHidden extends Matcher {
 }
 
 /// Matcher for game state status
-Matcher hasGameStatus(GameStatus expectedStatus) => _HasGameStatus(expectedStatus);
+Matcher hasGameStatus(GameStatus expectedStatus) =>
+    _HasGameStatus(expectedStatus);
 
 class _HasGameStatus extends Matcher {
   final GameStatus expectedStatus;
-  
+
   const _HasGameStatus(this.expectedStatus);
 
   @override
@@ -80,7 +81,7 @@ Matcher isPlayerTurn(String playerId) => _IsPlayerTurn(playerId);
 
 class _IsPlayerTurn extends Matcher {
   final String playerId;
-  
+
   const _IsPlayerTurn(this.playerId);
 
   @override
@@ -96,11 +97,12 @@ class _IsPlayerTurn extends Matcher {
 }
 
 /// Matcher for room status
-Matcher hasRoomStatus(RoomStatus expectedStatus) => _HasRoomStatus(expectedStatus);
+Matcher hasRoomStatus(RoomStatus expectedStatus) =>
+    _HasRoomStatus(expectedStatus);
 
 class _HasRoomStatus extends Matcher {
   final RoomStatus expectedStatus;
-  
+
   const _HasRoomStatus(this.expectedStatus);
 
   @override
@@ -119,7 +121,7 @@ Matcher hasPlayerCount(int expectedCount) => _HasPlayerCount(expectedCount);
 
 class _HasPlayerCount extends Matcher {
   final int expectedCount;
-  
+
   const _HasPlayerCount(this.expectedCount);
 
   @override
@@ -135,17 +137,18 @@ class _HasPlayerCount extends Matcher {
 }
 
 /// Matcher for revealed cards in grid
-Matcher hasRevealedCardsCount(int expectedCount) => _HasRevealedCardsCount(expectedCount);
+Matcher hasRevealedCardsCount(int expectedCount) =>
+    _HasRevealedCardsCount(expectedCount);
 
 class _HasRevealedCardsCount extends Matcher {
   final int expectedCount;
-  
+
   const _HasRevealedCardsCount(this.expectedCount);
 
   @override
   bool matches(dynamic item, Map matchState) {
     if (item is! PlayerGrid) return false;
-    final revealedCount = item.cards.where((card) => card.isRevealed).length;
+    final revealedCount = item.cards.where((card) => card?.isRevealed ?? false).length;
     return revealedCount == expectedCount;
   }
 
@@ -161,17 +164,19 @@ class _HasCompletedColumn extends Matcher {
   @override
   bool matches(dynamic item, Map matchState) {
     if (item is! PlayerGrid) return false;
-    
+
     for (int col = 0; col < 4; col++) {
       final columnCards = [
-        item.cards[col],      // Row 0
-        item.cards[col + 4],  // Row 1
-        item.cards[col + 8],  // Row 2
+        item.cards[col], // Row 0
+        item.cards[col + 4], // Row 1
+        item.cards[col + 8], // Row 2
       ];
-      
-      final allRevealed = columnCards.every((card) => card.isRevealed);
-      final sameValue = columnCards.every((card) => card.value == columnCards[0].value);
-      
+
+      final allRevealed = columnCards.every((card) => card?.isRevealed ?? false);
+      final sameValue = columnCards.every(
+        (card) => card != null && columnCards[0] != null && card.value == columnCards[0]!.value,
+      );
+
       if (allRevealed && sameValue) {
         return true;
       }
@@ -290,9 +295,11 @@ class GameAssertions {
     required GameState afterState,
     required String actionDescription,
   }) {
-    final expectedNextPlayer = beforeState.turnDirection == TurnDirection.clockwise
+    final expectedNextPlayer =
+        beforeState.turnDirection == TurnDirection.clockwise
         ? (beforeState.currentPlayerIndex + 1) % beforeState.players.length
-        : (beforeState.currentPlayerIndex - 1 + beforeState.players.length) % beforeState.players.length;
+        : (beforeState.currentPlayerIndex - 1 + beforeState.players.length) %
+              beforeState.players.length;
 
     expect(
       afterState.currentPlayerIndex,

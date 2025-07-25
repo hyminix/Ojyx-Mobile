@@ -18,15 +18,20 @@ void main() {
     setUp(() {
       mockNotifier = MockGameStateNotifier();
     });
-    
+
     setUpAll(() {
       registerFallbackValue(const game.Card(value: 0, isRevealed: false));
     });
 
-    testWidgets('should trigger draw action when player taps draw pile', (tester) async {
+    testWidgets('should trigger draw action when player taps draw pile', (
+      tester,
+    ) async {
       // Arrange: Mock the game state to simulate behavior
       final initialDeckState = DeckState(
-        drawPile: List.generate(10, (i) => game.Card(value: i, isRevealed: false)),
+        drawPile: List.generate(
+          10,
+          (i) => game.Card(value: i, isRevealed: false),
+        ),
         discardPile: [const game.Card(value: 5, isRevealed: true)],
       );
 
@@ -53,8 +58,16 @@ void main() {
       );
 
       // Assert initial state behavior
-      expect(find.text('10'), findsOneWidget, reason: 'Should display correct draw pile count');
-      expect(find.text('5'), findsWidgets, reason: 'Should display top discard card value');
+      expect(
+        find.text('10'),
+        findsOneWidget,
+        reason: 'Should display correct draw pile count',
+      );
+      expect(
+        find.text('5'),
+        findsWidgets,
+        reason: 'Should display top discard card value',
+      );
 
       // Trigger draw action behavior
       await tester.tap(find.byType(DrawPileWidget));
@@ -64,11 +77,16 @@ void main() {
       verify(() => mockNotifier.drawFromDeck('player1')).called(1);
     });
 
-    testWidgets('should trigger reshuffle action when draw pile is empty', (tester) async {
+    testWidgets('should trigger reshuffle action when draw pile is empty', (
+      tester,
+    ) async {
       // Arrange: Mock empty draw pile scenario
       final emptyDrawState = DeckState(
         drawPile: const [],
-        discardPile: List.generate(5, (i) => game.Card(value: i, isRevealed: true)),
+        discardPile: List.generate(
+          5,
+          (i) => game.Card(value: i, isRevealed: true),
+        ),
       );
 
       // Act: Render widget showing empty draw pile
@@ -92,8 +110,16 @@ void main() {
       );
 
       // Assert empty draw pile behavior
-      expect(find.text('0'), findsOneWidget, reason: 'Should show empty draw pile count');
-      expect(find.text('Mélange nécessaire'), findsOneWidget, reason: 'Should show reshuffle indicator');
+      expect(
+        find.text('0'),
+        findsOneWidget,
+        reason: 'Should show empty draw pile count',
+      );
+      expect(
+        find.text('Mélange nécessaire'),
+        findsOneWidget,
+        reason: 'Should show reshuffle indicator',
+      );
 
       // Trigger reshuffle behavior
       await tester.tap(find.byType(DrawPileWidget));
@@ -103,7 +129,9 @@ void main() {
       verify(() => mockNotifier.drawFromDeck('player1')).called(1);
     });
 
-    testWidgets('should not trigger actions when not player turn', (tester) async {
+    testWidgets('should not trigger actions when not player turn', (
+      tester,
+    ) async {
       // Arrange: Mock non-player turn scenario
       await tester.pumpWidget(
         ProviderScope(
@@ -133,7 +161,9 @@ void main() {
       verifyNever(() => mockNotifier.discardCard(any(), any()));
     });
 
-    testWidgets('should display proper UI animations during discard actions', (tester) async {
+    testWidgets('should display proper UI animations during discard actions', (
+      tester,
+    ) async {
       // Arrange: Mock initial card state
       const initialCard = game.Card(value: 3, isRevealed: true);
       const newCard = game.Card(value: 8, isRevealed: true);
@@ -159,25 +189,44 @@ void main() {
       );
 
       // Assert initial card display behavior
-      expect(find.text('3'), findsWidgets, reason: 'Should display initial top card value');
+      expect(
+        find.text('3'),
+        findsWidgets,
+        reason: 'Should display initial top card value',
+      );
 
-      // Act: Trigger discard UI behavior 
-      final discardPile = tester.widget<DiscardPileWidget>(find.byType(DiscardPileWidget));
-      expect(discardPile.onCardDropped, isNotNull, reason: 'Should provide discard drop callback');
+      // Act: Trigger discard UI behavior
+      final discardPile = tester.widget<DiscardPileWidget>(
+        find.byType(DiscardPileWidget),
+      );
+      expect(
+        discardPile.onCardDropped,
+        isNotNull,
+        reason: 'Should provide discard drop callback',
+      );
       discardPile.onCardDropped!(newCard);
 
       // Assert: Animation components should be present
       await tester.pump();
-      expect(find.byType(AnimatedSwitcher), findsWidgets, reason: 'Should show card transition animations');
+      expect(
+        find.byType(AnimatedSwitcher),
+        findsWidgets,
+        reason: 'Should show card transition animations',
+      );
 
       // Verify discard behavior was triggered
       verify(() => mockNotifier.discardCard('player1', 0)).called(1);
     });
 
-    testWidgets('should handle multiple draw actions correctly', (tester) async {
+    testWidgets('should handle multiple draw actions correctly', (
+      tester,
+    ) async {
       // Arrange: Mock initial deck state
       final initialDeckState = DeckState(
-        drawPile: List.generate(5, (i) => game.Card(value: i * 2, isRevealed: false)),
+        drawPile: List.generate(
+          5,
+          (i) => game.Card(value: i * 2, isRevealed: false),
+        ),
         discardPile: [const game.Card(value: 1, isRevealed: true)],
       );
 

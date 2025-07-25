@@ -71,7 +71,7 @@ void main() {
 
       // Verify decoration
       final decoration = animatedContainer.decoration as BoxDecoration;
-      expect(decoration.color, Colors.amber.withOpacity(0.2));
+      expect(decoration.color, Colors.amber.withAlpha((0.2 * 255).round()));
       expect(decoration.borderRadius, BorderRadius.circular(16));
       expect(decoration.border, isNotNull);
     });

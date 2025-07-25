@@ -1,0 +1,42 @@
+[✓] Flutter (Channel stable, 3.32.6, on Ubuntu 24.04.2 LTS 5.15.167.4-microsoft-standard-WSL2, locale C.UTF-8) [98ms]
+    • Flutter version 3.32.6 on channel stable at /home/hyminix/flutter
+    • Upstream repository https://github.com/flutter/flutter.git
+    • Framework revision 077b4a4ce1 (2 weeks ago), 2025-07-08 13:31:08 -0700
+    • Engine revision 72f2b18bb0
+    • Dart version 3.8.1
+    • DevTools version 2.45.1
+
+[✗] Android toolchain - develop for Android devices [132ms]
+    ✗ Unable to locate Android SDK.
+      Install Android Studio from: https://developer.android.com/studio/index.html
+      On first launch it will assist you in installing the Android SDK components.
+      (or visit https://flutter.dev/to/linux-android-setup for detailed instructions).
+      If the Android SDK has been installed to a custom location, please use
+      `flutter config --android-sdk` to update to that location.
+
+
+[✓] Chrome - develop for the web [61ms]
+    • CHROME_EXECUTABLE = /mnt/c/Program Files/Google/Chrome/Application/chrome.exe
+
+[✗] Linux toolchain - develop for Linux desktop [206ms]
+    ✗ clang++ is required for Linux development.
+      It is likely available from your distribution (e.g.: apt install clang), or can be downloaded from https://releases.llvm.org/
+    ✗ CMake is required for Linux development.
+      It is likely available from your distribution (e.g.: apt install cmake), or can be downloaded from https://cmake.org/download/
+    ✗ ninja is required for Linux development.
+      It is likely available from your distribution (e.g.: apt install ninja-build), or can be downloaded from https://github.com/ninja-build/ninja/releases
+    ✗ pkg-config is required for Linux development.
+      It is likely available from your distribution (e.g.: apt install pkg-config), or can be downloaded from https://www.freedesktop.org/wiki/Software/pkg-config/
+
+[!] Android Studio (not installed) [56ms]
+    • Android Studio not found; download from https://developer.android.com/studio/index.html
+      (or visit https://flutter.dev/to/linux-android-setup for detailed instructions).
+
+[✓] Connected device (2 available) [401ms]
+    • Linux (desktop) • linux  • linux-x64      • Ubuntu 24.04.2 LTS 5.15.167.4-microsoft-standard-WSL2
+    • Chrome (web)    • chrome • web-javascript • Ouverture dans une session de navigateur existante.
+
+[✓] Network resources [3.5s]
+    • All expected network resources are available.
+
+! Doctor found issues in 3 categories.

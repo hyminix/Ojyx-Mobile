@@ -49,20 +49,45 @@ void main() {
       });
     });
 
-    test('should throw UnsupportedError for deprecated client-side methods', () {
-      const testCard = ActionCard(
-        id: 'test', type: ActionCardType.peek, name: 'Test', description: 'Test',
-        timing: ActionTiming.optional, target: ActionTarget.self,
-      );
+    test(
+      'should throw UnsupportedError for deprecated client-side methods',
+      () {
+        const testCard = ActionCard(
+          id: 'test',
+          type: ActionCardType.peek,
+          name: 'Test',
+          description: 'Test',
+          timing: ActionTiming.optional,
+          target: ActionTarget.self,
+        );
 
-      // All deprecated methods should throw UnsupportedError
-      expect(() => repository.getPlayerActionCards('player1'), throwsA(isA<UnsupportedError>()));
-      expect(() => repository.addActionCardToPlayer('player1', testCard), throwsA(isA<UnsupportedError>()));
-      expect(() => repository.removeActionCardFromPlayer('player1', testCard), throwsA(isA<UnsupportedError>()));
-      expect(() => repository.drawActionCard(), throwsA(isA<UnsupportedError>()));
-      expect(() => repository.discardActionCard(testCard), throwsA(isA<UnsupportedError>()));
-      expect(() => repository.shuffleActionCards(), throwsA(isA<UnsupportedError>()));
-    });
+        // All deprecated methods should throw UnsupportedError
+        expect(
+          () => repository.getPlayerActionCards('player1'),
+          throwsA(isA<UnsupportedError>()),
+        );
+        expect(
+          () => repository.addActionCardToPlayer('player1', testCard),
+          throwsA(isA<UnsupportedError>()),
+        );
+        expect(
+          () => repository.removeActionCardFromPlayer('player1', testCard),
+          throwsA(isA<UnsupportedError>()),
+        );
+        expect(
+          () => repository.drawActionCard(),
+          throwsA(isA<UnsupportedError>()),
+        );
+        expect(
+          () => repository.discardActionCard(testCard),
+          throwsA(isA<UnsupportedError>()),
+        );
+        expect(
+          () => repository.shuffleActionCards(),
+          throwsA(isA<UnsupportedError>()),
+        );
+      },
+    );
 
     group('helper methods', () {
       test('getActionCardByType should return correct card', () async {
@@ -95,16 +120,28 @@ void main() {
 
       test('should correctly identify action timing types', () {
         const immediateCard = ActionCard(
-          id: 'immediate', type: ActionCardType.turnAround, name: 'Immediate', description: 'Test',
-          timing: ActionTiming.immediate, target: ActionTarget.none,
+          id: 'immediate',
+          type: ActionCardType.turnAround,
+          name: 'Immediate',
+          description: 'Test',
+          timing: ActionTiming.immediate,
+          target: ActionTarget.none,
         );
         const optionalCard = ActionCard(
-          id: 'optional', type: ActionCardType.peek, name: 'Optional', description: 'Test',
-          timing: ActionTiming.optional, target: ActionTarget.self,
+          id: 'optional',
+          type: ActionCardType.peek,
+          name: 'Optional',
+          description: 'Test',
+          timing: ActionTiming.optional,
+          target: ActionTarget.self,
         );
         const reactiveCard = ActionCard(
-          id: 'reactive', type: ActionCardType.shield, name: 'Reactive', description: 'Test',
-          timing: ActionTiming.reactive, target: ActionTarget.none,
+          id: 'reactive',
+          type: ActionCardType.shield,
+          name: 'Reactive',
+          description: 'Test',
+          timing: ActionTiming.reactive,
+          target: ActionTarget.none,
         );
 
         // Test immediate action detection

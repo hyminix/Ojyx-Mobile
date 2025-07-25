@@ -58,9 +58,10 @@ void main() {
         expect(
           find.text('Votre grille'),
           testCase.expectedFinds,
-          reason: 'When isCurrentPlayer=${testCase.isCurrentPlayer}, "Votre grille" should ${testCase.expectedFinds == findsOneWidget ? "be visible" : "not be visible"}',
+          reason:
+              'When isCurrentPlayer=${testCase.isCurrentPlayer}, "Votre grille" should ${testCase.expectedFinds == findsOneWidget ? "be visible" : "not be visible"}',
         );
-        
+
         if (testCase.isCurrentPlayer) {
           expect(find.byIcon(Icons.person), findsOneWidget);
         }
@@ -76,8 +77,8 @@ void main() {
       // Arrange
       var grid = PlayerGrid.empty();
       // Add some revealed cards
-      grid = grid.placeCard(game.Card(value: 5, isRevealed: true), 0, 0);
-      grid = grid.placeCard(game.Card(value: 3, isRevealed: true), 1, 1);
+      grid = grid.placeCard(const game.Card(value: 5, isRevealed: true), 0, 0);
+      grid = grid.placeCard(const game.Card(value: 3, isRevealed: true), 1, 1);
 
       // Act
       await tester.pumpWidget(
@@ -215,7 +216,7 @@ void main() {
       var grid = PlayerGrid.empty();
 
       // Create identical column (all 5s in column 0)
-      final card5 = game.Card(value: 5, isRevealed: true);
+      final card5 = const game.Card(value: 5, isRevealed: true);
 
       grid = grid.placeCard(card5, 0, 0);
       grid = grid.placeCard(card5.copyWith(), 1, 0);
@@ -310,5 +311,4 @@ void main() {
       expect(cardWidgets.isNotEmpty, isTrue);
     });
   });
-
 }

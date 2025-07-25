@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/core/providers/supabase_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {
   group('supabaseClientProvider', () {
@@ -19,6 +18,5 @@ void main() {
       // Clean up
       container.dispose();
     });
-
   });
 }

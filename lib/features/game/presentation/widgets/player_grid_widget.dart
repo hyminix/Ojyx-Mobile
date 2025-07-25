@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/player_grid.dart';
-import '../../domain/entities/card.dart' as game;
 import 'card_widget.dart';
 
 class PlayerGridWidget extends StatelessWidget {

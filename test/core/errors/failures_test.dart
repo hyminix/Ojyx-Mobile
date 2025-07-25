@@ -16,7 +16,7 @@ void main() {
             error: error,
             stackTrace: stackTrace,
           );
-          
+
           expect(failure, isA<ServerFailure>());
           expect((failure as ServerFailure).message, equals(message));
           expect(failure.error, equals(error));
@@ -27,7 +27,7 @@ void main() {
           const message = 'Network connection lost';
           final error = Exception('No internet');
           final failure = Failure.network(message: message, error: error);
-          
+
           expect(failure, isA<NetworkFailure>());
           expect((failure as NetworkFailure).message, equals(message));
           expect(failure.error, equals(error));
@@ -40,7 +40,7 @@ void main() {
             'password': 'Password too short',
           };
           final failure = Failure.validation(message: message, errors: errors);
-          
+
           expect(failure, isA<ValidationFailure>());
           expect((failure as ValidationFailure).message, equals(message));
           expect(failure.errors, equals(errors));
@@ -49,8 +49,8 @@ void main() {
         () {
           const message = 'Invalid move';
           const code = 'INVALID_CARD_PLACEMENT';
-          final failure = Failure.gameLogic(message: message, code: code);
-          
+          final failure = const Failure.gameLogic(message: message, code: code);
+
           expect(failure, isA<GameLogicFailure>());
           expect((failure as GameLogicFailure).message, equals(message));
           expect(failure.code, equals(code));
@@ -59,8 +59,11 @@ void main() {
         () {
           const message = 'Authentication failed';
           const code = 'INVALID_CREDENTIALS';
-          final failure = Failure.authentication(message: message, code: code);
-          
+          final failure = const Failure.authentication(
+            message: message,
+            code: code,
+          );
+
           expect(failure, isA<AuthenticationFailure>());
           expect((failure as AuthenticationFailure).message, equals(message));
           expect(failure.code, equals(code));
@@ -69,8 +72,11 @@ void main() {
         () {
           const message = 'Request timed out';
           const duration = Duration(seconds: 30);
-          final failure = Failure.timeout(message: message, duration: duration);
-          
+          final failure = const Failure.timeout(
+            message: message,
+            duration: duration,
+          );
+
           expect(failure, isA<TimeoutFailure>());
           expect((failure as TimeoutFailure).message, equals(message));
           expect(failure.duration, equals(duration));
@@ -85,7 +91,7 @@ void main() {
             error: error,
             stackTrace: stackTrace,
           );
-          
+
           expect(failure, isA<UnknownFailure>());
           expect((failure as UnknownFailure).message, equals(message));
           expect(failure.error, equals(error));

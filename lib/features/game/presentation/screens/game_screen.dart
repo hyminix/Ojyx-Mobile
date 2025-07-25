@@ -82,7 +82,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             currentUserId!,
           );
           if (currentPlayer == null) {
-            return Center(child: Text('Erreur: Joueur non trouvé'));
+            return const Center(child: Text('Erreur: Joueur non trouvé'));
           }
 
           final isMyTurn = gameStateAsync.currentPlayer.id == currentUserId;

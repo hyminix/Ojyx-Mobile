@@ -23,17 +23,29 @@ void main() {
         // Verify behavior classification for game logic
         switch (timing) {
           case ActionTiming.immediate:
-            expect(actionCard.isImmediate, isTrue, reason: 'Should trigger automatically');
+            expect(
+              actionCard.isImmediate,
+              isTrue,
+              reason: 'Should trigger automatically',
+            );
             expect(actionCard.isOptional, isFalse);
             expect(actionCard.isReactive, isFalse);
             break;
           case ActionTiming.optional:
-            expect(actionCard.isOptional, isTrue, reason: 'Should allow player choice');
+            expect(
+              actionCard.isOptional,
+              isTrue,
+              reason: 'Should allow player choice',
+            );
             expect(actionCard.isImmediate, isFalse);
             expect(actionCard.isReactive, isFalse);
             break;
           case ActionTiming.reactive:
-            expect(actionCard.isReactive, isTrue, reason: 'Should respond to actions');
+            expect(
+              actionCard.isReactive,
+              isTrue,
+              reason: 'Should respond to actions',
+            );
             expect(actionCard.isImmediate, isFalse);
             expect(actionCard.isOptional, isFalse);
             break;
@@ -116,8 +128,16 @@ void main() {
       );
 
       // Assert behavior: game should recognize same cards
-      expect(card1, equals(card2), reason: 'Same ID cards should be equal for game logic');
-      expect(card1, isNot(equals(differentCard)), reason: 'Different cards should not be equal');
+      expect(
+        card1,
+        equals(card2),
+        reason: 'Same ID cards should be equal for game logic',
+      );
+      expect(
+        card1,
+        isNot(equals(differentCard)),
+        reason: 'Different cards should not be equal',
+      );
     });
   });
 }

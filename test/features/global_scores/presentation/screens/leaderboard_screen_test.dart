@@ -19,7 +19,7 @@ void main() {
     setUp(() {
       mockRepository = MockGlobalScoreRepository();
       testPlayers = [
-        PlayerStats(
+        const PlayerStats(
           playerId: 'player1',
           playerName: 'Alice',
           totalGamesPlayed: 50,
@@ -30,7 +30,7 @@ void main() {
           averagePosition: 1.8,
           totalRoundsPlayed: 250,
         ),
-        PlayerStats(
+        const PlayerStats(
           playerId: 'player2',
           playerName: 'Bob',
           totalGamesPlayed: 45,
@@ -41,7 +41,7 @@ void main() {
           averagePosition: 2.3,
           totalRoundsPlayed: 225,
         ),
-        PlayerStats(
+        const PlayerStats(
           playerId: 'player3',
           playerName: 'Charlie',
           totalGamesPlayed: 40,
@@ -208,7 +208,7 @@ void main() {
     testWidgets('should sort players by win rate', (tester) async {
       // Create players with different win rates
       final unsortedPlayers = [
-        PlayerStats(
+        const PlayerStats(
           playerId: 'player1',
           playerName: 'Low Winner',
           totalGamesPlayed: 10,
@@ -219,7 +219,7 @@ void main() {
           averagePosition: 3.0,
           totalRoundsPlayed: 50,
         ),
-        PlayerStats(
+        const PlayerStats(
           playerId: 'player2',
           playerName: 'High Winner',
           totalGamesPlayed: 10,
@@ -230,7 +230,7 @@ void main() {
           averagePosition: 1.5,
           totalRoundsPlayed: 50,
         ),
-        PlayerStats(
+        const PlayerStats(
           playerId: 'player3',
           playerName: 'Mid Winner',
           totalGamesPlayed: 10,

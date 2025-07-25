@@ -12,7 +12,7 @@ class WinnerAnnouncement extends StatelessWidget {
       duration: const Duration(milliseconds: 500),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.amber.withOpacity(0.2),
+        color: Colors.amber.withAlpha((0.2 * 255).round()),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.amber, width: 2),
       ),

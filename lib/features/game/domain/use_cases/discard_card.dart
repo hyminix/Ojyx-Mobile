@@ -36,14 +36,14 @@ class DiscardCard implements UseCase<GameState, DiscardCardParams> {
       // Validate it's player's turn
       final currentPlayer = gameState.currentPlayer;
       if (currentPlayer.id != playerId) {
-        return Left(
+        return const Left(
           Failure.gameLogic(message: 'Not your turn', code: 'NOT_YOUR_TURN'),
         );
       }
 
       // Check if has drawn card
       if (gameState.drawnCard == null) {
-        return Left(
+        return const Left(
           Failure.gameLogic(
             message: 'No card to discard',
             code: 'NO_DRAWN_CARD',
@@ -62,8 +62,8 @@ class DiscardCard implements UseCase<GameState, DiscardCardParams> {
       }
 
       final drawnCard = gameState.drawnCard!;
-      var discardPile = List<Card>.from(gameState.discardPile);
-      var updatedPlayers = List<GamePlayer>.from(gameState.players);
+      final discardPile = List<Card>.from(gameState.discardPile);
+      final updatedPlayers = List<GamePlayer>.from(gameState.players);
       Card cardToDiscard = drawnCard;
 
       // If grid position provided, exchange with grid card
@@ -75,7 +75,7 @@ class DiscardCard implements UseCase<GameState, DiscardCardParams> {
             position.row >= kGridRows ||
             position.col < 0 ||
             position.col >= kGridColumns) {
-          return Left(
+          return const Left(
             Failure.gameLogic(
               message: 'Invalid grid position',
               code: 'INVALID_POSITION',
@@ -92,7 +92,7 @@ class DiscardCard implements UseCase<GameState, DiscardCardParams> {
         // Check if position has a card
         final gridCard = player.grid.cards[position.row][position.col];
         if (gridCard == null) {
-          return Left(
+          return const Left(
             Failure.gameLogic(
               message: 'No card at specified position',
               code: 'EMPTY_POSITION',

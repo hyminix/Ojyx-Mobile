@@ -24,12 +24,16 @@ void main() {
       List<String> playerIds = const ['player1', 'player2'],
       String creatorId = 'player1',
     }) {
-      final players = playerIds.map((id) => GamePlayer(
-            id: id,
-            name: 'Player $id',
-            grid: PlayerGrid.empty(),
-            isHost: id == creatorId,
-          )).toList();
+      final players = playerIds
+          .map(
+            (id) => GamePlayer(
+              id: id,
+              name: 'Player $id',
+              grid: PlayerGrid.empty(),
+              isHost: id == creatorId,
+            ),
+          )
+          .toList();
 
       return GameState(
         roomId: roomId,
@@ -50,15 +54,19 @@ void main() {
       List<String> playerIds = const ['player1', 'player2'],
       String creatorId = 'player1',
     }) {
-      when(() => mockRepository.initializeGame(
-            roomId: roomId,
-            playerIds: playerIds,
-            creatorId: creatorId,
-          )).thenAnswer((_) async => createTestGameState(
-            roomId: roomId,
-            playerIds: playerIds,
-            creatorId: creatorId,
-          ));
+      when(
+        () => mockRepository.initializeGame(
+          roomId: roomId,
+          playerIds: playerIds,
+          creatorId: creatorId,
+        ),
+      ).thenAnswer(
+        (_) async => createTestGameState(
+          roomId: roomId,
+          playerIds: playerIds,
+          creatorId: creatorId,
+        ),
+      );
     }
 
     test('should initialize game with correct setup', () async {
@@ -81,19 +89,41 @@ void main() {
       );
 
       // Assert - Test multiple initialization aspects
-      expect(result.players.length, equals(3), reason: 'Should create correct number of players');
-      expect(result.roomId, equals(roomId), reason: 'Should set correct room ID');
-      
-      // Test host assignment
-      expect(result.players[0].isHost, isFalse, reason: 'Player1 should not be host');
-      expect(result.players[1].isHost, isTrue, reason: 'Creator (Player2) should be host');
-      expect(result.players[2].isHost, isFalse, reason: 'Player3 should not be host');
+      expect(
+        result.players.length,
+        equals(3),
+        reason: 'Should create correct number of players',
+      );
+      expect(
+        result.roomId,
+        equals(roomId),
+        reason: 'Should set correct room ID',
+      );
 
-      verify(() => mockRepository.initializeGame(
-            roomId: roomId,
-            playerIds: playerIds,
-            creatorId: creatorId,
-          )).called(1);
+      // Test host assignment
+      expect(
+        result.players[0].isHost,
+        isFalse,
+        reason: 'Player1 should not be host',
+      );
+      expect(
+        result.players[1].isHost,
+        isTrue,
+        reason: 'Creator (Player2) should be host',
+      );
+      expect(
+        result.players[2].isHost,
+        isFalse,
+        reason: 'Player3 should not be host',
+      );
+
+      verify(
+        () => mockRepository.initializeGame(
+          roomId: roomId,
+          playerIds: playerIds,
+          creatorId: creatorId,
+        ),
+      ).called(1);
     });
 
     test('should throw exception when no players provided', () async {
@@ -225,10 +255,12 @@ void main() {
       final testState = createTestGameState();
       final gameStateStream = Stream.value(testState);
 
-      when(() => mockRepository.getGameState(gameStateId))
-          .thenAnswer((_) async => testState);
-      when(() => mockRepository.watchGameState(gameStateId))
-          .thenAnswer((_) => gameStateStream);
+      when(
+        () => mockRepository.getGameState(gameStateId),
+      ).thenAnswer((_) async => testState);
+      when(
+        () => mockRepository.watchGameState(gameStateId),
+      ).thenAnswer((_) => gameStateStream);
 
       // Act & Assert - Get game state
       final result = await useCase.getGameState(gameStateId);

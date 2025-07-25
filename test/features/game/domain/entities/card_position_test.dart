@@ -7,19 +7,21 @@ void main() {
       // Test cases for position comparison behavior
       final testCases = [
         // (position, checkRow, checkCol, shouldMatch, description)
-        (CardPosition(row: 1, col: 2), 1, 2, true, 'same position'),
-        (CardPosition(row: 1, col: 2), 2, 2, false, 'different row'),
-        (CardPosition(row: 1, col: 2), 1, 3, false, 'different col'),
-        (CardPosition(row: 1, col: 2), 3, 4, false, 'both different'),
-        (CardPosition(row: 0, col: 0), 0, 0, true, 'top-left corner'),
-        (CardPosition(row: 2, col: 3), 2, 3, true, 'bottom-right corner'),
+        (const CardPosition(row: 1, col: 2), 1, 2, true, 'same position'),
+        (const CardPosition(row: 1, col: 2), 2, 2, false, 'different row'),
+        (const CardPosition(row: 1, col: 2), 1, 3, false, 'different col'),
+        (const CardPosition(row: 1, col: 2), 3, 4, false, 'both different'),
+        (const CardPosition(row: 0, col: 0), 0, 0, true, 'top-left corner'),
+        (const CardPosition(row: 2, col: 3), 2, 3, true, 'bottom-right corner'),
       ];
 
-      for (final (position, checkRow, checkCol, shouldMatch, description) in testCases) {
+      for (final (position, checkRow, checkCol, shouldMatch, description)
+          in testCases) {
         expect(
           position.equals(checkRow, checkCol),
           shouldMatch,
-          reason: 'Position comparison for $description should ${shouldMatch ? "match" : "not match"}',
+          reason:
+              'Position comparison for $description should ${shouldMatch ? "match" : "not match"}',
         );
       }
     });
@@ -29,14 +31,26 @@ void main() {
       final targetData = position.toTargetData();
 
       // Verify position data can be used for game actions
-      expect(targetData, isA<Map<String, dynamic>>(), 
-             reason: 'Should provide map for action targeting');
-      expect(targetData['row'], 3, 
-             reason: 'Should preserve row for action target');
-      expect(targetData['col'], 4, 
-             reason: 'Should preserve col for action target');
-      expect(targetData.keys.length, 2, 
-             reason: 'Should contain only necessary coordinates');
+      expect(
+        targetData,
+        isA<Map<String, dynamic>>(),
+        reason: 'Should provide map for action targeting',
+      );
+      expect(
+        targetData['row'],
+        3,
+        reason: 'Should preserve row for action target',
+      );
+      expect(
+        targetData['col'],
+        4,
+        reason: 'Should preserve col for action target',
+      );
+      expect(
+        targetData.keys.length,
+        2,
+        reason: 'Should contain only necessary coordinates',
+      );
     });
 
     test('should support position equality for game state comparison', () {
@@ -45,10 +59,16 @@ void main() {
       const position3 = CardPosition(row: 2, col: 1);
 
       // Verify positions can be compared for game logic
-      expect(position1, equals(position2), 
-             reason: 'Same coordinates should be equal for game state');
-      expect(position1, isNot(equals(position3)), 
-             reason: 'Different coordinates should not be equal');
+      expect(
+        position1,
+        equals(position2),
+        reason: 'Same coordinates should be equal for game state',
+      );
+      expect(
+        position1,
+        isNot(equals(position3)),
+        reason: 'Different coordinates should not be equal',
+      );
     });
 
     test('should allow position modification for game moves', () {
@@ -58,8 +78,11 @@ void main() {
       // Verify position can be modified for move actions
       expect(moved.row, 3, reason: 'Should update row for movement');
       expect(moved.col, 2, reason: 'Should preserve col when not changed');
-      expect(moved, isNot(equals(original)), 
-             reason: 'Modified position should be different for game state');
+      expect(
+        moved,
+        isNot(equals(original)),
+        reason: 'Modified position should be different for game state',
+      );
     });
   });
 }

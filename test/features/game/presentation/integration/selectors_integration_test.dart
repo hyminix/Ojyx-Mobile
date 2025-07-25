@@ -6,248 +6,348 @@ import 'package:ojyx/features/game/domain/entities/card_position.dart';
 
 void main() {
   group('Card Selection User Behavior Tests', () {
-    testWidgets('should enable strategic teleport card swapping through dual selection workflow', (
-      tester,
-    ) async {
-      // Test behavior: players can select two cards strategically to swap positions
-      Map<String, dynamic>? teleportResult;
+    testWidgets(
+      'should enable strategic teleport card swapping through dual selection workflow',
+      (tester) async {
+        // Test behavior: players can select two cards strategically to swap positions
+        Map<String, dynamic>? teleportResult;
 
-      await tester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(
-              body: Consumer(
-                builder: (context, ref, _) {
-                  final state = ref.watch(cardSelectionProvider);
+        await tester.pumpWidget(
+          ProviderScope(
+            child: MaterialApp(
+              home: Scaffold(
+                body: Consumer(
+                  builder: (context, ref, _) {
+                    final state = ref.watch(cardSelectionProvider);
 
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Strategic Action: ${state.isSelecting ? "Active" : "Inactive"}'),
-                      Text('Selection Type: ${state.selectionType?.toString() ?? "none"}'),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).startTeleportSelection();
-                        },
-                        child: const Text('Initiate Teleport Strategy'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectCard(0, 0);
-                        },
-                        child: const Text('Choose Strategic Card 1'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectCard(2, 3);
-                        },
-                        child: const Text('Choose Strategic Card 2'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          teleportResult = ref.read(cardSelectionProvider.notifier).completeSelection();
-                        },
-                        child: const Text('Execute Teleport'),
-                      ),
-                    ],
-                  );
-                },
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Strategic Action: ${state.isSelecting ? "Active" : "Inactive"}',
+                        ),
+                        Text(
+                          'Selection Type: ${state.selectionType?.toString() ?? "none"}',
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(cardSelectionProvider.notifier)
+                                .startTeleportSelection();
+                          },
+                          child: const Text('Initiate Teleport Strategy'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(cardSelectionProvider.notifier)
+                                .selectCard(0, 0);
+                          },
+                          child: const Text('Choose Strategic Card 1'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(cardSelectionProvider.notifier)
+                                .selectCard(2, 3);
+                          },
+                          child: const Text('Choose Strategic Card 2'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            teleportResult = ref
+                                .read(cardSelectionProvider.notifier)
+                                .completeSelection();
+                          },
+                          child: const Text('Execute Teleport'),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Player initiates strategic action
-      await tester.tap(find.text('Initiate Teleport Strategy'));
-      await tester.pumpAndSettle();
-      
-      expect(find.text('Strategic Action: Active'), findsOneWidget);
-      expect(find.text('Selection Type: CardSelectionType.teleport'), findsOneWidget);
+        // Player initiates strategic action
+        await tester.tap(find.text('Initiate Teleport Strategy'));
+        await tester.pumpAndSettle();
 
-      // Player selects first strategic position
-      await tester.tap(find.text('Choose Strategic Card 1'));
-      await tester.pumpAndSettle();
+        expect(find.text('Strategic Action: Active'), findsOneWidget);
+        expect(
+          find.text('Selection Type: CardSelectionType.teleport'),
+          findsOneWidget,
+        );
 
-      // Player selects second strategic position  
-      await tester.tap(find.text('Choose Strategic Card 2'));
-      await tester.pumpAndSettle();
+        // Player selects first strategic position
+        await tester.tap(find.text('Choose Strategic Card 1'));
+        await tester.pumpAndSettle();
 
-      // Player executes the strategic swap
-      await tester.tap(find.text('Execute Teleport'));
-      await tester.pumpAndSettle();
+        // Player selects second strategic position
+        await tester.tap(find.text('Choose Strategic Card 2'));
+        await tester.pumpAndSettle();
 
-      // Verify strategic action was completed successfully
-      expect(teleportResult, isNotNull, reason: 'Teleport action should produce strategic result data');
-      expect(teleportResult!['position1'], isNotNull, reason: 'First strategic position should be captured');
-      expect(teleportResult!['position2'], isNotNull, reason: 'Second strategic position should be captured');
-      expect(find.text('Strategic Action: Inactive'), findsOneWidget, reason: 'Strategic mode should end after execution');
-    });
+        // Player executes the strategic swap
+        await tester.tap(find.text('Execute Teleport'));
+        await tester.pumpAndSettle();
 
-    testWidgets('should enable tactical card peeking with capacity management for strategic planning', (
-      tester,
-    ) async {
-      // Test behavior: players can peek at multiple cards within capacity limits for strategic advantage
-      List<CardPosition> revealedCards = [];
-      Map<String, dynamic>? peekResult;
+        // Verify strategic action was completed successfully
+        expect(
+          teleportResult,
+          isNotNull,
+          reason: 'Teleport action should produce strategic result data',
+        );
+        expect(
+          teleportResult!['position1'],
+          isNotNull,
+          reason: 'First strategic position should be captured',
+        );
+        expect(
+          teleportResult!['position2'],
+          isNotNull,
+          reason: 'Second strategic position should be captured',
+        );
+        expect(
+          find.text('Strategic Action: Inactive'),
+          findsOneWidget,
+          reason: 'Strategic mode should end after execution',
+        );
+      },
+    );
 
-      await tester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(
-              body: Consumer(
-                builder: (context, ref, _) {
-                  final state = ref.watch(cardSelectionProvider);
-                  revealedCards = state.selections;
+    testWidgets(
+      'should enable tactical card peeking with capacity management for strategic planning',
+      (tester) async {
+        // Test behavior: players can peek at multiple cards within capacity limits for strategic advantage
+        List<CardPosition> revealedCards = [];
+        Map<String, dynamic>? peekResult;
 
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Information Gathered: ${state.selections.length} cards'),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).startPeekSelection(maxCards: 3);
-                        },
-                        child: const Text('Begin Intelligence Gathering'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectCard(0, 0);
-                        },
-                        child: const Text('Scout Card A'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectCard(1, 1);
-                        },
-                        child: const Text('Scout Card B'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectCard(2, 2);
-                        },
-                        child: const Text('Scout Card C'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectCard(0, 1);
-                        },
-                        child: const Text('Scout Additional Card'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          peekResult = ref.read(cardSelectionProvider.notifier).completeSelection();
-                        },
-                        child: const Text('Finalize Intelligence'),
-                      ),
-                    ],
-                  );
-                },
+        await tester.pumpWidget(
+          ProviderScope(
+            child: MaterialApp(
+              home: Scaffold(
+                body: Consumer(
+                  builder: (context, ref, _) {
+                    final state = ref.watch(cardSelectionProvider);
+                    revealedCards = state.selections;
+
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Information Gathered: ${state.selections.length} cards',
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(cardSelectionProvider.notifier)
+                                .startPeekSelection(maxCards: 3);
+                          },
+                          child: const Text('Begin Intelligence Gathering'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(cardSelectionProvider.notifier)
+                                .selectCard(0, 0);
+                          },
+                          child: const Text('Scout Card A'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(cardSelectionProvider.notifier)
+                                .selectCard(1, 1);
+                          },
+                          child: const Text('Scout Card B'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(cardSelectionProvider.notifier)
+                                .selectCard(2, 2);
+                          },
+                          child: const Text('Scout Card C'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(cardSelectionProvider.notifier)
+                                .selectCard(0, 1);
+                          },
+                          child: const Text('Scout Additional Card'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            peekResult = ref
+                                .read(cardSelectionProvider.notifier)
+                                .completeSelection();
+                          },
+                          child: const Text('Finalize Intelligence'),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Player begins strategic intelligence gathering
-      await tester.tap(find.text('Begin Intelligence Gathering'));
-      await tester.pumpAndSettle();
+        // Player begins strategic intelligence gathering
+        await tester.tap(find.text('Begin Intelligence Gathering'));
+        await tester.pumpAndSettle();
 
-      // Player gathers information within capacity
-      await tester.tap(find.text('Scout Card A'));
-      await tester.pumpAndSettle();
-      expect(revealedCards.length, 1, reason: 'First card should be scouted for strategic planning');
+        // Player gathers information within capacity
+        await tester.tap(find.text('Scout Card A'));
+        await tester.pumpAndSettle();
+        expect(
+          revealedCards.length,
+          1,
+          reason: 'First card should be scouted for strategic planning',
+        );
 
-      await tester.tap(find.text('Scout Card B'));
-      await tester.pumpAndSettle();
-      expect(revealedCards.length, 2, reason: 'Second card should expand strategic knowledge');
+        await tester.tap(find.text('Scout Card B'));
+        await tester.pumpAndSettle();
+        expect(
+          revealedCards.length,
+          2,
+          reason: 'Second card should expand strategic knowledge',
+        );
 
-      await tester.tap(find.text('Scout Card C'));
-      await tester.pumpAndSettle();
-      expect(revealedCards.length, 3, reason: 'Third card should reach capacity limit');
+        await tester.tap(find.text('Scout Card C'));
+        await tester.pumpAndSettle();
+        expect(
+          revealedCards.length,
+          3,
+          reason: 'Third card should reach capacity limit',
+        );
 
-      // Player attempts to exceed capacity - should manage intelligently
-      await tester.tap(find.text('Scout Additional Card'));
-      await tester.pumpAndSettle();
-      expect(revealedCards.length, 3, reason: 'System should enforce strategic capacity limits');
+        // Player attempts to exceed capacity - should manage intelligently
+        await tester.tap(find.text('Scout Additional Card'));
+        await tester.pumpAndSettle();
+        expect(
+          revealedCards.length,
+          3,
+          reason: 'System should enforce strategic capacity limits',
+        );
 
-      // Player finalizes their intelligence operation
-      await tester.tap(find.text('Finalize Intelligence'));
-      await tester.pumpAndSettle();
-      
-      expect(peekResult, isNotNull, reason: 'Intelligence operation should produce actionable data');
-      expect(peekResult!['positions'], isNotNull, reason: 'Strategic positions should be recorded');
-    });
+        // Player finalizes their intelligence operation
+        await tester.tap(find.text('Finalize Intelligence'));
+        await tester.pumpAndSettle();
 
-    testWidgets('should enable competitive opponent targeting for multiplayer actions', (
-      tester,
-    ) async {
-      // Test behavior: players can target specific opponents for competitive interactions
-      String? targetedOpponent;
-      bool actionReady = false;
+        expect(
+          peekResult,
+          isNotNull,
+          reason: 'Intelligence operation should produce actionable data',
+        );
+        expect(
+          peekResult!['positions'],
+          isNotNull,
+          reason: 'Strategic positions should be recorded',
+        );
+      },
+    );
 
-      await tester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(
-              body: Consumer(
-                builder: (context, ref, _) {
-                  final state = ref.watch(cardSelectionProvider);
-                  targetedOpponent = state.selectedOpponentId;
-                  actionReady = state.isSelectionComplete;
+    testWidgets(
+      'should enable competitive opponent targeting for multiplayer actions',
+      (tester) async {
+        // Test behavior: players can target specific opponents for competitive interactions
+        String? targetedOpponent;
+        bool actionReady = false;
 
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Target: ${state.selectedOpponentId ?? "No Target"}'),
-                      Text('Ready to Act: $actionReady'),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).startOpponentSelection();
-                        },
-                        child: const Text('Choose Opponent Target'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).selectOpponent('player-2');
-                        },
-                        child: const Text('Target Player Alpha'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(cardSelectionProvider.notifier).cancelSelection();
-                        },
-                        child: const Text('Abort Targeting'),
-                      ),
-                    ],
-                  );
-                },
+        await tester.pumpWidget(
+          ProviderScope(
+            child: MaterialApp(
+              home: Scaffold(
+                body: Consumer(
+                  builder: (context, ref, _) {
+                    final state = ref.watch(cardSelectionProvider);
+                    targetedOpponent = state.selectedOpponentId;
+                    actionReady = state.isSelectionComplete;
+
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Target: ${state.selectedOpponentId ?? "No Target"}',
+                        ),
+                        Text('Ready to Act: $actionReady'),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(cardSelectionProvider.notifier)
+                                .startOpponentSelection();
+                          },
+                          child: const Text('Choose Opponent Target'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(cardSelectionProvider.notifier)
+                                .selectOpponent('player-2');
+                          },
+                          child: const Text('Target Player Alpha'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref
+                                .read(cardSelectionProvider.notifier)
+                                .cancelSelection();
+                          },
+                          child: const Text('Abort Targeting'),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Player initiates opponent targeting
-      await tester.tap(find.text('Choose Opponent Target'));
-      await tester.pumpAndSettle();
+        // Player initiates opponent targeting
+        await tester.tap(find.text('Choose Opponent Target'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Target: No Target'), findsOneWidget, reason: 'Initial state should show no target selected');
-      expect(find.text('Ready to Act: false'), findsOneWidget, reason: 'Action should not be ready without target');
+        expect(
+          find.text('Target: No Target'),
+          findsOneWidget,
+          reason: 'Initial state should show no target selected',
+        );
+        expect(
+          find.text('Ready to Act: false'),
+          findsOneWidget,
+          reason: 'Action should not be ready without target',
+        );
 
-      // Player selects strategic target
-      await tester.tap(find.text('Target Player Alpha'));
-      await tester.pumpAndSettle();
+        // Player selects strategic target
+        await tester.tap(find.text('Target Player Alpha'));
+        await tester.pumpAndSettle();
 
-      expect(targetedOpponent, equals('player-2'), reason: 'Strategic target should be locked in');
-      expect(actionReady, isTrue, reason: 'Action should be ready with valid target');
+        expect(
+          targetedOpponent,
+          equals('player-2'),
+          reason: 'Strategic target should be locked in',
+        );
+        expect(
+          actionReady,
+          isTrue,
+          reason: 'Action should be ready with valid target',
+        );
 
-      // Player changes their mind and aborts
-      await tester.tap(find.text('Abort Targeting'));
-      await tester.pumpAndSettle();
+        // Player changes their mind and aborts
+        await tester.tap(find.text('Abort Targeting'));
+        await tester.pumpAndSettle();
 
-      expect(targetedOpponent, isNull, reason: 'Target should be cleared when action is aborted');
-    });
+        expect(
+          targetedOpponent,
+          isNull,
+          reason: 'Target should be cleared when action is aborted',
+        );
+      },
+    );
 
     testWidgets('CardSelectionProvider integration - Steal two-phase', (
       tester,

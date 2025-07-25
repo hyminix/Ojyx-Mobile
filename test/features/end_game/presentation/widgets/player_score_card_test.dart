@@ -259,7 +259,7 @@ void main() {
 
         expect(rankBadge, isNotNull);
         final decoration = rankBadge!.decoration as BoxDecoration;
-        expect(decoration.color, Colors.amber.withOpacity(0.2));
+        expect(decoration.color, Colors.amber.withAlpha((0.2 * 255).round()));
         expect(decoration.border?.top.color, Colors.amber);
       });
 
@@ -298,7 +298,7 @@ void main() {
 
         expect(rankBadge, isNotNull);
         final decoration = rankBadge!.decoration as BoxDecoration;
-        expect(decoration.color, Colors.grey[400]!.withOpacity(0.2));
+        expect(decoration.color, Colors.grey[400]!.withAlpha((0.2 * 255).round()));
         expect(decoration.border?.top.color, Colors.grey[400]);
       });
 
@@ -337,7 +337,7 @@ void main() {
 
         expect(rankBadge, isNotNull);
         final decoration = rankBadge!.decoration as BoxDecoration;
-        expect(decoration.color, Colors.brown[400]!.withOpacity(0.2));
+        expect(decoration.color, Colors.brown[400]!.withAlpha((0.2 * 255).round()));
         expect(decoration.border?.top.color, Colors.brown[400]);
       });
     });

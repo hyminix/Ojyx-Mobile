@@ -1,7 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/room_model.dart';
-import '../../domain/entities/room_event.dart';
-import '../../../game/data/models/game_state_model.dart';
 
 class SupabaseRoomDatasource {
   final SupabaseClient _supabase;

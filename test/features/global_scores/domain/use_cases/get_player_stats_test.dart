@@ -3,7 +3,6 @@ import 'package:ojyx/features/global_scores/domain/entities/global_score.dart';
 import 'package:ojyx/features/global_scores/domain/repositories/global_score_repository.dart';
 import 'package:ojyx/features/global_scores/domain/use_cases/get_player_stats.dart';
 import 'package:ojyx/core/errors/failures.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockGlobalScoreRepository extends Mock implements GlobalScoreRepository {}
@@ -18,7 +17,7 @@ void main() {
       useCase = GetPlayerStatsUseCase(mockRepository);
     });
 
-    final testStats = PlayerStats(
+    final testStats = const PlayerStats(
       playerId: 'player1',
       playerName: 'Alice',
       totalGamesPlayed: 25,
@@ -84,7 +83,7 @@ void main() {
     });
 
     test('should calculate correct win rate', () async {
-      final statsWithDifferentWinRate = PlayerStats(
+      final statsWithDifferentWinRate = const PlayerStats(
         playerId: 'player2',
         playerName: 'Bob',
         totalGamesPlayed: 50,

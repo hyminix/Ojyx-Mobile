@@ -135,12 +135,12 @@ void main() {
       result.fold((failure) {
         failure.when(
           gameLogic: (message, code) => expect(code, 'NO_DRAWN_CARD'),
-          server: (_, __, ___) => fail('Wrong failure type'),
-          network: (_, __, ___) => fail('Wrong failure type'),
-          validation: (_, __) => fail('Wrong failure type'),
-          authentication: (_, __) => fail('Wrong failure type'),
-          timeout: (_, __) => fail('Wrong failure type'),
-          unknown: (_, __, ___) => fail('Wrong failure type'),
+          server: (_, _, __) => fail('Wrong failure type'),
+          network: (_, _, __) => fail('Wrong failure type'),
+          validation: (_, _) => fail('Wrong failure type'),
+          authentication: (_, _) => fail('Wrong failure type'),
+          timeout: (_, _) => fail('Wrong failure type'),
+          unknown: (_, _, __) => fail('Wrong failure type'),
         );
       }, (_) => fail('Should have failed'));
     });
@@ -179,12 +179,12 @@ void main() {
       result.fold((failure) {
         failure.when(
           gameLogic: (message, code) => expect(code, 'NOT_YOUR_TURN'),
-          server: (_, __, ___) => fail('Wrong failure type'),
-          network: (_, __, ___) => fail('Wrong failure type'),
-          validation: (_, __) => fail('Wrong failure type'),
-          authentication: (_, __) => fail('Wrong failure type'),
-          timeout: (_, __) => fail('Wrong failure type'),
-          unknown: (_, __, ___) => fail('Wrong failure type'),
+          server: (_, _, __) => fail('Wrong failure type'),
+          network: (_, _, __) => fail('Wrong failure type'),
+          validation: (_, _) => fail('Wrong failure type'),
+          authentication: (_, _) => fail('Wrong failure type'),
+          timeout: (_, _) => fail('Wrong failure type'),
+          unknown: (_, _, __) => fail('Wrong failure type'),
         );
       }, (_) => fail('Should have failed'));
     });
@@ -219,12 +219,12 @@ void main() {
       result.fold((failure) {
         failure.when(
           gameLogic: (message, code) => expect(code, 'EMPTY_POSITION'),
-          server: (_, __, ___) => fail('Wrong failure type'),
-          network: (_, __, ___) => fail('Wrong failure type'),
-          validation: (_, __) => fail('Wrong failure type'),
-          authentication: (_, __) => fail('Wrong failure type'),
-          timeout: (_, __) => fail('Wrong failure type'),
-          unknown: (_, __, ___) => fail('Wrong failure type'),
+          server: (_, _, __) => fail('Wrong failure type'),
+          network: (_, _, __) => fail('Wrong failure type'),
+          validation: (_, _) => fail('Wrong failure type'),
+          authentication: (_, _) => fail('Wrong failure type'),
+          timeout: (_, _) => fail('Wrong failure type'),
+          unknown: (_, _, __) => fail('Wrong failure type'),
         );
       }, (_) => fail('Should have failed'));
     });
@@ -259,12 +259,12 @@ void main() {
       result.fold((failure) {
         failure.when(
           gameLogic: (message, code) => expect(code, 'INVALID_POSITION'),
-          server: (_, __, ___) => fail('Wrong failure type'),
-          network: (_, __, ___) => fail('Wrong failure type'),
-          validation: (_, __) => fail('Wrong failure type'),
-          authentication: (_, __) => fail('Wrong failure type'),
-          timeout: (_, __) => fail('Wrong failure type'),
-          unknown: (_, __, ___) => fail('Wrong failure type'),
+          server: (_, _, __) => fail('Wrong failure type'),
+          network: (_, _, __) => fail('Wrong failure type'),
+          validation: (_, _) => fail('Wrong failure type'),
+          authentication: (_, _) => fail('Wrong failure type'),
+          timeout: (_, _) => fail('Wrong failure type'),
+          unknown: (_, _, __) => fail('Wrong failure type'),
         );
       }, (_) => fail('Should have failed'));
     });

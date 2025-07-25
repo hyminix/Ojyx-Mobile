@@ -27,23 +27,31 @@ void main() {
 
   group('SupabaseActionCardRepository', () {
     const testCard = ActionCard(
-      id: 'test-card', type: ActionCardType.teleport, name: 'Test Card', description: 'Test',
-      timing: ActionTiming.optional, target: ActionTarget.self,
+      id: 'test-card',
+      type: ActionCardType.teleport,
+      name: 'Test Card',
+      description: 'Test',
+      timing: ActionTiming.optional,
+      target: ActionTarget.self,
     );
 
     test('should return action cards from datasource', () async {
       // Test getAvailableActionCards
       final availableCards = [testCard];
-      when(() => mockDataSource.getAvailableActionCards()).thenAnswer((_) async => availableCards);
-      
+      when(
+        () => mockDataSource.getAvailableActionCards(),
+      ).thenAnswer((_) async => availableCards);
+
       final availableResult = await repository.getAvailableActionCards();
       expect(availableResult, hasLength(1));
       expect(availableResult.first.id, equals('test-card'));
 
       // Test getPlayerActionCards
       final playerCards = [testCard];
-      when(() => mockDataSource.getPlayerActionCards(testPlayerId)).thenAnswer((_) async => playerCards);
-      
+      when(
+        () => mockDataSource.getPlayerActionCards(testPlayerId),
+      ).thenAnswer((_) async => playerCards);
+
       final playerResult = await repository.getPlayerActionCards(testPlayerId);
       expect(playerResult, hasLength(1));
       expect(playerResult.first.type, equals(ActionCardType.teleport));
@@ -51,8 +59,12 @@ void main() {
 
     test('should manage player card operations successfully', () async {
       // Setup mock responses
-      when(() => mockDataSource.addActionCardToPlayer(testPlayerId, testCard)).thenAnswer((_) async {});
-      when(() => mockDataSource.removeActionCardFromPlayer(testPlayerId, testCard)).thenAnswer((_) async {});
+      when(
+        () => mockDataSource.addActionCardToPlayer(testPlayerId, testCard),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockDataSource.removeActionCardFromPlayer(testPlayerId, testCard),
+      ).thenAnswer((_) async {});
 
       // Test adding card completes successfully
       await expectLater(
@@ -60,7 +72,7 @@ void main() {
         completes,
       );
 
-      // Test removing card completes successfully  
+      // Test removing card completes successfully
       await expectLater(
         repository.removeActionCardFromPlayer(testPlayerId, testCard),
         completes,
@@ -69,7 +81,9 @@ void main() {
 
     test('should handle deck operations correctly', () async {
       // Test drawActionCard - success case
-      when(() => mockDataSource.drawActionCard()).thenAnswer((_) async => testCard);
+      when(
+        () => mockDataSource.drawActionCard(),
+      ).thenAnswer((_) async => testCard);
       final drawnCard = await repository.drawActionCard();
       expect(drawnCard, isNotNull);
       expect(drawnCard!.id, equals('test-card'));
@@ -80,7 +94,9 @@ void main() {
       expect(emptyResult, isNull);
 
       // Test discard, shuffle, and initialize operations complete successfully
-      when(() => mockDataSource.discardActionCard(testCard)).thenAnswer((_) async {});
+      when(
+        () => mockDataSource.discardActionCard(testCard),
+      ).thenAnswer((_) async {});
       when(() => mockDataSource.shuffleActionCards()).thenAnswer((_) async {});
       when(() => mockDataSource.initializeDeck()).thenAnswer((_) async {});
 

@@ -4,7 +4,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ojyx/core/providers/supabase_provider.dart';
 import 'package:ojyx/core/config/router_config.dart';
-import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
