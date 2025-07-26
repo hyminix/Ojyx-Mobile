@@ -1,0 +1,15 @@
+# Example local.properties file
+# Copy this file to local.properties and update with your system paths
+
+# For Windows (Android Studio):
+# sdk.dir=C:\\Users\\[YOUR_USERNAME]\\AppData\\Local\\Android\\sdk
+# flutter.sdk=D:\\dev\\flutter\\flutter
+
+# For WSL2:
+# sdk.dir=/home/[YOUR_USERNAME]/Android/Sdk
+# flutter.sdk=/home/[YOUR_USERNAME]/flutter
+
+# These properties are automatically set by Flutter
+flutter.buildMode=debug
+flutter.versionName=1.0.0
+flutter.versionCode=1

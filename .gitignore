@@ -51,6 +51,11 @@ app.*.map.json
 .env
 .env.local
 
+# Platform-specific files
+android/local.properties
+.flutter_env_states/
+android/*.hprof
+
 # Logs
 logs
 npm-debug.log*
