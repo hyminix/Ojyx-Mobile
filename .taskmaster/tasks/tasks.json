@@ -3,212 +3,209 @@
     "tasks": [
       {
         "id": 1,
-        "title": "Audit et Analyse des Dépendances",
-        "description": "Analyser toutes les dépendances actuelles du projet, identifier les versions obsolètes et planifier la stratégie de mise à jour en respectant les contraintes de compatibilité",
-        "details": "1. Exécuter `flutter pub outdated` pour obtenir la liste complète des dépendances obsolètes\n2. Créer un tableau de mapping avec les versions actuelles vs cibles\n3. Analyser les breaking changes pour chaque dépendance majeure:\n   - Flutter SDK: vérifier la migration vers Flutter 3.24+\n   - Riverpod: étudier la migration de 2.x vers 3.x (si applicable)\n   - go_router: vérifier les changements de API depuis la version actuelle\n   - freezed: s'assurer de la compatibilité avec build_runner 2.4+\n   - supabase_flutter: vérifier la compatibilité avec les autres dépendances\n4. Créer un document de stratégie de migration groupant les dépendances par ordre de criticité\n5. Identifier les dépendances transitives pouvant causer des conflits\n6. Planifier l'ordre de mise à jour optimal pour minimiser les risques",
-        "testStrategy": "1. Créer des tests de régression pour chaque fonctionnalité critique avant la mise à jour\n2. Écrire des tests d'intégration vérifiant le comportement des dépendances clés (Riverpod providers, go_router navigation, Supabase queries)\n3. Mettre en place des tests de smoke pour valider que l'application démarre correctement après chaque mise à jour\n4. Créer des tests unitaires pour les adapters/wrappers autour des dépendances externes\n5. Utiliser le coverage report pour s'assurer d'une couverture minimale de 80% sur les zones impactées",
+        "title": "Refactoring des entités Player dans le domaine",
+        "description": "Unifier et séparer les entités Player dupliquées en GamePlayer et LobbyPlayer distincts, en supprimant toute logique de sérialisation des entités du domaine",
+        "details": "1. Créer deux entités distinctes dans domain/entities: GamePlayer (pour le jeu actif avec grille, score, position) et LobbyPlayer (pour la salle d'attente avec statut ready, nom). 2. Utiliser Freezed pour l'immutabilité SANS json_serializable dans le domaine. 3. Supprimer toute référence à fromJson/toJson dans les entités. 4. Implémenter les mappers GamePlayerModel ↔ GamePlayer et LobbyPlayerModel ↔ LobbyPlayer dans la couche data. 5. Mettre à jour tous les use cases et repositories pour utiliser les bonnes entités. Code exemple: @freezed class GamePlayer with _$GamePlayer { const factory GamePlayer({required String id, required String name, required PlayerGrid grid, required int score, required PlayerPosition position}) = _GamePlayer; }",
+        "testStrategy": "Tests unitaires pour valider l'immutabilité des entités, tests des mappers pour vérifier la conversion bidirectionnelle, tests d'intégration pour valider que les use cases fonctionnent avec les nouvelles entités. Vérifier qu'aucune méthode de sérialisation n'existe dans le domaine.",
         "priority": "high",
         "dependencies": [],
-        "status": "done",
+        "status": "pending",
         "subtasks": [
           {
             "id": 1,
-            "title": "Analyser les dépendances actuelles et créer un rapport d'obsolescence",
-            "description": "Exécuter flutter pub outdated et analyser systématiquement toutes les dépendances pour identifier les versions obsolètes, créer un tableau comparatif et prioriser les mises à jour",
+            "title": "Créer l'entité GamePlayer dans le domaine",
+            "description": "Implémenter l'entité GamePlayer avec Freezed dans domain/entities sans aucune logique de sérialisation",
             "dependencies": [],
-            "details": "1. Exécuter `flutter pub outdated --json` pour obtenir les données structurées\n2. Parser la sortie JSON et créer un tableau avec colonnes: Package, Version actuelle, Version résolvable, Version latest, Type (direct/transitive)\n3. Classifier les dépendances par catégorie: Core Flutter, État/Navigation, Backend/Services, Utilitaires, Dev dependencies\n4. Identifier les dépendances critiques nécessitant une attention particulière (Riverpod, go_router, Supabase)\n5. Calculer l'écart de version pour chaque package (patch/minor/major)\n6. Générer un rapport markdown structuré dans .taskmaster/reports/dependency-audit.md\n<info added on 2025-07-25T15:09:50.900Z>\n**Résultats de l'analyse effectuée:**\n\nLe rapport d'obsolescence a été créé avec succès dans `.taskmaster/reports/dependency-audit.md`. L'analyse révèle 28 packages obsolètes au total, dont 3 dépendances directes critiques nécessitant des mises à jour majeures : freezed_annotation (passage de 2.x à 3.x), go_router (14.x à 16.x) et sentry_flutter. 5 dépendances de développement sont également obsolètes. Une contrainte importante identifiée : le pubspec.yaml spécifie Dart SDK ^3.8.1 alors que Flutter 3.32.6 utilise Dart 3.32.0, créant une incompatibilité. Les breaking changes majeurs dans freezed et go_router nécessitent une attention particulière et une migration par phases. Le risque global est évalué comme élevé, confirmant la nécessité d'une approche prudente et méthodique pour les mises à jour.\n</info added on 2025-07-25T15:09:50.900Z>",
-            "status": "done",
-            "testStrategy": "1. Créer un script de test vérifiant que toutes les dépendances du pubspec.yaml sont analysées\n2. Valider le format du rapport généré avec des tests unitaires\n3. Vérifier que les classifications de dépendances sont correctes"
+            "details": "Créer lib/features/game/domain/entities/game_player.dart avec @freezed class GamePlayer contenant: id (String), name (String), grid (PlayerGrid), score (int), position (PlayerPosition), isReady (bool), hasKnocked (bool). Utiliser uniquement Freezed pour l'immutabilité, sans json_serializable. Implémenter les méthodes copyWith générées par Freezed. S'assurer que PlayerGrid et PlayerPosition sont des entités pures du domaine.",
+            "status": "pending",
+            "testStrategy": "Tests unitaires pour valider l'immutabilité de GamePlayer, tests de création avec différentes valeurs, tests copyWith pour vérifier les modifications, vérifier l'absence de méthodes fromJson/toJson"
           },
           {
             "id": 2,
-            "title": "Analyser les breaking changes et créer une matrice de compatibilité",
-            "description": "Étudier en profondeur les changelogs et migration guides de chaque dépendance majeure pour identifier les breaking changes et créer une matrice de compatibilité inter-dépendances",
-            "dependencies": [
-              "1.1"
-            ],
-            "details": "1. Pour chaque dépendance majeure, consulter:\n   - Changelog officiel sur pub.dev\n   - Migration guides sur GitHub\n   - Issues connues et solutions\n2. Créer une matrice de compatibilité:\n   - Riverpod 2.x → 3.x: impact sur StateNotifier, syntaxe des providers\n   - go_router: changements d'API, nouvelles fonctionnalités\n   - freezed/json_serializable: compatibilité avec build_runner\n   - supabase_flutter: changements Realtime, Auth API\n3. Identifier les incompatibilités potentielles entre packages\n4. Documenter les modifications de code requises pour chaque breaking change\n5. Créer un fichier .taskmaster/docs/breaking-changes-analysis.md\n<info added on 2025-07-25T15:16:25.803Z>\nAnalyse des breaking changes complétée. Deux documents créés :\n1. breaking-changes-analysis.md : Analyse détaillée des changements majeurs pour freezed (syntaxe abstract/sealed, suppression when/map), go_router (URLs case-sensitive), flutter_lints (nouvelles règles), et sentry_flutter (API mutable, config Android)\n2. compatibility-matrix.md : Matrice complète de compatibilité inter-dépendances\n\nRésultats clés :\n- Conflit identifié : freezed 3.x requiert analyzer ^8.0.0 mais build_runner 2.6.0 utilise ^7.6.0 (solution : dependency_overrides)\n- SDK minimum global : Dart 3.8.0 et Flutter 3.32.0 (imposés par flutter_lints 6.0.0)\n- Temps estimé total : 20-36 heures de travail\n- Ordre optimal : SDK/Linting → Build Tools → Freezed → Navigation → Services\n</info added on 2025-07-25T15:16:25.803Z>",
-            "status": "done",
-            "testStrategy": "1. Vérifier que chaque dépendance majeure a une section dans l'analyse\n2. Valider que les incompatibilités identifiées sont testables\n3. S'assurer que chaque breaking change a une stratégie de migration associée"
+            "title": "Créer l'entité LobbyPlayer dans le domaine",
+            "description": "Implémenter l'entité LobbyPlayer avec Freezed dans domain/entities pour la gestion des joueurs en salle d'attente",
+            "dependencies": [],
+            "details": "Créer lib/features/multiplayer/domain/entities/lobby_player.dart avec @freezed class LobbyPlayer contenant: id (String), name (String), isReady (bool), isHost (bool), avatarUrl (String?). Utiliser Freezed sans json_serializable. Ajouter des factory constructors pour les cas d'usage courants (guest, host). Implémenter une méthode toGamePlayer() pour la conversion lors du démarrage de partie.",
+            "status": "pending",
+            "testStrategy": "Tests unitaires de création et modification de LobbyPlayer, tests des factory constructors, tests de la méthode toGamePlayer avec valeurs par défaut pour grid et score"
           },
           {
             "id": 3,
-            "title": "Créer une stratégie de migration par ordre de priorité",
-            "description": "Développer un plan de migration détaillé organisant les dépendances par ordre optimal de mise à jour pour minimiser les risques et les conflits",
+            "title": "Implémenter les modèles et mappers GamePlayer",
+            "description": "Créer GamePlayerModel dans la couche data avec json_serializable et implémenter les mappers bidirectionnels",
             "dependencies": [
-              "1.1",
-              "1.2"
+              "1.1"
             ],
-            "details": "1. Définir les critères de priorisation:\n   - Criticité pour l'application (Core > Features > Dev)\n   - Nombre de dépendances transitives impactées\n   - Complexité des breaking changes\n   - Risque de régression\n2. Créer les groupes de migration:\n   - Phase 1: Flutter SDK, Dart SDK, linters\n   - Phase 2: build_runner, freezed, json_serializable\n   - Phase 3: Riverpod et packages associés\n   - Phase 4: go_router et navigation\n   - Phase 5: Supabase, Sentry, utilitaires\n3. Pour chaque phase, définir:\n   - Ordre exact des packages\n   - Tests de validation requis\n   - Points de rollback\n4. Documenter dans .taskmaster/docs/migration-strategy.md\n<info added on 2025-07-25T16:50:23.630Z>\nStratégie complétée avec succès ! Documents créés dans .taskmaster/docs/ :\n\n**migration-strategy.md** - Plan détaillé en 6 phases (0-6) avec approche TDD stricte\n- Phase 0 : Préparation et sauvegarde complète (1-2h)\n- Phase 1 : SDK Flutter/Dart et environnement (2-3h)\n- Phase 2 : Linting et analyse statique (3-4h)\n- Phase 3 : Build tools (build_runner, json_serializable) (2-3h)\n- Phase 4 : Freezed - PHASE CRITIQUE avec régénération complète (8-12h)\n- Phase 5 : Navigation go_router avec tests exhaustifs (4-6h)\n- Phase 6 : Services externes Sentry/Supabase (4-6h)\n\n**rollback-plan.md** - Procédures de rollback granulaires pour chaque phase\n- Scripts de rollback automatisés (5-60 min selon la phase)\n- Points de sauvegarde git avec tags versionnés\n- Procédures de validation post-rollback\n- Gestion des états partiels et recovery\n\nDurée totale estimée : 30-40 heures réparties sur 5-6 jours\nChaque phase inclut : critères Go/No-Go stricts, scripts de validation automatisés, tests de régression, et commits atomiques permettant un rollback chirurgical si nécessaire.\n</info added on 2025-07-25T16:50:23.630Z>",
-            "status": "done",
-            "testStrategy": "1. Valider que chaque dépendance est assignée à une phase unique\n2. Vérifier que l'ordre respecte les dépendances transitives\n3. S'assurer que chaque phase a des critères de succès mesurables"
+            "details": "Créer lib/features/game/data/models/game_player_model.dart avec @JsonSerializable() et tous les champs de GamePlayer. Implémenter toEntity() pour convertir vers GamePlayer du domaine. Créer une extension GamePlayerMapper sur GamePlayer avec toModel(). Gérer la conversion des objets imbriqués (PlayerGridModel, PlayerPositionModel). Ajouter les factories fromJson/toJson générées.",
+            "status": "pending",
+            "testStrategy": "Tests round-trip complets GamePlayer -> GamePlayerModel -> GamePlayer, tests avec différentes valeurs de grid et position, tests de sérialisation JSON, vérification de la préservation de toutes les données"
           },
           {
             "id": 4,
-            "title": "Identifier et résoudre les conflits de dépendances transitives",
-            "description": "Analyser en profondeur l'arbre de dépendances pour identifier les conflits potentiels et développer des stratégies de résolution",
+            "title": "Implémenter les modèles et mappers LobbyPlayer",
+            "description": "Créer LobbyPlayerModel dans la couche data avec json_serializable et implémenter les mappers bidirectionnels",
             "dependencies": [
-              "1.2",
-              "1.3"
+              "1.2"
             ],
-            "details": "1. Exécuter `flutter pub deps --style=tree` pour visualiser l'arbre complet\n2. Utiliser `flutter pub deps --json` pour analyse programmatique\n3. Identifier les conflits potentiels:\n   - Versions incompatibles demandées par différents packages\n   - Dépendances transitives obsolètes\n   - Packages en conflit avec les contraintes SDK\n4. Pour chaque conflit identifié:\n   - Documenter les packages impliqués\n   - Proposer des solutions (dependency_overrides, versions intermédiaires)\n   - Évaluer l'impact sur la stabilité\n5. Créer un script de validation des résolutions\n6. Documenter dans .taskmaster/docs/dependency-conflicts.md\n<info added on 2025-07-25T17:24:54.572Z>\nAnalyse des conflits de dépendances transitives complétée avec succès. Un seul conflit critique détecté entre analyzer 7.6.0 (requis par la version actuelle) et analyzer 8.0.0 (requis par freezed 3.x). Solution implémentée via dependency_overrides pour analyzer et _fe_analyzer_shared. Outils de validation créés : dependency-conflicts.md contenant l'analyse détaillée des conflits et solutions, check-conflicts.sh pour la détection automatique et continue des conflits transitifs, et dependency_overrides.yaml comme template de configuration. Le script check-conflicts.sh vérifie automatiquement les versions multiples, simule les mises à jour et teste les overrides nécessaires. Aucun blocage insurmontable identifié pour la migration, tous les autres packages s'alignent correctement sans conflits majeurs.\n</info added on 2025-07-25T17:24:54.572Z>",
-            "status": "done",
-            "testStrategy": "1. Créer des tests vérifiant qu'aucun conflit n'existe après résolution\n2. Valider que les dependency_overrides sont minimaux et justifiés\n3. Tester la résolution avec `flutter pub get --dry-run`"
+            "details": "Créer lib/features/multiplayer/data/models/lobby_player_model.dart avec @JsonSerializable(). Implémenter toEntity() retournant LobbyPlayer. Créer extension LobbyPlayerMapper sur LobbyPlayer avec toModel(). Gérer les champs nullable correctement (avatarUrl). Ajouter support pour la conversion depuis/vers les réponses Supabase.",
+            "status": "pending",
+            "testStrategy": "Tests de conversion bidirectionnelle, tests avec avatarUrl null/non-null, tests de compatibilité avec format JSON Supabase, validation des valeurs booléennes"
           },
           {
             "id": 5,
-            "title": "Créer un plan de test et de validation complet",
-            "description": "Développer une suite de tests complète pour valider chaque étape de la migration et garantir la stabilité du projet tout au long du processus",
+            "title": "Migrer les use cases et repositories vers les nouvelles entités",
+            "description": "Mettre à jour tous les use cases et repositories pour utiliser GamePlayer/LobbyPlayer au lieu de Player",
             "dependencies": [
               "1.3",
               "1.4"
             ],
-            "details": "1. Créer une baseline de tests avant migration:\n   - Capturer l'état actuel avec des snapshots\n   - Documenter les comportements critiques\n   - Mesurer les performances actuelles\n2. Développer des tests par catégorie:\n   - Tests unitaires pour chaque provider Riverpod\n   - Tests d'intégration pour la navigation go_router\n   - Tests de contrat pour les APIs Supabase\n   - Tests E2E pour les parcours utilisateur\n3. Créer des scripts de validation automatisés:\n   - Pre-migration: validation de l'état initial\n   - Post-migration par phase: tests de non-régression\n   - Final: validation complète avec coverage\n4. Définir les métriques de succès:\n   - Coverage minimum maintenu à 80%\n   - Temps de build < baseline + 10%\n   - Zero regression sur les tests existants\n5. Documenter dans .taskmaster/docs/test-validation-plan.md\n<info added on 2025-07-25T17:42:47.103Z>\nPlan de test et validation complété avec succès. Le plan exhaustif a été créé et documenté dans .taskmaster/docs/test-validation-plan.md. Les scripts de validation automatisés ont été développés :\n- capture-baseline.sh pour capturer les métriques de référence avant migration\n- validate-phase.sh pour validation automatique après chaque phase\n- compare-metrics.sh pour comparaison des métriques avant/après\n\nUn template de test spécialisé freezed_migration_test_template.dart a été créé pour standardiser les tests de migration Freezed.\n\nPoints clés de l'implémentation :\n- 122 fichiers de tests existants identifiés nécessitant validation\n- Approche TDD stricte : tests écrits AVANT chaque modification de code\n- Validation automatisée intégrée à chaque étape du processus\n- Métriques mesurables avec baseline de référence (coverage ≥80%, 0 régressions)\n- Temps de test estimé : 30-45 minutes par phase de migration\n\nLe plan couvre toutes les phases de migration : SDK, linting, génération de code, Freezed, navigation et services backend. Chaque phase dispose de sa propre checklist de validation et de tests spécifiques adaptés aux changements attendus.\n</info added on 2025-07-25T17:42:47.103Z>",
-            "status": "done",
-            "testStrategy": "1. Valider que chaque catégorie de dépendance a des tests dédiés\n2. Vérifier que les scripts de validation sont exécutables et idempotents\n3. S'assurer que les métriques sont mesurables et réalistes"
+            "details": "Identifier tous les fichiers utilisant l'ancienne entité Player via grep/recherche. Remplacer Player par GamePlayer dans: game repositories, game use cases (StartGame, EndTurn, etc.), game state. Remplacer Player par LobbyPlayer dans: room repositories, lobby use cases (JoinRoom, ToggleReady). Adapter les signatures de méthodes et les imports. Supprimer l'ancienne entité Player après migration complète.",
+            "status": "pending",
+            "testStrategy": "Tests d'intégration pour vérifier le flux complet lobby -> game, tests unitaires des use cases modifiés, vérification que l'ancienne entité Player n'est plus référencée, tests de non-régression sur les fonctionnalités critiques"
           }
         ]
       },
       {
         "id": 2,
-        "title": "Mise à Jour Incrémentale des Dépendances Core",
-        "description": "Mettre à jour les dépendances fondamentales (Flutter SDK, Dart SDK, et les packages de base) en suivant rigoureusement la méthodologie TDD",
-        "details": "1. Commencer par la mise à jour du Flutter SDK vers la dernière version stable (3.24.x):\n   ```bash\n   flutter upgrade\n   flutter doctor -v\n   ```\n2. Mettre à jour les dépendances de base dans l'ordre suivant:\n   - flutter_lints: ^5.0.0\n   - build_runner: ^2.4.13\n   - freezed: ^2.5.7\n   - json_serializable: ^6.8.0\n3. Pour chaque dépendance:\n   a. Créer une branche dédiée (ex: `chore/update-freezed`)\n   b. Écrire des tests vérifiant le comportement actuel (Red phase)\n   c. Mettre à jour la dépendance dans pubspec.yaml\n   d. Exécuter `flutter pub get`\n   e. Lancer les tests et noter les échecs\n   f. Adapter le code pour faire passer les tests (Green phase)\n   g. Refactorer si nécessaire (Refactor phase)\n4. Régénérer le code avec build_runner après chaque mise à jour:\n   ```bash\n   flutter pub run build_runner build --delete-conflicting-outputs\n   ```\n5. Valider avec `flutter analyze` et `flutter test`",
-        "testStrategy": "1. Avant chaque mise à jour, capturer l'état actuel avec des tests snapshot\n2. Écrire des tests de contrat pour chaque interface publique utilisée\n3. Créer des tests de régression spécifiques pour les fonctionnalités Freezed (immutabilité, copyWith, toJson/fromJson)\n4. Tester la génération de code avec build_runner dans la CI\n5. Vérifier que tous les tests existants passent après chaque mise à jour\n6. Mesurer et maintenir une couverture de code > 80%",
+        "title": "Migration de DbPlayerGrid vers la couche data",
+        "description": "Déplacer DbPlayerGrid de la couche domain vers data car elle contient de la logique de sérialisation, violant les principes de Clean Architecture",
+        "details": "1. Déplacer lib/features/game/domain/entities/db_player_grid.dart vers lib/features/game/data/models/db_player_grid_model.dart. 2. Renommer la classe en DbPlayerGridModel. 3. Créer une entité PlayerGrid pure dans domain sans sérialisation. 4. Implémenter les mappers DbPlayerGridModel ↔ PlayerGrid. 5. Mettre à jour toutes les références dans les repositories et datasources. 6. Adapter les requêtes Supabase pour utiliser DbPlayerGridModel. Utiliser json_serializable uniquement dans la couche data.",
+        "testStrategy": "Tests unitaires pour la nouvelle entité PlayerGrid, tests des mappers de conversion, tests d'intégration avec Supabase pour valider la persistance. Vérifier que l'entité domain ne contient aucune annotation json_serializable.",
         "priority": "high",
         "dependencies": [
           1
         ],
-        "status": "in-progress",
+        "status": "pending",
         "subtasks": [
           {
             "id": 1,
-            "title": "Mise à jour du Flutter SDK et validation de l'environnement",
-            "description": "Mettre à jour Flutter vers la dernière version stable 3.24.x et valider l'environnement de développement complet",
+            "title": "Déplacer et renommer DbPlayerGrid vers la couche data",
+            "description": "Migrer le fichier DbPlayerGrid de domain/entities vers data/models et renommer la classe en DbPlayerGridModel",
             "dependencies": [],
-            "details": "1. Créer une branche dédiée `chore/update-flutter-sdk`\n2. Écrire des tests validant la version actuelle du SDK et les configurations\n3. Exécuter la mise à jour:\n   ```bash\n   flutter upgrade\n   flutter doctor -v\n   ```\n4. Vérifier que tous les composants sont valides (Android toolchain, Chrome, VS Code)\n5. Lancer tous les tests existants pour détecter les régressions potentielles\n6. Documenter les changements de version dans un CHANGELOG temporaire",
-            "status": "done",
-            "testStrategy": "1. Créer des tests vérifiant les versions SDK avant/après\n2. Tests de smoke sur la compilation Android\n3. Vérifier que tous les tests existants passent toujours\n4. Tester la génération de code avec build_runner"
+            "details": "1. Créer le répertoire lib/features/game/data/models s'il n'existe pas. 2. Déplacer lib/features/game/domain/entities/db_player_grid.dart vers lib/features/game/data/models/db_player_grid_model.dart. 3. Renommer la classe DbPlayerGrid en DbPlayerGridModel. 4. Mettre à jour les imports dans le fichier. 5. Conserver toutes les annotations json_serializable existantes car elles sont appropriées dans la couche data.",
+            "status": "pending",
+            "testStrategy": "Vérifier que le fichier est bien déplacé, que la classe est renommée correctement, et que les annotations json_serializable sont préservées. Exécuter build_runner pour s'assurer que la génération de code fonctionne."
           },
           {
             "id": 2,
-            "title": "Mise à jour de flutter_lints et configuration du linting",
-            "description": "Mettre à jour flutter_lints vers ^5.0.0 en suivant rigoureusement le cycle TDD et adapter les règles de linting",
-            "dependencies": [
-              "2.1"
-            ],
-            "details": "1. Créer une branche `chore/update-flutter-lints`\n2. Écrire des tests capturant les warnings/erreurs actuels du linter\n3. Mettre à jour dans pubspec.yaml: flutter_lints: ^5.0.0\n4. Exécuter `flutter pub get`\n5. Lancer `flutter analyze` et capturer les nouvelles erreurs\n6. Corriger le code pour respecter les nouvelles règles lint une par une\n7. Adapter analysis_options.yaml si nécessaire pour les règles projet-spécifiques\n8. Valider avec `flutter analyze --no-fatal-infos`\n<info added on 2025-07-25T21:37:41.387Z>\n9. **Résultats de la mise à jour flutter_lints 5.0.0 → 6.0.0 :**\n   - Total des issues détectées initialement : 364\n   - Issues restantes après correction : 60 (réduction de 83.5%)\n   - Corrections automatiques appliquées : 218 fixes\n     * Imports non utilisés supprimés\n     * Ajout de `const` sur les constructeurs constants\n     * Conversion var → final pour les variables non réassignées\n   - **11 erreurs de compilation restantes à corriger manuellement :**\n     * Méthodes `withOpacity` appelées sur des couleurs nullables\n     * Types manquants dans les tests (inférence de type plus stricte)\n   - Tests de migration créés avec succès pour valider les changements\n</info added on 2025-07-25T21:37:41.387Z>",
-            "status": "done",
-            "testStrategy": "1. Script de test comparant les outputs de flutter analyze avant/après\n2. Tests unitaires vérifiant que le code respecte les conventions\n3. Tests de régression sur les fichiers critiques\n4. Validation que aucun warning n'est introduit"
+            "title": "Créer l'entité PlayerGrid pure dans domain",
+            "description": "Implémenter une nouvelle entité PlayerGrid sans logique de sérialisation dans la couche domain",
+            "dependencies": [],
+            "details": "1. Créer lib/features/game/domain/entities/player_grid.dart. 2. Définir la classe PlayerGrid avec uniquement les propriétés métier (playerId, cards, revealedPositions, etc.). 3. Utiliser Freezed pour l'immutabilité mais sans json_serializable. 4. Implémenter les méthodes métier comme revealCard(), replaceCard(), isColumnComplete(). 5. Assurer que l'entité ne contient aucune dépendance vers la couche data.",
+            "status": "pending",
+            "testStrategy": "Tests unitaires pour toutes les méthodes métier de PlayerGrid. Vérifier l'immutabilité avec Freezed. S'assurer qu'aucune annotation json_serializable n'est présente dans le fichier."
           },
           {
             "id": 3,
-            "title": "Mise à jour de build_runner et validation de la génération de code",
-            "description": "Mettre à jour build_runner vers ^2.4.13 et s'assurer que toute la génération de code fonctionne correctement",
+            "title": "Implémenter les mappers bidirectionnels",
+            "description": "Créer les fonctions de conversion entre PlayerGrid (domain) et DbPlayerGridModel (data)",
             "dependencies": [
+              "2.1",
               "2.2"
             ],
-            "details": "1. Créer une branche `chore/update-build-runner`\n2. Écrire des tests vérifiant les fichiers générés actuels (.g.dart, .freezed.dart)\n3. Sauvegarder un snapshot des fichiers générés pour comparaison\n4. Mettre à jour dans pubspec.yaml: build_runner: ^2.4.13\n5. Exécuter `flutter pub get`\n6. Lancer `flutter pub run build_runner build --delete-conflicting-outputs`\n7. Comparer les fichiers générés avec les snapshots\n8. Adapter le code si des différences sont détectées\n9. Relancer tous les tests pour valider",
+            "details": "1. Dans db_player_grid_model.dart, ajouter une méthode toEntity() qui convertit DbPlayerGridModel vers PlayerGrid. 2. Ajouter une factory DbPlayerGridModel.fromEntity(PlayerGrid entity) pour la conversion inverse. 3. Gérer la conversion des types complexes comme les listes de cartes. 4. S'assurer que les positions révélées sont correctement mappées. 5. Traiter les cas null de manière appropriée.",
             "status": "pending",
-            "testStrategy": "1. Tests de snapshot sur tous les fichiers .g.dart et .freezed.dart\n2. Tests unitaires sur les modèles sérialisables\n3. Tests d'intégration vérifiant la génération complète\n4. Validation que les imports et exports sont corrects"
+            "testStrategy": "Tests unitaires exhaustifs pour les deux sens de conversion. Vérifier la préservation de toutes les données lors des conversions. Tests avec des cas limites (listes vides, valeurs null)."
           },
           {
             "id": 4,
-            "title": "Mise à jour de freezed et adaptation des modèles",
-            "description": "Mettre à jour freezed vers ^2.5.7 et adapter tous les modèles immutables du projet",
+            "title": "Mettre à jour les repositories et datasources",
+            "description": "Adapter tous les repositories et datasources pour utiliser les nouveaux types",
             "dependencies": [
               "2.3"
             ],
-            "details": "1. Créer une branche `chore/update-freezed`\n2. Identifier tous les modèles Freezed: `find lib -name '*.dart' -exec grep -l '@freezed' {} \\;`\n3. Écrire des tests exhaustifs pour chaque modèle (copyWith, toJson, fromJson, equality)\n4. Mettre à jour dans pubspec.yaml: freezed: ^2.5.7\n5. Exécuter `flutter pub get`\n6. Régénérer avec `flutter pub run build_runner build --delete-conflicting-outputs`\n7. Lancer les tests et corriger les échecs un par un\n8. Vérifier l'immutabilité et les unions types\n9. Valider que tous les providers Riverpod utilisant ces modèles fonctionnent",
+            "details": "1. Mettre à jour GameStateRepository pour utiliser PlayerGrid dans les signatures de méthodes. 2. Modifier SupabaseGameStateDataSource pour travailler avec DbPlayerGridModel. 3. Appliquer les mappers dans les implémentations de repository pour convertir entre les couches. 4. Mettre à jour les imports dans tous les fichiers affectés. 5. Adapter les requêtes Supabase pour sérialiser/désérialiser DbPlayerGridModel.",
             "status": "pending",
-            "testStrategy": "1. Tests unitaires pour chaque méthode générée (copyWith, equality, toJson)\n2. Tests de sérialisation/désérialisation JSON\n3. Tests d'immutabilité vérifiant qu'aucune mutation n'est possible\n4. Tests d'intégration avec les providers Riverpod"
+            "testStrategy": "Tests d'intégration pour vérifier que les données transitent correctement entre les couches. Mocker Supabase pour tester les conversions. Vérifier que les types sont correctement utilisés à chaque niveau."
           },
           {
             "id": 5,
-            "title": "Mise à jour de json_serializable et validation finale",
-            "description": "Mettre à jour json_serializable vers ^6.8.0 et effectuer une validation complète de toutes les dépendances core",
+            "title": "Refactorer les use cases et la couche présentation",
+            "description": "Mettre à jour tous les use cases et widgets pour utiliser la nouvelle entité PlayerGrid",
             "dependencies": [
               "2.4"
             ],
-            "details": "1. Créer une branche `chore/update-json-serializable`\n2. Écrire des tests de sérialisation pour tous les modèles JSON\n3. Créer des fixtures JSON pour les tests\n4. Mettre à jour dans pubspec.yaml: json_serializable: ^6.8.0\n5. Exécuter `flutter pub get`\n6. Régénérer tout le code: `flutter pub run build_runner build --delete-conflicting-outputs`\n7. Lancer tous les tests de sérialisation\n8. Validation finale complète:\n   - `flutter analyze`\n   - `flutter test`\n   - `flutter test --coverage` (vérifier > 80%)\n9. Créer une PR consolidée avec toutes les mises à jour",
+            "details": "1. Identifier tous les use cases qui utilisent DbPlayerGrid et les mettre à jour pour utiliser PlayerGrid. 2. Modifier les providers Riverpod qui exposent des grilles de joueurs. 3. Adapter les widgets UI pour consommer PlayerGrid au lieu de DbPlayerGridModel. 4. Mettre à jour les tests associés aux use cases et widgets. 5. S'assurer que la couche présentation n'a aucune dépendance vers DbPlayerGridModel.",
             "status": "pending",
-            "testStrategy": "1. Tests de round-trip JSON (objet -> JSON -> objet)\n2. Tests avec données malformées pour vérifier la robustesse\n3. Tests de performance sur la sérialisation\n4. Suite de tests de régression complète du projet"
+            "testStrategy": "Tests unitaires pour chaque use case modifié. Tests de widgets pour vérifier que l'UI fonctionne avec la nouvelle entité. Tests d'intégration end-to-end pour valider le flux complet."
           }
         ]
       },
       {
         "id": 3,
-        "title": "Mise à Jour des Dépendances de Gestion d'État et Navigation",
-        "description": "Mettre à jour Riverpod, go_router et les packages associés en adaptant le code selon les breaking changes identifiés",
-        "details": "1. Mise à jour de Riverpod et packages associés:\n   - flutter_riverpod: ^2.5.1 ou ^3.0.0 (selon disponibilité)\n   - riverpod_annotation: ^2.3.5\n   - hooks_riverpod: ^2.5.2 (si utilisé)\n2. Pour la migration Riverpod:\n   a. Identifier tous les providers existants avec `grep -r 'Provider\\|StateNotifier' lib/`\n   b. Écrire des tests pour chaque provider AVANT la mise à jour\n   c. Migrer vers la nouvelle syntaxe si nécessaire (Notifier au lieu de StateNotifier)\n   d. Adapter les ConsumerWidget et ConsumerStatefulWidget\n3. Mise à jour de go_router:\n   - go_router: ^14.6.0\n   - Vérifier les changements dans la syntaxe de déclaration des routes\n   - Adapter les guards et redirections si nécessaire\n4. Code d'exemple pour la migration Riverpod:\n   ```dart\n   // Ancien: StateNotifier\n   class GameStateNotifier extends StateNotifier<GameState> {}\n   \n   // Nouveau: Notifier\n   @riverpod\n   class GameState extends _$GameState {\n     @override\n     GameStateModel build() => GameStateModel.initial();\n   }\n   ```\n5. Valider toutes les navigations avec des tests d'intégration",
-        "testStrategy": "1. Créer des tests unitaires pour chaque provider Riverpod vérifiant:\n   - L'état initial\n   - Les mutations d'état\n   - Les effets de bord (API calls)\n2. Écrire des tests d'intégration pour go_router:\n   - Navigation entre écrans\n   - Deep linking\n   - Guards et redirections\n3. Tester les interactions provider-widget avec des widget tests\n4. Vérifier la persistance d'état lors des hot reloads\n5. Créer des tests E2E pour les flux utilisateur critiques",
-        "priority": "medium",
+        "title": "Création des mappers GameState complets",
+        "description": "Implémenter les mappers bidirectionnels complets entre GameState (domain) et GameStateModel (data) pour corriger les problèmes de mapping incomplets",
+        "details": "1. Analyser GameState et identifier tous les champs manquants dans GameStateModel. 2. Compléter GameStateModel avec tous les champs nécessaires (currentPlayerIndex, lastAction, etc.). 3. Implémenter toEntity() dans GameStateModel avec gestion complète des sous-objets. 4. Implémenter toModel() comme extension sur GameState. 5. Gérer la conversion des collections (players, actionCards, etc.) avec les mappers appropriés. 6. Ajouter la gestion des cas null et des valeurs par défaut. Code: extension GameStateX on GameState { GameStateModel toModel() => GameStateModel(...); }",
+        "testStrategy": "Tests exhaustifs de conversion aller-retour (round-trip) pour vérifier qu'aucune donnée n'est perdue. Tests avec états complexes incluant toutes les cartes actions, multiples joueurs. Tests des cas limites (listes vides, valeurs null).",
+        "priority": "high",
         "dependencies": [
+          1,
           2
         ],
         "status": "pending",
         "subtasks": [
           {
             "id": 1,
-            "title": "Audit et Préparation de la Migration Riverpod",
-            "description": "Identifier tous les providers existants, analyser les breaking changes et créer les tests de régression avant la mise à jour",
+            "title": "Analyse complète des entités domain et création du modèle de données",
+            "description": "Analyser en profondeur les entités GameState, Player, ActionCard et autres pour identifier tous les champs nécessaires dans les modèles data",
             "dependencies": [],
-            "details": "1. Exécuter `grep -r 'Provider\\|StateNotifier\\|StateProvider\\|FutureProvider\\|StreamProvider' lib/` pour lister tous les providers\n2. Créer un inventaire détaillé avec:\n   - Type de provider (StateNotifier, StateProvider, etc.)\n   - Dépendances entre providers\n   - Utilisation dans les widgets\n3. Analyser les breaking changes entre la version actuelle et la cible:\n   - Migration StateNotifier vers Notifier\n   - Changements dans la syntaxe des providers\n   - Nouvelles annotations avec riverpod_annotation\n4. Documenter la stratégie de migration pour chaque provider\n5. Créer des tests unitaires pour chaque provider existant vérifiant:\n   - État initial\n   - Toutes les mutations d'état\n   - Comportement des dépendances",
+            "details": "1. Examiner GameState dans domain/entities pour lister tous les champs (currentPlayerIndex, lastAction, gamePhase, etc.). 2. Analyser Player, ActionCard, Card et autres entités liées. 3. Créer une matrice de mapping détaillée domain ↔ data. 4. Identifier les champs manquants dans les modèles existants. 5. Documenter les types de données et contraintes pour chaque champ. 6. Définir la stratégie de gestion des valeurs null et optionnelles.",
             "status": "pending",
-            "testStrategy": "1. Écrire des tests unitaires pour 100% des providers existants\n2. Créer des tests d'intégration pour les chaînes de providers dépendants\n3. Utiliser ProviderContainer pour tester les providers isolément\n4. Vérifier les edge cases et états d'erreur\n5. Créer des snapshots de l'état actuel pour comparaison post-migration"
+            "testStrategy": "Créer des tests de vérification de structure pour s'assurer que tous les champs du domain sont représentés dans les modèles. Tests de comparaison des propriétés entre entités et modèles."
           },
           {
             "id": 2,
-            "title": "Migration des Providers Riverpod vers la Nouvelle Syntaxe",
-            "description": "Migrer progressivement tous les providers vers la syntaxe moderne avec @riverpod et Notifier",
+            "title": "Implémentation complète de GameStateModel avec tous les champs",
+            "description": "Enrichir GameStateModel avec tous les champs identifiés et implémenter la sérialisation JSON complète",
             "dependencies": [
               "3.1"
             ],
-            "details": "1. Configurer riverpod_annotation et build_runner:\n   ```yaml\n   dependencies:\n     flutter_riverpod: ^2.5.1\n     riverpod_annotation: ^2.3.5\n   dev_dependencies:\n     riverpod_generator: ^2.4.3\n   ```\n2. Migrer les StateNotifier vers Notifier:\n   ```dart\n   // Avant\n   class GameStateNotifier extends StateNotifier<GameState> {\n     GameStateNotifier() : super(GameState.initial());\n   }\n   \n   // Après\n   @riverpod\n   class GameState extends _$GameState {\n     @override\n     GameStateModel build() => GameStateModel.initial();\n   }\n   ```\n3. Adapter les providers simples avec les annotations\n4. Migrer les FutureProvider et StreamProvider\n5. Mettre à jour les références dans tous les ConsumerWidget",
+            "details": "1. Ajouter les champs manquants dans GameStateModel (currentPlayerIndex, lastAction, gamePhase, roundNumber, etc.). 2. Implémenter @JsonSerializable avec les bonnes annotations. 3. Gérer la sérialisation des enums et types complexes. 4. Ajouter les factory constructors fromJson/toJson. 5. Implémenter les valeurs par défaut pour les champs optionnels. 6. Utiliser freezed pour l'immutabilité et la génération de code.",
             "status": "pending",
-            "testStrategy": "1. Exécuter les tests existants après chaque migration de provider\n2. Vérifier que les tests passent toujours au vert\n3. Ajouter des tests pour les nouvelles fonctionnalités (auto-dispose, etc.)\n4. Tester les performances avec les nouveaux providers\n5. Valider l'absence de fuites mémoire"
+            "testStrategy": "Tests de sérialisation/désérialisation JSON pour vérifier l'intégrité. Tests avec différentes configurations de données (valeurs null, listes vides, enums). Golden tests pour les structures JSON générées."
           },
           {
             "id": 3,
-            "title": "Audit et Préparation de la Migration go_router",
-            "description": "Analyser la configuration actuelle de go_router, identifier les breaking changes et préparer la migration",
-            "dependencies": [],
-            "details": "1. Inventorier la configuration actuelle:\n   - Routes définies\n   - Guards et redirections\n   - Deep linking configuré\n   - Paramètres et query parameters\n2. Analyser les breaking changes vers go_router ^14.6.0:\n   - Changements dans GoRoute constructor\n   - Nouvelle syntaxe pour les redirections\n   - Modifications des guards\n   - Évolution du StatefulShellRoute\n3. Créer des tests d'intégration pour toutes les routes:\n   ```dart\n   testWidgets('Navigation vers écran de jeu', (tester) async {\n     // Test de navigation avec paramètres\n   });\n   ```\n4. Documenter les changements nécessaires dans router_config.dart\n5. Préparer les mocks pour les tests de navigation",
+            "title": "Création des mappers pour les entités associées",
+            "description": "Implémenter les mappers bidirectionnels pour Player, ActionCard, Card et autres sous-entités",
+            "dependencies": [
+              "3.2"
+            ],
+            "details": "1. Créer PlayerModel.toEntity() et extension PlayerX.toModel(). 2. Implémenter ActionCardModel ↔ ActionCard avec gestion des types spécifiques. 3. Créer les mappers pour Card, DeckState, CardPosition. 4. Gérer la conversion des enums (CardType, ActionType, etc.). 5. Implémenter la logique de conversion des collections imbriquées. 6. Ajouter la validation des données lors du mapping.",
             "status": "pending",
-            "testStrategy": "1. Créer des tests widget pour chaque route définie\n2. Tester les redirections et guards\n3. Vérifier le deep linking avec différents URLs\n4. Tester la navigation avec paramètres\n5. Valider le comportement du back button sur Android"
+            "testStrategy": "Tests unitaires pour chaque mapper avec vérification de tous les champs. Tests de conversion aller-retour pour garantir aucune perte de données. Tests avec données invalides pour vérifier la robustesse."
           },
           {
             "id": 4,
-            "title": "Migration de go_router et Adaptation du Routing",
-            "description": "Mettre à jour go_router vers la version 14.6.0 et adapter toute la configuration de navigation",
+            "title": "Implémentation de toEntity() et toModel() pour GameState",
+            "description": "Créer les méthodes de conversion principales avec gestion complète des relations et collections",
             "dependencies": [
               "3.3"
             ],
-            "details": "1. Mettre à jour la dépendance dans pubspec.yaml:\n   ```yaml\n   go_router: ^14.6.0\n   ```\n2. Adapter la configuration dans router_config.dart:\n   - Migrer vers la nouvelle syntaxe des routes\n   - Mettre à jour les redirections avec la nouvelle API\n   - Adapter les guards si nécessaire\n3. Exemple de migration:\n   ```dart\n   // Avant\n   redirect: (state) => authCheck(state),\n   \n   // Après\n   redirect: (context, state) => authCheck(context, state),\n   ```\n4. Mettre à jour tous les appels de navigation dans l'app:\n   - context.go() / context.push()\n   - Paramètres et query parameters\n5. Vérifier la compatibilité avec les ConsumerWidget mis à jour",
+            "details": "1. Implémenter GameStateModel.toEntity() avec conversion de tous les champs. 2. Utiliser les mappers des sous-entités pour players.map((p) => p.toEntity()).toList(). 3. Créer extension GameStateX avec toModel() complet. 4. Gérer la conversion des maps et collections complexes. 5. Implémenter la logique de fallback pour les données manquantes. 6. Optimiser les performances avec lazy evaluation si nécessaire.",
             "status": "pending",
-            "testStrategy": "1. Exécuter tous les tests de navigation créés précédemment\n2. Vérifier que toutes les routes fonctionnent correctement\n3. Tester les cas limites (routes invalides, paramètres manquants)\n4. Valider la persistance de l'état lors de la navigation\n5. Tester sur device physique Android"
+            "testStrategy": "Tests exhaustifs de conversion avec états de jeu complexes. Tests de performance avec grandes collections. Tests de cohérence entre conversions successives. Utiliser des fixtures d'états de jeu réels."
           },
           {
             "id": 5,
-            "title": "Tests d'Intégration Complets et Validation Finale",
-            "description": "Valider l'intégration complète entre Riverpod et go_router, et assurer la stabilité de l'application",
+            "title": "Tests d'intégration et validation des mappers",
+            "description": "Créer une suite de tests complète pour valider le système de mapping dans tous les scénarios",
             "dependencies": [
-              "3.2",
               "3.4"
             ],
-            "details": "1. Créer des tests d'intégration complets:\n   - Navigation déclenchant des changements d'état Riverpod\n   - Providers influençant la navigation (guards basés sur l'auth)\n   - Synchronisation état global et route\n2. Tester les scénarios complexes:\n   ```dart\n   test('Navigation avec état Riverpod', () async {\n     // Changer l'état auth\n     // Vérifier la redirection automatique\n     // Valider l'état après navigation\n   });\n   ```\n3. Vérifier la performance:\n   - Temps de navigation entre écrans\n   - Consommation mémoire des providers\n   - Rebuilds inutiles\n4. Tests de régression sur toutes les features\n5. Validation sur différentes versions d'Android",
+            "details": "1. Créer des fixtures d'états de jeu complexes avec toutes les fonctionnalités. 2. Implémenter des tests round-trip pour chaque niveau de mapping. 3. Tester les cas limites (null, listes vides, valeurs maximales). 4. Vérifier la préservation de l'intégrité référentielle. 5. Tester avec des données corrompues ou incomplètes. 6. Créer des benchmarks de performance pour les conversions massives.",
             "status": "pending",
-            "testStrategy": "1. Suite complète de tests E2E avec integration_test\n2. Tests de performance avec flutter_driver\n3. Monitoring des rebuilds avec debugPrint\n4. Tests manuels sur devices physiques\n5. Validation de la CI/CD avec les nouvelles dépendances"
+            "testStrategy": "Tests d'intégration end-to-end simulant des parties complètes. Property-based testing pour découvrir des cas non prévus. Tests de régression avec snapshots des structures de données."
           }
         ]
       },
       {
         "id": 4,
-        "title": "Mise à Jour des Dépendances Backend et Utilitaires",
-        "description": "Mettre à jour Supabase, Sentry et toutes les dépendances utilitaires en garantissant la compatibilité avec l'infrastructure existante",
-        "details": "1. Mise à jour de Supabase:\n   - supabase_flutter: ^2.6.0\n   - Vérifier la compatibilité avec les Edge Functions existantes\n   - Adapter les queries Realtime si changements d'API\n2. Mise à jour de Sentry:\n   - sentry_flutter: ^8.10.0\n   - Configurer les nouvelles options de performance monitoring\n3. Autres dépendances utilitaires:\n   - flutter_dotenv: ^5.1.0\n   - path_provider: ^2.1.4\n   - shared_preferences: ^2.3.2\n   - connectivity_plus: ^6.0.5\n4. Configuration Supabase mise à jour:\n   ```dart\n   await Supabase.initialize(\n     url: dotenv.env['SUPABASE_URL']!,\n     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,\n     authOptions: FlutterAuthClientOptions(\n       authFlowType: AuthFlowType.implicit,\n       autoRefreshToken: true,\n     ),\n   );\n   ```\n5. Vérifier la compatibilité des WebSockets pour le mode multijoueur\n6. Tester les mécanismes de reconnexion automatique",
-        "testStrategy": "1. Créer des tests d'intégration mockant Supabase:\n   - Tests de requêtes (select, insert, update, delete)\n   - Tests Realtime avec des WebSocket mocks\n   - Tests d'authentification anonyme\n2. Vérifier l'intégration Sentry avec des tests de capture d'erreur\n3. Tester la gestion de la connectivité réseau\n4. Créer des tests de performance pour les opérations Supabase\n5. Valider le stockage local avec des tests unitaires",
-        "priority": "medium",
+        "title": "Configuration du gameStateRepositoryProvider manquant",
+        "description": "Créer et configurer le provider Riverpod pour GameStateRepository qui est actuellement manquant, causant des erreurs d'injection de dépendances",
+        "details": "1. Créer game_state_repository_provider.dart dans presentation/providers. 2. Définir: final gameStateRepositoryProvider = Provider<GameStateRepository>((ref) => SupabaseGameStateRepository(ref.watch(supabaseGameStateDatasourceProvider))). 3. Créer aussi supabaseGameStateDatasourceProvider si manquant. 4. Vérifier que SupabaseGameStateRepository implémente bien GameStateRepository. 5. Mettre à jour tous les use cases pour utiliser ref.watch(gameStateRepositoryProvider). 6. Suivre le pattern Riverpod 2.x avec annotations @riverpod si applicable.",
+        "testStrategy": "Tests d'injection pour vérifier que le provider retourne la bonne instance. Tests d'intégration pour valider que les use cases peuvent accéder au repository. Utiliser ProviderContainer pour les tests isolés.",
+        "priority": "high",
         "dependencies": [
           3
         ],
@@ -216,67 +213,65 @@
         "subtasks": [
           {
             "id": 1,
-            "title": "Audit et Planification des Mises à Jour Backend",
-            "description": "Analyser les versions actuelles de Supabase, Sentry et des utilitaires, identifier les breaking changes et créer un plan de migration détaillé",
+            "title": "Analyser l'architecture existante des providers et datasources",
+            "description": "Examiner la structure actuelle des providers Riverpod et identifier les datasources nécessaires pour GameStateRepository",
             "dependencies": [],
-            "details": "1. Analyser le pubspec.yaml actuel et documenter les versions utilisées\n2. Consulter les changelogs officiels:\n   - Supabase Flutter: https://github.com/supabase/supabase-flutter/releases\n   - Sentry Flutter: https://github.com/getsentry/sentry-dart/releases\n   - Autres dépendances utilitaires\n3. Identifier les breaking changes critiques:\n   - API Realtime Supabase (channels, broadcast)\n   - Options de configuration Sentry\n   - APIs dépréciées dans connectivity_plus\n4. Créer une matrice de compatibilité avec les versions cibles\n5. Documenter les modifications de code nécessaires pour chaque dépendance",
+            "details": "1. Explorer le dossier lib/features/game/presentation/providers pour comprendre les patterns existants. 2. Vérifier si supabaseGameStateDatasourceProvider existe déjà. 3. Analyser les imports et dépendances de SupabaseGameStateRepository. 4. Identifier tous les use cases qui nécessitent GameStateRepository. 5. Documenter les providers manquants et leurs dépendances.",
             "status": "pending",
-            "testStrategy": "1. Créer des tests de snapshot capturant le comportement actuel des intégrations\n2. Écrire des tests unitaires pour toutes les fonctions utilisant Supabase et Sentry\n3. Documenter les comportements attendus avant migration"
+            "testStrategy": "Créer des tests de smoke pour vérifier l'existence des fichiers et la cohérence des imports. Utiliser flutter analyze pour détecter les erreurs de dépendances."
           },
           {
             "id": 2,
-            "title": "Mise à Jour et Configuration de Supabase Flutter",
-            "description": "Migrer vers supabase_flutter ^2.6.0 en adaptant les queries Realtime et en vérifiant la compatibilité avec les Edge Functions",
+            "title": "Créer le supabaseGameStateDatasourceProvider",
+            "description": "Implémenter le provider pour SupabaseGameStateDatasource qui sera utilisé par gameStateRepositoryProvider",
             "dependencies": [
               "4.1"
             ],
-            "details": "1. Mise à jour de la dépendance:\n   ```yaml\n   supabase_flutter: ^2.6.0\n   ```\n2. Adapter l'initialisation Supabase avec les nouvelles options:\n   ```dart\n   await Supabase.initialize(\n     url: dotenv.env['SUPABASE_URL']!,\n     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,\n     authOptions: FlutterAuthClientOptions(\n       authFlowType: AuthFlowType.implicit,\n       autoRefreshToken: true,\n     ),\n   );\n   ```\n3. Migration des queries Realtime:\n   - Adapter channel() au lieu de from().on()\n   - Utiliser broadcast() pour les événements temps réel\n   - Implémenter les nouveaux callbacks de reconnexion\n4. Vérifier la compatibilité avec les Edge Functions existantes\n5. Mettre à jour les intercepteurs et error handlers",
+            "details": "1. Créer le fichier game_state_datasource_provider.dart si nécessaire. 2. Définir: final supabaseGameStateDatasourceProvider = Provider<SupabaseGameStateDatasource>((ref) => SupabaseGameStateDatasource(ref.watch(supabaseClientProvider))). 3. Vérifier que supabaseClientProvider existe et est correctement configuré. 4. S'assurer que SupabaseGameStateDatasource a les bonnes dépendances. 5. Ajouter les exports nécessaires dans le barrel file des providers.",
             "status": "pending",
-            "testStrategy": "1. Tests d'intégration avec Supabase mocké:\n   - CRUD operations (select, insert, update, delete)\n   - Realtime subscriptions avec WebSocket mocks\n   - Authentification anonyme et gestion des tokens\n2. Tests de reconnexion automatique\n3. Tests de latence et timeout"
+            "testStrategy": "Tests unitaires avec ProviderContainer pour vérifier l'instanciation. Mock du supabaseClient pour les tests isolés. Vérifier que le provider retourne toujours la même instance (singleton)."
           },
           {
             "id": 3,
-            "title": "Mise à Jour et Configuration de Sentry Flutter",
-            "description": "Migrer vers sentry_flutter ^8.10.0 et configurer les nouvelles options de performance monitoring",
+            "title": "Implémenter le gameStateRepositoryProvider",
+            "description": "Créer le provider principal pour GameStateRepository avec injection correcte des dépendances",
             "dependencies": [
-              "4.1"
+              "4.2"
             ],
-            "details": "1. Mise à jour de la dépendance:\n   ```yaml\n   sentry_flutter: ^8.10.0\n   ```\n2. Adapter l'initialisation Sentry avec les nouvelles options:\n   ```dart\n   await SentryFlutter.init(\n     (options) {\n       options.dsn = dotenv.env['SENTRY_DSN'];\n       options.tracesSampleRate = 1.0;\n       options.profilesSampleRate = 1.0;\n       options.enableAutoPerformanceTracing = true;\n       options.enableUserInteractionTracing = true;\n       options.attachScreenshot = true;\n       options.attachViewHierarchy = true;\n     },\n   );\n   ```\n3. Configurer le performance monitoring:\n   - Transactions automatiques pour les routes\n   - Spans pour les opérations Supabase\n   - Breadcrumbs enrichis\n4. Implémenter les nouveaux hooks de capture d'erreur\n5. Configurer les environnements (dev, staging, prod)",
+            "details": "1. Créer game_state_repository_provider.dart dans lib/features/game/presentation/providers. 2. Implémenter: final gameStateRepositoryProvider = Provider<GameStateRepository>((ref) => SupabaseGameStateRepository(ref.watch(supabaseGameStateDatasourceProvider))). 3. Vérifier que SupabaseGameStateRepository implémente correctement l'interface GameStateRepository. 4. Ajouter les annotations @riverpod si le projet utilise Riverpod 2.x avec code generation. 5. Exporter le provider dans le barrel file.",
             "status": "pending",
-            "testStrategy": "1. Tests unitaires de capture d'erreur\n2. Tests d'intégration vérifiant:\n   - Envoi des transactions\n   - Attachement des screenshots\n   - Performance metrics\n3. Tests de désactivation en mode debug"
+            "testStrategy": "Tests d'injection avec ProviderContainer pour valider le graphe de dépendances. Tests d'interface pour vérifier que toutes les méthodes de GameStateRepository sont implémentées. Tests de type pour garantir la compatibilité."
           },
           {
             "id": 4,
-            "title": "Mise à Jour des Dépendances Utilitaires",
-            "description": "Mettre à jour flutter_dotenv, path_provider, shared_preferences et connectivity_plus en gérant les changements d'API",
+            "title": "Migrer les use cases vers l'injection par provider",
+            "description": "Mettre à jour tous les use cases qui utilisent GameStateRepository pour utiliser le nouveau provider",
             "dependencies": [
-              "4.1"
+              "4.3"
             ],
-            "details": "1. Mettre à jour les dépendances utilitaires:\n   ```yaml\n   flutter_dotenv: ^5.1.0\n   path_provider: ^2.1.4\n   shared_preferences: ^2.3.2\n   connectivity_plus: ^6.0.5\n   ```\n2. Adapter le code pour flutter_dotenv:\n   - Vérifier le chargement asynchrone\n   - Gérer les erreurs de fichier .env manquant\n3. Migration connectivity_plus:\n   - Utiliser les nouvelles énumérations ConnectivityResult\n   - Adapter les listeners de changement de connexion\n   - Implémenter la vérification de connexion Internet réelle\n4. Vérifier path_provider sur Android 14+:\n   - Permissions de stockage\n   - Scoped storage compliance\n5. Tester shared_preferences avec les nouvelles méthodes async",
+            "details": "1. Identifier tous les use cases dans lib/features/game/domain/use_cases qui dépendent de GameStateRepository. 2. Créer un provider pour chaque use case: Provider((ref) => UseCase(ref.watch(gameStateRepositoryProvider))). 3. Supprimer les imports directs de datasources ou repositories concrets. 4. Mettre à jour les constructeurs pour accepter l'interface GameStateRepository. 5. Modifier les tests pour utiliser les providers avec ProviderContainer.",
             "status": "pending",
-            "testStrategy": "1. Tests unitaires pour chaque utilitaire:\n   - Mock de flutter_dotenv\n   - Mock de connectivity_plus streams\n   - Tests de persistence shared_preferences\n2. Tests d'intégration cross-platform\n3. Tests de gestion d'erreur et fallback"
+            "testStrategy": "Tests unitaires avec mocks pour chaque use case migré. Vérifier l'absence d'imports de classes concrètes. Tests d'intégration pour valider le flux complet d'injection. Coverage à 100% sur les constructeurs."
           },
           {
             "id": 5,
-            "title": "Tests d'Intégration et Validation Complète",
-            "description": "Exécuter une suite complète de tests d'intégration pour valider la compatibilité de toutes les mises à jour backend",
+            "title": "Valider l'intégration complète et nettoyer le code",
+            "description": "Effectuer les tests d'intégration finaux et nettoyer les anciens patterns d'injection",
             "dependencies": [
-              "4.2",
-              "4.3",
               "4.4"
             ],
-            "details": "1. Créer une suite de tests end-to-end:\n   - Initialisation complète de l'application\n   - Test du flow d'authentification anonyme Supabase\n   - Vérification des WebSockets Realtime\n   - Capture d'erreurs avec Sentry\n2. Tests de performance:\n   - Mesurer les temps d'initialisation\n   - Vérifier la consommation mémoire\n   - Tester la reconnexion après perte réseau\n3. Tests de régression:\n   - Vérifier toutes les fonctionnalités existantes\n   - Tester les edge cases identifiés\n4. Validation sur différents environnements:\n   - Android API 21, 26, 30, 34\n   - Mode release vs debug\n   - Avec/sans connexion Internet\n5. Documentation des résultats et ajustements finaux",
+            "details": "1. Exécuter flutter analyze pour détecter les erreurs résiduelles. 2. Mettre à jour les widgets qui utilisent les use cases pour utiliser ref.watch. 3. Supprimer les anciennes instanciations directes et les imports inutiles. 4. Vérifier la cohérence avec les autres repositories (ActionCardRepository, etc.). 5. Documenter le nouveau pattern dans un commentaire en tête de fichier. 6. Exécuter tous les tests pour garantir la non-régression.",
             "status": "pending",
-            "testStrategy": "1. Suite de tests automatisés avec coverage > 80%\n2. Tests manuels sur devices physiques\n3. Monitoring des métriques Sentry en staging\n4. Tests de charge sur les connexions Realtime\n5. Validation des logs et error reporting"
+            "testStrategy": "Tests end-to-end pour valider le flux complet depuis l'UI. Tests de régression sur l'ensemble de la feature game. Benchmarks de performance pour vérifier l'absence d'overhead. Tests de hot reload pour valider la stabilité."
           }
         ]
       },
       {
         "id": 5,
-        "title": "Configuration et Résolution des Problèmes de Build Android",
-        "description": "Configurer l'environnement de build Android, résoudre les erreurs Gradle et garantir une compilation fonctionnelle",
-        "details": "1. Mise à jour de la configuration Android:\n   - android/gradle/wrapper/gradle-wrapper.properties: Gradle 8.5+\n   - android/build.gradle: \n     ```gradle\n     ext.kotlin_version = '1.9.25'\n     classpath 'com.android.tools.build:gradle:8.3.2'\n     ```\n   - android/app/build.gradle:\n     ```gradle\n     compileSdkVersion 34\n     minSdkVersion 21\n     targetSdkVersion 34\n     ```\n2. Résoudre les problèmes courants:\n   - Namespace obligatoire dans Android Gradle Plugin 8.0+\n   - Migration vers les nouvelles APIs Android\n   - Compatibilité avec androidx\n3. Configuration du build.gradle app:\n   ```gradle\n   android {\n     namespace 'com.example.ojyx'\n     compileSdkVersion flutter.compileSdkVersion\n     \n     defaultConfig {\n       applicationId 'com.example.ojyx'\n       minSdkVersion 21\n       targetSdkVersion flutter.targetSdkVersion\n       versionCode flutterVersionCode.toInteger()\n       versionName flutterVersionName\n       multiDexEnabled true\n     }\n   }\n   ```\n4. Nettoyer et reconstruire:\n   ```bash\n   flutter clean\n   cd android && ./gradlew clean\n   cd .. && flutter pub get\n   flutter build apk --debug\n   ```",
-        "testStrategy": "1. Créer un script de build automatisé testant:\n   - Build debug APK\n   - Build release APK\n   - Build App Bundle\n2. Tester sur différentes versions d'Android (API 21, 26, 30, 34)\n3. Vérifier les permissions dans AndroidManifest.xml\n4. Tester l'installation et le lancement sur émulateur\n5. Valider la signature de l'APK pour le release\n6. Créer des tests de smoke post-installation",
+        "title": "Correction de l'injection des dépendances dans les use cases",
+        "description": "Mettre à jour tous les use cases pour utiliser correctement l'injection de dépendances Riverpod au lieu des accès directs aux datasources",
+        "details": "1. Identifier tous les use cases qui accèdent directement aux datasources. 2. Modifier chaque use case pour accepter un Repository dans le constructeur. 3. Créer un provider pour chaque use case: final startGameUseCaseProvider = Provider((ref) => StartGameUseCase(ref.watch(gameStateRepositoryProvider))). 4. Supprimer tout import de datasources dans les use cases. 5. Mettre à jour les widgets pour utiliser ref.watch(useCaseProvider). 6. Respecter le principe d'inversion de dépendances (DIP).",
+        "testStrategy": "Tests unitaires avec mocks pour chaque use case. Vérifier qu'aucun use case n'importe de datasource. Tests d'intégration pour valider le flux complet depuis le widget. Utiliser Mockito pour les mocks de repositories.",
         "priority": "high",
         "dependencies": [
           4
@@ -285,66 +280,66 @@
         "subtasks": [
           {
             "id": 1,
-            "title": "Mise à jour et configuration des fichiers Gradle",
-            "description": "Mettre à jour les fichiers de configuration Gradle pour Android avec les versions compatibles et résoudre les problèmes de namespace",
+            "title": "Audit et inventaire des use cases avec accès direct aux datasources",
+            "description": "Identifier et documenter tous les use cases qui violent le principe DIP en accédant directement aux datasources au lieu de passer par les repositories",
             "dependencies": [],
-            "details": "1. Mettre à jour android/gradle/wrapper/gradle-wrapper.properties:\n   - distributionUrl=https://services.gradle.org/distributions/gradle-8.5-all.zip\n2. Modifier android/build.gradle:\n   ```gradle\n   buildscript {\n     ext.kotlin_version = '1.9.25'\n     repositories {\n       google()\n       mavenCentral()\n     }\n     dependencies {\n       classpath 'com.android.tools.build:gradle:8.3.2'\n       classpath \"org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version\"\n     }\n   }\n   ```\n3. Ajouter le namespace obligatoire dans android/app/build.gradle:\n   ```gradle\n   android {\n     namespace 'com.example.ojyx'\n   }\n   ```\n4. Vérifier la compatibilité avec le plugin Android Gradle 8.0+",
+            "details": "Parcourir tous les fichiers dans lib/features/*/domain/use_cases/. Rechercher les imports de datasources (import '../../data/datasources/'). Lister chaque use case problématique avec le datasource utilisé. Identifier les constructeurs qui n'acceptent pas de repository. Documenter les patterns d'accès direct (ref.read, singleton, etc.). Créer une liste de priorité basée sur la criticité.",
             "status": "pending",
-            "testStrategy": "1. Créer un script de validation Gradle:\n   - Vérifier la version de Gradle avec ./gradlew --version\n   - Tester la résolution des dépendances avec ./gradlew dependencies\n2. Écrire des tests unitaires vérifiant:\n   - La présence du namespace dans le fichier build.gradle\n   - Les versions correctes de Kotlin et AGP\n3. Valider que les tâches Gradle s'exécutent sans erreur"
+            "testStrategy": "Script de vérification grep/ast pour détecter les imports interdits. Tests de régression pour s'assurer qu'aucun nouvel accès direct n'est introduit."
           },
           {
             "id": 2,
-            "title": "Configuration des SDK et options de compilation Android",
-            "description": "Configurer les versions des SDK Android, les options de compilation et activer les fonctionnalités nécessaires comme MultiDex",
+            "title": "Refactoring des constructeurs des use cases pour l'injection de repositories",
+            "description": "Modifier chaque use case identifié pour accepter un repository via son constructeur au lieu d'accéder directement aux datasources",
             "dependencies": [
               "5.1"
             ],
-            "details": "1. Mettre à jour android/app/build.gradle avec les configurations SDK:\n   ```gradle\n   android {\n     compileSdkVersion 34\n     ndkVersion flutter.ndkVersion\n     \n     defaultConfig {\n       applicationId 'com.example.ojyx'\n       minSdkVersion 21\n       targetSdkVersion 34\n       versionCode flutterVersionCode.toInteger()\n       versionName flutterVersionName\n       multiDexEnabled true\n     }\n     \n     compileOptions {\n       sourceCompatibility JavaVersion.VERSION_17\n       targetCompatibility JavaVersion.VERSION_17\n     }\n     \n     kotlinOptions {\n       jvmTarget = '17'\n     }\n   }\n   ```\n2. Ajouter les dépendances androidx nécessaires:\n   ```gradle\n   dependencies {\n     implementation 'androidx.multidex:multidex:2.0.1'\n   }\n   ```\n3. Configurer le support des architectures:\n   ```gradle\n   android {\n     defaultConfig {\n       ndk {\n         abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'\n       }\n     }\n   }\n   ```",
+            "details": "Pour chaque use case: remplacer les accès directs par des paramètres de constructeur. Exemple: class StartGameUseCase { final GameStateRepository _repository; StartGameUseCase(this._repository); }. Supprimer tous les imports de datasources. Remplacer les appels directs par _repository.method(). Assurer que chaque use case ne dépend que des abstractions (interfaces repository). Mettre à jour les signatures des méthodes si nécessaire.",
             "status": "pending",
-            "testStrategy": "1. Écrire des tests vérifiant la configuration SDK:\n   - Test que compileSdkVersion >= 34\n   - Test que minSdkVersion = 21\n   - Test que multiDexEnabled = true\n2. Créer des tests de build pour différentes architectures:\n   - Build pour arm64-v8a\n   - Build pour armeabi-v7a\n3. Tester la compatibilité Java 17 avec un test de compilation"
+            "testStrategy": "Tests unitaires avec mocks de repositories pour chaque use case modifié. Vérifier que les use cases n'ont plus d'imports de la couche data/datasources."
           },
           {
             "id": 3,
-            "title": "Migration et résolution des APIs Android obsolètes",
-            "description": "Identifier et migrer les APIs Android obsolètes, résoudre les problèmes de compatibilité avec AndroidX et les permissions",
+            "title": "Création des providers Riverpod pour chaque use case",
+            "description": "Implémenter un provider dédié pour chaque use case en utilisant l'injection de dépendances avec les repositories providers existants",
             "dependencies": [
               "5.2"
             ],
-            "details": "1. Vérifier et mettre à jour AndroidManifest.xml:\n   ```xml\n   <uses-permission android:name=\"android.permission.INTERNET\"/>\n   <application\n     android:name=\"${applicationName}\"\n     android:label=\"ojyx\"\n     android:icon=\"@mipmap/ic_launcher\"\n     android:usesCleartextTraffic=\"false\"\n     android:allowBackup=\"false\">\n   </application>\n   ```\n2. Migrer vers les nouvelles APIs Android:\n   - Remplacer les imports obsolètes android.support.* par androidx.*\n   - Utiliser WindowCompat pour la gestion des insets\n   - Migrer vers les nouvelles APIs de notification si utilisées\n3. Ajouter android.enableJetifier=true dans gradle.properties si nécessaire\n4. Résoudre les conflits de versions androidx:\n   ```gradle\n   configurations.all {\n     resolutionStrategy {\n       force 'androidx.core:core:1.12.0'\n       force 'androidx.lifecycle:lifecycle-runtime:2.7.0'\n     }\n   }\n   ```",
+            "details": "Créer un fichier use_case_providers.dart dans presentation/providers/. Pour chaque use case, définir: final startGameUseCaseProvider = Provider<StartGameUseCase>((ref) => StartGameUseCase(ref.watch(gameStateRepositoryProvider))). Gérer les dépendances multiples si nécessaire. Organiser les providers par feature. Ajouter la documentation sur les dépendances. Exporter tous les providers dans un barrel file.",
             "status": "pending",
-            "testStrategy": "1. Créer des tests de lint Android:\n   - Vérifier l'absence d'APIs obsolètes\n   - Valider les imports androidx\n2. Écrire des tests d'intégration pour les permissions:\n   - Test de demande de permission Internet\n   - Test des paramètres de sécurité (cleartext traffic)\n3. Tester la compatibilité avec différentes versions d'Android (API 21, 26, 30, 34)"
+            "testStrategy": "Tests avec ProviderContainer pour vérifier l'injection correcte. Tests d'override des providers pour les tests unitaires. Vérifier la résolution des dépendances circulaires."
           },
           {
             "id": 4,
-            "title": "Optimisation et nettoyage du build Android",
-            "description": "Nettoyer le projet, optimiser les paramètres de build et créer des scripts de build automatisés pour différents environnements",
+            "title": "Migration des widgets pour utiliser les use case providers",
+            "description": "Mettre à jour tous les widgets qui utilisent directement les use cases pour passer par les providers Riverpod",
             "dependencies": [
               "5.3"
             ],
-            "details": "1. Créer un script de nettoyage complet clean_build.sh:\n   ```bash\n   #!/bin/bash\n   flutter clean\n   cd android\n   ./gradlew clean\n   rm -rf .gradle\n   cd ..\n   rm -rf build/\n   flutter pub get\n   cd android\n   ./gradlew build --refresh-dependencies\n   ```\n2. Optimiser les paramètres de build dans android/app/build.gradle:\n   ```gradle\n   android {\n     buildTypes {\n       release {\n         signingConfig signingConfigs.debug\n         minifyEnabled true\n         shrinkResources true\n         proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\n       }\n       debug {\n         applicationIdSuffix \".debug\"\n         debuggable true\n       }\n     }\n     packagingOptions {\n       exclude 'META-INF/DEPENDENCIES'\n       exclude 'META-INF/LICENSE'\n       exclude 'META-INF/LICENSE.txt'\n     }\n   }\n   ```\n3. Configurer les flavors si nécessaire pour différents environnements\n4. Créer des tâches Gradle personnalisées pour automatiser les builds",
+            "details": "Identifier tous les widgets qui créent ou utilisent des use cases. Remplacer les instanciations directes par ref.watch(useCaseProvider). Exemple: final startGame = ref.watch(startGameUseCaseProvider). Gérer les cas avec ConsumerWidget et ConsumerStatefulWidget. Mettre à jour les callbacks et event handlers. Assurer la propagation correcte des erreurs. Optimiser avec ref.read pour les actions ponctuelles.",
             "status": "pending",
-            "testStrategy": "1. Tester les différents types de build:\n   - flutter build apk --debug\n   - flutter build apk --release\n   - flutter build appbundle --release\n2. Mesurer les performances de build:\n   - Temps de compilation\n   - Taille des APK générés\n   - Utilisation mémoire durant le build\n3. Valider l'optimisation ProGuard/R8 sur le build release"
+            "testStrategy": "Tests de widgets avec mock providers. Vérifier que les widgets ne créent plus d'instances de use cases. Tests d'intégration end-to-end pour valider le flux complet."
           },
           {
             "id": 5,
-            "title": "Validation finale et création de la documentation de build",
-            "description": "Valider l'ensemble de la configuration Android, créer une documentation complète et établir des procédures de dépannage",
+            "title": "Validation et tests d'intégration de l'architecture DIP",
+            "description": "Vérifier que l'architecture respecte complètement le principe d'inversion de dépendances et documenter les patterns",
             "dependencies": [
               "5.4"
             ],
-            "details": "1. Exécuter une validation complète:\n   ```bash\n   flutter doctor -v\n   cd android && ./gradlew tasks\n   ./gradlew assembleDebug --stacktrace\n   ./gradlew assembleRelease --stacktrace\n   ```\n2. Créer un fichier ANDROID_BUILD.md documentant:\n   - Configuration Gradle requise\n   - Versions des SDK et outils\n   - Procédures de résolution des erreurs courantes\n   - Scripts de build automatisés\n3. Établir une checklist de validation:\n   - [ ] Gradle 8.5+ configuré\n   - [ ] Namespace Android défini\n   - [ ] SDK 34 compilé avec succès\n   - [ ] MultiDex activé et fonctionnel\n   - [ ] Build debug et release réussis\n   - [ ] APK installable sur émulateur\n4. Créer des tests de régression pour prévenir les futurs problèmes de build\n5. Documenter les erreurs rencontrées et leurs solutions",
+            "details": "Créer des tests d'architecture avec flutter_test ou analyzer. Vérifier qu'aucun use case n'importe de datasource ou modèle. Valider que tous les use cases dépendent uniquement d'abstractions. Tester les scénarios de remplacement de datasources. Documenter les patterns d'injection dans ARCHITECTURE.md. Créer un diagramme de dépendances. Ajouter des lints custom si nécessaire.",
             "status": "pending",
-            "testStrategy": "1. Créer une suite de tests de build automatisés:\n   - Test de build incrémental\n   - Test de build clean\n   - Test de build avec cache\n2. Valider sur différents environnements:\n   - Linux/Mac/Windows\n   - Différentes versions de JDK (17, 21)\n3. Tester l'installation et le lancement:\n   - Sur émulateur Android\n   - Sur device physique si disponible\n4. Vérifier la reproductibilité des builds"
+            "testStrategy": "Tests d'architecture automatisés pour détecter les violations DIP. Tests de substitution avec différentes implémentations de repositories. Benchmarks de performance avant/après refactoring."
           }
         ]
       },
       {
         "id": 6,
-        "title": "Validation Finale et Configuration CI/CD",
-        "description": "Valider l'ensemble des mises à jour, configurer la CI/CD pour maintenir la stabilité et documenter les changements",
-        "details": "1. Validation complète du projet:\n   ```bash\n   flutter doctor -v\n   flutter analyze --no-fatal-infos\n   flutter test --coverage\n   flutter build apk --release\n   ```\n2. Mise à jour du workflow GitHub Actions:\n   ```yaml\n   - uses: actions/setup-java@v4\n     with:\n       java-version: '17'\n       distribution: 'temurin'\n   - uses: subosito/flutter-action@v2\n     with:\n       flutter-version: '3.24.x'\n       channel: 'stable'\n   ```\n3. Configuration des étapes CI:\n   - Cache des dépendances Pub et Gradle\n   - Analyse statique stricte\n   - Tests avec rapport de couverture\n   - Build APK de validation\n   - Upload des artifacts\n4. Création d'un CHANGELOG.md détaillant:\n   - Toutes les dépendances mises à jour\n   - Les breaking changes résolus\n   - Les adaptations de code effectuées\n5. Mise à jour de la documentation développeur\n6. Configuration des hooks pre-commit pour maintenir la qualité",
-        "testStrategy": "1. Tests E2E sur l'application complète:\n   - Parcours utilisateur principal\n   - Création et jointure de partie\n   - Gameplay basique\n2. Tests de performance:\n   - Temps de démarrage\n   - Utilisation mémoire\n   - FPS durant le jeu\n3. Validation de la CI/CD:\n   - Déclencher manuellement tous les workflows\n   - Vérifier les temps de build\n   - Valider les artifacts générés\n4. Tests de régression sur toutes les fonctionnalités\n5. Validation finale avec un APK installé sur device physique",
-        "priority": "medium",
+        "title": "Migration complète des ActionCards vers Supabase",
+        "description": "Finaliser la migration du système de cartes actions depuis la mémoire locale vers Supabase avec implémentation complète du datasource et repository",
+        "details": "1. Implémenter SupabaseActionCardDataSource avec toutes les méthodes CRUD. 2. Créer ActionCardModel avec json_serializable pour la sérialisation. 3. Implémenter les mappers ActionCard ↔ ActionCardModel. 4. Créer SupabaseActionCardRepository implémentant ActionCardRepository. 5. Migrer les données existantes vers la table action_cards. 6. Implémenter le cache local avec synchronisation. 7. Gérer les conflits de mise à jour avec versioning optimiste. Utiliser Supabase Realtime pour les mises à jour temps réel.",
+        "testStrategy": "Tests d'intégration avec base de données de test. Tests de synchronisation avec simulation de latence réseau. Tests de gestion des conflits avec actions concurrentes. Vérifier la cohérence des données après chaque opération.",
+        "priority": "high",
         "dependencies": [
           5
         ],
@@ -352,67 +347,674 @@
         "subtasks": [
           {
             "id": 1,
-            "title": "Validation complète de l'environnement de développement",
-            "description": "Exécuter une validation complète de l'environnement Flutter, analyser le code et générer un rapport de couverture de tests",
+            "title": "Implémenter SupabaseActionCardDataSource avec méthodes CRUD",
+            "description": "Créer le datasource Supabase pour les cartes actions avec toutes les opérations CRUD nécessaires et la gestion des erreurs",
             "dependencies": [],
-            "details": "Exécuter les commandes de validation dans l'ordre : flutter doctor -v pour vérifier l'environnement, flutter analyze --no-fatal-infos pour l'analyse statique, flutter test --coverage pour les tests avec couverture, et flutter build apk --release pour valider la compilation release. Documenter tous les problèmes détectés et les résoudre avant de passer aux étapes suivantes.",
+            "details": "Créer lib/features/game/data/datasources/supabase_action_card_datasource.dart avec les méthodes : getActionCards(), getActionCardById(), createActionCard(), updateActionCard(), deleteActionCard(). Implémenter la gestion des erreurs avec try-catch et conversion des exceptions Supabase. Utiliser le client Supabase injecté via le constructeur. Ajouter les logs pour le debug et le monitoring.",
             "status": "pending",
-            "testStrategy": "Créer un script de validation automatisé qui exécute toutes les commandes et capture les sorties. Vérifier que flutter doctor ne retourne aucune erreur critique, que l'analyse statique passe sans warnings, que la couverture de tests atteint au minimum 80%, et que le build release se termine avec succès."
+            "testStrategy": "Tests unitaires avec mock du client Supabase. Tests de chaque méthode CRUD avec différents scénarios de succès et d'échec. Vérifier la conversion correcte des exceptions et les messages d'erreur."
           },
           {
             "id": 2,
-            "title": "Mise à jour du workflow GitHub Actions",
-            "description": "Configurer et mettre à jour le fichier de workflow GitHub Actions avec les versions les plus récentes des actions et outils",
-            "dependencies": [
-              "6.1"
-            ],
-            "details": "Mettre à jour .github/workflows/ci.yml avec actions/setup-java@v4 (Java 17 Temurin), subosito/flutter-action@v2 (Flutter 3.24.x stable). Configurer le cache pour les dépendances Pub et Gradle. Ajouter les étapes d'analyse statique stricte, tests avec rapport de couverture, build APK de validation et upload des artifacts. Tester le workflow sur une branche de test.",
+            "title": "Créer ActionCardModel avec json_serializable et mappers",
+            "description": "Implémenter le modèle de données ActionCardModel avec la sérialisation JSON et les mappers bidirectionnels vers l'entité du domaine",
+            "dependencies": [],
+            "details": "Créer lib/features/game/data/models/action_card_model.dart avec @JsonSerializable. Définir tous les champs nécessaires : id, name, description, effect, cardType, isRevealed, stock. Implémenter fromJson/toJson avec json_serializable. Créer les méthodes toEntity() et fromEntity() pour la conversion ActionCardModel ↔ ActionCard. Utiliser freezed pour l'immutabilité.",
             "status": "pending",
-            "testStrategy": "Créer une PR de test pour déclencher le workflow et vérifier que toutes les étapes s'exécutent correctement. Valider que le cache fonctionne (temps d'exécution réduit lors des runs suivants), que les artifacts sont correctement uploadés, et que les rapports de couverture sont générés."
+            "testStrategy": "Tests unitaires de sérialisation/désérialisation JSON. Tests des mappers dans les deux sens. Vérifier la préservation de toutes les propriétés lors des conversions."
           },
           {
             "id": 3,
-            "title": "Configuration des hooks pre-commit et qualité du code",
-            "description": "Mettre en place des hooks pre-commit pour maintenir automatiquement la qualité du code et respecter les standards TDD",
-            "dependencies": [
-              "6.1"
-            ],
-            "details": "Installer et configurer pre-commit avec des hooks pour : formatage automatique du code (dart format), analyse statique (flutter analyze), exécution des tests (flutter test), vérification des règles TDD (détection de tests commentés, vérification de la couverture minimale). Créer un script de validation qui bloque les commits non conformes.",
-            "status": "pending",
-            "testStrategy": "Tester les hooks en créant volontairement des violations (code mal formaté, tests commentés, coverage insuffisante) et vérifier que les commits sont bloqués. Valider que les hooks n'interfèrent pas avec un workflow de développement normal lorsque le code respecte les standards."
-          },
-          {
-            "id": 4,
-            "title": "Création du CHANGELOG.md détaillé",
-            "description": "Documenter exhaustivement toutes les modifications, mises à jour de dépendances et breaking changes dans un CHANGELOG.md structuré",
+            "title": "Implémenter SupabaseActionCardRepository",
+            "description": "Créer le repository concret qui utilise le datasource et implémente l'interface ActionCardRepository du domaine",
             "dependencies": [
               "6.1",
               "6.2"
             ],
-            "details": "Créer un CHANGELOG.md suivant le format Keep a Changelog. Documenter : toutes les dépendances mises à jour avec versions avant/après, les breaking changes identifiés et leurs résolutions, les adaptations de code effectuées, les nouvelles fonctionnalités ajoutées, les bugs corrigés. Organiser par versions et dates, avec des liens vers les commits et PRs pertinents.",
+            "details": "Créer lib/features/game/data/repositories/supabase_action_card_repository.dart. Implémenter toutes les méthodes de l'interface ActionCardRepository. Utiliser le datasource pour les opérations et les mappers pour les conversions. Ajouter la gestion du cache local avec une Map<String, ActionCard>. Implémenter la logique de synchronisation cache/serveur.",
             "status": "pending",
-            "testStrategy": "Vérifier que le changelog est complet en comparant avec l'historique git et les modifications de pubspec.yaml. Valider que chaque breaking change documenté correspond à une adaptation réelle dans le code. Tester que les liens vers les commits et PRs sont fonctionnels."
+            "testStrategy": "Tests unitaires avec mocks du datasource. Tests du cache local et de la synchronisation. Tests d'intégration avec une base de données de test."
+          },
+          {
+            "id": 4,
+            "title": "Configurer Supabase Realtime et gestion des conflits",
+            "description": "Implémenter l'écoute des changements en temps réel et la résolution des conflits avec versioning optimiste",
+            "dependencies": [
+              "6.3"
+            ],
+            "details": "Ajouter l'abonnement Realtime dans le repository pour écouter les changements de la table action_cards. Implémenter le versioning optimiste avec un champ version dans ActionCardModel. Créer la logique de résolution de conflits : comparer les versions, merger les changements ou notifier l'utilisateur. Gérer la reconnexion automatique en cas de perte de connexion.",
+            "status": "pending",
+            "testStrategy": "Tests avec simulation de conflits concurrents. Tests de reconnexion après perte réseau. Vérifier la cohérence des données après résolution de conflits."
           },
           {
             "id": 5,
-            "title": "Mise à jour de la documentation développeur et validation finale",
-            "description": "Mettre à jour CLAUDE.md et toute la documentation technique, puis effectuer une validation complète du projet",
+            "title": "Migrer les données existantes et créer le provider Riverpod",
+            "description": "Effectuer la migration des données en mémoire vers Supabase et configurer l'injection de dépendances avec Riverpod",
             "dependencies": [
-              "6.1",
-              "6.2",
-              "6.3",
               "6.4"
             ],
-            "details": "Mettre à jour CLAUDE.md avec les nouvelles versions de dépendances, commandes modifiées, et procédures mises à jour. Documenter les nouveaux hooks pre-commit et le workflow CI/CD. Effectuer une validation finale complète : builds sur différents environnements, tests E2E, vérification des performances (temps de démarrage, utilisation mémoire, FPS). Créer un guide de migration pour les futurs développeurs.",
+            "details": "Créer un script de migration pour transférer les cartes actions existantes vers la table Supabase. Créer actionCardRepositoryProvider dans presentation/providers. Configurer l'injection : Provider<ActionCardRepository>((ref) => SupabaseActionCardRepository(...)). Mettre à jour tous les use cases et widgets pour utiliser le nouveau provider. Ajouter des logs de migration pour tracer le processus.",
             "status": "pending",
-            "testStrategy": "Exécuter une suite de tests complète incluant : tests unitaires, tests d'intégration, tests E2E sur le parcours utilisateur principal (création/jointure de partie, gameplay), tests de performance avec métriques de référence. Valider que la documentation est à jour en suivant les procédures documentées sur un environnement propre."
+            "testStrategy": "Tests de migration avec données de test. Vérifier l'intégrité des données après migration. Tests du provider avec ProviderContainer."
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Implémentation des fonctions PostgreSQL manquantes",
+        "description": "Compléter les fonctions PostgreSQL côté serveur pour gérer l'état complet du jeu incluant les cartes actions et la validation",
+        "details": "1. Créer use_action_card(game_id, player_id, card_id, target_data) pour valider et appliquer les effets. 2. Implémenter validate_action_card_usage() pour vérifier les conditions d'utilisation. 3. Créer apply_action_card_effects() avec la logique spécifique par type de carte. 4. Ajouter des triggers pour mettre à jour game_states après utilisation. 5. Implémenter la gestion du stock de 3 cartes maximum par joueur. 6. Ajouter des logs d'audit pour chaque action. Utiliser PL/pgSQL avec gestion des transactions.",
+        "testStrategy": "Tests PostgreSQL avec pgTAP. Tests de chaque fonction avec différents scénarios. Tests de performance avec multiples joueurs simultanés. Vérifier l'atomicité des transactions et la cohérence des données.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Création de la fonction use_action_card avec validation des paramètres",
+            "description": "Implémenter la fonction principale use_action_card(game_id, player_id, card_id, target_data) qui sera le point d'entrée pour l'utilisation des cartes actions",
+            "dependencies": [],
+            "details": "Créer la fonction PL/pgSQL avec validation des paramètres d'entrée : vérifier l'existence du game_id, que le player_id appartient bien à la partie, que card_id existe dans le stock du joueur. Retourner un type composite avec success boolean, message text et updated_state jsonb. Gérer les erreurs avec EXCEPTION blocks appropriés.",
+            "status": "pending",
+            "testStrategy": "Tests pgTAP pour valider les cas d'erreur : game inexistant, joueur non autorisé, carte non possédée. Vérifier que la fonction retourne les bons codes d'erreur et messages."
+          },
+          {
+            "id": 2,
+            "title": "Implémentation de validate_action_card_usage pour les règles métier",
+            "description": "Créer la fonction de validation qui vérifie toutes les conditions d'utilisation d'une carte action selon son type et l'état du jeu",
+            "dependencies": [],
+            "details": "Implémenter validate_action_card_usage(game_id, player_id, card_type, target_data) qui vérifie : tour du joueur actif, carte jouable selon l'état (ex: pas de swap sur grille complètement révélée), validité des cibles (positions existantes, joueurs dans la partie). Retourner un record (is_valid boolean, error_message text). Gérer les règles spécifiques par type de carte.",
+            "status": "pending",
+            "testStrategy": "Tests exhaustifs par type de carte : swap avec positions invalides, peek sur cartes déjà révélées, mirror sur joueur inexistant. Vérifier que chaque règle métier est respectée."
+          },
+          {
+            "id": 3,
+            "title": "Développement de apply_action_card_effects avec logique par type",
+            "description": "Créer la fonction qui applique les effets spécifiques de chaque type de carte action sur l'état du jeu",
+            "dependencies": [
+              "7.2"
+            ],
+            "details": "Implémenter apply_action_card_effects(game_id, player_id, card_type, target_data) avec un CASE statement pour chaque type : SWAP (échanger deux cartes), PEEK (révéler temporairement), MIRROR (copier une carte), etc. Utiliser des fonctions auxiliaires pour chaque effet complexe. Mettre à jour l'état du jeu de manière atomique. Gérer les cartes obligatoires vs optionnelles.",
+            "status": "pending",
+            "testStrategy": "Tests d'intégration pour chaque effet : vérifier que l'état est correctement modifié, que les historiques sont créés, que les effets en cascade sont appliqués (ex: validation de colonne après swap)."
+          },
+          {
+            "id": 4,
+            "title": "Création des triggers et gestion du stock de cartes",
+            "description": "Implémenter les triggers PostgreSQL pour maintenir la cohérence après utilisation des cartes et gérer le stock maximum de 3 cartes",
+            "dependencies": [
+              "7.1",
+              "7.3"
+            ],
+            "details": "Créer trigger after_action_card_used sur game_actions pour : retirer la carte du stock du joueur, vérifier et appliquer la règle des 3 cartes max, mettre à jour game_states.last_action. Implémenter manage_action_card_stock(player_id, game_id) pour forcer la défausse si stock plein. Ajouter trigger pour log automatique dans action_card_logs.",
+            "status": "pending",
+            "testStrategy": "Tests de concurrence avec multiples utilisations simultanées. Vérifier que le stock ne dépasse jamais 3 cartes. Tester les cas limites : utilisation rapide, ajout pendant défausse forcée."
+          },
+          {
+            "id": 5,
+            "title": "Mise en place du système d'audit et optimisation des performances",
+            "description": "Implémenter les logs d'audit détaillés et optimiser les performances pour supporter plusieurs parties simultanées",
+            "dependencies": [
+              "7.1",
+              "7.3",
+              "7.4"
+            ],
+            "details": "Créer la table action_card_logs avec colonnes : timestamp, game_id, player_id, card_type, target_data, result, duration_ms. Ajouter des index sur game_actions et game_states pour les requêtes fréquentes. Implémenter log_action_card_usage() appelée automatiquement. Utiliser EXPLAIN ANALYZE pour identifier les goulots. Ajouter pg_stat_statements pour monitoring.",
+            "status": "pending",
+            "testStrategy": "Tests de charge avec 50+ parties simultanées. Mesurer les temps de réponse < 100ms pour chaque action. Vérifier la complétude des logs avec différents scénarios d'erreur."
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Réparation des tests unitaires échouants",
+        "description": "Corriger les ~100-200 tests qui échouent suite aux changements d'architecture, en adaptant les fixtures et mocks aux nouvelles structures",
+        "details": "1. Exécuter flutter test et identifier tous les tests échouants. 2. Grouper les échecs par type (entités, mappers, providers). 3. Mettre à jour les fixtures pour utiliser GamePlayer/LobbyPlayer. 4. Adapter les mocks aux nouvelles interfaces de repositories. 5. Corriger les imports et les chemins suite aux déplacements. 6. Utiliser les builders de test pour créer des objets valides. 7. Vérifier que tous les tests utilisent les bons providers. Prioriser les tests critiques du gameplay.",
+        "testStrategy": "Approche itérative: corriger par batch de 10-20 tests. Utiliser --name pour cibler des groupes spécifiques. Vérifier la cohérence des données de test. S'assurer qu'aucun test n'est commenté ou skip.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2,
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Analyse et catégorisation des tests échouants",
+            "description": "Exécuter flutter test pour identifier tous les tests en échec et les catégoriser par type et par feature pour prioriser les corrections",
+            "dependencies": [],
+            "details": "1. Exécuter flutter test > test_report.txt pour capturer tous les échecs. 2. Parser le rapport pour extraire les patterns d'erreur (imports manquants, types incompatibles, mocks obsolètes). 3. Créer un fichier test_analysis.md groupant les échecs par: entités (GameState, Player), repositories, providers, use cases. 4. Identifier les tests critiques du gameplay à corriger en priorité. 5. Estimer le nombre exact de tests à corriger par catégorie. 6. Documenter les patterns de correction récurrents pour automatiser certaines fixes.",
+            "status": "pending",
+            "testStrategy": "Script d'analyse automatique pour parser les logs de test. Validation manuelle de la catégorisation. Vérifier que tous les tests sont comptabilisés."
+          },
+          {
+            "id": 2,
+            "title": "Création des builders et fixtures pour les nouvelles entités",
+            "description": "Développer des test builders et fixtures réutilisables pour GamePlayer, LobbyPlayer et les autres entités modifiées dans la nouvelle architecture",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "1. Créer test/helpers/test_builders.dart avec des factory methods pour GamePlayer, LobbyPlayer, GameState. 2. Implémenter des builders avec valeurs par défaut sensées et paramètres optionnels. 3. Créer test/fixtures/ avec des JSON fixtures pour les modèles Supabase. 4. Ajouter des helpers pour générer des listes d'entités (ex: createPlayerList). 5. Documenter l'usage des builders avec exemples. 6. Centraliser la création d'objets de test pour éviter la duplication. Pattern: TestGamePlayer.create(), TestLobbyPlayer.withCustomName().",
+            "status": "pending",
+            "testStrategy": "Tests unitaires des builders eux-mêmes. Vérifier que les objets créés sont valides selon les contraintes métier. Tests de sérialisation/désérialisation des fixtures JSON."
+          },
+          {
+            "id": 3,
+            "title": "Correction des tests des entités et mappers",
+            "description": "Réparer tous les tests unitaires des entités domain et des mappers data en utilisant les nouveaux builders et en adaptant aux changements d'architecture",
+            "dependencies": [
+              "8.2"
+            ],
+            "details": "1. Corriger game_state_test.dart en utilisant GamePlayer au lieu de Player. 2. Adapter player_grid_test.dart pour la nouvelle structure sans sérialisation. 3. Fixer les tests de mappers DbPlayerGridModel ↔ PlayerGrid. 4. Mettre à jour les tests d'ActionCard avec la nouvelle structure. 5. Corriger les imports cassés suite aux déplacements de fichiers. 6. Remplacer tous les constructeurs manuels par les test builders. 7. Vérifier que copyWith fonctionne correctement avec Freezed. Focus: ~30-40 tests estimés.",
+            "status": "pending",
+            "testStrategy": "Exécution ciblée avec flutter test test/features/game/domain. Vérification de la couverture sur les entités critiques. Pas de skip ou de tests commentés autorisés."
+          },
+          {
+            "id": 4,
+            "title": "Mise à jour des mocks et tests des repositories",
+            "description": "Adapter tous les mocks de repositories aux nouvelles interfaces et corriger les tests d'intégration avec les datasources Supabase",
+            "dependencies": [
+              "8.3"
+            ],
+            "details": "1. Régénérer les mocks avec mockito pour GameStateRepository, ActionCardRepository. 2. Adapter les when() statements aux nouvelles signatures de méthodes. 3. Corriger supabase_game_state_repository_test.dart avec les bons modèles. 4. Fixer les tests de SupabaseActionCardDataSource (si implémenté). 5. Mettre à jour les tests des use cases utilisant les repositories. 6. Créer des mocks pour les nouveaux providers manquants. 7. Utiliser ProviderContainer pour l'injection dans les tests. Focus: ~40-50 tests estimés.",
+            "status": "pending",
+            "testStrategy": "Tests d'intégration avec base Supabase de test. Vérification des appels réseau avec dio_mock_adapter. Tests de gestion d'erreurs et edge cases."
+          },
+          {
+            "id": 5,
+            "title": "Correction des tests de providers et widgets",
+            "description": "Réparer tous les tests des providers Riverpod et des widgets UI en adaptant aux nouveaux providers et à la structure de données modifiée",
+            "dependencies": [
+              "8.4"
+            ],
+            "details": "1. Corriger game_state_notifier_test.dart avec le nouveau gameStateRepositoryProvider. 2. Adapter les tests de widgets utilisant ConsumerWidget avec les bons providers. 3. Fixer player_grid_widget_test.dart avec les nouvelles entités. 4. Mettre à jour common_area_widget_test.dart pour les ActionCards. 5. Corriger les tests de navigation avec go_router. 6. Utiliser ProviderScope.overrides pour mocker les providers. 7. Vérifier pumpAndSettle() pour les animations. 8. S'assurer que tous les tests passent sans warnings. Focus: ~50-60 tests.",
+            "status": "pending",
+            "testStrategy": "Widget tests avec golden tests pour l'UI critique. Tests de providers avec états async. Vérification de l'accessibilité avec semantics. Coverage minimum 80% sur presentation/."
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Réactivation et migration des tests UI",
+        "description": "Réactiver les 3 fichiers de tests UI désactivés (.disabled) et les migrer vers la syntaxe Riverpod 2.x",
+        "details": "1. Renommer les fichiers .disabled en .dart. 2. Migrer de Provider.of/Consumer vers ConsumerWidget/ref.watch. 3. Utiliser ProviderScope.overrides pour les tests. 4. Adapter aux nouveaux providers créés (gameStateRepositoryProvider, etc.). 5. Utiliser tester.pumpWidget avec ProviderScope. 6. Gérer l'asynchronicité avec tester.pumpAndSettle(). 7. Vérifier les golden tests si présents. Migration exemple: class MyWidget extends ConsumerWidget { Widget build(BuildContext context, WidgetRef ref) { final gameState = ref.watch(gameStateProvider); }}",
+        "testStrategy": "Tests de widgets avec pump et interactions. Vérifier le rendu correct de chaque état. Tests d'intégration pour les flux utilisateur complets. Utiliser flutter_test et mockito pour les dépendances.",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          8
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Identification et préparation des fichiers de tests UI désactivés",
+            "description": "Localiser les 3 fichiers de tests UI avec extension .disabled et préparer leur réactivation en analysant leur contenu actuel",
+            "dependencies": [],
+            "details": "1. Scanner le répertoire test/ pour trouver tous les fichiers .disabled. 2. Analyser le contenu de chaque fichier pour identifier les dépendances Provider.of et Consumer. 3. Créer une liste des widgets et providers à migrer. 4. Identifier les golden tests présents. 5. Documenter les imports nécessaires pour Riverpod 2.x. 6. Vérifier les dépendances de test actuelles dans pubspec.yaml",
+            "status": "pending",
+            "testStrategy": "Vérification manuelle de la présence des fichiers et validation syntaxique après renommage"
+          },
+          {
+            "id": 2,
+            "title": "Migration des widgets de StatelessWidget/StatefulWidget vers ConsumerWidget/ConsumerStatefulWidget",
+            "description": "Convertir tous les widgets de test utilisant Provider vers la syntaxe Riverpod 2.x avec ConsumerWidget et WidgetRef",
+            "dependencies": [
+              "9.1"
+            ],
+            "details": "1. Remplacer extends StatelessWidget par extends ConsumerWidget. 2. Ajouter WidgetRef ref comme paramètre dans build(). 3. Remplacer Provider.of<T>(context) par ref.watch(provider). 4. Migrer Consumer<T> vers ref.watch directement. 5. Adapter les setState() dans StatefulWidget vers ref.read().notifier. 6. Gérer les listen: false avec ref.read(). 7. Mettre à jour les imports avec flutter_riverpod",
+            "status": "pending",
+            "testStrategy": "Tests de compilation après chaque migration. Vérifier que les widgets se construisent sans erreur"
+          },
+          {
+            "id": 3,
+            "title": "Configuration des ProviderScope et overrides pour les tests",
+            "description": "Adapter l'infrastructure de test pour utiliser ProviderScope avec les overrides nécessaires pour mocker les dépendances",
+            "dependencies": [
+              "9.2"
+            ],
+            "details": "1. Wrapper tous les pumpWidget avec ProviderScope. 2. Créer des mocks pour gameStateRepositoryProvider, actionCardRepositoryProvider. 3. Utiliser overrides: [...] pour injecter les mocks. 4. Configurer les AsyncValue.data() pour les providers asynchrones. 5. Gérer les StateNotifier avec des états initiaux mockés. 6. Créer des helpers de test réutilisables pour les configurations communes",
+            "status": "pending",
+            "testStrategy": "Tests unitaires pour vérifier que les overrides fonctionnent correctement. Validation des injections de dépendances"
+          },
+          {
+            "id": 4,
+            "title": "Gestion de l'asynchronicité et des animations dans les tests",
+            "description": "Implémenter la gestion correcte des opérations asynchrones et des animations avec pumpAndSettle et pump",
+            "dependencies": [
+              "9.3"
+            ],
+            "details": "1. Remplacer pump() par pumpAndSettle() pour attendre les animations. 2. Utiliser await tester.pump(Duration) pour les timers spécifiques. 3. Gérer les FutureProvider avec await tester.pumpAndSettle(). 4. Implémenter des matchers custom pour les états AsyncValue. 5. Ajouter runAsync pour les opérations futures. 6. Configurer les timeouts appropriés pour les tests longs. 7. Gérer les CircularProgressIndicator pendant le chargement",
+            "status": "pending",
+            "testStrategy": "Tests avec différents scénarios asynchrones. Vérifier l'absence de timers pendants après les tests"
+          },
+          {
+            "id": 5,
+            "title": "Validation des golden tests et finalisation de la migration",
+            "description": "Mettre à jour les golden tests si présents et valider que tous les tests UI passent avec la nouvelle architecture",
+            "dependencies": [
+              "9.4"
+            ],
+            "details": "1. Identifier les golden tests avec matchesGoldenFile(). 2. Régénérer les goldens avec --update-goldens si nécessaire. 3. Vérifier la compatibilité des goldens avec les nouveaux widgets. 4. Exécuter flutter test sur tous les fichiers migrés. 5. Corriger les erreurs de type et d'assertion. 6. Documenter les changements dans un fichier MIGRATION.md. 7. Mettre à jour le CI/CD pour inclure les tests réactivés",
+            "status": "pending",
+            "testStrategy": "Exécution complète de la suite de tests. Comparaison visuelle des goldens avant/après migration"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Optimisation de la couverture de tests à 80%+",
+        "description": "Analyser la couverture actuelle et ajouter les tests manquants pour atteindre le minimum requis de 80%",
+        "details": "1. Générer le rapport de couverture: flutter test --coverage. 2. Analyser avec lcov ou coverage pour identifier les gaps. 3. Prioriser les fichiers critiques (use cases, repositories). 4. Écrire des tests pour les branches non couvertes. 5. Ajouter des tests edge cases (erreurs réseau, données invalides). 6. Documenter les tests complexes avec des commentaires. 7. Configurer le CI pour bloquer si < 80%. Utiliser coverage_ignore sparingly pour le code généré uniquement.",
+        "testStrategy": "Approche TDD pour les nouveaux tests. Vérifier chaque branche conditionnelle. Tests de régression pour les bugs corrigés. Utiliser des données réalistes dans les tests.",
+        "priority": "medium",
+        "dependencies": [
+          8,
+          9
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Génération et analyse du rapport de couverture initial",
+            "description": "Générer le rapport de couverture actuel et analyser les gaps pour identifier les fichiers et branches non couverts",
+            "dependencies": [],
+            "details": "Exécuter 'flutter test --coverage' pour générer le rapport lcov. Utiliser 'genhtml coverage/lcov.info -o coverage/html' pour visualiser. Analyser avec 'lcov --summary coverage/lcov.info' pour obtenir les statistiques globales. Identifier les fichiers critiques (use cases, repositories, providers) avec une couverture < 80%. Créer une liste priorisée des fichiers à couvrir en se concentrant sur la logique métier du domaine.",
+            "status": "pending",
+            "testStrategy": "Documenter l'état actuel de la couverture par module (presentation, domain, data). Capturer des screenshots du rapport HTML pour référence. Créer un fichier markdown avec la liste des gaps prioritaires."
+          },
+          {
+            "id": 2,
+            "title": "Tests des use cases et logique métier du domaine",
+            "description": "Écrire les tests manquants pour tous les use cases du domaine game et multiplayer pour atteindre 100% de couverture",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "Compléter les tests pour DrawCardUseCase, EndTurnUseCase, UseActionCardUseCase avec tous les scénarios edge. Ajouter les tests manquants pour ProcessLastRoundUseCase et CalculateScoresUseCase. Tester les cas d'erreur: repository failures, états invalides, paramètres null. Utiliser des mocks pour les repositories avec mockito. Vérifier chaque branche conditionnelle et les early returns. Implémenter les tests pour les nouvelles fonctionnalités TDD.",
+            "status": "pending",
+            "testStrategy": "Approche AAA (Arrange, Act, Assert) pour chaque test. Un test par scénario pour maintenir la clarté. Utiliser des fixtures pour les données de test complexes. Grouper les tests par fonctionnalité avec des descriptions claires."
+          },
+          {
+            "id": 3,
+            "title": "Tests des repositories et datasources avec mocks Supabase",
+            "description": "Implémenter les tests manquants pour les couches data avec simulation complète des interactions Supabase",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "Créer des mocks complets pour SupabaseClient, RealtimeChannel, et PostgrestFilterBuilder. Tester SupabaseGameStateRepository avec tous les scénarios: succès, échecs réseau, timeouts, données invalides. Implémenter les tests pour SupabaseActionCardDatasource et SupabaseRoomDatasource. Vérifier la gestion des erreurs et les retry logic. Tester les transformations de modèles (fromJson/toJson). Simuler les edge cases Realtime: déconnexions, reconnexions, messages dupliqués.",
+            "status": "pending",
+            "testStrategy": "Utiliser fake_async pour les tests avec delays. Créer des helpers pour générer des réponses Supabase mockées. Tester chaque méthode publique avec au minimum 3 scénarios: succès, échec, edge case."
+          },
+          {
+            "id": 4,
+            "title": "Tests des providers Riverpod et gestion d'état",
+            "description": "Couvrir tous les providers et notifiers avec des tests d'intégration utilisant ProviderContainer",
+            "dependencies": [
+              "10.2",
+              "10.3"
+            ],
+            "details": "Tester GameStateNotifier avec tous les événements possibles et transitions d'état. Implémenter les tests pour actionCardProviders avec gestion du cache et invalidation. Tester les providers de repository avec injection de dépendances. Vérifier les auto-dispose providers et leur cycle de vie. Tester les family providers avec différents paramètres. Simuler les race conditions et updates concurrents. Ajouter des tests pour les computed providers et leurs dépendances.",
+            "status": "pending",
+            "testStrategy": "Utiliser ProviderContainer pour l'isolation des tests. Créer un helper TestProviderScope pour simplifier le setup. Vérifier les rebuilds avec un listener mock. Tester les erreurs avec AsyncError states."
+          },
+          {
+            "id": 5,
+            "title": "Configuration CI/CD et maintien de la couverture",
+            "description": "Configurer GitHub Actions pour bloquer les PR sous 80% et mettre en place le monitoring continu",
+            "dependencies": [
+              "10.2",
+              "10.3",
+              "10.4"
+            ],
+            "details": "Modifier .github/workflows/flutter.yml pour ajouter l'étape de couverture avec seuil minimum. Utiliser 'very_good_coverage' package pour le check (flutter pub global activate very_good_coverage && very_good_coverage --min-coverage 80). Configurer les badges de couverture dans README.md. Ajouter coverage_ignore judicieusement pour le code généré (*.g.dart, *.freezed.dart). Créer un script pre-commit hook pour vérifier la couverture localement. Documenter les guidelines de test dans CONTRIBUTING.md.",
+            "status": "pending",
+            "testStrategy": "Tester le workflow CI en créant une PR de test avec couverture insuffisante. Vérifier que le badge se met à jour automatiquement. Valider que les ignores n'affectent que le code généré."
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Implémentation des animations et transitions UX",
+        "description": "Ajouter des animations fluides pour améliorer l'expérience utilisateur lors des interactions de jeu",
+        "details": "1. Implémenter AnimationController pour les révélations de cartes avec effet flip 3D. 2. Ajouter Hero animations pour les transitions entre écrans. 3. Utiliser AnimatedContainer pour les changements d'état smooth. 4. Implémenter des animations de glissement pour swap/discard. 5. Ajouter des particules effects pour les actions spéciales (Lottie ou Rive). 6. Optimiser avec AnimatedBuilder pour éviter les rebuilds. 7. Respecter Material Design motion guidelines. Durées: 200-300ms pour les micro-interactions.",
+        "testStrategy": "Tests de performance pour vérifier 60 FPS constant. Golden tests pour les états d'animation clés. Tests d'accessibilité avec animations désactivées. Profiler avec Flutter DevTools.",
+        "priority": "low",
+        "dependencies": [
+          10
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer l'infrastructure d'animation et les utilitaires de base",
+            "description": "Mettre en place les classes de base, les constantes et les utilitaires pour gérer les animations de manière cohérente dans toute l'application",
+            "dependencies": [],
+            "details": "1. Créer lib/core/animations/animation_constants.dart avec les durées standards (200-300ms pour micro-interactions, 400-600ms pour transitions). 2. Implémenter AnimationUtils avec des courbes prédéfinies (easeInOut, spring, etc.). 3. Créer BaseAnimationWidget abstrait avec AnimationController et lifecycle management. 4. Définir les enums pour les types d'animations (flip, slide, fade, scale). 5. Implémenter AnimationConfig pour permettre aux utilisateurs de désactiver les animations (accessibilité). 6. Créer un ThemeExtension pour stocker les paramètres d'animation.",
+            "status": "pending",
+            "testStrategy": "Tests unitaires pour vérifier les valeurs des constantes d'animation. Tests de widget pour BaseAnimationWidget avec différentes configurations. Tests d'accessibilité pour vérifier que les animations peuvent être désactivées. Golden tests pour capturer les états d'animation de référence."
+          },
+          {
+            "id": 2,
+            "title": "Implémenter l'animation de révélation de carte avec flip 3D",
+            "description": "Créer un widget animé pour l'effet de retournement 3D des cartes lors de leur révélation, avec gestion des états et optimisation des performances",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "1. Créer FlipCardAnimationWidget héritant de BaseAnimationWidget. 2. Utiliser Transform avec Matrix4 pour l'effet 3D (rotationY). 3. Implémenter deux faces: CardBackWidget et CardFrontWidget. 4. Gérer l'état isFlipped avec AnimationController et Tween. 5. Ajouter des callbacks onFlipStart et onFlipComplete. 6. Optimiser avec AnimatedBuilder pour éviter les rebuilds inutiles. 7. Implémenter la gestion du toucher pour déclencher l'animation. 8. Ajouter un effet d'ombre dynamique pendant la rotation.",
+            "status": "pending",
+            "testStrategy": "Tests de widget pour vérifier le comportement du flip dans les deux sens. Tests de performance avec Flutter Driver pour mesurer le FPS (doit rester à 60). Golden tests pour capturer les états intermédiaires de l'animation. Tests d'interaction pour vérifier que le toucher déclenche correctement l'animation."
+          },
+          {
+            "id": 3,
+            "title": "Créer les animations de glissement pour swap et discard",
+            "description": "Développer des animations fluides pour les actions de glissement des cartes (échange entre joueurs et défausse), avec retour visuel et gestion des gestes",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "1. Créer DraggableCardWidget avec GestureDetector et Transform. 2. Implémenter DragAnimation avec suivi du doigt et physics-based animation. 3. Créer SwapAnimationController pour gérer l'échange visuel entre deux cartes. 4. Implémenter DiscardAnimation avec effet de disparition et trajectoire courbe. 5. Ajouter des indicateurs visuels (zones de drop surbrillance). 6. Gérer les cas d'annulation avec animation de retour élastique. 7. Utiliser Draggable et DragTarget pour la logique de drag & drop. 8. Ajouter haptic feedback sur les actions.",
+            "status": "pending",
+            "testStrategy": "Tests de gestes avec WidgetTester pour simuler les swipes. Tests de performance pour vérifier la fluidité lors du drag. Tests d'intégration pour valider le comportement complet swap/discard. Tests de régression visuelle avec golden tests pour chaque état de l'animation."
+          },
+          {
+            "id": 4,
+            "title": "Intégrer les animations Hero et les transitions entre écrans",
+            "description": "Implémenter des transitions fluides entre les différents écrans du jeu en utilisant Hero animations et des transitions personnalisées",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "1. Identifier les éléments à animer entre écrans (avatar joueur, score, cartes). 2. Implémenter Hero widgets avec tags uniques pour chaque élément. 3. Créer PageRouteBuilder personnalisé pour les transitions d'écran. 4. Implémenter FadeTransition et SlideTransition pour les écrans. 5. Ajouter SharedAxisTransition pour la navigation latérale. 6. Créer AnimatedSwitcher pour les changements d'état dans un même écran. 7. Optimiser avec precacheImage pour éviter les saccades. 8. Gérer les cas où Hero animation pourrait causer des problèmes de layout.",
+            "status": "pending",
+            "testStrategy": "Tests de navigation pour vérifier que les Hero animations se déclenchent. Tests visuels avec golden tests pour capturer les transitions. Tests de performance pour mesurer le temps de transition. Tests d'intégration multi-écrans pour valider le flux complet."
+          },
+          {
+            "id": 5,
+            "title": "Ajouter les effets visuels spéciaux et optimiser les performances",
+            "description": "Intégrer des effets de particules pour les actions spéciales et optimiser l'ensemble des animations pour maintenir 60 FPS constant",
+            "dependencies": [
+              "11.2",
+              "11.3",
+              "11.4"
+            ],
+            "details": "1. Intégrer Lottie ou Rive pour les animations complexes (victoire, bonus). 2. Créer ParticleEffectWidget pour les effets de confettis et explosions. 3. Implémenter AnimatedContainer pour les changements d'état smooth (couleurs, tailles). 4. Utiliser CustomPainter pour des effets légers (trails, sparkles). 5. Implémenter un AnimationScheduler pour coordonner les animations multiples. 6. Profiler avec Flutter DevTools et optimiser les animations coûteuses. 7. Ajouter RepaintBoundary sur les widgets animés complexes. 8. Implémenter un système de cache pour les animations Lottie/Rive.",
+            "status": "pending",
+            "testStrategy": "Benchmarks de performance avec Flutter Driver mesurant FPS et frame build time. Tests de charge avec multiples animations simultanées. Memory profiling pour détecter les fuites. Tests A/B comparant les performances avec/sans optimisations."
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Développement du mode hors-ligne avec synchronisation",
+        "description": "Implémenter un système de cache local permettant de jouer sans connexion et synchroniser lors du retour réseau",
+        "details": "1. Implémenter un cache local avec Hive ou Drift pour stocker GameState. 2. Créer OfflineActionQueue pour stocker les actions en attente. 3. Implémenter SyncService avec stratégie de résolution de conflits. 4. Utiliser connectivity_plus pour détecter l'état réseau. 5. Implémenter retry logic avec backoff exponentiel. 6. Gérer les conflits avec timestamps et version vectors. 7. Afficher l'état de sync dans l'UI. 8. Limiter le cache à N parties pour éviter l'explosion storage.",
+        "testStrategy": "Tests avec NetworkImageMock pour simuler offline. Tests de synchronisation avec états divergents. Tests de résolution de conflits avec actions contradictoires. Vérifier l'intégrité des données après sync.",
+        "priority": "low",
+        "dependencies": [
+          6,
+          7
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configuration de la base de données locale avec Drift",
+            "description": "Mettre en place Drift comme solution de persistance locale pour stocker GameState et la file d'actions hors-ligne",
+            "dependencies": [],
+            "details": "1. Ajouter drift et drift_dev aux dépendances. 2. Créer la base de données locale avec tables: cached_game_states (id, game_id, state_json, version, last_sync, is_dirty), offline_actions_queue (id, game_id, action_type, action_data, timestamp, retry_count, status). 3. Implémenter les DAOs pour CRUD sur ces tables. 4. Créer LocalGameStateEntity et OfflineActionEntity comme entités du domaine. 5. Implémenter les mappers entre entités domaine et modèles Drift. 6. Configurer la migration de schéma et l'initialisation de la DB. 7. Ajouter une limite de stockage (max 10 parties en cache).",
+            "status": "pending",
+            "testStrategy": "Tests unitaires des DAOs avec base in-memory. Tests d'insertion/récupération de GameState complexes. Tests de la limite de stockage avec rotation FIFO. Tests des migrations de schéma. Vérifier l'intégrité des données JSON stockées."
+          },
+          {
+            "id": 2,
+            "title": "Implémentation du repository hybride local/remote",
+            "description": "Créer un HybridGameStateRepository qui gère automatiquement le basculement entre cache local et API Supabase selon la connectivité",
+            "dependencies": [
+              "12.1"
+            ],
+            "details": "1. Créer HybridGameStateRepository implémentant GameStateRepository. 2. Injecter LocalGameStateRepository (Drift) et SupabaseGameStateRepository. 3. Implémenter la logique de décision: si online, tenter Supabase d'abord puis fallback sur local; si offline, utiliser local uniquement. 4. Implémenter saveGameState() qui sauvegarde localement ET marque comme 'dirty' si offline. 5. Implémenter getGameState() avec merge strategy si divergence. 6. Créer OfflineActionQueueRepository pour gérer la file d'actions. 7. Ajouter connectivity_plus pour détecter l'état réseau. 8. Implémenter un provider Riverpod pour ce repository hybride.",
+            "status": "pending",
+            "testStrategy": "Tests avec mock de connectivity pour simuler online/offline. Tests du fallback automatique lors d'échec réseau. Tests de sauvegarde avec flag dirty. Tests de récupération avec stratégie de merge. Vérifier la cohérence des données entre local et remote."
+          },
+          {
+            "id": 3,
+            "title": "Développement du service de synchronisation avec résolution de conflits",
+            "description": "Créer SyncService pour synchroniser les données locales avec Supabase lors du retour en ligne, avec gestion intelligente des conflits",
+            "dependencies": [
+              "12.2"
+            ],
+            "details": "1. Créer SyncService avec méthode syncPendingChanges(). 2. Implémenter la détection de retour en ligne via connectivity_plus stream. 3. Récupérer tous les GameState marqués dirty et actions en queue. 4. Implémenter version vectors pour détecter les conflits (local_version, remote_version). 5. Stratégie de résolution: pour les actions de jeu, appliquer dans l'ordre chronologique; pour les conflits d'état, privilégier la version avec le plus d'actions. 6. Implémenter retry logic avec backoff exponentiel (2^n secondes, max 5 tentatives). 7. Gérer les erreurs partielles et rollback si nécessaire. 8. Notifier l'UI des progrès de sync via Stream.",
+            "status": "pending",
+            "testStrategy": "Tests de synchronisation avec états divergents simulés. Tests de résolution avec actions contradictoires (ex: même carte jouée par 2 joueurs). Tests du retry avec échecs simulés. Tests de rollback en cas d'erreur critique. Vérifier l'ordre chronologique des actions."
+          },
+          {
+            "id": 4,
+            "title": "Création de l'interface utilisateur pour l'état hors-ligne",
+            "description": "Développer les widgets et indicateurs visuels pour informer l'utilisateur de l'état de connexion et de synchronisation",
+            "dependencies": [
+              "12.3"
+            ],
+            "details": "1. Créer ConnectivityIndicatorWidget affichant l'état réseau (online/offline) avec icône appropriée. 2. Créer SyncStatusWidget montrant: nombre d'actions en attente, progression de sync, dernière sync réussie. 3. Implémenter des providers Riverpod pour l'état de connectivité et sync. 4. Ajouter bannière 'Mode hors-ligne' en haut de l'écran de jeu si offline. 5. Afficher badge sur les actions en attente de sync. 6. Implémenter SnackBar pour notifier la fin de synchronisation. 7. Ajouter animation de chargement pendant la sync. 8. Gérer l'affichage des erreurs de sync avec option de retry manuel.",
+            "status": "pending",
+            "testStrategy": "Tests de widgets avec différents états de connectivité. Tests d'affichage avec 0, 5, 50 actions en attente. Tests des animations et transitions d'état. Tests d'accessibilité des indicateurs. Vérifier la réactivité aux changements d'état."
+          },
+          {
+            "id": 5,
+            "title": "Tests d'intégration et optimisation des performances",
+            "description": "Implémenter une suite complète de tests d'intégration pour le mode hors-ligne et optimiser les performances de synchronisation",
+            "dependencies": [
+              "12.4"
+            ],
+            "details": "1. Créer NetworkSimulator pour tests contrôlés online/offline. 2. Tests end-to-end: jouer 10 coups offline, reconnecter, vérifier sync complète. 3. Tests de stress: 100+ actions en queue, mesurer temps de sync. 4. Implémenter batch sync pour grouper les actions (max 20 par requête). 5. Optimiser la sérialisation JSON avec compression si >1KB. 6. Ajouter cache mémoire pour GameState fréquemment accédés. 7. Implémenter throttling pour éviter spam de sync. 8. Profiler et optimiser les requêtes Drift. 9. Documenter les limites du mode offline (max 7 jours, max 1000 actions).",
+            "status": "pending",
+            "testStrategy": "Tests de performance avec grands volumes de données. Tests de robustesse avec coupures réseau aléatoires. Tests de cohérence après multiples cycles offline/online. Benchmarks de temps de sync. Tests de consommation mémoire et batterie en mode offline prolongé."
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "Configuration de l'environnement de production",
+        "description": "Préparer l'application pour le déploiement en production avec les bonnes configurations et optimisations",
+        "details": "1. Configurer les flavors Flutter (dev, staging, prod) avec configurations séparées. 2. Implémenter la gestion des secrets avec --dart-define-from-file. 3. Optimiser les assets avec flutter_native_splash et flutter_launcher_icons. 4. Configurer ProGuard/R8 pour l'obfuscation Android. 5. Implémenter App Bundle avec dynamic delivery. 6. Ajouter les métadonnées Play Store (descriptions, screenshots). 7. Créer privacy policy et terms of service. 8. Configurer les deep links et app links. Version: semantic versioning avec build number auto-incrémenté.",
+        "testStrategy": "Tests de build pour chaque flavor. Vérifier les tailles d'APK/AAB. Tests de performance sur devices réels. Audit de sécurité avec MobSF. Tests des deep links sur différentes versions Android.",
+        "priority": "medium",
+        "dependencies": [
+          10
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configuration des flavors Flutter et gestion des secrets",
+            "description": "Mettre en place les flavors dev, staging et prod avec leurs configurations spécifiques et implémenter la gestion sécurisée des secrets",
+            "dependencies": [],
+            "details": "1. Créer les fichiers de configuration pour chaque flavor dans android/app/src/{dev,staging,prod}. 2. Configurer build.gradle avec productFlavors et leurs applicationIdSuffix. 3. Créer les fichiers .env.dev, .env.staging, .env.prod avec les variables d'environnement. 4. Implémenter un script Dart pour générer les fichiers --dart-define-from-file. 5. Configurer les différentes URLs Supabase et clés API par environnement. 6. Ajouter les fichiers secrets au .gitignore. 7. Documenter le processus de build par flavor.",
+            "status": "pending",
+            "testStrategy": "Vérifier que chaque flavor build correctement avec flutter build apk --flavor dev. Tester que les bonnes variables d'environnement sont chargées. Valider que les secrets ne sont pas exposés dans le code compilé."
+          },
+          {
+            "id": 2,
+            "title": "Optimisation des assets et configuration des icônes",
+            "description": "Configurer flutter_native_splash et flutter_launcher_icons pour optimiser l'expérience de lancement et l'identité visuelle de l'app",
+            "dependencies": [],
+            "details": "1. Installer et configurer flutter_native_splash dans pubspec.yaml. 2. Créer les assets du splash screen en différentes résolutions. 3. Configurer les couleurs et animations du splash par flavor. 4. Installer flutter_launcher_icons et créer les icônes adaptatives. 5. Générer les icônes pour chaque densité Android. 6. Optimiser tous les assets images avec des outils de compression. 7. Configurer les assets conditionnels par flavor si nécessaire.",
+            "status": "pending",
+            "testStrategy": "Vérifier la génération correcte des icônes pour toutes les densités. Tester le splash screen sur différentes tailles d'écran. Mesurer le temps de lancement de l'app. Valider la taille finale des assets."
+          },
+          {
+            "id": 3,
+            "title": "Configuration de l'obfuscation et optimisation du build",
+            "description": "Mettre en place ProGuard/R8 pour l'obfuscation du code et optimiser la taille de l'APK/AAB",
+            "dependencies": [
+              "13.1"
+            ],
+            "details": "1. Créer android/app/proguard-rules.pro avec les règles de base Flutter. 2. Ajouter les règles keep pour Supabase, Riverpod et autres dépendances. 3. Configurer minifyEnabled et shrinkResources dans build.gradle. 4. Tester l'obfuscation avec des builds release. 5. Implémenter le split APK par ABI pour réduire la taille. 6. Configurer l'App Bundle avec modules dynamiques si pertinent. 7. Analyser la taille finale avec bundletool.",
+            "status": "pending",
+            "testStrategy": "Builder en release et vérifier que l'app fonctionne correctement. Analyser les crashs potentiels dus à l'obfuscation. Comparer les tailles avant/après optimisation. Tester sur différentes architectures ARM."
+          },
+          {
+            "id": 4,
+            "title": "Préparation des métadonnées Play Store et aspects légaux",
+            "description": "Créer tous les éléments nécessaires pour la publication sur le Play Store incluant les descriptions, screenshots et documents légaux",
+            "dependencies": [
+              "13.2"
+            ],
+            "details": "1. Rédiger les descriptions courte et longue en français pour le Play Store. 2. Créer les screenshots de l'app dans les dimensions requises (phone, tablet). 3. Générer une vidéo de présentation du gameplay. 4. Rédiger la politique de confidentialité conforme RGPD. 5. Créer les conditions d'utilisation adaptées au jeu. 6. Préparer le formulaire de classification du contenu. 7. Créer les graphiques promotionnels (feature graphic, banner).",
+            "status": "pending",
+            "testStrategy": "Valider les textes avec un correcteur orthographique. Vérifier les dimensions des images avec les guidelines Google. Faire relire les documents légaux. Tester l'affichage des screenshots sur différents appareils."
+          },
+          {
+            "id": 5,
+            "title": "Configuration des deep links et versioning automatique",
+            "description": "Implémenter les deep links pour l'app et mettre en place un système de versioning sémantique avec build number auto-incrémenté",
+            "dependencies": [
+              "13.3"
+            ],
+            "details": "1. Configurer les intent-filters Android pour les deep links ojyx://. 2. Implémenter la gestion des routes deep link avec go_router. 3. Configurer les app links vérifiés avec assetlinks.json. 4. Créer un script de versioning automatique qui incrémente le build number. 5. Intégrer le versioning dans le pipeline CI/CD. 6. Ajouter les métadonnées de version dans l'app. 7. Tester les liens pour rejoindre une partie directement.",
+            "status": "pending",
+            "testStrategy": "Tester les deep links avec adb shell am start. Vérifier la navigation correcte depuis un lien externe. Valider l'incrémentation automatique du build number. Tester les app links sur un domaine de test."
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Mise en place du pipeline CI/CD de production",
+        "description": "Configurer un pipeline complet pour automatiser les builds, tests et déploiements vers le Play Store",
+        "details": "1. Étendre .github/workflows pour inclure les builds release. 2. Configurer Fastlane pour l'automatisation Play Store. 3. Implémenter semantic-release pour le versioning automatique. 4. Ajouter les étapes: lint → test → build → upload. 5. Configurer les secrets GitHub pour les clés de signature. 6. Implémenter les release notes automatiques depuis les commits. 7. Ajouter des notifications Slack/Discord pour les déploiements. 8. Configurer les tracks Play Store (internal, alpha, beta, production). Utiliser GitHub Environments pour les approbations.",
+        "testStrategy": "Tests du pipeline sur une branche dédiée. Dry-run des déploiements Play Store. Vérifier les signatures APK. Tests de rollback en cas d'échec. Monitoring des métriques de build time.",
+        "priority": "medium",
+        "dependencies": [
+          13
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configuration de Fastlane pour l'automatisation Android",
+            "description": "Installer et configurer Fastlane avec les lanes nécessaires pour automatiser les builds et déploiements Android vers le Play Store",
+            "dependencies": [],
+            "details": "1. Installer Fastlane via bundler (créer Gemfile avec fastlane). 2. Exécuter 'fastlane init' et sélectionner Android. 3. Configurer le fichier Appfile avec package_name et json_key_file. 4. Créer les lanes dans Fastfile: test_lane (flutter test), build_lane (flutter build appbundle), deploy_internal (upload_to_play_store track: 'internal'), deploy_alpha, deploy_beta, deploy_production. 5. Configurer supply pour le Play Store avec 'fastlane supply init'. 6. Créer le fichier .env.default pour les variables d'environnement. 7. Tester localement avec 'fastlane test_lane'.",
+            "status": "pending",
+            "testStrategy": "Exécuter chaque lane en mode dry-run. Vérifier la génération correcte des AAB. Tester avec un compte Play Console de test. Valider les métadonnées générées par supply."
+          },
+          {
+            "id": 2,
+            "title": "Mise en place de semantic-release et gestion du versioning",
+            "description": "Configurer semantic-release pour automatiser le versioning basé sur les commits conventionnels et générer les changelogs",
+            "dependencies": [],
+            "details": "1. Installer semantic-release et plugins: @semantic-release/changelog, @semantic-release/git, @semantic-release/github, @semantic-release/exec. 2. Créer .releaserc.json avec configuration des branches (main, beta, alpha). 3. Configurer les plugins pour: analyser les commits (conventional-commits), générer CHANGELOG.md, mettre à jour pubspec.yaml avec la nouvelle version via @semantic-release/exec, créer le tag git et release GitHub. 4. Créer script update-flutter-version.js pour modifier pubspec.yaml. 5. Configurer les règles de versioning: feat → minor, fix → patch, breaking → major. 6. Ajouter les commit hooks avec husky pour forcer conventional commits.",
+            "status": "pending",
+            "testStrategy": "Simuler des releases avec différents types de commits. Vérifier la génération correcte du CHANGELOG. Valider que pubspec.yaml est mis à jour. Tester les releases sur une branche dédiée."
+          },
+          {
+            "id": 3,
+            "title": "Extension du workflow GitHub Actions pour les builds release",
+            "description": "Modifier le workflow CI/CD existant pour inclure les étapes de build release, signature et upload vers Play Store",
+            "dependencies": [
+              "14.1",
+              "14.2"
+            ],
+            "details": "1. Créer release.yml dans .github/workflows déclenché sur push tags 'v*'. 2. Définir les jobs: lint (dart format --set-exit-if-changed), test (flutter test --coverage), build (flutter build appbundle --release). 3. Configurer les secrets GitHub: PLAY_STORE_UPLOAD_KEY (base64 du keystore), KEY_STORE_PASSWORD, KEY_PASSWORD, ALIAS, PLAY_STORE_CONFIG_JSON (compte de service). 4. Ajouter étape de décodage et configuration du keystore. 5. Intégrer semantic-release pour déterminer la version. 6. Utiliser Fastlane via 'bundle exec fastlane deploy_$TRACK'. 7. Implémenter la matrice de déploiement selon les branches.",
+            "status": "pending",
+            "testStrategy": "Tester sur une branche feature avec dry-run. Vérifier la signature correcte de l'APK/AAB. Valider les artifacts générés. Tester le workflow complet sur un fork."
+          },
+          {
+            "id": 4,
+            "title": "Configuration des environnements GitHub et tracks Play Store",
+            "description": "Mettre en place les GitHub Environments avec approbations manuelles et configurer les tracks Play Store pour le déploiement progressif",
+            "dependencies": [
+              "14.3"
+            ],
+            "details": "1. Créer les environnements GitHub: development, staging, production avec protection rules. 2. Configurer les approbations requises: staging (1 reviewer), production (2 reviewers + admin). 3. Définir les secrets spécifiques par environnement. 4. Dans Play Console: créer les tracks internal (équipe QA), alpha (testeurs internes), beta (testeurs externes), production. 5. Configurer les critères de promotion: internal → alpha (tests automatisés passés), alpha → beta (approbation manuelle), beta → production (métriques de stabilité OK). 6. Implémenter les règles de rollout progressif: 10% → 50% → 100%. 7. Ajouter les conditions dans le workflow pour déployer selon l'environnement.",
+            "status": "pending",
+            "testStrategy": "Simuler les déploiements sur chaque environnement. Tester les approbations manuelles. Vérifier les rollbacks. Valider les métriques de crash-free rate."
+          },
+          {
+            "id": 5,
+            "title": "Implémentation des notifications et monitoring du pipeline",
+            "description": "Ajouter les notifications Slack/Discord pour les événements du pipeline et mettre en place le monitoring des métriques de build",
+            "dependencies": [
+              "14.3",
+              "14.4"
+            ],
+            "details": "1. Créer un webhook Slack/Discord pour les notifications CI/CD. 2. Utiliser l'action slack-notify ou discord-webhook pour envoyer: début de build, succès/échec avec détails, lien vers les artifacts, changelog de la release. 3. Configurer les notifications différenciées par environnement (couleurs, mentions). 4. Implémenter le monitoring: durée des builds, taux de succès, taille des artifacts. 5. Créer un dashboard GitHub Actions avec badges de statut. 6. Ajouter les métriques dans Sentry: releases, source maps, commits associés. 7. Configurer les alertes pour: builds échoués consécutifs, augmentation du temps de build, diminution du coverage.",
+            "status": "pending",
+            "testStrategy": "Tester chaque type de notification. Vérifier la réception sur Slack/Discord. Simuler des échecs pour valider les alertes. Mesurer les métriques sur plusieurs builds."
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Configuration du monitoring et analytics production",
+        "description": "Implémenter un système complet de monitoring pour suivre la santé de l'application en production",
+        "details": "1. Configurer Sentry avec les bons environnements et release tracking. 2. Implémenter Firebase Analytics pour les événements utilisateur. 3. Ajouter Firebase Crashlytics comme backup de Sentry. 4. Configurer des dashboards personnalisés (temps de jeu, actions populaires). 5. Implémenter performance monitoring avec traces custom. 6. Ajouter des health checks pour Supabase. 7. Configurer des alertes pour les erreurs critiques. 8. Implémenter A/B testing avec Firebase Remote Config. GDPR: demander consentement avant tracking.",
+        "testStrategy": "Tests d'envoi d'événements en environnement de test. Vérifier la désactivation du tracking en dev. Tests GDPR compliance. Simulation de crashes pour valider les rapports. Tests de performance des SDK analytics.",
+        "priority": "low",
+        "dependencies": [
+          14
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configuration de Sentry pour le monitoring des erreurs",
+            "description": "Mettre en place Sentry avec environnements séparés, release tracking et gestion GDPR compliant",
+            "dependencies": [],
+            "details": "1. Installer le package sentry_flutter et configurer SentryFlutter.init dans main.dart. 2. Créer SentryConfig dans core/config avec gestion des environnements (dev, staging, prod). 3. Implémenter le release tracking avec version automatique depuis pubspec.yaml. 4. Configurer beforeSend pour filtrer les données sensibles. 5. Ajouter un ConsentManager pour demander l'autorisation utilisateur avant d'activer Sentry (GDPR). 6. Créer des wrappers pour capturer les erreurs métier spécifiques (GameError, NetworkError). 7. Configurer les tags et contextes (userId anonyme, gameRoom, etc.).",
+            "status": "pending",
+            "testStrategy": "Tests unitaires pour vérifier la configuration conditionnelle par environnement. Tests du ConsentManager avec mock SharedPreferences. Tests d'intégration pour valider l'envoi d'événements en environnement test. Vérifier que Sentry est désactivé sans consentement."
+          },
+          {
+            "id": 2,
+            "title": "Intégration de Firebase Analytics et Crashlytics",
+            "description": "Configurer Firebase pour le tracking des événements utilisateur et comme système de crash reporting de secours",
+            "dependencies": [
+              "15.1"
+            ],
+            "details": "1. Ajouter firebase_core, firebase_analytics et firebase_crashlytics aux dépendances. 2. Configurer Firebase pour Android avec google-services.json par flavor. 3. Créer AnalyticsService dans core/services avec méthodes pour logger les événements de jeu (game_started, card_played, action_used). 4. Implémenter FirebaseCrashlyticsConfig comme backup de Sentry avec la même logique de consentement. 5. Créer des événements analytics typés avec paramètres (GameEvent, UserEvent). 6. Configurer la collection automatique des propriétés utilisateur anonymisées. 7. Implémenter le debug view pour les tests.",
+            "status": "pending",
+            "testStrategy": "Tests avec Firebase Test Lab pour valider les événements. Mock de FirebaseAnalytics pour tests unitaires. Tests du système de consentement unifié Sentry/Firebase. Vérification que les événements ne contiennent pas de données personnelles."
+          },
+          {
+            "id": 3,
+            "title": "Implémentation du Performance Monitoring avec traces custom",
+            "description": "Mettre en place le monitoring de performance pour identifier les goulots d'étranglement dans le gameplay",
+            "dependencies": [
+              "15.2"
+            ],
+            "details": "1. Ajouter firebase_performance au projet et configurer l'auto-collection. 2. Créer PerformanceTracker dans core/services avec méthodes pour démarrer/arrêter des traces. 3. Implémenter des traces custom pour: synchronisation Supabase, rendu des grilles de cartes, calcul des scores, animations complexes. 4. Ajouter des métriques custom (nombre de cartes, taille des données sync). 5. Créer un décorateur @Traced pour annoter les méthodes critiques. 6. Configurer des seuils d'alerte pour les opérations lentes (>2s pour sync, >500ms pour UI). 7. Implémenter le sampling pour réduire l'overhead en production.",
+            "status": "pending",
+            "testStrategy": "Tests de performance avec profiling pour mesurer l'overhead du monitoring. Tests des traces avec Timer mock. Validation que le monitoring n'impacte pas le gameplay. Tests du sampling avec différents taux."
+          },
+          {
+            "id": 4,
+            "title": "Création des health checks et monitoring Supabase",
+            "description": "Développer un système de surveillance de la santé de la connexion Supabase et des services critiques",
+            "dependencies": [
+              "15.3"
+            ],
+            "details": "1. Créer HealthCheckService avec vérifications périodiques de Supabase (auth, realtime, database). 2. Implémenter un endpoint de health check côté Supabase avec fonction Edge. 3. Ajouter des métriques de latence pour chaque type d'opération (query, mutation, subscription). 4. Créer un ConnectionMonitor qui track les déconnexions/reconnexions WebSocket. 5. Implémenter un système de retry intelligent avec backoff exponentiel. 6. Logger les métriques dans Firebase Analytics (connection_lost, reconnection_time). 7. Ajouter une UI minimale pour afficher l'état de connexion aux joueurs.",
+            "status": "pending",
+            "testStrategy": "Tests avec simulation de coupures réseau. Tests du circuit breaker avec Supabase mock. Validation des métriques de latence avec différentes conditions réseau. Tests du retry avec différents scénarios d'échec."
+          },
+          {
+            "id": 5,
+            "title": "Configuration des dashboards et alertes de monitoring",
+            "description": "Créer des tableaux de bord personnalisés et configurer les alertes pour les incidents critiques",
+            "dependencies": [
+              "15.4"
+            ],
+            "details": "1. Configurer les dashboards Firebase Console pour visualiser: temps de jeu moyen, actions les plus utilisées, taux de complétion des parties. 2. Créer des segments d'utilisateurs (nouveaux, actifs, churned) dans Analytics. 3. Configurer les alertes Sentry pour: erreurs critiques (>10/min), nouvelles erreurs, regression après release. 4. Implémenter Firebase Remote Config pour A/B testing des features. 5. Créer des alertes custom pour: serveur Supabase down, taux d'erreur WebSocket élevé, performance dégradée. 6. Configurer l'intégration Slack/Discord pour les notifications. 7. Documenter les runbooks pour chaque type d'alerte.",
+            "status": "pending",
+            "testStrategy": "Tests des webhooks d'alerte avec payloads simulés. Validation des seuils d'alerte avec données de test. Tests A/B avec Remote Config en environnement staging. Simulation d'incidents pour valider les runbooks."
           }
         ]
       }
     ],
     "metadata": {
-      "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-25T21:37:46.958Z",
+      "created": "2025-07-25T08:09:44.471Z",
+      "updated": "2025-07-25T08:09:44.471Z",
       "description": "Tasks for master context"
     }
   }
