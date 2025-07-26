@@ -11,12 +11,13 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = "17"
     }
 
     defaultConfig {
@@ -28,6 +29,11 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
+        
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86_64")
+        }
     }
 
     buildTypes {
@@ -35,7 +41,47 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            
+            // Optimizations for release builds
+            isDebuggable = false
+            isJniDebuggable = false
+            renderscriptDebuggable = false
+            isPseudoLocalesEnabled = false
         }
+        debug {
+            applicationIdSuffix = ".debug"
+            isDebuggable = true
+            isMinifyEnabled = false
+            isShrinkResources = false
+        }
+    }
+    
+    packagingOptions {
+        exclude("META-INF/DEPENDENCIES")
+        exclude("META-INF/LICENSE")
+        exclude("META-INF/LICENSE.txt")
+        exclude("META-INF/NOTICE")
+        exclude("META-INF/NOTICE.txt")
+        exclude("META-INF/*.kotlin_module")
+    }
+    
+    buildFeatures {
+        buildConfig = true
+    }
+}
+
+dependencies {
+    implementation("androidx.multidex:multidex:2.0.1")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("androidx.core:core:1.12.0")
+        force("androidx.lifecycle:lifecycle-runtime:2.7.0")
     }
 }
 

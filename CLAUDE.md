@@ -38,14 +38,24 @@ lib/
 
 ## Stack Technique Obligatoire
 
+### Versions Actuelles (Mises à jour 2025-07-26)
+- **Flutter**: 3.32.6 (stable)
+- **Dart**: 3.8.1 (stable)
+- **Java**: 17 (requis pour Android 34)
+- **Gradle**: 8.12 (dernière version LTS)
+
 ### Gestion d'État et DI
 - **Riverpod** : OBLIGATOIRE pour toute gestion d'état et injection de dépendances
+  - Version : 2.6.1 (dernière mise à jour)
+  - Syntaxe moderne avec `@riverpod` et `Notifier` obligatoire
 - Convention de nommage stricte :
   - Providers : `[entity]RepositoryProvider`, `[feature]StateNotifierProvider`
   - États : `[Feature]State` avec Freezed
 
 ### Modèles de Données
 - **Freezed + json_serializable** : OBLIGATOIRE pour TOUS les modèles et états
+  - freezed: 2.5.7
+  - json_serializable: 6.8.0
 - Garantir l'immuabilité de toutes les structures de données
 - Utiliser les unions types pour les états complexes
 
@@ -76,11 +86,24 @@ lib/
    - Revue de code effectuée
    - Pas de conflits
 
-### CI/CD GitHub Actions
-Le workflow doit vérifier automatiquement :
-- `dart format --set-exit-if-changed .` : Formatage du code
-- `flutter analyze` : Analyse statique sans warnings
-- `flutter test` : Tous les tests passent (coverage minimum 80%)
+### CI/CD GitHub Actions (Configuration Moderne 2025)
+
+Le pipeline CI/CD est configuré dans `.github/workflows/ci.yml` avec 5 jobs parallèles :
+
+1. **validate** : Validation de l'environnement Flutter 3.32.6
+2. **analyze** : `flutter analyze --no-fatal-infos` - Analyse statique stricte
+3. **test** : `flutter test --coverage` avec rapports de couverture
+4. **format** : `dart format --set-exit-if-changed .` - Formatage obligatoire
+5. **build** : Build Android APK debug/release avec cache optimisé
+
+**Workflows additionnels :**
+- **Release** (`.github/workflows/release.yml`) : Génération APK/AAB automatique sur tags
+- **Dependabot** (`.github/dependabot.yml`) : Mises à jour automatiques Dart, Actions, Gradle
+
+**Cache optimisé pour performance :**
+- Cache Pub dependencies avec clé basée sur pubspec.lock
+- Cache Gradle avec distribution et wrapper
+- Timeouts configurés (10-20 minutes selon job)
 
 ### Approche Test-First (OBLIGATOIRE ET NON-NÉGOCIABLE)
 
@@ -152,34 +175,36 @@ Le workflow doit vérifier automatiquement :
 
 **Toute violation des règles TDD entraîne des conséquences IMMÉDIATES et AUTOMATIQUES :**
 
-1. **Commit Local Bloqué**
-   - Le pre-commit hook empêche tout commit avec violations
-   - Message d'erreur détaillé avec les violations trouvées
-   - Obligation de corriger avant de pouvoir commiter
+#### 1. Hooks Git Automatiques (scripts/)
 
-2. **Pull Request Fermée Automatiquement**
-   - La CI/CD détecte et ferme immédiatement toute PR avec violations
-   - Message automatique expliquant les violations
-   - Labels "tdd-violation" et "auto-closed" ajoutés
-   - Impossibilité de merger même en forçant
+**Pre-commit Hook** (`scripts/pre-commit-hook.sh`):
+- Détection tests commentés : `grep -r "//.*test\|/\*.*test\|skip.*true"`
+- Formatage obligatoire : `dart format --set-exit-if-changed`
+- Analyse statique : `flutter analyze --no-fatal-infos`
+- Tests passants : `flutter test --coverage --reporter=compact`
+- Couverture calculée avec lcov (recommandé 80%+)
+- Interdiction fichiers `*test_summary*`
 
-3. **Violations Détectées**
-   - Tests commentés (//test, /*test, skip:true, etc.)
-   - Fichiers test_summary ou similaires
-   - Code créé avant les tests (vérifié via git history)
-   - Tests vides ou placeholder
-   - Coverage < 80%
-   - Tests qui échouent
+**Commit-msg Hook** (`scripts/commit-msg-hook.sh`):
+- Format conventional : `type(scope?): description`
+- Types valides : feat|fix|docs|style|refactor|test|chore|perf|ci|build
+- Max 50 caractères, minuscule, sans point final
 
-4. **Notification et Tracking**
-   - Rapport détaillé dans GitHub Actions
-   - Métriques de violations trackées
-   - Historique des tentatives de contournement
+**Installation** (`scripts/install-hooks.sh`):
+- Hooks installés dans `.git/hooks/` automatiquement
+- Validation permissions et intégrité
+- Tests complets avec `scripts/test-hooks.sh`
 
-5. **Aucune Exception Possible**
-   - Même les administrateurs ne peuvent pas contourner
-   - Pas de merge direct sur main
-   - Pas de force push autorisé
+#### 2. Pipeline CI/CD Strict
+- Double validation de TOUS les checks pre-commit
+- Jobs parallèles avec cache optimisé
+- Labels automatiques sur violations
+- Blocage merge si un job échoue
+
+#### 3. Aucune Exception Possible
+- Contournement avec `--no-verify` découragé
+- Protection main empêche force push
+- Logs détaillés pour debugging
 
 **RAPPEL POUR L'IA** : Ces mécanismes sont en place pour VOUS aider à maintenir la qualité. Les violations ne sont pas des "erreurs" mais des garde-fous pour garantir le succès du projet.
 
@@ -227,27 +252,50 @@ Le workflow doit vérifier automatiquement :
 - Pénalité double si l'initiateur n'a pas le score le plus bas
 
 ## Commandes Essentielles
-```bash
-# Création du projet
-flutter create ojyx --platforms android
 
+### Configuration Initiale
+```bash
+# Installation des hooks Git (OBLIGATOIRE après clone)
+./scripts/install-hooks.sh
+
+# Validation complète du projet
+./scripts/validate_project.sh
+
+# Test des hooks installés
+./scripts/test-hooks.sh
+```
+
+### Développement Quotidien
+```bash
 # Installation des dépendances
 flutter pub get
 
-# Génération de code
+# Génération de code (hooks l'exécutent aussi)
 flutter pub run build_runner build --delete-conflicting-outputs
 
-# Lancement des tests
-flutter test
+# Tests avec couverture
+flutter test --coverage
 
 # Analyse du code
-flutter analyze
+flutter analyze --no-fatal-infos
 
-# Formatage
+# Formatage (obligatoire avant commit)
 dart format .
 
+# Nettoyage complet Android
+./scripts/clean_build.sh
+```
+
+### Build et Lancement
+```bash
 # Lancement avec variables d'environnement
 flutter run --dart-define=SUPABASE_URL=xxx --dart-define=SUPABASE_ANON_KEY=xxx
+
+# Build APK release
+flutter build apk --release
+
+# Validation build Android
+./scripts/validate_android_build.sh
 ```
 
 ## Checklist Pré-Commit

@@ -1,9 +1,9 @@
 Linting Metrics Before flutter_lints Update
 ==========================================
-Date: 2025-07-26 08:15:42.868322
+Date: 2025-07-26 10:04:26.694446
 flutter_lints version: 5.0.0
 
-Errors: 11
-Warnings: 35
-Info: 84
-Total issues: 130
+Errors: 252
+Warnings: 81
+Info: 180
+Total issues: 513
