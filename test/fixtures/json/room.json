@@ -1,0 +1,32 @@
+{
+  "waiting_room": {
+    "id": "room_123",
+    "creatorId": "player1",
+    "playerIds": ["player1"],
+    "status": "waiting",
+    "maxPlayers": 8,
+    "currentGameId": null,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  "full_room": {
+    "id": "room_456",
+    "creatorId": "player1",
+    "playerIds": ["player1", "player2", "player3", "player4", "player5", "player6", "player7", "player8"],
+    "status": "inGame",
+    "maxPlayers": 8,
+    "currentGameId": "game_789",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:10:00.000Z"
+  },
+  "finished_room": {
+    "id": "room_789",
+    "creatorId": "player1",
+    "playerIds": ["player1", "player2", "player3"],
+    "status": "finished",
+    "maxPlayers": 4,
+    "currentGameId": "game_999",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T01:00:00.000Z"
+  }
+}

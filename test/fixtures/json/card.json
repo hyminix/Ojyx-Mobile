@@ -1,0 +1,21 @@
+{
+  "valid_card": {
+    "value": 7,
+    "isRevealed": true
+  },
+  "hidden_card": {
+    "value": -2,
+    "isRevealed": false
+  },
+  "max_value_card": {
+    "value": 12,
+    "isRevealed": true
+  },
+  "invalid_card_missing_value": {
+    "isRevealed": true
+  },
+  "invalid_card_wrong_type": {
+    "value": "not_a_number",
+    "isRevealed": true
+  }
+}

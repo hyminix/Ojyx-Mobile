@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-07-26T08:15:23.136172",
+  "jsonSerializableVersion": "6.8.0",
+  "files": {
+    "lib/features/auth/presentation/providers/auth_provider.g.dart": "97af6e15cd7a7e0a898b5223adb2800a",
+    "lib/features/end_game/domain/entities/end_game_state.g.dart": "6ab37e5d962ef77fedefb6dcf36686fd",
+    "lib/features/game/data/models/db_player_grid_model.g.dart": "1f89b8539604c0c717944709fba1c556",
+    "lib/features/game/data/models/game_state_model.g.dart": "ef38903778a2ee13500fea3878645076",
+    "lib/features/game/data/models/player_grid_model.g.dart": "8c8f77a5fb21fa2e5cf8ed406052e273",
+    "lib/features/game/domain/entities/action_card.g.dart": "862ad836c82e3bb4e18d4271041d4ab7",
+    "lib/features/game/domain/entities/card.g.dart": "24032a1829eba29a7e5e2c026e425b80",
+    "lib/features/game/domain/entities/deck_state.g.dart": "ad327f43593fbecd761a08d67ce21056",
+    "lib/features/game/domain/entities/game_player.g.dart": "7ccb3b631d61833e67ef7b9c7be7426e",
+    "lib/features/game/domain/entities/player_grid.g.dart": "73c693c2d516ed474fa91b89980c008e",
+    "lib/features/game/domain/entities/player_state.g.dart": "783791402d40a1ec64646cee2a734029",
+    "lib/features/game/presentation/providers/action_card_providers.g.dart": "127c4888ca6ada25d384f1e70d881d66",
+    "lib/features/game/presentation/providers/game_state_notifier.g.dart": "a4e8370abee93252aab515f3deca2426",
+    "lib/features/game/presentation/providers/repository_providers.g.dart": "9aeb902d028894fdebc38fb1793cce13",
+    "lib/features/global_scores/data/models/global_score_model.g.dart": "7bb554005f093a3c7dbd8c1c8a4805c5",
+    "lib/features/global_scores/domain/entities/global_score.g.dart": "52650b444b4e2042aca6638b5339d8ca",
+    "lib/features/multiplayer/data/models/player_model.g.dart": "e2e4756b8b7f192e6355a964eeb50fec",
+    "lib/features/multiplayer/data/models/room_model.g.dart": "5c16e5c77e7677be3c6a07d85ab12723",
+    "lib/features/multiplayer/domain/entities/lobby_player.g.dart": "d5971cb118a902e42c49815e92ef47d8",
+    "lib/features/multiplayer/domain/entities/room.g.dart": "78152baafa5f2d980b4fa0a79b9d60fa",
+    "lib/features/multiplayer/domain/entities/room_event.g.dart": "b192d8c1446601e4ebb26b50ae095f84",
+    "lib/features/multiplayer/presentation/providers/multiplayer_game_notifier.g.dart": "c0c0b26d0dc586f49f5069eddfe3b9b7",
+    "lib/features/multiplayer/presentation/providers/room_providers.g.dart": "56398ce413dd5929860cd7533bf968e6"
+  }
+}
