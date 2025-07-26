@@ -17,9 +17,16 @@ class ConnectivityService {
   
   ConnectivityService({Connectivity? connectivity})
       : _connectivity = connectivity ?? Connectivity();
+      
+  /// Create with a mock connectivity instance (for testing)
+  ConnectivityService.createWithConnectivity(Connectivity connectivity)
+      : _connectivity = connectivity;
 
   /// Stream of connectivity status changes
   Stream<ConnectivityStatus> get connectivityStream => _connectivityStreamController.stream;
+  
+  /// Stream of boolean connectivity status (for backward compatibility)
+  Stream<bool> get connectionStream => _connectivityStreamController.stream.map((status) => status.isOnline);
   
   /// Current connectivity status
   ConnectivityStatus get currentStatus => _currentStatus;
