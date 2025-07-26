@@ -965,7 +965,7 @@
             "description": "Parcourir récursivement le répertoire test/ pour créer un inventaire complet de tous les fichiers *_test.dart avec leurs statistiques",
             "dependencies": [],
             "details": "Utiliser un script Dart pour analyser automatiquement tous les fichiers de tests et générer un rapport structuré incluant : le chemin de chaque fichier, le nombre total de tests, le nombre de tests commentés (lignes contenant //.*test ou /*.*test), le nombre de tests avec skip: true, la taille du fichier en lignes, et la date de dernière modification. Exporter le résultat dans un fichier JSON structuré pour faciliter l'analyse ultérieure.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Créer un test unitaire pour le script d'inventaire vérifiant qu'il détecte correctement les différents patterns de tests commentés et skippés dans des fichiers de test échantillons"
           },
           {
@@ -976,7 +976,7 @@
               "15.1"
             ],
             "details": "À partir de l'inventaire généré, parcourir chaque fichier identifié comme contenant des tests commentés ou skippés. Supprimer automatiquement : toutes les lignes de test commentées (// test, /* test */), tous les blocs de code test avec skip: true, et les imports inutilisés après suppression. Générer un rapport de suppression listant chaque test supprimé avec sa localisation pour traçabilité. Commiter les changements par batch de 10 fichiers maximum pour faciliter la revue.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Vérifier que le script de suppression préserve l'indentation et la structure des fichiers. Exécuter flutter test après chaque batch pour s'assurer qu'aucun test valide n'a été supprimé par erreur"
           },
           {
@@ -987,7 +987,7 @@
               "15.2"
             ],
             "details": "Analyser chaque test selon les critères de suppression définis : tests d'implémentation testant des méthodes privées ou des détails internes, tests triviaux vérifiant uniquement des getters/setters sans logique, tests dupliqués ayant la même structure Arrange-Act-Assert, tests sans assertions significatives ou avec des expect triviaux. Utiliser l'AST (Abstract Syntax Tree) Dart pour analyser la structure des tests programmatiquement. Créer un rapport détaillé justifiant chaque suppression proposée avant d'effectuer les suppressions.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Comparer la couverture de code avant et après suppression pour s'assurer qu'aucune logique métier critique n'est plus couverte. La couverture doit rester stable ou augmenter"
           },
           {
@@ -1436,7 +1436,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-26T18:57:59.404Z",
+      "updated": "2025-07-26T20:26:32.107Z",
       "description": "Tasks for master context"
     }
   }

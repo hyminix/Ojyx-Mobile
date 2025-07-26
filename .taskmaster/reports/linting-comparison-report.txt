@@ -1,6 +1,6 @@
 Linting Migration Comparison Report
 ===================================
-Date: 2025-07-26 17:08:00.821129
+Date: 2025-07-26 22:23:21.539588
 flutter_lints: 5.0.0 → 6.0.0
 
 Metrics Comparison:
