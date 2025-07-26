@@ -150,8 +150,6 @@ void main() {
         // Should notify listeners
         await Future.delayed(const Duration(milliseconds: 100));
         expect(notified, isTrue);
-
-        refreshListenable.dispose();
       });
     });
 

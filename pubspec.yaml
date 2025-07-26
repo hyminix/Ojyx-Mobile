@@ -81,9 +81,11 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+# dependency_overrides:
+  # crypto: any  # Successfully removed
+  # riverpod: any  # Testing removal
+
 # The following section is specific to Flutter packages.
-  crypto: any
-  riverpod: any
 flutter:
 
   # The following line ensures that the Material Icons font is

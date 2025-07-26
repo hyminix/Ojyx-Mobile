@@ -6,7 +6,7 @@ import 'package:ojyx/features/game/domain/entities/card_position.dart';
 void main() {
   group('CardSelectionProvider', () {
     late ProviderContainer container;
-    late CardSelectionNotifier notifier;
+    late CardSelection notifier;
 
     setUp(() {
       container = ProviderContainer();

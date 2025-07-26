@@ -252,12 +252,7 @@ SENTRY_DSN=https://test@sentry.io/123
         ).thenAnswer((_) => connectivityStream.stream);
         when(() => mockSupabase.realtime).thenReturn(mockRealtime);
         when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-        when(() => mockChannel.subscribe()).thenAnswer((_) async {
-          return ChannelResponse(
-            status: ChannelStatus.subscribed,
-            channel: mockChannel,
-          );
-        });
+        when(() => mockChannel.subscribe()).thenReturn(mockChannel);
         when(() => mockChannel.unsubscribe()).thenAnswer((_) async => 'ok');
 
         await connectivityService.initialize();
