@@ -1,0 +1,61 @@
+name: Update Build Badge
+
+on:
+  workflow_run:
+    workflows: ["WSL Android Build"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  update-badge:
+    name: Update README Badge
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.head_branch == 'main'
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏷️ Generate badge status
+        id: badge
+        run: |
+          if [ "${{ github.event.workflow_run.conclusion }}" == "success" ]; then
+            BADGE_COLOR="success"
+            BADGE_TEXT="passing"
+          else
+            BADGE_COLOR="critical"
+            BADGE_TEXT="failing"
+          fi
+          
+          echo "color=$BADGE_COLOR" >> $GITHUB_OUTPUT
+          echo "text=$BADGE_TEXT" >> $GITHUB_OUTPUT
+
+      - name: 📝 Update README badge
+        run: |
+          # Check if badge exists
+          if grep -q "!\[Build Status\]" README.md; then
+            # Update existing badge
+            sed -i "s|!\[Build Status\].*|![Build Status](https://img.shields.io/badge/build-${{ steps.badge.outputs.text }}-${{ steps.badge.outputs.color }})|" README.md
+          else
+            # Add badge to top of README
+            sed -i '1s/^/![Build Status](https:\/\/img.shields.io\/badge\/build-${{ steps.badge.outputs.text }}-${{ steps.badge.outputs.color }})\n\n/' README.md
+          fi
+
+      - name: 💾 Commit badge update
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if git diff --quiet; then
+            echo "No changes to commit"
+          else
+            git add README.md
+            git commit -m "chore: update build status badge [skip ci]"
+            git push
+          fi

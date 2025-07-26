@@ -1,0 +1,183 @@
+name: Dependency Update Check
+
+on:
+  push:
+    paths:
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+  pull_request:
+    paths:
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check-dependencies:
+    name: Analyze Dependency Changes
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout PR
+        uses: actions/checkout@v4
+
+      - name: 📥 Checkout base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          path: base
+
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'
+          channel: 'stable'
+
+      - name: 🔍 Analyze dependency changes
+        id: deps
+        run: |
+          # Get dependencies for PR
+          flutter pub deps --json > pr_deps.json
+          
+          # Get dependencies for base
+          cd base
+          flutter pub deps --json > ../base_deps.json
+          cd ..
+          
+          # Analyze changes
+          cat > analyze_deps.py << 'EOF'
+          import json
+          import sys
+          
+          with open('pr_deps.json') as f:
+              pr_deps = json.load(f)
+          with open('base_deps.json') as f:
+              base_deps = json.load(f)
+          
+          def get_deps_map(deps_json):
+              deps_map = {}
+              for pkg in deps_json.get('packages', []):
+                  deps_map[pkg['name']] = {
+                      'version': pkg.get('version', 'unknown'),
+                      'kind': pkg.get('kind', 'direct')
+                  }
+              return deps_map
+          
+          pr_map = get_deps_map(pr_deps)
+          base_map = get_deps_map(base_deps)
+          
+          added = []
+          removed = []
+          updated = []
+          
+          for name, info in pr_map.items():
+              if name not in base_map:
+                  added.append(f"{name} ({info['version']})")
+              elif info['version'] != base_map[name]['version']:
+                  updated.append(f"{name}: {base_map[name]['version']} → {info['version']}")
+          
+          for name, info in base_map.items():
+              if name not in pr_map:
+                  removed.append(f"{name} ({info['version']})")
+          
+          # Output results
+          print(f"added={len(added)}")
+          print(f"removed={len(removed)}")
+          print(f"updated={len(updated)}")
+          
+          if added:
+              print(f"added_list={','.join(added[:5])}")
+          if removed:
+              print(f"removed_list={','.join(removed[:5])}")
+          if updated:
+              print(f"updated_list={','.join(updated[:5])}")
+          EOF
+          
+          python3 analyze_deps.py >> $GITHUB_OUTPUT
+
+      - name: 💬 Comment dependency changes
+        if: github.event_name == 'pull_request' && (steps.deps.outputs.added != '0' || steps.deps.outputs.removed != '0' || steps.deps.outputs.updated != '0')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const added = ${{ steps.deps.outputs.added }};
+            const removed = ${{ steps.deps.outputs.removed }};
+            const updated = ${{ steps.deps.outputs.updated }};
+            
+            let comment = '### 📦 Dependency Changes\n\n';
+            
+            if (updated > 0) {
+              comment += `**Updated:** ${updated} package${updated > 1 ? 's' : ''}\n`;
+              const list = '${{ steps.deps.outputs.updated_list }}';
+              if (list) {
+                comment += list.split(',').map(item => `- ${item}`).join('\n') + '\n';
+                if (updated > 5) comment += `- ... and ${updated - 5} more\n`;
+              }
+              comment += '\n';
+            }
+            
+            if (added > 0) {
+              comment += `**Added:** ${added} package${added > 1 ? 's' : ''}\n`;
+              const list = '${{ steps.deps.outputs.added_list }}';
+              if (list) {
+                comment += list.split(',').map(item => `- ➕ ${item}`).join('\n') + '\n';
+                if (added > 5) comment += `- ... and ${added - 5} more\n`;
+              }
+              comment += '\n';
+            }
+            
+            if (removed > 0) {
+              comment += `**Removed:** ${removed} package${removed > 1 ? 's' : ''}\n`;
+              const list = '${{ steps.deps.outputs.removed_list }}';
+              if (list) {
+                comment += list.split(',').map(item => `- ➖ ${item}`).join('\n') + '\n';
+                if (removed > 5) comment += `- ... and ${removed - 5} more\n`;
+              }
+            }
+            
+            comment += '\n---\n';
+            comment += '⚠️ **Remember to:**\n';
+            comment += '- Run `flutter pub get` after merging\n';
+            comment += '- Clear CI caches if build fails\n';
+            comment += '- Update your local dependencies\n';
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('📦 Dependency Changes')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
+      - name: 🔒 Security check
+        run: |
+          # Simple security check for critical packages
+          CRITICAL_PACKAGES="http crypto"
+          
+          for pkg in $CRITICAL_PACKAGES; do
+            if grep -q "^  $pkg:" pubspec.lock; then
+              echo "✓ Found critical package: $pkg"
+            fi
+          done

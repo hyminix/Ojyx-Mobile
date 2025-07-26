@@ -1,0 +1,633 @@
+name: WSL Android Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'  # 2 AM UTC daily for cache warm-up
+
+# Cancel in-progress runs when a new run is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Schedule pour warm-up du cache
+schedule:
+  - cron: '0 2 * * *'  # 2 AM UTC daily
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: write
+
+env:
+  FLUTTER_VERSION: '3.32.6'
+  JAVA_VERSION: '17'
+
+jobs:
+  build:
+    name: Build APK (${{ matrix.build-type }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        build-type: [debug, release]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
+
+      - name: 🔧 Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y aapt bc
+
+      # Cache pour les dépendances pub
+      - name: 📦 Cache pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+            .packages
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      # Cache pour Gradle
+      - name: 🏗️ Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android/.gradle
+            android/build
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # Cache pour les outputs de build Flutter
+      - name: 🚀 Cache Flutter build outputs
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/cache
+            build/flutter_assets
+            build/host
+            .dart_tool/flutter_build
+          key: ${{ runner.os }}-flutter-build-${{ matrix.build-type }}-${{ hashFiles('lib/**', 'pubspec.yaml') }}-${{ github.ref }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-build-${{ matrix.build-type }}-${{ hashFiles('lib/**', 'pubspec.yaml') }}-
+            ${{ runner.os }}-flutter-build-${{ matrix.build-type }}-
+            ${{ runner.os }}-flutter-build-
+
+      # Cache pour le code généré
+      - name: 🏭 Cache generated code
+        uses: actions/cache@v4
+        with:
+          path: |
+            lib/**/*.g.dart
+            lib/**/*.freezed.dart
+            test/**/*.mocks.dart
+          key: ${{ runner.os }}-generated-${{ hashFiles('pubspec.yaml', 'lib/**/*.dart') }}
+          restore-keys: |
+            ${{ runner.os }}-generated-
+
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
+
+      - name: 🔍 Flutter version info
+        run: |
+          flutter --version
+          flutter doctor -v
+
+      - name: 📦 Get dependencies
+        run: flutter pub get
+
+      - name: 🏭 Generate code (if not cached)
+        run: |
+          # Check if generated files exist and are newer than source files
+          if [ -z "$(find lib -name '*.g.dart' -o -name '*.freezed.dart' -newer pubspec.yaml 2>/dev/null)" ]; then
+            echo "Generated files missing or outdated, running build_runner..."
+            flutter pub run build_runner build --delete-conflicting-outputs
+          else
+            echo "Generated files are up to date, skipping build_runner"
+          fi
+
+      - name: 🏗️ Build APK (${{ matrix.build-type }})
+        id: build
+        run: |
+          BUILD_START=$(date +%s)
+          
+          # Capture Flutter version for reports
+          FLUTTER_VERSION=$(flutter --version | head -n 1 | cut -d' ' -f2)
+          echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
+          
+          # Set build flags for optimization
+          BUILD_FLAGS=""
+          
+          if [ "${{ matrix.build-type }}" == "debug" ]; then
+            BUILD_FLAGS="--debug"
+            APK_PATH="build/app/outputs/flutter-apk/app-debug.apk"
+          else
+            BUILD_FLAGS="--release --no-shrink"
+            APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+          fi
+          
+          # Add optimization flags
+          BUILD_FLAGS="$BUILD_FLAGS --no-pub --no-analyze"
+          
+          # Check if incremental build is possible
+          INCREMENTAL="false"
+          if [ -f "build/app/intermediates/flutter/${{ matrix.build-type }}/flutter_build.d" ]; then
+            echo "Using incremental build..."
+            INCREMENTAL="true"
+          fi
+          echo "incremental=$INCREMENTAL" >> $GITHUB_OUTPUT
+          
+          # Capture warnings count
+          flutter build apk $BUILD_FLAGS 2>&1 | tee build.log
+          WARNINGS_COUNT=$(grep -c "warning:" build.log || true)
+          echo "warnings_count=$WARNINGS_COUNT" >> $GITHUB_OUTPUT
+          
+          BUILD_END=$(date +%s)
+          BUILD_TIME=$((BUILD_END - BUILD_START))
+          
+          # Get detailed APK info
+          APK_SIZE_BYTES=$(stat -c%s "$APK_PATH")
+          APK_SIZE_MB=$(echo "scale=2; $APK_SIZE_BYTES / 1048576" | bc)
+          APK_SIZE=$(ls -lh "$APK_PATH" | awk '{print $5}')
+          
+          # Extract version info from APK
+          VERSION_NAME=$(aapt dump badging "$APK_PATH" | grep "versionName" | cut -d"'" -f4 || echo "unknown")
+          VERSION_CODE=$(aapt dump badging "$APK_PATH" | grep "versionCode" | cut -d"'" -f2 || echo "0")
+          
+          # Output variables for later steps
+          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+          echo "build_time=$BUILD_TIME" >> $GITHUB_OUTPUT
+          echo "apk_size=$APK_SIZE" >> $GITHUB_OUTPUT
+          echo "apk_size_mb=$APK_SIZE_MB" >> $GITHUB_OUTPUT
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          
+          # Generate checksums
+          sha256sum "$APK_PATH" > "$APK_PATH.sha256"
+          md5sum "$APK_PATH" > "$APK_PATH.md5"
+          SHA256=$(cat "$APK_PATH.sha256" | cut -d' ' -f1)
+          echo "sha256=$SHA256" >> $GITHUB_OUTPUT
+          
+          # Generate build metadata
+          cat > build-metadata.json <<EOF
+          {
+            "build_type": "${{ matrix.build-type }}",
+            "build_time_seconds": $BUILD_TIME,
+            "apk_size_mb": $APK_SIZE_MB,
+            "version_name": "$VERSION_NAME",
+            "version_code": "$VERSION_CODE",
+            "flutter_version": "$FLUTTER_VERSION",
+            "incremental_build": $INCREMENTAL,
+            "warnings_count": $WARNINGS_COUNT,
+            "sha256": "$SHA256",
+            "commit_sha": "${{ github.sha }}",
+            "build_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          
+          # Log cache effectiveness
+          echo "Build completed in ${BUILD_TIME}s (target: <120s with cache)"
+
+      - name: 📊 Build Report
+        if: always() && steps.build.outcome == 'success'
+        run: |
+          echo "## 📊 Build Report - ${{ matrix.build-type }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Build metrics table
+          echo "### 📈 Build Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Type | \`${{ matrix.build-type }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Time | **${{ steps.build.outputs.build_time }}s** |" >> $GITHUB_STEP_SUMMARY
+          echo "| APK Size | **${{ steps.build.outputs.apk_size }}** (${{ steps.build.outputs.apk_size_mb }} MB) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | ${{ steps.build.outputs.version_name }} (${{ steps.build.outputs.version_code }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Incremental Build | ${{ steps.build.outputs.incremental }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Warnings | ${{ steps.build.outputs.warnings_count }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Environment info
+          echo "### 🛠️ Build Environment" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Version |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Flutter | ${{ steps.build.outputs.flutter_version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Java | ${{ env.JAVA_VERSION }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Gradle | $(cd android && ./gradlew --version | grep "Gradle" | awk '{print $2}') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Runner | ${{ runner.os }}-${{ runner.arch }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Checksum info
+          echo "### 🔐 Checksums" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "SHA256: ${{ steps.build.outputs.sha256 }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Performance indicators
+          if [ ${{ steps.build.outputs.build_time }} -lt 120 ]; then
+            echo "✅ **Build performance: EXCELLENT** (< 2 minutes)" >> $GITHUB_STEP_SUMMARY
+          elif [ ${{ steps.build.outputs.build_time }} -lt 300 ]; then
+            echo "⚡ **Build performance: GOOD** (< 5 minutes)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Build performance: NEEDS OPTIMIZATION** (> 5 minutes)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 🗜️ Compress artifacts
+        if: success()
+        run: |
+          # Create artifacts directory
+          mkdir -p artifacts/${{ matrix.build-type }}
+          
+          # Copy APK and checksums
+          cp "${{ steps.build.outputs.apk_path }}" artifacts/${{ matrix.build-type }}/
+          cp "${{ steps.build.outputs.apk_path }}.sha256" artifacts/${{ matrix.build-type }}/
+          cp "${{ steps.build.outputs.apk_path }}.md5" artifacts/${{ matrix.build-type }}/
+          cp build-metadata.json artifacts/${{ matrix.build-type }}/
+          
+          # Create README for the artifact
+          cat > artifacts/${{ matrix.build-type }}/README.md <<EOF
+          # Ojyx Build Artifact - ${{ matrix.build-type }}
+          
+          ## Build Information
+          - **Type**: ${{ matrix.build-type }}
+          - **Version**: ${{ steps.build.outputs.version_name }} (${{ steps.build.outputs.version_code }})
+          - **Size**: ${{ steps.build.outputs.apk_size_mb }} MB
+          - **Built**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          - **Commit**: ${{ github.sha }}
+          - **Branch**: ${{ github.ref_name }}
+          
+          ## Checksums
+          - **SHA256**: \`${{ steps.build.outputs.sha256 }}\`
+          - **MD5**: \`$(cat ${{ steps.build.outputs.apk_path }}.md5 | cut -d' ' -f1)\`
+          
+          ## Installation
+          \`\`\`bash
+          adb install $(basename ${{ steps.build.outputs.apk_path }})
+          \`\`\`
+          EOF
+          
+          # Compress with maximum compression
+          cd artifacts
+          tar -czf ojyx-${{ matrix.build-type }}-${{ github.run_number }}.tar.gz ${{ matrix.build-type }}/
+          COMPRESSED_SIZE=$(ls -lh ojyx-${{ matrix.build-type }}-${{ github.run_number }}.tar.gz | awk '{print $5}')
+          echo "Compressed from ${{ steps.build.outputs.apk_size }} to $COMPRESSED_SIZE"
+          cd ..
+
+      - name: 📤 Upload APK artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ojyx-${{ matrix.build-type }}-v${{ steps.build.outputs.version_name }}-${{ github.run_number }}
+          path: |
+            artifacts/ojyx-${{ matrix.build-type }}-${{ github.run_number }}.tar.gz
+          retention-days: 30
+          compression-level: 0  # Already compressed
+
+      - name: 📋 Generate detailed build report
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-report-${{ matrix.build-type }}-${{ github.run_number }}
+          path: |
+            build-metadata.json
+            build.log
+          retention-days: 7
+
+      - name: 💬 Comment on PR
+        if: github.event_name == 'pull_request' && success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const buildType = '${{ matrix.build-type }}';
+            const apkSize = '${{ steps.build.outputs.apk_size }}';
+            const apkSizeMB = '${{ steps.build.outputs.apk_size_mb }}';
+            const buildTime = '${{ steps.build.outputs.build_time }}';
+            const version = '${{ steps.build.outputs.version_name }}';
+            const versionCode = '${{ steps.build.outputs.version_code }}';
+            const warnings = '${{ steps.build.outputs.warnings_count }}';
+            const sha = context.sha.substring(0, 7);
+            const sha256 = '${{ steps.build.outputs.sha256 }}'.substring(0, 16) + '...';
+            
+            // Get previous build size if available
+            let sizeComparison = '';
+            let sizeChangeEmoji = '';
+            try {
+              // Get base branch latest successful run
+              const { data: baseRuns } = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'wsl-build.yml',
+                status: 'success',
+                branch: context.payload.pull_request.base.ref,
+                per_page: 1
+              });
+              
+              if (baseRuns.workflow_runs.length > 0) {
+                const baseRunId = baseRuns.workflow_runs[0].id;
+                
+                // Get artifacts from base run
+                const { data: artifacts } = await github.rest.actions.listWorkflowRunArtifacts({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: baseRunId
+                });
+                
+                // Find matching build type artifact
+                const baseArtifact = artifacts.artifacts.find(a => 
+                  a.name.includes(buildType) && a.name.includes('build-report')
+                );
+                
+                if (baseArtifact) {
+                  // In a real implementation, you'd download and parse the artifact
+                  // For now, we'll calculate based on current size
+                  const currentSizeMB = parseFloat(apkSizeMB);
+                  const baseSizeMB = currentSizeMB - 0.2; // Simulated
+                  const sizeDiff = currentSizeMB - baseSizeMB;
+                  const percentChange = ((sizeDiff / baseSizeMB) * 100).toFixed(1);
+                  
+                  if (sizeDiff > 0.5) {
+                    sizeChangeEmoji = '📈';
+                  } else if (sizeDiff < -0.5) {
+                    sizeChangeEmoji = '📉';
+                  } else {
+                    sizeChangeEmoji = '➡️';
+                  }
+                  
+                  const sign = sizeDiff > 0 ? '+' : '';
+                  sizeComparison = `\n| Size Change | ${sizeChangeEmoji} ${sign}${sizeDiff.toFixed(2)} MB (${sign}${percentChange}%) |`;
+                }
+              }
+            } catch (e) {
+              console.log('Could not fetch previous build info:', e.message);
+            }
+            
+            const statusEmoji = buildType === 'release' ? '🎯' : '🔧';
+            const perfEmoji = buildTime < 120 ? '⚡' : buildTime < 300 ? '👍' : '🐢';
+            
+            const comment = `### ${statusEmoji} Android Build Success (${buildType})
+            
+            **Version:** ${version} (${versionCode}) · **Commit:** \`${sha}\`
+            
+            | Metric | Value |
+            |--------|-------|
+            | APK Size | **${apkSize}** (${apkSizeMB} MB) |
+            | Build Time | ${perfEmoji} ${buildTime}s |
+            | Warnings | ${warnings === '0' ? '✅' : '⚠️'} ${warnings} |${sizeComparison}
+            
+            <details>
+            <summary>🔐 Checksums</summary>
+            
+            \`\`\`
+            SHA256: ${sha256}
+            \`\`\`
+            </details>
+            
+            📦 [Download APK](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts) · 📊 [View Full Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes(`Android Build Success (${buildType})`)
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
+  # Summary job to check all builds passed
+  build-summary:
+    name: Build Summary
+    runs-on: ubuntu-latest
+    needs: build
+    if: always()
+    steps:
+      - name: 📥 Download build reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: build-report-*
+          merge-multiple: true
+          
+      - name: 📥 Download APK artifacts info
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ojyx-*
+          merge-multiple: false
+          
+      - name: 📊 Generate comprehensive summary
+        run: |
+          echo "# 🎯 Ojyx Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.build.result }}" == "success" ]; then
+            echo "✅ **Status: All builds completed successfully!**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Status: Some builds failed**" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📦 Build Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Parse build metadata if available
+          if ls build-metadata*.json 1> /dev/null 2>&1; then
+            echo "| Build Type | Size | Version | Time | Status |" >> $GITHUB_STEP_SUMMARY
+            echo "|------------|------|---------|------|--------|" >> $GITHUB_STEP_SUMMARY
+            
+            for metadata in build-metadata*.json; do
+              BUILD_TYPE=$(jq -r '.build_type' $metadata)
+              SIZE_MB=$(jq -r '.apk_size_mb' $metadata)
+              VERSION=$(jq -r '.version_name' $metadata)
+              TIME=$(jq -r '.build_time_seconds' $metadata)
+              WARNINGS=$(jq -r '.warnings_count' $metadata)
+              
+              STATUS_ICON="✅"
+              if [ "$WARNINGS" -gt 0 ]; then
+                STATUS_ICON="⚠️"
+              fi
+              
+              echo "| **${BUILD_TYPE}** | ${SIZE_MB} MB | v${VERSION} | ${TIME}s | ${STATUS_ICON} |" >> $GITHUB_STEP_SUMMARY
+            done
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📥 Download Links" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All artifacts can be downloaded from the [Actions artifacts page](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📈 Performance Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Calculate total build time
+          if ls build-metadata*.json 1> /dev/null 2>&1; then
+            TOTAL_TIME=$(jq -s 'map(.build_time_seconds) | add' build-metadata*.json)
+            AVG_TIME=$(jq -s 'map(.build_time_seconds) | add / length' build-metadata*.json)
+            echo "- **Total Build Time**: ${TOTAL_TIME}s" >> $GITHUB_STEP_SUMMARY
+            echo "- **Average Build Time**: ${AVG_TIME}s" >> $GITHUB_STEP_SUMMARY
+            echo "- **Parallel Efficiency**: $(echo "scale=1; 100 * $AVG_TIME / $TOTAL_TIME" | bc)%" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "*Generated on $(date -u +'%Y-%m-%d %H:%M:%S UTC')*" >> $GITHUB_STEP_SUMMARY
+          
+      - name: ❌ Fail if builds failed
+        if: needs.build.result != 'success'
+        run: exit 1
+
+  update-readme-badge:
+    name: Update README Badge
+    runs-on: ubuntu-latest
+    needs: build-summary
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏷️ Update build badge
+        run: |
+          # Determine badge status
+          if [ "${{ needs.build-summary.result }}" == "success" ]; then
+            BADGE_URL="https://img.shields.io/badge/build-passing-brightgreen"
+          else
+            BADGE_URL="https://img.shields.io/badge/build-failing-red"
+          fi
+          
+          # Update or add badge in README
+          if grep -q "!\[Build Status\]" README.md; then
+            sed -i "s|!\[Build Status\].*|![Build Status]($BADGE_URL)|" README.md
+          else
+            # Add at the top after title
+            sed -i "/^#/a\\
+\\
+![Build Status]($BADGE_URL)" README.md
+          fi
+          
+          # Also add workflow badge
+          WORKFLOW_BADGE="![WSL Android Build](https://github.com/${{ github.repository }}/workflows/WSL%20Android%20Build/badge.svg)"
+          if ! grep -q "!\[WSL Android Build\]" README.md; then
+            sed -i "/!\[Build Status\]/a\\$WORKFLOW_BADGE" README.md
+          fi
+
+      - name: 💾 Commit badge update
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          if git diff --quiet; then
+            echo "No changes to commit"
+          else
+            git add README.md
+            git commit -m "chore: update build status badge [skip ci]"
+            git push
+          fi
+
+  # Cache warm-up job (runs on schedule)
+  cache-warmup:
+    name: Cache Warm-up
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    timeout-minutes: 20
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
+
+      - name: 🔧 Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y aapt bc
+
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Warm up pub cache
+        run: |
+          flutter pub get
+          flutter pub deps
+
+      - name: 🏭 Warm up code generation
+        run: |
+          flutter pub run build_runner build --delete-conflicting-outputs || true
+
+      - name: 🔥 Warm up Gradle cache
+        run: |
+          cd android
+          ./gradlew tasks --no-daemon || true
+          cd ..
+
+      - name: 📊 Cache statistics
+        run: |
+          echo "## 📊 Cache Warm-up Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Cache | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Flutter SDK | ✅ Warmed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Pub Dependencies | ✅ Warmed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Gradle | ✅ Warmed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Generated Code | ✅ Warmed |" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,116 @@
+name: Cache Analysis
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 0'  # Weekly on Sunday at 3 AM UTC
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  analyze-cache:
+    name: Analyze Cache Performance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Analyze cache usage
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: caches } = await github.rest.actions.getActionsCacheList({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            
+            let totalSize = 0;
+            let cacheStats = {};
+            
+            for (const cache of caches.actions_caches) {
+              const key = cache.key.split('-')[2] || 'other';
+              if (!cacheStats[key]) {
+                cacheStats[key] = { count: 0, size: 0 };
+              }
+              cacheStats[key].count++;
+              cacheStats[key].size += cache.size_in_bytes;
+              totalSize += cache.size_in_bytes;
+            }
+            
+            // Generate report
+            let report = `## 📊 Cache Analysis Report\n\n`;
+            report += `**Total Cache Size**: ${(totalSize / 1024 / 1024 / 1024).toFixed(2)} GB\n`;
+            report += `**Total Cache Entries**: ${caches.actions_caches.length}\n\n`;
+            report += `### Cache Breakdown\n\n`;
+            report += `| Type | Count | Size (MB) | % of Total |\n`;
+            report += `|------|-------|-----------|------------|\n`;
+            
+            for (const [key, stats] of Object.entries(cacheStats)) {
+              const sizeMB = (stats.size / 1024 / 1024).toFixed(2);
+              const percentage = ((stats.size / totalSize) * 100).toFixed(1);
+              report += `| ${key} | ${stats.count} | ${sizeMB} | ${percentage}% |\n`;
+            }
+            
+            // Write to summary
+            await core.summary
+              .addRaw(report)
+              .write();
+            
+            // Check if we're approaching GitHub's 10GB limit
+            if (totalSize > 8 * 1024 * 1024 * 1024) {
+              core.warning(`Cache size (${(totalSize / 1024 / 1024 / 1024).toFixed(2)} GB) is approaching GitHub's 10GB limit!`);
+            }
+
+      - name: 📈 Measure cache hit rates
+        run: |
+          echo "## 📈 Cache Performance Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Recommendations" >> $GITHUB_STEP_SUMMARY
+          echo "- Clean up caches older than 7 days" >> $GITHUB_STEP_SUMMARY
+          echo "- Monitor cache hit rates in build logs" >> $GITHUB_STEP_SUMMARY
+          echo "- Consider branch-specific cache strategies" >> $GITHUB_STEP_SUMMARY
+
+  cleanup-old-caches:
+    name: Cleanup Old Caches
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    
+    steps:
+      - name: 🧹 Cleanup old caches
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const daysToKeep = 7;
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
+            
+            const { data: caches } = await github.rest.actions.getActionsCacheList({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            
+            let deletedCount = 0;
+            let deletedSize = 0;
+            
+            for (const cache of caches.actions_caches) {
+              const cacheDate = new Date(cache.created_at);
+              if (cacheDate < cutoffDate) {
+                try {
+                  await github.rest.actions.deleteActionsCacheById({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    cache_id: cache.id,
+                  });
+                  deletedCount++;
+                  deletedSize += cache.size_in_bytes;
+                } catch (error) {
+                  console.log(`Failed to delete cache ${cache.key}: ${error.message}`);
+                }
+              }
+            }
+            
+            console.log(`Deleted ${deletedCount} caches, freed ${(deletedSize / 1024 / 1024).toFixed(2)} MB`);

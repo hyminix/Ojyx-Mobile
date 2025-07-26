@@ -1,0 +1,235 @@
+name: Build Notifications
+
+on:
+  workflow_run:
+    workflows: ["WSL Android Build"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+jobs:
+  notify-failure:
+    name: Notify Build Failure
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'failure'
+    
+    steps:
+      - name: 📊 Analyze failure type
+        id: failure
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId = ${{ github.event.workflow_run.id }};
+            
+            // Get workflow run jobs
+            const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId
+            });
+            
+            // Analyze failures
+            let failureType = 'unknown';
+            let failedStep = '';
+            let errorMessage = '';
+            
+            for (const job of jobs.jobs) {
+              if (job.conclusion === 'failure') {
+                for (const step of job.steps) {
+                  if (step.conclusion === 'failure') {
+                    failedStep = step.name;
+                    
+                    // Categorize failure
+                    if (step.name.includes('Build APK')) {
+                      failureType = 'compilation';
+                    } else if (step.name.includes('test')) {
+                      failureType = 'tests';
+                    } else if (step.name.includes('analyze')) {
+                      failureType = 'linting';
+                    } else if (step.name.includes('Generate code')) {
+                      failureType = 'codegen';
+                    }
+                    
+                    break;
+                  }
+                }
+                break;
+              }
+            }
+            
+            core.setOutput('failure_type', failureType);
+            core.setOutput('failed_step', failedStep);
+            core.setOutput('run_url', `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`);
+
+      - name: 📢 Send Slack notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          # Determine emoji based on failure type
+          case "${{ steps.failure.outputs.failure_type }}" in
+            compilation) EMOJI="🔨" ;;
+            tests) EMOJI="🧪" ;;
+            linting) EMOJI="📝" ;;
+            codegen) EMOJI="🏭" ;;
+            *) EMOJI="❌" ;;
+          esac
+          
+          # Craft message
+          MESSAGE=$(cat <<EOF
+          {
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "$EMOJI Build Failed - ${{ github.event.workflow_run.name }}",
+                  "emoji": true
+                }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Type:*\n${{ steps.failure.outputs.failure_type }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Failed Step:*\n${{ steps.failure.outputs.failed_step }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Branch:*\n${{ github.event.workflow_run.head_branch }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Commit:*\n\`${{ github.event.workflow_run.head_sha.substring(0, 7) }}\`"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*Triggered by:* ${{ github.event.workflow_run.triggering_actor.login }}"
+                }
+              },
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "View Logs"
+                    },
+                    "url": "${{ steps.failure.outputs.run_url }}"
+                  }
+                ]
+              }
+            ]
+          }
+          EOF
+          )
+          
+          curl -X POST -H 'Content-type: application/json' \
+            --data "$MESSAGE" \
+            "$SLACK_WEBHOOK_URL"
+
+      - name: 🎮 Send Discord notification
+        if: env.DISCORD_WEBHOOK_URL != ''
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          # Determine color based on failure type
+          case "${{ steps.failure.outputs.failure_type }}" in
+            compilation) COLOR="16711680" ;; # Red
+            tests) COLOR="16744448" ;; # Orange
+            linting) COLOR="16776960" ;; # Yellow
+            codegen) COLOR="9807270" ;; # Purple
+            *) COLOR="10038562" ;; # Dark Red
+          esac
+          
+          MESSAGE=$(cat <<EOF
+          {
+            "embeds": [{
+              "title": "❌ Build Failed - ${{ github.event.workflow_run.name }}",
+              "color": $COLOR,
+              "fields": [
+                {
+                  "name": "Failure Type",
+                  "value": "${{ steps.failure.outputs.failure_type }}",
+                  "inline": true
+                },
+                {
+                  "name": "Failed Step",
+                  "value": "${{ steps.failure.outputs.failed_step }}",
+                  "inline": true
+                },
+                {
+                  "name": "Branch",
+                  "value": "${{ github.event.workflow_run.head_branch }}",
+                  "inline": true
+                },
+                {
+                  "name": "Commit",
+                  "value": "\`${{ github.event.workflow_run.head_sha.substring(0, 7) }}\`",
+                  "inline": true
+                }
+              ],
+              "footer": {
+                "text": "Triggered by ${{ github.event.workflow_run.triggering_actor.login }}"
+              },
+              "timestamp": "${{ github.event.workflow_run.created_at }}",
+              "url": "${{ steps.failure.outputs.run_url }}"
+            }]
+          }
+          EOF
+          )
+          
+          curl -X POST -H "Content-Type: application/json" \
+            -d "$MESSAGE" \
+            "$DISCORD_WEBHOOK_URL"
+
+  notify-success:
+    name: Notify Build Success (Release only)
+    runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+    
+    steps:
+      - name: 📢 Send success notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          MESSAGE=$(cat <<EOF
+          {
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "✅ *Main branch build successful!*\nNew release artifacts are available."
+                },
+                "accessory": {
+                  "type": "button",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "Download Artifacts"
+                  },
+                  "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts"
+                }
+              }
+            ]
+          }
+          EOF
+          )
+          
+          curl -X POST -H 'Content-type: application/json' \
+            --data "$MESSAGE" \
+            "$SLACK_WEBHOOK_URL"
