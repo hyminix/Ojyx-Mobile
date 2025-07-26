@@ -50,12 +50,16 @@ dependencies:
   
   # Functional Programming
   dartz: ^0.10.1
+  fpdart: ^1.1.0
   
   # UI
   cupertino_icons: ^1.0.8
   
-  # Functional Programming
-  fpdart: ^1.1.0
+  # Utilities
+  flutter_dotenv: ^5.1.0
+  path_provider: ^2.1.4
+  shared_preferences: ^2.3.2
+  connectivity_plus: ^6.0.5
 
 dev_dependencies:
   flutter_test:

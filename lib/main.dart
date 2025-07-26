@@ -1,34 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'core/config/env_config.dart';
-import 'core/config/sentry_config.dart';
-import 'core/config/supabase_config.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+import 'core/config/app_initializer.dart';
 import 'core/config/router_config.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize all app services
+  await AppInitializer.initialize();
 
-  // Validate environment configuration
-  try {
-    EnvConfig.validate();
-  } catch (e) {
-    // In development, we can continue without proper env config
-    if (!EnvConfig.isDevelopment) {
-      rethrow;
-    }
-    debugPrint('Warning: $e');
-  }
-
-  // Initialize Sentry with error tracking
-  await SentryConfig.initialize(
-    appRunner: () async {
-      // Initialize Supabase
-      if (EnvConfig.supabaseUrl.isNotEmpty) {
-        await SupabaseConfig.initialize();
-      }
-
-      runApp(const ProviderScope(child: OjyxApp()));
+  // Run app with Sentry performance monitoring
+  await SentryFlutter.init(
+    (options) {
+      // Options are already configured in AppInitializer
     },
+    appRunner: () => runApp(
+      const ProviderScope(child: OjyxApp()),
+    ),
   );
 }
 
