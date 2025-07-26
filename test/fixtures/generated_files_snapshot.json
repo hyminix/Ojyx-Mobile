@@ -1,7 +1,12 @@
 {
-  "timestamp": "2025-07-26T09:39:04.703505",
+  "timestamp": "2025-07-26T10:07:04.236361",
   "files": {
+    "lib/core/config/router_config_v2_example.g.dart": "05b76bda82163e80cfa5fd74026ac1d4",
     "lib/core/errors/failures.freezed.dart": "711c4e833340b39791126c3c06316ce4",
+    "lib/core/providers/connectivity_provider.g.dart": "a916a971e00bace5ac55a32d00e4caf2",
+    "lib/core/providers/file_provider.g.dart": "892a78927fb5a68b922560523dc213c9",
+    "lib/core/providers/sentry_provider.g.dart": "80cbde3b2577918bf6181a1b5b3a4f15",
+    "lib/core/providers/storage_provider.g.dart": "96cd1848fae6b045366d0b4160c98f8e",
     "lib/core/providers/supabase_provider_v2.g.dart": "6809d037dbb176d51d68731c9b4c3aef",
     "lib/features/auth/presentation/providers/auth_provider.g.dart": "97af6e15cd7a7e0a898b5223adb2800a",
     "lib/features/end_game/domain/entities/end_game_state.freezed.dart": "07712221ad581b9dff4ef6e37748bc2c",
