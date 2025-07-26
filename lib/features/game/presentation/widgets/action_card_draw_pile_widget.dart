@@ -36,10 +36,10 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
                   end: Alignment.bottomRight,
                   colors: [
                     colorScheme.primary.withValues(
-                      opacity: canDraw ? 1.0 : 0.5,
+                      alpha: canDraw ? 1.0 : 0.5,
                     ),
-                    colorScheme.primaryContainer.withOpacity(
-                      canDraw ? 1.0 : 0.5,
+                    colorScheme.primaryContainer.withValues(
+                      alpha: canDraw ? 1.0 : 0.5,
                     ),
                   ],
                 ),
@@ -62,7 +62,7 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
                           Icons.style,
                           size: 32,
                           color: Colors.white.withValues(
-                            opacity: canDraw ? 1.0 : 0.6,
+                            alpha: canDraw ? 1.0 : 0.6,
                           ),
                         ),
                         const SizedBox(height: 4),
