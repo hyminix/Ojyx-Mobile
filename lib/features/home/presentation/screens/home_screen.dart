@@ -3,12 +3,50 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
-class HomeScreen extends ConsumerWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends ConsumerStatefulWidget {
+  const HomeScreen({this.redirectUrl, super.key});
+
+  final String? redirectUrl;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Handle redirect after auth is complete
+    if (widget.redirectUrl != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkAndRedirect();
+      });
+    }
+  }
+
+  void _checkAndRedirect() {
+    final authState = ref.read(authNotifierProvider);
+    authState.whenData((user) {
+      if (user != null && widget.redirectUrl != null && mounted) {
+        // Decode and redirect
+        context.go(Uri.decodeComponent(widget.redirectUrl!));
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
+
+    // Listen for auth changes to handle redirect
+    ref.listen(authNotifierProvider, (previous, next) {
+      if (widget.redirectUrl != null &&
+          previous?.valueOrNull == null &&
+          next.valueOrNull != null) {
+        // User just authenticated, redirect
+        context.go(Uri.decodeComponent(widget.redirectUrl!));
+      }
+    });
 
     return Scaffold(
       body: Container(
@@ -56,11 +94,53 @@ class HomeScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 48),
 
+                    // Show redirect notice if present
+                    if (widget.redirectUrl != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onPrimaryContainer,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Connexion requise pour continuer',
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryContainer,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+
                     // Loading or buttons
                     authState.when(
                       data: (user) {
                         if (user == null) {
-                          return const CircularProgressIndicator();
+                          return Column(
+                            children: [
+                              const CircularProgressIndicator(),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Connexion en cours...',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ],
+                          );
                         }
                         return Column(
                           children: [
@@ -104,6 +184,11 @@ class HomeScreen extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.surface,
                                 borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.outline.withValues(alpha: 0.2),
+                                ),
                               ),
                               child: Row(
                                 children: [

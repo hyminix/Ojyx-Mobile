@@ -10,7 +10,7 @@ void main() async {
   print('📋 Backup du router actuel...');
   final routerFile = File('lib/core/config/router_config.dart');
   final backupFile = File('lib/core/config/router_config_backup.dart');
-  
+
   if (routerFile.existsSync()) {
     await routerFile.copy(backupFile.path);
     print('✅ Backup créé: ${backupFile.path}');
@@ -21,33 +21,36 @@ void main() async {
   final mainFile = File('lib/main.dart');
   if (mainFile.existsSync()) {
     var mainContent = await mainFile.readAsString();
-    
+
     // Remplacer l'import
     mainContent = mainContent.replaceAll(
       "import 'core/config/router_config.dart';",
-      "import 'core/config/router_config_v2.dart';"
+      "import 'core/config/router_config_v2.dart';",
     );
-    
+
     // Remplacer le provider
-    mainContent = mainContent.replaceAll(
-      'routerProvider',
-      'routerProviderV2'
-    );
-    
+    mainContent = mainContent.replaceAll('routerProvider', 'routerProviderV2');
+
     await mainFile.writeAsString(mainContent);
     print('✅ main.dart mis à jour');
   }
 
   // 3. Mettre à jour le HomeScreen
   print('\n📝 Mise à jour du HomeScreen...');
-  final homeFile = File('lib/features/home/presentation/screens/home_screen.dart');
-  final homeBackupFile = File('lib/features/home/presentation/screens/home_screen_backup.dart');
-  
+  final homeFile = File(
+    'lib/features/home/presentation/screens/home_screen.dart',
+  );
+  final homeBackupFile = File(
+    'lib/features/home/presentation/screens/home_screen_backup.dart',
+  );
+
   if (homeFile.existsSync()) {
     await homeFile.copy(homeBackupFile.path);
-    
+
     // Copier la v2 sur l'original
-    final homeV2File = File('lib/features/home/presentation/screens/home_screen_v2.dart');
+    final homeV2File = File(
+      'lib/features/home/presentation/screens/home_screen_v2.dart',
+    );
     if (homeV2File.existsSync()) {
       await homeV2File.copy(homeFile.path);
       print('✅ HomeScreen mis à jour avec gestion des redirections');
@@ -69,8 +72,12 @@ void main() async {
 
   // 5. Rollback instructions
   print('\n⚠️  Pour rollback si nécessaire:');
-  print('1. cp lib/core/config/router_config_backup.dart lib/core/config/router_config.dart');
-  print('2. cp lib/features/home/presentation/screens/home_screen_backup.dart lib/features/home/presentation/screens/home_screen.dart');
+  print(
+    '1. cp lib/core/config/router_config_backup.dart lib/core/config/router_config.dart',
+  );
+  print(
+    '2. cp lib/features/home/presentation/screens/home_screen_backup.dart lib/features/home/presentation/screens/home_screen.dart',
+  );
   print('3. Restaurer les imports dans main.dart');
 
   print('\n✅ Migration préparée! Lancer les tests pour valider.');

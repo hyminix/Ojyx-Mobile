@@ -15,7 +15,7 @@ import '../widgets/opponents_view_widget.dart';
 import '../widgets/action_card_hand_widget.dart';
 import '../widgets/action_card_draw_pile_widget.dart';
 import '../widgets/game_animation_overlay.dart';
-import '../providers/card_selection_provider.dart';
+import '../providers/card_selection_provider_v2.dart';
 import '../../domain/entities/game_state.dart';
 import '../../domain/entities/game_player.dart';
 import '../../domain/entities/action_card.dart';

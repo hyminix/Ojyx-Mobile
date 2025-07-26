@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/services/deep_link_service.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/room_providers.dart';
 import '../../domain/entities/room.dart';
@@ -64,6 +66,20 @@ class RoomLobbyScreen extends ConsumerWidget {
                               Text(
                                 'Partie #${room.id.substring(0, 8)}',
                                 style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(width: 16),
+                              IconButton(
+                                icon: const Icon(Icons.share, size: 20),
+                                tooltip: 'Partager la partie',
+                                onPressed: () => _shareRoom(context, room.id),
+                                visualDensity: VisualDensity.compact,
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.copy, size: 20),
+                                tooltip: 'Copier le code',
+                                onPressed: () =>
+                                    _copyRoomCode(context, room.id),
+                                visualDensity: VisualDensity.compact,
                               ),
                             ],
                           ),
@@ -282,6 +298,50 @@ class RoomLobbyScreen extends ConsumerWidget {
       case RoomStatus.cancelled:
         return 'Annulée';
     }
+  }
+
+  void _shareRoom(BuildContext context, String roomId) {
+    final link = DeepLinkService.generateRoomLink(roomId);
+    final message = DeepLinkService.generateShareMessage(roomId);
+
+    // TODO: Implement actual sharing using share_plus package
+    // For now, just copy to clipboard
+    Clipboard.setData(ClipboardData(text: message));
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Lien de partage copié!'),
+        action: SnackBarAction(
+          label: 'Voir',
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Partager la partie'),
+                content: SelectableText(message),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Fermer'),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  void _copyRoomCode(BuildContext context, String roomId) {
+    Clipboard.setData(ClipboardData(text: roomId));
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Code de la partie copié!'),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   Future<void> _startGame(

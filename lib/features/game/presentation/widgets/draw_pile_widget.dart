@@ -196,7 +196,9 @@ class _DrawPileWidgetState extends State<DrawPileWidget>
                 CustomPaint(
                   size: Size.infinite,
                   painter: _CardBackPainter(
-                    color: theme.colorScheme.onPrimary.withAlpha((0.1 * 255).round()),
+                    color: theme.colorScheme.onPrimary.withAlpha(
+                      (0.1 * 255).round(),
+                    ),
                   ),
                 ),
                 if (isTop && widget.cardCount == 0)

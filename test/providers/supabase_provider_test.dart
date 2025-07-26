@@ -17,34 +17,34 @@ void main() {
     test('legacy provider should provide SupabaseClient', () {
       final container = ProviderContainer();
       final client = container.read(legacy.supabaseClientProvider);
-      
+
       expect(client, isNotNull);
       expect(client, isA<SupabaseClient>());
-      
+
       container.dispose();
     });
 
     test('modern provider should provide same SupabaseClient', () {
       final container = ProviderContainer();
       final client = container.read(modern.supabaseClientProvider);
-      
+
       expect(client, isNotNull);
       expect(client, isA<SupabaseClient>());
       expect(client, equals(Supabase.instance.client));
-      
+
       container.dispose();
     });
 
     test('both providers should return the same instance', () {
       final container = ProviderContainer();
-      
+
       // Note: In real migration, we'd import only one
       // This is just to verify they work the same way
       final legacyClient = container.read(legacy.supabaseClientProvider);
       final modernClient = container.read(modern.supabaseClientProvider);
-      
+
       expect(modernClient, equals(legacyClient));
-      
+
       container.dispose();
     });
   });

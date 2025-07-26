@@ -3,14 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ojyx/features/game/presentation/providers/direction_observer_provider.dart';
 import 'package:ojyx/features/game/presentation/providers/game_state_notifier.dart';
-import 'package:ojyx/features/game/presentation/providers/game_animation_provider.dart';
+import 'package:ojyx/features/game/presentation/providers/game_animation_provider_v2.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/play_direction.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 
-class MockGameAnimationNotifier extends Mock implements GameAnimationNotifier {}
+class MockGameAnimation extends Mock implements GameAnimation {}
 
 void main() {
   setUpAll(() {
@@ -19,15 +19,13 @@ void main() {
 
   group('Direction Observer Game Flow Behavior', () {
     late ProviderContainer container;
-    late MockGameAnimationNotifier mockAnimationNotifier;
+    late MockGameAnimation mockAnimation;
     late GameState clockwiseState;
     late GameState counterClockwiseState;
 
     setUp(() {
-      mockAnimationNotifier = MockGameAnimationNotifier();
-      when(
-        () => mockAnimationNotifier.showDirectionChange(any()),
-      ).thenReturn(null);
+      mockAnimation = MockGameAnimation();
+      when(() => mockAnimation.showDirectionChange(any())).thenReturn(null);
 
       final mockPlayerGrid = PlayerGrid.empty();
       clockwiseState = GameState(
@@ -64,7 +62,7 @@ void main() {
       container = ProviderContainer(
         overrides: [
           gameStateNotifierProvider.overrideWith(() => GameStateNotifier()),
-          gameAnimationProvider.overrideWith((ref) => mockAnimationNotifier),
+          gameAnimationProvider.overrideWith(() => mockAnimation),
         ],
       );
     });
@@ -98,8 +96,7 @@ void main() {
         await Future.delayed(Duration.zero);
 
         verify(
-          () =>
-              mockAnimationNotifier.showDirectionChange(PlayDirection.backward),
+          () => mockAnimation.showDirectionChange(PlayDirection.backward),
         ).called(1);
 
         // Verify protection against redundant visual feedback
@@ -112,8 +109,7 @@ void main() {
         await Future.delayed(Duration.zero);
 
         verifyNever(
-          () =>
-              mockAnimationNotifier.showDirectionChange(PlayDirection.backward),
+          () => mockAnimation.showDirectionChange(PlayDirection.backward),
         );
       },
     );
@@ -142,8 +138,7 @@ void main() {
 
         // Then: Direction change is detected and notified
         verify(
-          () =>
-              mockAnimationNotifier.showDirectionChange(PlayDirection.backward),
+          () => mockAnimation.showDirectionChange(PlayDirection.backward),
         ).called(1);
 
         // When: Direction changes back to clockwise
@@ -154,8 +149,7 @@ void main() {
 
         // Then: Return to normal flow is detected
         verify(
-          () =>
-              mockAnimationNotifier.showDirectionChange(PlayDirection.forward),
+          () => mockAnimation.showDirectionChange(PlayDirection.forward),
         ).called(1);
       },
     );

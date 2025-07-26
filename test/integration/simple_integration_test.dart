@@ -1,11 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ojyx/core/config/app_initializer.dart';
 import 'package:ojyx/core/services/connectivity_service.dart';
 import 'package:ojyx/core/services/storage_service.dart';
 import 'package:ojyx/core/services/file_service.dart';
@@ -14,6 +11,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:async';
 
 class MockConnectivity extends Mock implements Connectivity {}
+
 class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 void main() {
@@ -31,12 +29,14 @@ void main() {
     });
 
     test('should initialize app configuration successfully', () async {
-      dotenv.testLoad(fileInput: '''
+      dotenv.testLoad(
+        fileInput: '''
 SUPABASE_URL=https://test.supabase.co
 SUPABASE_ANON_KEY=test-key
 SENTRY_DSN=https://test@sentry.io/123
 ENVIRONMENT=test
-''');
+''',
+      );
 
       expect(dotenv.env['SUPABASE_URL'], equals('https://test.supabase.co'));
       expect(dotenv.env['SUPABASE_ANON_KEY'], equals('test-key'));
@@ -46,22 +46,27 @@ ENVIRONMENT=test
 
     test('should initialize services without errors', () async {
       // Connectivity service
-      final connectivityStream = StreamController<List<ConnectivityResult>>.broadcast();
-      when(() => mockConnectivity.onConnectivityChanged).thenAnswer(
-        (_) => connectivityStream.stream,
-      );
-      when(() => mockConnectivity.checkConnectivity()).thenAnswer(
-        (_) async => [ConnectivityResult.wifi],
-      );
+      final connectivityStream =
+          StreamController<List<ConnectivityResult>>.broadcast();
+      when(
+        () => mockConnectivity.onConnectivityChanged,
+      ).thenAnswer((_) => connectivityStream.stream);
+      when(
+        () => mockConnectivity.checkConnectivity(),
+      ).thenAnswer((_) async => [ConnectivityResult.wifi]);
 
-      final connectivityService = ConnectivityService.createWithConnectivity(mockConnectivity);
+      final connectivityService = ConnectivityService.createWithConnectivity(
+        mockConnectivity,
+      );
       await connectivityService.initialize();
 
       expect(connectivityService.isConnected, isTrue);
 
       // Storage service
       when(() => mockPrefs.getString(any())).thenReturn(null);
-      when(() => mockPrefs.setString(any(), any())).thenAnswer((_) async => true);
+      when(
+        () => mockPrefs.setString(any(), any()),
+      ).thenAnswer((_) async => true);
       when(() => mockPrefs.containsKey(any())).thenReturn(false);
 
       final storageService = StorageService.createWithPrefs(mockPrefs);
@@ -79,7 +84,9 @@ ENVIRONMENT=test
     });
 
     test('should handle service operations correctly', () async {
-      when(() => mockPrefs.setString(any(), any())).thenAnswer((_) async => true);
+      when(
+        () => mockPrefs.setString(any(), any()),
+      ).thenAnswer((_) async => true);
       when(() => mockPrefs.getString(any())).thenReturn('test-value');
       when(() => mockPrefs.remove(any())).thenAnswer((_) async => true);
       when(() => mockPrefs.containsKey(any())).thenReturn(true);
@@ -88,7 +95,10 @@ ENVIRONMENT=test
       await storageService.initialize();
 
       // Test save operation
-      final saveResult = await storageService.saveString('test-key', 'test-value');
+      final saveResult = await storageService.saveString(
+        'test-key',
+        'test-value',
+      );
       expect(saveResult, isTrue);
 
       // Test get operation
@@ -105,15 +115,18 @@ ENVIRONMENT=test
     });
 
     test('should handle connectivity changes', () async {
-      final connectivityStream = StreamController<List<ConnectivityResult>>.broadcast();
-      when(() => mockConnectivity.onConnectivityChanged).thenAnswer(
-        (_) => connectivityStream.stream,
-      );
-      when(() => mockConnectivity.checkConnectivity()).thenAnswer(
-        (_) async => [ConnectivityResult.wifi],
-      );
+      final connectivityStream =
+          StreamController<List<ConnectivityResult>>.broadcast();
+      when(
+        () => mockConnectivity.onConnectivityChanged,
+      ).thenAnswer((_) => connectivityStream.stream);
+      when(
+        () => mockConnectivity.checkConnectivity(),
+      ).thenAnswer((_) async => [ConnectivityResult.wifi]);
 
-      final connectivityService = ConnectivityService.createWithConnectivity(mockConnectivity);
+      final connectivityService = ConnectivityService.createWithConnectivity(
+        mockConnectivity,
+      );
       await connectivityService.initialize();
 
       final statusChanges = <bool>[];
@@ -137,7 +150,9 @@ ENVIRONMENT=test
     });
 
     test('should measure performance of operations', () async {
-      when(() => mockPrefs.setString(any(), any())).thenAnswer((_) async => true);
+      when(
+        () => mockPrefs.setString(any(), any()),
+      ).thenAnswer((_) async => true);
       when(() => mockPrefs.getString(any())).thenReturn('value');
 
       final storageService = StorageService.createWithPrefs(mockPrefs);
@@ -153,10 +168,15 @@ ENVIRONMENT=test
 
       stopwatch.stop();
 
-      expect(stopwatch.elapsedMilliseconds, lessThan(1000),
-          reason: '$operations operations should complete within 1 second');
+      expect(
+        stopwatch.elapsedMilliseconds,
+        lessThan(1000),
+        reason: '$operations operations should complete within 1 second',
+      );
 
-      print('Performance test: ${stopwatch.elapsedMilliseconds}ms for $operations operations');
+      print(
+        'Performance test: ${stopwatch.elapsedMilliseconds}ms for $operations operations',
+      );
     });
 
     testWidgets('should integrate with Flutter widget tree', (tester) async {
@@ -195,8 +215,12 @@ ENVIRONMENT=test
 
     test('should handle error scenarios gracefully', () async {
       // Test storage service with failing operations
-      when(() => mockPrefs.setString(any(), any())).thenThrow(Exception('Storage failed'));
-      when(() => mockPrefs.getString(any())).thenThrow(Exception('Read failed'));
+      when(
+        () => mockPrefs.setString(any(), any()),
+      ).thenThrow(Exception('Storage failed'));
+      when(
+        () => mockPrefs.getString(any()),
+      ).thenThrow(Exception('Read failed'));
 
       final storageService = StorageService.createWithPrefs(mockPrefs);
       await storageService.initialize();
@@ -206,26 +230,28 @@ ENVIRONMENT=test
         throwsA(isA<Exception>()),
       );
 
-      expect(
-        () => storageService.getString('test'),
-        throwsA(isA<Exception>()),
-      );
+      expect(() => storageService.getString('test'), throwsA(isA<Exception>()));
     });
 
     test('should validate service integration points', () async {
       // Setup all services
-      final connectivityStream = StreamController<List<ConnectivityResult>>.broadcast();
-      when(() => mockConnectivity.onConnectivityChanged).thenAnswer(
-        (_) => connectivityStream.stream,
-      );
-      when(() => mockConnectivity.checkConnectivity()).thenAnswer(
-        (_) async => [ConnectivityResult.wifi],
-      );
+      final connectivityStream =
+          StreamController<List<ConnectivityResult>>.broadcast();
+      when(
+        () => mockConnectivity.onConnectivityChanged,
+      ).thenAnswer((_) => connectivityStream.stream);
+      when(
+        () => mockConnectivity.checkConnectivity(),
+      ).thenAnswer((_) async => [ConnectivityResult.wifi]);
 
-      when(() => mockPrefs.setString(any(), any())).thenAnswer((_) async => true);
+      when(
+        () => mockPrefs.setString(any(), any()),
+      ).thenAnswer((_) async => true);
       when(() => mockPrefs.getString(any())).thenReturn(null);
 
-      final connectivityService = ConnectivityService.createWithConnectivity(mockConnectivity);
+      final connectivityService = ConnectivityService.createWithConnectivity(
+        mockConnectivity,
+      );
       final storageService = StorageService.createWithPrefs(mockPrefs);
       final fileService = FileService();
 

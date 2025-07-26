@@ -204,7 +204,7 @@ final gameStatePersistenceProvider =
 
 typedef _$GameStatePersistence =
     AutoDisposeAsyncNotifier<Map<String, dynamic>?>;
-String _$errorLoggerHash() => r'40da7811d10af26ff1b5b5967dfc25c01e12e622';
+String _$errorLoggerHash() => r'fc09f3ed362835127674fbd4e820000ebd494643';
 
 /// Provider for error logging
 ///

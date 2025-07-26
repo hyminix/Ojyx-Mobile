@@ -25,28 +25,31 @@ void main() {
     test('should have all required routes', () {
       final routes = router.configuration.routes;
       expect(routes.length, 5);
-      
+
       // Extract route paths
       final paths = routes.map((route) => (route as GoRoute).path).toSet();
-      expect(paths, containsAll([
-        '/',
-        '/create-room',
-        '/join-room',
-        '/room/:roomId',
-        '/game/:roomId',
-      ]));
+      expect(
+        paths,
+        containsAll([
+          '/',
+          '/create-room',
+          '/join-room',
+          '/room/:roomId',
+          '/game/:roomId',
+        ]),
+      );
     });
 
     test('should have named routes', () {
       final routes = router.configuration.routes.cast<GoRoute>();
-      
+
       final namedRoutes = <String, String>{};
       for (final route in routes) {
         if (route.name != null) {
           namedRoutes[route.name!] = route.path;
         }
       }
-      
+
       expect(namedRoutes, {
         'home': '/',
         'createRoom': '/create-room',
@@ -57,18 +60,18 @@ void main() {
     });
 
     test('should parse room lobby route with parameter', () {
-      final route = router.configuration.routes
-          .cast<GoRoute>()
-          .firstWhere((r) => r.name == 'roomLobby');
-      
+      final route = router.configuration.routes.cast<GoRoute>().firstWhere(
+        (r) => r.name == 'roomLobby',
+      );
+
       expect(route.path, '/room/:roomId');
     });
 
     test('should parse game route with parameter', () {
-      final route = router.configuration.routes
-          .cast<GoRoute>()
-          .firstWhere((r) => r.name == 'game');
-      
+      final route = router.configuration.routes.cast<GoRoute>().firstWhere(
+        (r) => r.name == 'game',
+      );
+
       expect(route.path, '/game/:roomId');
     });
 
@@ -108,18 +111,18 @@ void main() {
 
       // Verify we start at home
       expect(find.text('Create Room'), findsOneWidget);
-      
+
       // Navigate to create room
       await tester.tap(find.text('Create Room'));
       await tester.pumpAndSettle();
-      
+
       // Verify navigation occurred
       expect(find.text('Create Room Screen'), findsOneWidget);
     });
 
     testWidgets('should navigate with room ID parameter', (tester) async {
       const testRoomId = 'test-room-123';
-      
+
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp.router(
@@ -138,9 +141,7 @@ void main() {
                   path: '/room/:roomId',
                   builder: (context, state) {
                     final roomId = state.pathParameters['roomId']!;
-                    return Scaffold(
-                      body: Center(child: Text('Room: $roomId')),
-                    );
+                    return Scaffold(body: Center(child: Text('Room: $roomId')));
                   },
                 ),
               ],
@@ -152,7 +153,7 @@ void main() {
       // Navigate to room with ID
       await tester.tap(find.text('Join Room'));
       await tester.pumpAndSettle();
-      
+
       // Verify room ID is passed correctly
       expect(find.text('Room: $testRoomId'), findsOneWidget);
     });
@@ -165,16 +166,12 @@ void main() {
               routes: [
                 GoRoute(
                   path: '/',
-                  builder: (context, state) => const Scaffold(
-                    body: Center(child: Text('Home')),
-                  ),
+                  builder: (context, state) =>
+                      const Scaffold(body: Center(child: Text('Home'))),
                 ),
               ],
-              errorBuilder: (context, state) => const Scaffold(
-                body: Center(
-                  child: Text('Page not found'),
-                ),
-              ),
+              errorBuilder: (context, state) =>
+                  const Scaffold(body: Center(child: Text('Page not found'))),
               initialLocation: '/invalid-route',
             ),
           ),
@@ -182,7 +179,7 @@ void main() {
       );
 
       await tester.pumpAndSettle();
-      
+
       // Verify error page is shown
       expect(find.text('Page not found'), findsOneWidget);
     });

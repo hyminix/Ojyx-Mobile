@@ -6,11 +6,11 @@ part of 'room.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$RoomImpl _$$RoomImplFromJson(Map<String, dynamic> json) => $checkedCreate(
-  r'_$RoomImpl',
+_Room _$RoomFromJson(Map<String, dynamic> json) => $checkedCreate(
+  '_Room',
   json,
   ($checkedConvert) {
-    final val = _$RoomImpl(
+    final val = _Room(
       id: $checkedConvert('id', (v) => v as String),
       creatorId: $checkedConvert('creator_id', (v) => v as String),
       playerIds: $checkedConvert(
@@ -44,17 +44,16 @@ _$RoomImpl _$$RoomImplFromJson(Map<String, dynamic> json) => $checkedCreate(
   },
 );
 
-Map<String, dynamic> _$$RoomImplToJson(_$RoomImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'creator_id': instance.creatorId,
-      'player_ids': instance.playerIds,
-      'status': _$RoomStatusEnumMap[instance.status]!,
-      'max_players': instance.maxPlayers,
-      'current_game_id': instance.currentGameId,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-    };
+Map<String, dynamic> _$RoomToJson(_Room instance) => <String, dynamic>{
+  'id': instance.id,
+  'creator_id': instance.creatorId,
+  'player_ids': instance.playerIds,
+  'status': _$RoomStatusEnumMap[instance.status]!,
+  'max_players': instance.maxPlayers,
+  'current_game_id': instance.currentGameId,
+  'created_at': instance.createdAt?.toIso8601String(),
+  'updated_at': instance.updatedAt?.toIso8601String(),
+};
 
 const _$RoomStatusEnumMap = {
   RoomStatus.waiting: 'waiting',

@@ -16,10 +16,17 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:async';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockGoTrueClient extends Mock implements GoTrueClient {}
+
 class MockRealtimeClient extends Mock implements RealtimeClient {}
+
+class MockRealtimeChannel extends Mock implements RealtimeChannel {}
+
 class MockHub extends Mock implements Hub {}
+
 class MockConnectivity extends Mock implements Connectivity {}
+
 class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 void main() {
@@ -42,20 +49,24 @@ void main() {
       mockSentryHub = MockHub();
       mockConnectivity = MockConnectivity();
       mockPrefs = MockSharedPreferences();
-      
+
       when(() => mockSupabase.auth).thenReturn(mockAuth);
       when(() => mockSupabase.realtime).thenReturn(mockRealtime);
     });
 
-    testWidgets('should complete full app lifecycle with all services', (tester) async {
+    testWidgets('should complete full app lifecycle with all services', (
+      tester,
+    ) async {
       // Load test environment
-      dotenv.testLoad(fileInput: '''
+      dotenv.testLoad(
+        fileInput: '''
 SUPABASE_URL=https://test.supabase.co
 SUPABASE_ANON_KEY=test-key
 SENTRY_DSN=https://test@sentry.io/123
 ENVIRONMENT=test
 ENABLE_PERFORMANCE_MONITORING=true
-''');
+''',
+      );
 
       // Test metrics
       final metrics = <String, dynamic>{
@@ -78,25 +89,30 @@ ENABLE_PERFORMANCE_MONITORING=true
       }
 
       // Initialize services
-      final connectivityService = ConnectivityService.createWithConnectivity(mockConnectivity);
-      final sentryService = SentryService.createWithHub(mockSentryHub);
+      final connectivityService = ConnectivityService.createWithConnectivity(
+        mockConnectivity,
+      );
+      // SentryService is now a static class, no need to create instance
       final storageService = StorageService.createWithPrefs(mockPrefs);
       final fileService = FileService();
 
       // Setup connectivity
-      final connectivityStream = StreamController<List<ConnectivityResult>>.broadcast();
-      when(() => mockConnectivity.onConnectivityChanged).thenAnswer(
-        (_) => connectivityStream.stream,
-      );
-      when(() => mockConnectivity.checkConnectivity()).thenAnswer(
-        (_) async => [ConnectivityResult.wifi],
-      );
+      final connectivityStream =
+          StreamController<List<ConnectivityResult>>.broadcast();
+      when(
+        () => mockConnectivity.onConnectivityChanged,
+      ).thenAnswer((_) => connectivityStream.stream);
+      when(
+        () => mockConnectivity.checkConnectivity(),
+      ).thenAnswer((_) async => [ConnectivityResult.wifi]);
 
       await connectivityService.initialize();
       metrics['services_initialized'].add('connectivity');
 
       // Setup storage
-      when(() => mockPrefs.setString(any(), any())).thenAnswer((_) async => true);
+      when(
+        () => mockPrefs.setString(any(), any()),
+      ).thenAnswer((_) async => true);
       when(() => mockPrefs.getString(any())).thenReturn(null);
       when(() => mockPrefs.setBool(any(), any())).thenAnswer((_) async => true);
       when(() => mockPrefs.getBool(any())).thenReturn(true);
@@ -105,13 +121,15 @@ ENABLE_PERFORMANCE_MONITORING=true
       metrics['services_initialized'].add('storage');
 
       // Setup Sentry
-      when(() => mockSentryHub.captureException(
-        any(),
-        stackTrace: any(named: 'stackTrace'),
-        withScope: any(named: 'withScope'),
-      )).thenAnswer((_) async {
+      when(
+        () => mockSentryHub.captureException(
+          any(),
+          stackTrace: any(named: 'stackTrace'),
+          withScope: any(named: 'withScope'),
+        ),
+      ).thenAnswer((_) async {
         metrics['errors_captured']++;
-        return SentryId.empty();
+        return const SentryId.empty();
       });
 
       // Test app widget
@@ -129,7 +147,10 @@ ENABLE_PERFORMANCE_MONITORING=true
                         ElevatedButton(
                           onPressed: () async {
                             // Simulate user action
-                            await storageService.saveString('test_action', 'button_pressed');
+                            await storageService.saveString(
+                              'test_action',
+                              'button_pressed',
+                            );
                             metrics['storage_operations']++;
                           },
                           child: const Text('Test Action'),
@@ -137,9 +158,7 @@ ENABLE_PERFORMANCE_MONITORING=true
                         StreamBuilder<bool>(
                           stream: connectivityService.connectionStream,
                           builder: (context, snapshot) {
-                            return Text(
-                              'Connected: ${snapshot.data ?? false}',
-                            );
+                            return Text('Connected: ${snapshot.data ?? false}');
                           },
                         ),
                       ],
@@ -194,7 +213,7 @@ ENABLE_PERFORMANCE_MONITORING=true
 
     test('should handle complete user session flow', () async {
       // Scenario: User opens app -> signs in anonymously -> plays game -> handles disconnection -> resumes
-      
+
       final sessionMetrics = <String, dynamic>{
         'session_start': DateTime.now(),
         'auth_completed': false,
@@ -204,19 +223,24 @@ ENABLE_PERFORMANCE_MONITORING=true
       };
 
       // 1. Initialize services
-      final connectivityService = ConnectivityService.createWithConnectivity(mockConnectivity);
-      final sentryService = SentryService.createWithHub(mockSentryHub);
+      final connectivityService = ConnectivityService.createWithConnectivity(
+        mockConnectivity,
+      );
+      // SentryService is now a static class, no need to create instance
       final storageService = StorageService.createWithPrefs(mockPrefs);
 
       // Setup mocks
-      final connectivityStream = StreamController<List<ConnectivityResult>>.broadcast();
-      when(() => mockConnectivity.onConnectivityChanged).thenAnswer(
-        (_) => connectivityStream.stream,
-      );
-      when(() => mockConnectivity.checkConnectivity()).thenAnswer(
-        (_) async => [ConnectivityResult.wifi],
-      );
-      when(() => mockPrefs.setString(any(), any())).thenAnswer((_) async => true);
+      final connectivityStream =
+          StreamController<List<ConnectivityResult>>.broadcast();
+      when(
+        () => mockConnectivity.onConnectivityChanged,
+      ).thenAnswer((_) => connectivityStream.stream);
+      when(
+        () => mockConnectivity.checkConnectivity(),
+      ).thenAnswer((_) async => [ConnectivityResult.wifi]);
+      when(
+        () => mockPrefs.setString(any(), any()),
+      ).thenAnswer((_) async => true);
       when(() => mockPrefs.getString(any())).thenReturn(null);
 
       await Future.wait([
@@ -254,7 +278,7 @@ ENABLE_PERFORMANCE_MONITORING=true
       });
 
       final gameChannel = mockRealtime.channel('game:room123');
-      await gameChannel.subscribe();
+      gameChannel.subscribe();
       expect(sessionMetrics['game_joined'], isTrue);
 
       // 4. Save game state
@@ -264,14 +288,16 @@ ENABLE_PERFORMANCE_MONITORING=true
       // 5. Handle disconnection
       connectivityStream.add([ConnectivityResult.none]);
       await Future.delayed(const Duration(milliseconds: 100));
-      
+
       sessionMetrics['disconnection_handled'] = true;
 
       // 6. Restore connection and session
       connectivityStream.add([ConnectivityResult.wifi]);
       await Future.delayed(const Duration(milliseconds: 100));
 
-      when(() => mockPrefs.getString('game_state')).thenReturn('{"score": 50, "turn": 3}');
+      when(
+        () => mockPrefs.getString('game_state'),
+      ).thenReturn('{"score": 50, "turn": 3}');
       when(() => mockPrefs.getString('player_id')).thenReturn('test-user-id');
 
       final restoredGameState = storageService.getString('game_state');
@@ -320,8 +346,11 @@ ENABLE_PERFORMANCE_MONITORING=true
       criticalPaths['network_recovery'] = true; // Tested above
 
       // All critical paths should be covered
-      expect(criticalPaths.values.every((covered) => covered), isTrue,
-          reason: 'All critical paths must be covered');
+      expect(
+        criticalPaths.values.every((covered) => covered),
+        isTrue,
+        reason: 'All critical paths must be covered',
+      );
     });
   });
 }

@@ -43,8 +43,8 @@ enum ActionTarget {
   none,
 }
 
-@freezed
-class ActionCard with _$ActionCard {
+@Freezed()
+abstract class ActionCard with _$ActionCard {
   const factory ActionCard({
     required String id,
     required ActionCardType type,

@@ -17,19 +17,20 @@ class FileService {
     _tempDir = await getTemporaryDirectory();
     _appDocumentsDir = await getApplicationDocumentsDirectory();
     _appSupportDir = await getApplicationSupportDirectory();
-    
+
     // Cache directory is not available on all platforms
     try {
       _appCacheDir = await getApplicationCacheDirectory();
     } catch (e) {
       debugPrint('Cache directory not available on this platform');
     }
-    
+
     debugPrint('FileService initialized');
   }
-  
+
   /// Check if service is initialized
-  bool get isInitialized => _tempDir != null && _appDocumentsDir != null && _appSupportDir != null;
+  bool get isInitialized =>
+      _tempDir != null && _appDocumentsDir != null && _appSupportDir != null;
 
   /// Get temporary directory
   Future<Directory> getTempDirectory() async {
@@ -72,14 +73,21 @@ class FileService {
   }
 
   /// Write string to file
-  Future<File> writeStringToFile(String fileName, String content, {Directory? directory}) async {
+  Future<File> writeStringToFile(
+    String fileName,
+    String content, {
+    Directory? directory,
+  }) async {
     directory ??= await getAppDocumentsDirectory();
     final file = File(path.join(directory.path, fileName));
     return await file.writeAsString(content);
   }
 
   /// Read string from file
-  Future<String?> readStringFromFile(String fileName, {Directory? directory}) async {
+  Future<String?> readStringFromFile(
+    String fileName, {
+    Directory? directory,
+  }) async {
     try {
       directory ??= await getAppDocumentsDirectory();
       final file = File(path.join(directory.path, fileName));
@@ -94,14 +102,21 @@ class FileService {
   }
 
   /// Write bytes to file
-  Future<File> writeBytesToFile(String fileName, Uint8List bytes, {Directory? directory}) async {
+  Future<File> writeBytesToFile(
+    String fileName,
+    Uint8List bytes, {
+    Directory? directory,
+  }) async {
     directory ??= await getAppDocumentsDirectory();
     final file = File(path.join(directory.path, fileName));
     return await file.writeAsBytes(bytes);
   }
 
   /// Read bytes from file
-  Future<Uint8List?> readBytesFromFile(String fileName, {Directory? directory}) async {
+  Future<Uint8List?> readBytesFromFile(
+    String fileName, {
+    Directory? directory,
+  }) async {
     try {
       directory ??= await getAppDocumentsDirectory();
       final file = File(path.join(directory.path, fileName));
@@ -139,7 +154,10 @@ class FileService {
   }
 
   /// List files in directory
-  Future<List<FileSystemEntity>> listFiles(Directory directory, {bool recursive = false}) async {
+  Future<List<FileSystemEntity>> listFiles(
+    Directory directory, {
+    bool recursive = false,
+  }) async {
     try {
       return await directory.list(recursive: recursive).toList();
     } catch (e) {
@@ -168,13 +186,13 @@ class FileService {
     try {
       final tempDir = await getTempDirectory();
       final files = await listFiles(tempDir);
-      
+
       for (final file in files) {
         if (file is File) {
           await file.delete();
         }
       }
-      
+
       debugPrint('Temporary files cleared');
     } catch (e) {
       debugPrint('Error clearing temp files: $e');
@@ -187,7 +205,7 @@ class FileService {
       final cacheDir = await getAppCacheDirectory();
       if (cacheDir != null) {
         final files = await listFiles(cacheDir);
-        
+
         for (final file in files) {
           if (file is File) {
             await file.delete();
@@ -195,7 +213,7 @@ class FileService {
             await file.delete(recursive: true);
           }
         }
-        
+
         debugPrint('Cache cleared');
       }
     } catch (e) {
@@ -206,21 +224,21 @@ class FileService {
   /// Get storage info
   Future<Map<String, dynamic>> getStorageInfo() async {
     final info = <String, dynamic>{};
-    
+
     try {
       // Get directory paths
       final tempDir = await getTempDirectory();
       final docsDir = await getAppDocumentsDirectory();
       final supportDir = await getAppSupportDirectory();
       final cacheDir = await getAppCacheDirectory();
-      
+
       info['tempPath'] = tempDir.path;
       info['documentsPath'] = docsDir.path;
       info['supportPath'] = supportDir.path;
       if (cacheDir != null) {
         info['cachePath'] = cacheDir.path;
       }
-      
+
       // Calculate directory sizes (simplified)
       info['tempSize'] = await _getDirectorySize(tempDir);
       info['documentsSize'] = await _getDirectorySize(docsDir);
@@ -228,18 +246,17 @@ class FileService {
       if (cacheDir != null) {
         info['cacheSize'] = await _getDirectorySize(cacheDir);
       }
-      
     } catch (e) {
       debugPrint('Error getting storage info: $e');
     }
-    
+
     return info;
   }
 
   /// Get directory size
   Future<int> _getDirectorySize(Directory dir) async {
     int size = 0;
-    
+
     try {
       await for (final entity in dir.list(recursive: true)) {
         if (entity is File) {
@@ -249,7 +266,7 @@ class FileService {
     } catch (e) {
       debugPrint('Error calculating directory size: $e');
     }
-    
+
     return size;
   }
 }
@@ -257,13 +274,13 @@ class FileService {
 /// File paths constants
 class FilePaths {
   FilePaths._();
-  
+
   // Subdirectories
   static const String gameData = 'game_data';
   static const String userFiles = 'user_files';
   static const String exports = 'exports';
   static const String logs = 'logs';
-  
+
   // File names
   static const String gameState = 'game_state.json';
   static const String playerProfile = 'player_profile.json';

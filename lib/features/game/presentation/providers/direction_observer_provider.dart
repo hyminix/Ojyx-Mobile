@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'game_state_notifier.dart';
-import 'game_animation_provider.dart';
+import 'game_animation_provider_v2.dart';
 import '../../domain/entities/game_state.dart';
 import '../../domain/entities/play_direction.dart';
 

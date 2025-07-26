@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -13,9 +12,9 @@ import '../../domain/entities/action_card.dart';
 import '../../domain/repositories/action_card_repository.dart';
 import '../../domain/use_cases/use_action_card_use_case.dart';
 import 'repository_providers.dart';
+export 'action_card_state_provider_v2.dart';
 
 part 'action_card_providers.g.dart';
-part 'action_card_providers.freezed.dart';
 
 @riverpod
 ActionCardLocalDataSource actionCardLocalDataSource(
@@ -115,53 +114,4 @@ class ActionCardNotifier extends _$ActionCardNotifier {
   }
 }
 
-// ActionCardState for UI state management
-@freezed
-class ActionCardState with _$ActionCardState {
-  const factory ActionCardState({
-    required int drawPileCount,
-    required int discardPileCount,
-    required bool isLoading,
-  }) = _ActionCardState;
-}
-
-class ActionCardStateNotifier extends StateNotifier<ActionCardState> {
-  ActionCardStateNotifier()
-    : super(
-        const ActionCardState(
-          drawPileCount: 37, // Initial deck size
-          discardPileCount: 0,
-          isLoading: false,
-        ),
-      );
-
-  void updateCounts({int? drawPileCount, int? discardPileCount}) {
-    state = state.copyWith(
-      drawPileCount: drawPileCount ?? state.drawPileCount,
-      discardPileCount: discardPileCount ?? state.discardPileCount,
-    );
-  }
-
-  void setLoading(bool isLoading) {
-    state = state.copyWith(isLoading: isLoading);
-  }
-
-  Future<void> drawCard() async {
-    if (state.drawPileCount <= 0) return;
-
-    setLoading(true);
-
-    // Simulate drawing a card
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    state = state.copyWith(
-      drawPileCount: state.drawPileCount - 1,
-      isLoading: false,
-    );
-  }
-}
-
-final actionCardStateNotifierProvider =
-    StateNotifierProvider<ActionCardStateNotifier, ActionCardState>(
-      (ref) => ActionCardStateNotifier(),
-    );
+// Moved to action_card_state_provider_v2.dart for Riverpod 3.0 migration

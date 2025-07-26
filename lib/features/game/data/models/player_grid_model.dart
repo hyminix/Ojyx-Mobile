@@ -7,8 +7,8 @@ import '../models/db_player_grid_model.dart';
 part 'player_grid_model.freezed.dart';
 part 'player_grid_model.g.dart';
 
-@freezed
-class PlayerGridModel with _$PlayerGridModel {
+@Freezed()
+abstract class PlayerGridModel with _$PlayerGridModel {
   const factory PlayerGridModel({
     required String id,
     required String gameStateId,

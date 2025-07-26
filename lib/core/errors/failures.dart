@@ -2,8 +2,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'failures.freezed.dart';
 
-@freezed
-class Failure with _$Failure {
+@Freezed()
+abstract class Failure with _$Failure {
   const factory Failure.server({
     required String message,
     Object? error,

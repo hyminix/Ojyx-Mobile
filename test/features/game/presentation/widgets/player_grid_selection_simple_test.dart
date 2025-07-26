@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/game/presentation/widgets/player_grid_with_selection.dart';
-import 'package:ojyx/features/game/presentation/providers/card_selection_provider.dart';
+import 'package:ojyx/features/game/presentation/providers/card_selection_provider_v2.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart' as game;
 

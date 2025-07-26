@@ -11,6 +11,29 @@ import 'package:mocktail/mocktail.dart';
 
 class MockEndGameState extends Mock implements EndGameState {}
 
+class MockEndGameStateNotifier extends EndGameStateNotifier {
+  MockEndGameStateNotifier(this._state);
+
+  final EndGameState? _state;
+
+  @override
+  EndGameState? build() => _state;
+}
+
+class MockEndGameAction extends EndGameAction {
+  MockEndGameAction(this.onEndGame);
+
+  final VoidCallback onEndGame;
+
+  @override
+  void build() {}
+
+  @override
+  Future<void> endGame() async {
+    onEndGame();
+  }
+}
+
 void main() {
   group('EndGameScreen', () {
     late EndGameState mockEndGameState;
@@ -76,41 +99,30 @@ void main() {
     Widget createTestWidget({EndGameState? overrideState}) {
       return ProviderScope(
         overrides: [
-          endGameProvider.overrideWithValue(
-            AsyncData(overrideState ?? mockEndGameState),
+          endGameProvider.overrideWith(
+            () => MockEndGameStateNotifier(overrideState ?? mockEndGameState),
           ),
         ],
         child: const MaterialApp(home: EndGameScreen()),
       );
     }
 
-    testWidgets('should display loading indicator when state is loading', (
+    testWidgets('should display no game data when state is null', (
       tester,
     ) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [endGameProvider.overrideWithValue(const AsyncLoading())],
-          child: const MaterialApp(home: EndGameScreen()),
-        ),
-      );
-
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    });
-
-    testWidgets('should display error when state has error', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
           overrides: [
-            endGameProvider.overrideWithValue(
-              AsyncError(Exception('Test error'), StackTrace.empty),
-            ),
+            endGameProvider.overrideWith(() => MockEndGameStateNotifier(null)),
           ],
           child: const MaterialApp(home: EndGameScreen()),
         ),
       );
 
-      expect(find.text('Error: Exception: Test error'), findsOneWidget);
+      expect(find.text('No game data available'), findsOneWidget);
     });
+
+    // Test removed - EndGameScreen no longer handles AsyncError states directly
 
     testWidgets(
       'should display all required UI elements with correct content',
@@ -174,10 +186,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            endGameProvider.overrideWithValue(AsyncData(mockEndGameState)),
-            voteToContineProvider.overrideWith((ref, playerId) {
+            endGameProvider.overrideWith(
+              () => MockEndGameStateNotifier(mockEndGameState),
+            ),
+            voteToContineProvider('player1').overrideWith((ref) {
               voteToContinueCalled = true;
-              return;
             }),
           ],
           child: const MaterialApp(home: EndGameScreen()),
@@ -200,11 +213,14 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            endGameProvider.overrideWithValue(AsyncData(mockEndGameState)),
-            endGameActionProvider.overrideWith((ref) {
-              endGameCalled = true;
-              return;
-            }),
+            endGameProvider.overrideWith(
+              () => MockEndGameStateNotifier(mockEndGameState),
+            ),
+            endGameActionProvider.overrideWith(
+              () => MockEndGameAction(() {
+                endGameCalled = true;
+              }),
+            ),
           ],
           child: const MaterialApp(home: EndGameScreen()),
         ),

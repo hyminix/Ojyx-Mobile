@@ -8,8 +8,8 @@ import '../../domain/entities/action_card.dart';
 part 'game_state_model.freezed.dart';
 part 'game_state_model.g.dart';
 
-@freezed
-class GameStateModel with _$GameStateModel {
+@Freezed()
+abstract class GameStateModel with _$GameStateModel {
   const factory GameStateModel({
     required String id,
     @JsonKey(name: 'room_id') required String roomId,

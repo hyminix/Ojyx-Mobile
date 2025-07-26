@@ -4,8 +4,8 @@ import '../../domain/entities/room.dart';
 part 'room_model.freezed.dart';
 part 'room_model.g.dart';
 
-@freezed
-class RoomModel with _$RoomModel {
+@Freezed()
+abstract class RoomModel with _$RoomModel {
   const factory RoomModel({
     required String id,
     @JsonKey(name: 'creator_id') required String creatorId,

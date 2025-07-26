@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ojyx/core/config/router_config_v2.dart';
+import 'package:ojyx/core/config/router_config.dart';
 import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
 import 'package:ojyx/features/game/presentation/providers/card_selection_provider_v2.dart';
 import 'package:ojyx/features/game/presentation/providers/action_card_provider_v2.dart';
@@ -16,6 +16,7 @@ class MockUser extends Mock implements User {
 }
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockGotrueClient extends Mock implements GotrueClient {}
 
 void main() {
@@ -50,11 +51,13 @@ void main() {
 
       test('providers should handle state updates correctly', () {
         // Update CardSelection
-        container.read(cardSelectionProvider.notifier).selectCard(
-          playerId: 'player1',
-          cardIndex: 5,
-          mode: CardSelectionMode.peek,
-        );
+        container
+            .read(cardSelectionProvider.notifier)
+            .selectCard(
+              playerId: 'player1',
+              cardIndex: 5,
+              mode: CardSelectionMode.peek,
+            );
 
         final updatedSelection = container.read(cardSelectionProvider);
         expect(updatedSelection.selectedCard, isNotNull);
@@ -69,24 +72,28 @@ void main() {
 
       test('providers should interact correctly', () {
         // Simulate card swap with animation
-        container.read(cardSelectionProvider.notifier).selectCard(
-          playerId: 'player1',
-          cardIndex: 2,
-          mode: CardSelectionMode.swap,
-        );
-
-        // Start animation
-        container.read(gameAnimationProvider.notifier).startAnimation(
-          type: AnimationType.cardSwap,
-          cards: [
-            AnimatingCard(
+        container
+            .read(cardSelectionProvider.notifier)
+            .selectCard(
               playerId: 'player1',
               cardIndex: 2,
-              startPosition: const Offset(0, 0),
-              endPosition: const Offset(100, 100),
-            ),
-          ],
-        );
+              mode: CardSelectionMode.swap,
+            );
+
+        // Start animation
+        container
+            .read(gameAnimationProvider.notifier)
+            .startAnimation(
+              type: AnimationType.cardSwap,
+              cards: [
+                AnimatingCard(
+                  playerId: 'player1',
+                  cardIndex: 2,
+                  startPosition: const Offset(0, 0),
+                  endPosition: const Offset(100, 100),
+                ),
+              ],
+            );
 
         final animation = container.read(gameAnimationProvider);
         expect(animation.currentAnimationType, AnimationType.cardSwap);
@@ -103,7 +110,7 @@ void main() {
               authNotifierProvider.overrideWith(() => MockAuthNotifier(null)),
             ],
             child: MaterialApp.router(
-              routerConfig: container.read(routerProviderV2),
+              routerConfig: container.read(routerProvider),
             ),
           ),
         );
@@ -114,24 +121,24 @@ void main() {
         expect(find.byType(MaterialApp), findsOneWidget);
       });
 
-      testWidgets('authenticated users can access protected routes', (tester) async {
+      testWidgets('authenticated users can access protected routes', (
+        tester,
+      ) async {
         final mockUser = MockUser();
-        
+
         // Create router that allows authenticated access
         final testRouter = GoRouter(
           initialLocation: '/create-room',
           routes: [
             GoRoute(
               path: '/',
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Home')),
-              ),
+              builder: (context, state) =>
+                  const Scaffold(body: Center(child: Text('Home'))),
             ),
             GoRoute(
               path: '/create-room',
-              builder: (context, state) => const Scaffold(
-                body: Center(child: Text('Create Room')),
-              ),
+              builder: (context, state) =>
+                  const Scaffold(body: Center(child: Text('Create Room'))),
               redirect: (context, state) {
                 // Simulate authenticated user
                 return null; // Allow access
@@ -140,11 +147,7 @@ void main() {
           ],
         );
 
-        await tester.pumpWidget(
-          MaterialApp.router(
-            routerConfig: testRouter,
-          ),
-        );
+        await tester.pumpWidget(MaterialApp.router(routerConfig: testRouter));
 
         await tester.pumpAndSettle();
 
@@ -156,7 +159,7 @@ void main() {
     group('Complete User Flow Integration', () {
       test('user flow from auth to game', () async {
         // 1. Start with no auth
-        var authState = container.read(authNotifierProvider);
+        final authState = container.read(authNotifierProvider);
         expect(authState.isLoading, isTrue);
 
         // 2. Simulate successful auth
@@ -174,29 +177,39 @@ void main() {
 
         // 4. Simulate game flow
         // Select card for peek
-        container.read(cardSelectionProvider.notifier).selectCard(
-          playerId: 'player1',
-          cardIndex: 0,
-          mode: CardSelectionMode.peek,
-        );
+        container
+            .read(cardSelectionProvider.notifier)
+            .selectCard(
+              playerId: 'player1',
+              cardIndex: 0,
+              mode: CardSelectionMode.peek,
+            );
 
         // Add action card
-        container.read(actionCardProvider.notifier).addCardToPlayer(
-          playerId: 'player1',
-          card: const ActionCard(
-            id: 'card1',
-            name: 'Peek',
-            description: 'Look at one of your cards',
-            type: ActionCardType.optional,
-            effect: ActionCardEffect.peek,
-            targetType: TargetType.self,
-            targetCount: 1,
-          ),
-        );
+        container
+            .read(actionCardProvider.notifier)
+            .addCardToPlayer(
+              playerId: 'player1',
+              card: const ActionCard(
+                id: 'card1',
+                name: 'Peek',
+                description: 'Look at one of your cards',
+                type: ActionCardType.optional,
+                effect: ActionCardEffect.peek,
+                targetType: TargetType.self,
+                targetCount: 1,
+              ),
+            );
 
         // Verify state consistency
-        expect(container.read(cardSelectionProvider).mode, CardSelectionMode.peek);
-        expect(container.read(actionCardProvider).playerHands['player1']?.length, 1);
+        expect(
+          container.read(cardSelectionProvider).mode,
+          CardSelectionMode.peek,
+        );
+        expect(
+          container.read(actionCardProvider).playerHands['player1']?.length,
+          1,
+        );
       });
     });
 
@@ -204,11 +217,13 @@ void main() {
       test('providers should handle errors gracefully', () {
         // Test error in CardSelection
         expect(
-          () => container.read(cardSelectionProvider.notifier).selectCard(
-            playerId: '',
-            cardIndex: -1,
-            mode: CardSelectionMode.peek,
-          ),
+          () => container
+              .read(cardSelectionProvider.notifier)
+              .selectCard(
+                playerId: '',
+                cardIndex: -1,
+                mode: CardSelectionMode.peek,
+              ),
           returnsNormally,
         );
 
@@ -223,11 +238,14 @@ void main() {
 
         // Perform 100 rapid selections
         for (int i = 0; i < 100; i++) {
-          container.read(cardSelectionProvider.notifier).selectCard(
-            playerId: 'player$i',
-            cardIndex: i % 12,
-            mode: CardSelectionMode.values[i % CardSelectionMode.values.length],
-          );
+          container
+              .read(cardSelectionProvider.notifier)
+              .selectCard(
+                playerId: 'player$i',
+                cardIndex: i % 12,
+                mode: CardSelectionMode
+                    .values[i % CardSelectionMode.values.length],
+              );
         }
 
         stopwatch.stop();
@@ -246,9 +264,9 @@ void main() {
 // Mock implementation for tests
 class MockAuthNotifier extends AuthNotifier {
   MockAuthNotifier(this._user);
-  
+
   final User? _user;
-  
+
   @override
   Future<User?> build() async => _user;
 }

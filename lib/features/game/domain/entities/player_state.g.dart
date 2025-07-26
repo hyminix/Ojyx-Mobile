@@ -6,13 +6,11 @@ part of 'player_state.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PlayerStateImpl _$$PlayerStateImplFromJson(
-  Map<String, dynamic> json,
-) => $checkedCreate(
-  r'_$PlayerStateImpl',
+_PlayerState _$PlayerStateFromJson(Map<String, dynamic> json) => $checkedCreate(
+  '_PlayerState',
   json,
   ($checkedConvert) {
-    final val = _$PlayerStateImpl(
+    final val = _PlayerState(
       playerId: $checkedConvert('player_id', (v) => v as String),
       cards: $checkedConvert(
         'cards',
@@ -45,7 +43,7 @@ _$PlayerStateImpl _$$PlayerStateImplFromJson(
   },
 );
 
-Map<String, dynamic> _$$PlayerStateImplToJson(_$PlayerStateImpl instance) =>
+Map<String, dynamic> _$PlayerStateToJson(_PlayerState instance) =>
     <String, dynamic>{
       'player_id': instance.playerId,
       'cards': instance.cards.map((e) => e?.toJson()).toList(),

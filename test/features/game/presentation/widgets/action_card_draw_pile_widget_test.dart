@@ -28,7 +28,7 @@ void main() {
     Widget createTestWidget({bool canDraw = true, VoidCallback? onDraw}) {
       return ProviderScope(
         overrides: [
-          actionCardStateNotifierProvider.overrideWith((ref) => mockNotifier),
+          actionCardStateNotifierProvider.overrideWith(() => mockNotifier),
         ],
         child: MaterialApp(
           home: Scaffold(

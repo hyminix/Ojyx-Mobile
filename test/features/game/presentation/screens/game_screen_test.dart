@@ -8,7 +8,7 @@ import 'package:ojyx/features/game/presentation/widgets/player_grid_with_selecti
 import 'package:ojyx/features/game/presentation/widgets/turn_info_widget.dart';
 import 'package:ojyx/features/game/presentation/widgets/deck_and_discard_widget.dart';
 import 'package:ojyx/features/game/presentation/widgets/opponents_view_widget.dart';
-import 'package:ojyx/features/game/presentation/providers/card_selection_provider.dart';
+import 'package:ojyx/features/game/presentation/providers/card_selection_provider_v2.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';

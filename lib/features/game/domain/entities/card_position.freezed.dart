@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,158 +9,266 @@ part of 'card_position.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
-
 /// @nodoc
 mixin _$CardPosition {
-  int get row => throw _privateConstructorUsedError;
-  int get col => throw _privateConstructorUsedError;
 
-  /// Create a copy of CardPosition
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $CardPositionCopyWith<CardPosition> get copyWith =>
-      throw _privateConstructorUsedError;
+ int get row; int get col;
+/// Create a copy of CardPosition
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CardPositionCopyWith<CardPosition> get copyWith => _$CardPositionCopyWithImpl<CardPosition>(this as CardPosition, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CardPosition&&(identical(other.row, row) || other.row == row)&&(identical(other.col, col) || other.col == col));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,row,col);
+
+@override
+String toString() {
+  return 'CardPosition(row: $row, col: $col)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $CardPositionCopyWith<$Res> {
-  factory $CardPositionCopyWith(
-    CardPosition value,
-    $Res Function(CardPosition) then,
-  ) = _$CardPositionCopyWithImpl<$Res, CardPosition>;
-  @useResult
-  $Res call({int row, int col});
-}
+abstract mixin class $CardPositionCopyWith<$Res>  {
+  factory $CardPositionCopyWith(CardPosition value, $Res Function(CardPosition) _then) = _$CardPositionCopyWithImpl;
+@useResult
+$Res call({
+ int row, int col
+});
 
+
+
+
+}
 /// @nodoc
-class _$CardPositionCopyWithImpl<$Res, $Val extends CardPosition>
+class _$CardPositionCopyWithImpl<$Res>
     implements $CardPositionCopyWith<$Res> {
-  _$CardPositionCopyWithImpl(this._value, this._then);
+  _$CardPositionCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final CardPosition _self;
+  final $Res Function(CardPosition) _then;
 
-  /// Create a copy of CardPosition
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? row = null, Object? col = null}) {
-    return _then(
-      _value.copyWith(
-            row: null == row
-                ? _value.row
-                : row // ignore: cast_nullable_to_non_nullable
-                      as int,
-            col: null == col
-                ? _value.col
-                : col // ignore: cast_nullable_to_non_nullable
-                      as int,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of CardPosition
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? row = null,Object? col = null,}) {
+  return _then(_self.copyWith(
+row: null == row ? _self.row : row // ignore: cast_nullable_to_non_nullable
+as int,col: null == col ? _self.col : col // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [CardPosition].
+extension CardPositionPatterns on CardPosition {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CardPosition value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CardPosition() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CardPosition value)  $default,){
+final _that = this;
+switch (_that) {
+case _CardPosition():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CardPosition value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CardPosition() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int row,  int col)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CardPosition() when $default != null:
+return $default(_that.row,_that.col);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int row,  int col)  $default,) {final _that = this;
+switch (_that) {
+case _CardPosition():
+return $default(_that.row,_that.col);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int row,  int col)?  $default,) {final _that = this;
+switch (_that) {
+case _CardPosition() when $default != null:
+return $default(_that.row,_that.col);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
-abstract class _$$CardPositionImplCopyWith<$Res>
-    implements $CardPositionCopyWith<$Res> {
-  factory _$$CardPositionImplCopyWith(
-    _$CardPositionImpl value,
-    $Res Function(_$CardPositionImpl) then,
-  ) = __$$CardPositionImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({int row, int col});
+
+
+class _CardPosition extends CardPosition {
+  const _CardPosition({required this.row, required this.col}): super._();
+  
+
+@override final  int row;
+@override final  int col;
+
+/// Create a copy of CardPosition
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CardPositionCopyWith<_CardPosition> get copyWith => __$CardPositionCopyWithImpl<_CardPosition>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CardPosition&&(identical(other.row, row) || other.row == row)&&(identical(other.col, col) || other.col == col));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,row,col);
+
+@override
+String toString() {
+  return 'CardPosition(row: $row, col: $col)';
+}
+
+
 }
 
 /// @nodoc
-class __$$CardPositionImplCopyWithImpl<$Res>
-    extends _$CardPositionCopyWithImpl<$Res, _$CardPositionImpl>
-    implements _$$CardPositionImplCopyWith<$Res> {
-  __$$CardPositionImplCopyWithImpl(
-    _$CardPositionImpl _value,
-    $Res Function(_$CardPositionImpl) _then,
-  ) : super(_value, _then);
+abstract mixin class _$CardPositionCopyWith<$Res> implements $CardPositionCopyWith<$Res> {
+  factory _$CardPositionCopyWith(_CardPosition value, $Res Function(_CardPosition) _then) = __$CardPositionCopyWithImpl;
+@override @useResult
+$Res call({
+ int row, int col
+});
 
-  /// Create a copy of CardPosition
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? row = null, Object? col = null}) {
-    return _then(
-      _$CardPositionImpl(
-        row: null == row
-            ? _value.row
-            : row // ignore: cast_nullable_to_non_nullable
-                  as int,
-        col: null == col
-            ? _value.col
-            : col // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
-  }
+
+
+
 }
-
 /// @nodoc
+class __$CardPositionCopyWithImpl<$Res>
+    implements _$CardPositionCopyWith<$Res> {
+  __$CardPositionCopyWithImpl(this._self, this._then);
 
-class _$CardPositionImpl extends _CardPosition {
-  const _$CardPositionImpl({required this.row, required this.col}) : super._();
+  final _CardPosition _self;
+  final $Res Function(_CardPosition) _then;
 
-  @override
-  final int row;
-  @override
-  final int col;
-
-  @override
-  String toString() {
-    return 'CardPosition(row: $row, col: $col)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$CardPositionImpl &&
-            (identical(other.row, row) || other.row == row) &&
-            (identical(other.col, col) || other.col == col));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, row, col);
-
-  /// Create a copy of CardPosition
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$CardPositionImplCopyWith<_$CardPositionImpl> get copyWith =>
-      __$$CardPositionImplCopyWithImpl<_$CardPositionImpl>(this, _$identity);
+/// Create a copy of CardPosition
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? row = null,Object? col = null,}) {
+  return _then(_CardPosition(
+row: null == row ? _self.row : row // ignore: cast_nullable_to_non_nullable
+as int,col: null == col ? _self.col : col // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
 }
 
-abstract class _CardPosition extends CardPosition {
-  const factory _CardPosition({
-    required final int row,
-    required final int col,
-  }) = _$CardPositionImpl;
-  const _CardPosition._() : super._();
 
-  @override
-  int get row;
-  @override
-  int get col;
-
-  /// Create a copy of CardPosition
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$CardPositionImplCopyWith<_$CardPositionImpl> get copyWith =>
-      throw _privateConstructorUsedError;
 }
+
+// dart format on

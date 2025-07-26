@@ -9,8 +9,8 @@ part 'db_player_grid_model.g.dart';
 // Type alias for the model
 typedef DbPlayerGrid = DbPlayerGridModel;
 
-@freezed
-class DbPlayerGridModel with _$DbPlayerGridModel {
+@Freezed()
+abstract class DbPlayerGridModel with _$DbPlayerGridModel {
   const factory DbPlayerGridModel({
     required String id,
     @JsonKey(name: 'game_state_id') required String gameStateId,

@@ -13,14 +13,16 @@ void main() {
   group('AppInitializer', () {
     setUp(() {
       // Reset dotenv for each test
-      dotenv.testLoad(fileInput: '''
+      dotenv.testLoad(
+        fileInput: '''
 SUPABASE_URL=https://test.supabase.co
 SUPABASE_ANON_KEY=test-anon-key
 SENTRY_DSN=https://test@sentry.io/123456
 ENVIRONMENT=test
 ENABLE_ERROR_SCREENSHOTS=true
 ENABLE_PERFORMANCE_MONITORING=true
-''');
+''',
+      );
     });
 
     tearDown(() {
@@ -33,30 +35,37 @@ ENABLE_PERFORMANCE_MONITORING=true
         // Verify that required environment variables are loaded
         expect(dotenv.env['SUPABASE_URL'], equals('https://test.supabase.co'));
         expect(dotenv.env['SUPABASE_ANON_KEY'], equals('test-anon-key'));
-        expect(dotenv.env['SENTRY_DSN'], equals('https://test@sentry.io/123456'));
+        expect(
+          dotenv.env['SENTRY_DSN'],
+          equals('https://test@sentry.io/123456'),
+        );
       });
 
       test('should validate required environment variables', () {
         // Test with missing SUPABASE_URL
         dotenv.clean();
-        dotenv.testLoad(fileInput: '''
+        dotenv.testLoad(
+          fileInput: '''
 SUPABASE_ANON_KEY=test-anon-key
-''');
+''',
+        );
 
         expect(
           () => AppInitializer.initialize(),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Missing required environment variable: SUPABASE_URL'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Missing required environment variable: SUPABASE_URL'),
+            ),
+          ),
         );
       });
 
       test('should handle missing .env file in debug mode gracefully', () {
         // Clear dotenv to simulate missing file
         dotenv.clean();
-        
+
         // In debug mode, should not throw
         // This test verifies the fallback mechanism
         expect(dotenv.env['SUPABASE_URL'], isNull);
@@ -88,9 +97,7 @@ SUPABASE_ANON_KEY=test-anon-key
 
       test('should configure Storage client options', () {
         // Verify Storage configuration
-        const storageOptions = StorageClientOptions(
-          retryAttempts: 3,
-        );
+        const storageOptions = StorageClientOptions(retryAttempts: 3);
 
         expect(storageOptions.retryAttempts, equals(3));
       });
@@ -147,7 +154,10 @@ SUPABASE_ANON_KEY=test-anon-key
 
         // Test default environment
         dotenv.env.remove('ENVIRONMENT');
-        expect(dotenv.env['ENVIRONMENT'] ?? 'development', equals('development'));
+        expect(
+          dotenv.env['ENVIRONMENT'] ?? 'development',
+          equals('development'),
+        );
       });
     });
 
@@ -169,15 +179,14 @@ SUPABASE_ANON_KEY=test-anon-key
       test('should handle initialization errors gracefully', () async {
         // Test with invalid Supabase credentials
         dotenv.clean();
-        dotenv.testLoad(fileInput: '''
+        dotenv.testLoad(
+          fileInput: '''
 SUPABASE_URL=
 SUPABASE_ANON_KEY=
-''');
-
-        expect(
-          () => AppInitializer.initialize(),
-          throwsA(isA<Exception>()),
+''',
         );
+
+        expect(() => AppInitializer.initialize(), throwsA(isA<Exception>()));
       });
     });
   });
@@ -187,7 +196,7 @@ SUPABASE_ANON_KEY=
 extension AppInitializerTest on AppInitializer {
   static double getTracesSampleRate() {
     final environment = getEnvironment();
-    
+
     switch (environment) {
       case 'production':
         return 0.1;

@@ -5,32 +5,35 @@ import 'package:flutter/foundation.dart';
 /// Service to monitor and manage network connectivity
 class ConnectivityService {
   final Connectivity _connectivity;
-  
+
   // Stream subscription for connectivity changes
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
-  
+
   // Stream controller for connectivity status
-  final _connectivityStreamController = StreamController<ConnectivityStatus>.broadcast();
-  
+  final _connectivityStreamController =
+      StreamController<ConnectivityStatus>.broadcast();
+
   // Current connectivity status
   ConnectivityStatus _currentStatus = ConnectivityStatus.unknown;
-  
+
   ConnectivityService({Connectivity? connectivity})
-      : _connectivity = connectivity ?? Connectivity();
-      
+    : _connectivity = connectivity ?? Connectivity();
+
   /// Create with a mock connectivity instance (for testing)
   ConnectivityService.createWithConnectivity(Connectivity connectivity)
-      : _connectivity = connectivity;
+    : _connectivity = connectivity;
 
   /// Stream of connectivity status changes
-  Stream<ConnectivityStatus> get connectivityStream => _connectivityStreamController.stream;
-  
+  Stream<ConnectivityStatus> get connectivityStream =>
+      _connectivityStreamController.stream;
+
   /// Stream of boolean connectivity status (for backward compatibility)
-  Stream<bool> get connectionStream => _connectivityStreamController.stream.map((status) => status.isOnline);
-  
+  Stream<bool> get connectionStream =>
+      _connectivityStreamController.stream.map((status) => status.isOnline);
+
   /// Current connectivity status
   ConnectivityStatus get currentStatus => _currentStatus;
-  
+
   /// Check if currently connected to internet
   bool get isConnected => _currentStatus == ConnectivityStatus.online;
 
@@ -39,7 +42,7 @@ class ConnectivityService {
     try {
       // Get initial connectivity status
       await checkConnectivity();
-      
+
       // Listen for connectivity changes
       _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
         _handleConnectivityChange,
@@ -47,7 +50,7 @@ class ConnectivityService {
           debugPrint('Connectivity monitoring error: $error');
         },
       );
-      
+
       debugPrint('Connectivity service initialized');
     } catch (e) {
       debugPrint('Failed to initialize connectivity service: $e');
@@ -60,25 +63,27 @@ class ConnectivityService {
   Future<ConnectivityStatus> checkConnectivity() async {
     try {
       final results = await _connectivity.checkConnectivity();
-      
+
       if (results.isEmpty) {
         _updateStatus(ConnectivityStatus.offline);
         return _currentStatus;
       }
-      
+
       // Check if any result indicates connectivity
-      final hasConnectivity = results.any((result) => 
-        result != ConnectivityResult.none
+      final hasConnectivity = results.any(
+        (result) => result != ConnectivityResult.none,
       );
-      
+
       if (hasConnectivity) {
         // Verify actual internet connectivity
         final hasInternet = await _verifyInternetConnection();
-        _updateStatus(hasInternet ? ConnectivityStatus.online : ConnectivityStatus.offline);
+        _updateStatus(
+          hasInternet ? ConnectivityStatus.online : ConnectivityStatus.offline,
+        );
       } else {
         _updateStatus(ConnectivityStatus.offline);
       }
-      
+
       return _currentStatus;
     } catch (e) {
       debugPrint('Error checking connectivity: $e');
@@ -90,7 +95,7 @@ class ConnectivityService {
   /// Handle connectivity changes
   void _handleConnectivityChange(List<ConnectivityResult> results) {
     debugPrint('Connectivity changed: $results');
-    
+
     // Re-check connectivity when it changes
     checkConnectivity();
   }
@@ -129,10 +134,10 @@ class ConnectivityService {
 enum ConnectivityStatus {
   /// Connected to internet
   online,
-  
+
   /// Not connected to internet
   offline,
-  
+
   /// Unknown connectivity status
   unknown,
 }
@@ -149,7 +154,7 @@ extension ConnectivityStatusExtension on ConnectivityStatus {
         return 'Connexion inconnue';
     }
   }
-  
+
   bool get isOnline => this == ConnectivityStatus.online;
   bool get isOffline => this == ConnectivityStatus.offline;
 }

@@ -6,13 +6,13 @@ part of 'game_state_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$GameStateModelImpl _$$GameStateModelImplFromJson(
+_GameStateModel _$GameStateModelFromJson(
   Map<String, dynamic> json,
 ) => $checkedCreate(
-  r'_$GameStateModelImpl',
+  '_GameStateModel',
   json,
   ($checkedConvert) {
-    final val = _$GameStateModelImpl(
+    final val = _GameStateModel(
       id: $checkedConvert('id', (v) => v as String),
       roomId: $checkedConvert('room_id', (v) => v as String),
       status: $checkedConvert('status', (v) => v as String),
@@ -49,18 +49,17 @@ _$GameStateModelImpl _$$GameStateModelImplFromJson(
   },
 );
 
-Map<String, dynamic> _$$GameStateModelImplToJson(
-  _$GameStateModelImpl instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'room_id': instance.roomId,
-  'status': instance.status,
-  'current_player_id': instance.currentPlayerId,
-  'turn_number': instance.turnNumber,
-  'round_number': instance.roundNumber,
-  'game_data': instance.gameData,
-  'winner_id': instance.winnerId,
-  'ended_at': instance.endedAt?.toIso8601String(),
-  'created_at': instance.createdAt.toIso8601String(),
-  'updated_at': instance.updatedAt.toIso8601String(),
-};
+Map<String, dynamic> _$GameStateModelToJson(_GameStateModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'room_id': instance.roomId,
+      'status': instance.status,
+      'current_player_id': instance.currentPlayerId,
+      'turn_number': instance.turnNumber,
+      'round_number': instance.roundNumber,
+      'game_data': instance.gameData,
+      'winner_id': instance.winnerId,
+      'ended_at': instance.endedAt?.toIso8601String(),
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt.toIso8601String(),
+    };

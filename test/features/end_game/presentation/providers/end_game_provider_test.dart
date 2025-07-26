@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/end_game/presentation/providers/end_game_provider.dart';
-import 'package:ojyx/features/end_game/domain/entities/end_game_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
@@ -107,11 +106,10 @@ void main() {
     test('should provide EndGameState when round is ended', () {
       final endGameState = container.read(endGameProvider);
 
-      expect(endGameState, isA<AsyncData<EndGameState?>>());
-      expect(endGameState.value, isNotNull);
-      expect(endGameState.value!.players.length, equals(3));
-      expect(endGameState.value!.roundInitiatorId, equals('player3'));
-      expect(endGameState.value!.roundNumber, equals(1));
+      expect(endGameState, isNotNull);
+      expect(endGameState!.players.length, equals(3));
+      expect(endGameState.roundInitiatorId, equals('player3'));
+      expect(endGameState.roundNumber, equals(1));
     });
 
     test('should return null when round is not ended', () {
@@ -128,8 +126,7 @@ void main() {
 
       final endGameState = container.read(endGameProvider);
 
-      expect(endGameState, isA<AsyncData<EndGameState?>>());
-      expect(endGameState.value, isNull);
+      expect(endGameState, isNull);
     });
 
     test('should return null when room is not available', () {
@@ -144,15 +141,13 @@ void main() {
 
       final endGameState = container.read(endGameProvider);
 
-      expect(endGameState, isA<AsyncData<EndGameState?>>());
-      expect(endGameState.value, isNull);
+      expect(endGameState, isNull);
     });
 
     test('voteToContineProvider should execute without error', () {
       // First read to initialize the state
       final initialState = container.read(endGameProvider);
-      expect(initialState.hasValue, isTrue);
-      expect(initialState.value, isNotNull);
+      expect(initialState, isNotNull);
 
       // Call vote to continue - this should not throw
       expect(
@@ -164,7 +159,7 @@ void main() {
       // This test just verifies the provider can be called without errors
     });
 
-    test('endGameActionProvider should navigate to home', () {
+    test('endGameActionProvider should navigate to home', () async {
       bool navigatedToHome = false;
 
       container = ProviderContainer(
@@ -179,7 +174,7 @@ void main() {
         ],
       );
 
-      container.read(endGameActionProvider);
+      await container.read(endGameActionProvider.notifier).endGame();
 
       expect(navigatedToHome, isTrue);
     });
@@ -187,7 +182,7 @@ void main() {
     test('should watch game state changes', () async {
       // Initial state with finished status
       final listener = container.listen(endGameProvider, (previous, next) {});
-      expect(listener.read().value, isNotNull);
+      expect(listener.read(), isNotNull);
 
       // Create a new container with playing status
       final mockGameStatePlaying = MockGameState();
@@ -208,7 +203,7 @@ void main() {
 
       // State should be null when game is playing
       final playingState = newContainer.read(endGameProvider);
-      expect(playingState.value, isNull);
+      expect(playingState, isNull);
 
       newContainer.dispose();
     });

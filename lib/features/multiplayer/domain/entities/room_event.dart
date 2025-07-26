@@ -5,8 +5,8 @@ import 'package:ojyx/features/multiplayer/data/converters/game_state_converter.d
 part 'room_event.freezed.dart';
 part 'room_event.g.dart';
 
-@freezed
-class RoomEvent with _$RoomEvent {
+@Freezed()
+abstract class RoomEvent with _$RoomEvent {
   const factory RoomEvent.playerJoined({
     required String playerId,
     required String playerName,

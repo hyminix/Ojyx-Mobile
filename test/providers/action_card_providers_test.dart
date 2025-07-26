@@ -25,7 +25,7 @@ void main() {
 
     test('should update draw pile count', () {
       notifier.updateCounts(drawPileCount: 25);
-      
+
       final state = container.read(actionCardStateNotifierProvider);
       expect(state.drawPileCount, 25);
       expect(state.discardPileCount, 0); // Unchanged
@@ -33,7 +33,7 @@ void main() {
 
     test('should update discard pile count', () {
       notifier.updateCounts(discardPileCount: 5);
-      
+
       final state = container.read(actionCardStateNotifierProvider);
       expect(state.drawPileCount, 37); // Unchanged
       expect(state.discardPileCount, 5);
@@ -41,7 +41,7 @@ void main() {
 
     test('should update both counts', () {
       notifier.updateCounts(drawPileCount: 20, discardPileCount: 17);
-      
+
       final state = container.read(actionCardStateNotifierProvider);
       expect(state.drawPileCount, 20);
       expect(state.discardPileCount, 17);
@@ -50,14 +50,14 @@ void main() {
     test('should set loading state', () {
       notifier.setLoading(true);
       expect(container.read(actionCardStateNotifierProvider).isLoading, true);
-      
+
       notifier.setLoading(false);
       expect(container.read(actionCardStateNotifierProvider).isLoading, false);
     });
 
     test('should handle draw card action', () async {
       await notifier.drawCard();
-      
+
       final state = container.read(actionCardStateNotifierProvider);
       expect(state.drawPileCount, 36); // One card drawn
       expect(state.discardPileCount, 0);

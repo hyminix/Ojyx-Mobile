@@ -67,14 +67,14 @@ class GameStatePersistence extends _$GameStatePersistence {
   @override
   Future<Map<String, dynamic>?> build() async {
     _fileService = ref.watch(fileServiceProvider);
-    
+
     // Load game state from file
     final gameDir = await ref.watch(gameDataDirectoryProvider.future);
     final content = await _fileService.readStringFromFile(
       FilePaths.gameState,
       directory: gameDir,
     );
-    
+
     if (content != null) {
       try {
         return Map<String, dynamic>.from(
@@ -85,20 +85,20 @@ class GameStatePersistence extends _$GameStatePersistence {
         return null;
       }
     }
-    
+
     return null;
   }
 
   /// Save game state
   Future<void> saveGameState(Map<String, dynamic> gameState) async {
     final gameDir = await ref.read(gameDataDirectoryProvider.future);
-    
+
     await _fileService.writeStringToFile(
       FilePaths.gameState,
       gameState.toString(),
       directory: gameDir,
     );
-    
+
     // Update state
     state = AsyncData(gameState);
   }
@@ -106,12 +106,9 @@ class GameStatePersistence extends _$GameStatePersistence {
   /// Clear game state
   Future<void> clearGameState() async {
     final gameDir = await ref.read(gameDataDirectoryProvider.future);
-    
-    await _fileService.deleteFile(
-      FilePaths.gameState,
-      directory: gameDir,
-    );
-    
+
+    await _fileService.deleteFile(FilePaths.gameState, directory: gameDir);
+
     // Update state
     state = const AsyncData(null);
   }
@@ -131,9 +128,10 @@ class ErrorLogger extends _$ErrorLogger {
   Future<void> logError(String error, {String? stackTrace}) async {
     try {
       final logsDir = await ref.read(logsDirectoryProvider.future);
-      
+
       final timestamp = DateTime.now().toIso8601String();
-      final logEntry = '''
+      final logEntry =
+          '''
 ================================================================================
 Timestamp: $timestamp
 Error: $error
@@ -143,14 +141,16 @@ ${stackTrace != null ? 'Stack Trace:\n$stackTrace' : ''}
 ''';
 
       // Read existing log
-      String existingLog = await _fileService.readStringFromFile(
-        FilePaths.errorLog,
-        directory: logsDir,
-      ) ?? '';
-      
+      final String existingLog =
+          await _fileService.readStringFromFile(
+            FilePaths.errorLog,
+            directory: logsDir,
+          ) ??
+          '';
+
       // Append new entry
       final updatedLog = existingLog + logEntry;
-      
+
       // Write back to file
       await _fileService.writeStringToFile(
         FilePaths.errorLog,
@@ -165,10 +165,7 @@ ${stackTrace != null ? 'Stack Trace:\n$stackTrace' : ''}
   /// Clear error logs
   Future<void> clearLogs() async {
     final logsDir = await ref.read(logsDirectoryProvider.future);
-    await _fileService.deleteFile(
-      FilePaths.errorLog,
-      directory: logsDir,
-    );
+    await _fileService.deleteFile(FilePaths.errorLog, directory: logsDir);
   }
 
   /// Get error logs
@@ -209,13 +206,13 @@ class DataExporter extends _$DataExporter {
   Future<File?> exportData(String fileName, String data) async {
     try {
       final exportDir = await ref.read(exportsDirectoryProvider.future);
-      
+
       final file = await _fileService.writeStringToFile(
         fileName,
         data,
         directory: exportDir,
       );
-      
+
       return file;
     } catch (e) {
       return null;
@@ -226,13 +223,13 @@ class DataExporter extends _$DataExporter {
   Future<File?> exportBinaryData(String fileName, Uint8List data) async {
     try {
       final exportDir = await ref.read(exportsDirectoryProvider.future);
-      
+
       final file = await _fileService.writeBytesToFile(
         fileName,
         data,
         directory: exportDir,
       );
-      
+
       return file;
     } catch (e) {
       return null;

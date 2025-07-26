@@ -2,8 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {
   group('Router with Guards Tests', () {
@@ -22,25 +20,25 @@ void main() {
       expect(true, true);
     });
 
-    testWidgets('should protect game route when not authenticated', (tester) async {
+    testWidgets('should protect game route when not authenticated', (
+      tester,
+    ) async {
       // Create a test router with guards
       final router = GoRouter(
         initialLocation: '/game/test-room',
         routes: [
           GoRoute(
             path: '/',
-            builder: (context, state) => const Scaffold(
-              body: Center(child: Text('Home')),
-            ),
+            builder: (context, state) =>
+                const Scaffold(body: Center(child: Text('Home'))),
           ),
           GoRoute(
             path: '/game/:roomId',
-            builder: (context, state) => const Scaffold(
-              body: Center(child: Text('Game')),
-            ),
+            builder: (context, state) =>
+                const Scaffold(body: Center(child: Text('Game'))),
             redirect: (context, state) {
               // Simulate auth check
-              final isAuthenticated = false;
+              const isAuthenticated = false;
               if (!isAuthenticated) {
                 return '/';
               }
@@ -50,11 +48,7 @@ void main() {
         ],
       );
 
-      await tester.pumpWidget(
-        MaterialApp.router(
-          routerConfig: router,
-        ),
-      );
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
 
       await tester.pumpAndSettle();
 
@@ -63,25 +57,25 @@ void main() {
       expect(find.text('Game'), findsNothing);
     });
 
-    testWidgets('should allow access to game when authenticated', (tester) async {
+    testWidgets('should allow access to game when authenticated', (
+      tester,
+    ) async {
       // Create a test router with guards
       final router = GoRouter(
         initialLocation: '/game/test-room',
         routes: [
           GoRoute(
             path: '/',
-            builder: (context, state) => const Scaffold(
-              body: Center(child: Text('Home')),
-            ),
+            builder: (context, state) =>
+                const Scaffold(body: Center(child: Text('Home'))),
           ),
           GoRoute(
             path: '/game/:roomId',
-            builder: (context, state) => const Scaffold(
-              body: Center(child: Text('Game')),
-            ),
+            builder: (context, state) =>
+                const Scaffold(body: Center(child: Text('Game'))),
             redirect: (context, state) {
               // Simulate auth check
-              final isAuthenticated = true;
+              const isAuthenticated = true;
               if (!isAuthenticated) {
                 return '/';
               }
@@ -91,11 +85,7 @@ void main() {
         ],
       );
 
-      await tester.pumpWidget(
-        MaterialApp.router(
-          routerConfig: router,
-        ),
-      );
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
 
       await tester.pumpAndSettle();
 

@@ -26,7 +26,7 @@ class UserPreferences extends _$UserPreferences {
   @override
   Map<String, dynamic> build() {
     _storage = ref.watch(storageServiceProvider);
-    
+
     // Load preferences from storage
     final prefs = _storage.getJson(StorageKeys.userPreferences);
     return prefs ?? _getDefaultPreferences();
@@ -46,10 +46,10 @@ class UserPreferences extends _$UserPreferences {
   /// Update a preference
   Future<void> updatePreference(String key, dynamic value) async {
     final newPrefs = {...state, key: value};
-    
+
     // Save to storage
     await _storage.setJson(StorageKeys.userPreferences, newPrefs);
-    
+
     // Update state
     state = newPrefs;
   }
@@ -57,10 +57,10 @@ class UserPreferences extends _$UserPreferences {
   /// Reset to default preferences
   Future<void> resetToDefaults() async {
     final defaults = _getDefaultPreferences();
-    
+
     // Save to storage
     await _storage.setJson(StorageKeys.userPreferences, defaults);
-    
+
     // Update state
     state = defaults;
   }
@@ -79,7 +79,7 @@ class GameSettings extends _$GameSettings {
   @override
   Map<String, dynamic> build() {
     _storage = ref.watch(storageServiceProvider);
-    
+
     // Load settings from storage
     final settings = _storage.getJson(StorageKeys.gameSettings);
     return settings ?? _getDefaultSettings();
@@ -99,10 +99,10 @@ class GameSettings extends _$GameSettings {
   /// Update a setting
   Future<void> updateSetting(String key, dynamic value) async {
     final newSettings = {...state, key: value};
-    
+
     // Save to storage
     await _storage.setJson(StorageKeys.gameSettings, newSettings);
-    
+
     // Update state
     state = newSettings;
   }
@@ -166,7 +166,7 @@ class AppTheme extends _$AppTheme {
 Future<void> clearAllStorage(Ref ref) async {
   final storage = ref.read(storageServiceProvider);
   await storage.clear();
-  
+
   // Invalidate all storage-dependent providers
   ref.invalidate(userPreferencesProvider);
   ref.invalidate(gameSettingsProvider);

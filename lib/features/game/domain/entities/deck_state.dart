@@ -4,8 +4,8 @@ import 'card.dart';
 part 'deck_state.freezed.dart';
 part 'deck_state.g.dart';
 
-@freezed
-class DeckState with _$DeckState {
+@Freezed()
+abstract class DeckState with _$DeckState {
   const factory DeckState({
     required List<Card> drawPile,
     required List<Card> discardPile,

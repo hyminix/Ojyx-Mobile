@@ -5,8 +5,8 @@ import '../../domain/entities/play_direction.dart';
 part 'game_animation_provider_v2.g.dart';
 part 'game_animation_provider_v2.freezed.dart';
 
-@freezed
-class GameAnimationState with _$GameAnimationState {
+@Freezed()
+abstract class GameAnimationState with _$GameAnimationState {
   const factory GameAnimationState({
     @Default(false) bool showingDirectionChange,
     @Default(PlayDirection.forward) PlayDirection direction,

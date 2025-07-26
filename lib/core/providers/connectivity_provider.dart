@@ -8,15 +8,15 @@ part 'connectivity_provider.g.dart';
 @Riverpod(keepAlive: true)
 ConnectivityService connectivityService(Ref ref) {
   final service = ConnectivityService();
-  
+
   // Initialize the service
   service.initialize();
-  
+
   // Dispose when provider is disposed
   ref.onDispose(() {
     service.dispose();
   });
-  
+
   return service;
 }
 
@@ -24,15 +24,12 @@ ConnectivityService connectivityService(Ref ref) {
 @riverpod
 ConnectivityStatus connectivityStatus(Ref ref) {
   final service = ref.watch(connectivityServiceProvider);
-  
+
   // Listen to connectivity changes
-  ref.listen<ConnectivityStatus>(
-    connectivityStatusStreamProvider,
-    (previous, next) {
-      // Status will be updated via stream
-    },
-  );
-  
+  ref.listen(connectivityStatusStreamProvider.stream, (previous, next) {
+    // Status will be updated via stream
+  });
+
   return service.currentStatus;
 }
 

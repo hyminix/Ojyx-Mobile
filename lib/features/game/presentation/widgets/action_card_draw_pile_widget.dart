@@ -35,9 +35,7 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    colorScheme.primary.withValues(
-                      alpha: canDraw ? 1.0 : 0.5,
-                    ),
+                    colorScheme.primary.withValues(alpha: canDraw ? 1.0 : 0.5),
                     colorScheme.primaryContainer.withValues(
                       alpha: canDraw ? 1.0 : 0.5,
                     ),
@@ -91,7 +89,9 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
                           Text(
                             'Pile vide',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.white.withAlpha((0.8 * 255).round()),
+                              color: Colors.white.withAlpha(
+                                (0.8 * 255).round(),
+                              ),
                               fontSize: 10,
                             ),
                           ),

@@ -18,8 +18,8 @@ enum GameStatus {
 
 enum TurnDirection { clockwise, counterClockwise }
 
-@freezed
-class GameState with _$GameState {
+@Freezed()
+abstract class GameState with _$GameState {
   const factory GameState({
     required String roomId,
     required List<GamePlayer> players,

@@ -28,18 +28,18 @@ class SentryService {
 
       // Execute the action
       final result = await action();
-      
+
       // Mark transaction as successful
       transaction.status = const SpanStatus.ok();
-      
+
       return result;
     } catch (e, stackTrace) {
       // Mark transaction as failed
       transaction.status = const SpanStatus.internalError();
-      
+
       // Capture the exception
       await captureException(e, stackTrace: stackTrace);
-      
+
       rethrow;
     } finally {
       await transaction.finish();
@@ -75,10 +75,7 @@ class SentryService {
       name: '$method $url',
       operation: 'http.client',
       action: request,
-      data: {
-        'http.method': method,
-        'http.url': url,
-      },
+      data: {'http.method': method, 'http.url': url},
     );
   }
 
@@ -192,12 +189,7 @@ class SentryService {
   }) {
     Sentry.configureScope((scope) {
       scope.setUser(
-        SentryUser(
-          id: id,
-          username: username,
-          email: email,
-          data: extra,
-        ),
+        SentryUser(id: id, username: username, email: email, data: extra),
       );
     });
   }
@@ -214,10 +206,7 @@ class SentryService {
     addBreadcrumb(
       message: 'App lifecycle: $event',
       category: 'app.lifecycle',
-      data: {
-        'event': event,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      data: {'event': event, 'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -231,11 +220,7 @@ class SentryService {
       message: 'Navigated from $from to $to',
       category: 'navigation',
       type: 'navigation',
-      data: {
-        'from': from,
-        'to': to,
-        if (params != null) 'params': params,
-      },
+      data: {'from': from, 'to': to, if (params != null) 'params': params},
     );
   }
 
@@ -253,7 +238,7 @@ class SentryService {
       query: () async {
         try {
           final result = await query();
-          
+
           // Add success breadcrumb
           addBreadcrumb(
             message: 'Supabase $operation successful',
@@ -264,7 +249,7 @@ class SentryService {
               if (filters != null) 'filters': filters,
             },
           );
-          
+
           return result;
         } catch (e) {
           // Add error breadcrumb
@@ -279,7 +264,7 @@ class SentryService {
               if (filters != null) 'filters': filters,
             },
           );
-          
+
           rethrow;
         }
       },

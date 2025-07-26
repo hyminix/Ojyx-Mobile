@@ -6,8 +6,8 @@ import 'action_card.dart';
 part 'game_player.freezed.dart';
 part 'game_player.g.dart';
 
-@freezed
-class GamePlayer with _$GamePlayer {
+@Freezed()
+abstract class GamePlayer with _$GamePlayer {
   @Assert('actionCards.length <= kMaxActionCardsInHand')
   const factory GamePlayer({
     required String id,

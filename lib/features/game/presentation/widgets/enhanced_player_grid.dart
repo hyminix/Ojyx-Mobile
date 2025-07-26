@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/game_player.dart';
 import '../../domain/entities/card.dart' as game;
-import '../providers/card_selection_provider.dart';
+import '../providers/card_selection_provider_v2.dart';
 import 'card_widget.dart';
 import 'card_animation_widget.dart';
 import 'visual_feedback_widget.dart';

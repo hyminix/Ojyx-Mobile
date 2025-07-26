@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/game/presentation/widgets/game_animation_overlay.dart';
 import 'package:ojyx/features/game/presentation/widgets/direction_change_animation.dart';
 import 'package:ojyx/features/game/domain/entities/play_direction.dart';
-import 'package:ojyx/features/game/presentation/providers/game_animation_provider.dart';
+import 'package:ojyx/features/game/presentation/providers/game_animation_provider_v2.dart';
 
 void main() {
   group('GameAnimationOverlay Strategic Visual Communication Behavior', () {
