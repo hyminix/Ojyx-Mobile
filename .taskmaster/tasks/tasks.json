@@ -119,8 +119,8 @@
             "dependencies": [
               "2.3"
             ],
-            "details": "1. Créer une branche `chore/update-freezed`\n2. Identifier tous les modèles Freezed: `find lib -name '*.dart' -exec grep -l '@freezed' {} \\;`\n3. Écrire des tests exhaustifs pour chaque modèle (copyWith, toJson, fromJson, equality)\n4. Mettre à jour dans pubspec.yaml: freezed: ^2.5.7\n5. Exécuter `flutter pub get`\n6. Régénérer avec `flutter pub run build_runner build --delete-conflicting-outputs`\n7. Lancer les tests et corriger les échecs un par un\n8. Vérifier l'immutabilité et les unions types\n9. Valider que tous les providers Riverpod utilisant ces modèles fonctionnent",
-            "status": "pending",
+            "details": "1. Créer une branche `chore/update-freezed`\n2. Identifier tous les modèles Freezed: `find lib -name '*.dart' -exec grep -l '@freezed' {} \\;`\n3. Écrire des tests exhaustifs pour chaque modèle (copyWith, toJson, fromJson, equality)\n4. Mettre à jour dans pubspec.yaml: freezed: ^2.5.7\n5. Exécuter `flutter pub get`\n6. Régénérer avec `flutter pub run build_runner build --delete-conflicting-outputs`\n7. Lancer les tests et corriger les échecs un par un\n8. Vérifier l'immutabilité et les unions types\n9. Valider que tous les providers Riverpod utilisant ces modèles fonctionnent\n<info added on 2025-07-26T06:03:36.323Z>\n10. Mise à jour réussie :\n   - Version freezed confirmée : ^2.5.7 (déjà à jour dans pubspec.yaml)\n   - Tous les tests créés passent avec succès :\n     * Tests des modèles Freezed (copyWith, equality, toString)\n     * Tests de sérialisation JSON (toJson/fromJson)\n     * Tests d'immutabilité et de validation des unions types\n   - Aucune modification détectée dans les fichiers générés après build_runner\n   - Compatibilité confirmée avec les providers Riverpod existants\n   - Prêt pour la création de PR\n</info added on 2025-07-26T06:03:36.323Z>",
+            "status": "done",
             "testStrategy": "1. Tests unitaires pour chaque méthode générée (copyWith, equality, toJson)\n2. Tests de sérialisation/désérialisation JSON\n3. Tests d'immutabilité vérifiant qu'aucune mutation n'est possible\n4. Tests d'intégration avec les providers Riverpod"
           },
           {
@@ -412,7 +412,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-26T05:52:47.303Z",
+      "updated": "2025-07-26T06:03:42.340Z",
       "description": "Tasks for master context"
     }
   }
