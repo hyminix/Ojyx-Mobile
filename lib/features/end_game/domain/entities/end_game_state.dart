@@ -4,8 +4,8 @@ import 'package:ojyx/features/game/domain/entities/game_player.dart';
 part 'end_game_state.freezed.dart';
 part 'end_game_state.g.dart';
 
-@freezed
-class EndGameState with _$EndGameState {
+@Freezed()
+abstract class EndGameState with _$EndGameState {
   const EndGameState._();
 
   const factory EndGameState({

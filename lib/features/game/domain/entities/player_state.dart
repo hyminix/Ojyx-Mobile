@@ -4,8 +4,8 @@ import 'card.dart';
 part 'player_state.freezed.dart';
 part 'player_state.g.dart';
 
-@freezed
-class PlayerState with _$PlayerState {
+@Freezed()
+abstract class PlayerState with _$PlayerState {
   const factory PlayerState({
     required String playerId,
     required List<Card?> cards,

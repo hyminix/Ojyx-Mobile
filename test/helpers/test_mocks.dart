@@ -72,7 +72,7 @@ class FakeRoom extends Fake implements Room {
   @override
   final DateTime updatedAt = DateTime.now();
 
-  FakeRoom({this.gameStateJson});
+  FakeRoom();
 }
 
 // Setup functions for common test scenarios

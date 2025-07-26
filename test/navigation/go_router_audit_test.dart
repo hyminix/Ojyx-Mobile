@@ -3,11 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ojyx/core/config/router_config.dart';
-import 'package:ojyx/features/home/presentation/screens/home_screen.dart';
-import 'package:ojyx/features/multiplayer/presentation/screens/create_room_screen.dart';
-import 'package:ojyx/features/multiplayer/presentation/screens/join_room_screen.dart';
-import 'package:ojyx/features/multiplayer/presentation/screens/room_lobby_screen.dart';
-import 'package:ojyx/features/game/presentation/screens/game_screen.dart';
 
 void main() {
   group('go_router Audit Tests', () {
@@ -32,14 +27,17 @@ void main() {
       test('should have all required route paths', () {
         final routes = router.configuration.routes.cast<GoRoute>();
         final paths = routes.map((r) => r.path).toList();
-        
-        expect(paths, containsAll([
-          '/',
-          '/create-room',
-          '/join-room',
-          '/room/:roomId',
-          '/game/:roomId',
-        ]));
+
+        expect(
+          paths,
+          containsAll([
+            '/',
+            '/create-room',
+            '/join-room',
+            '/room/:roomId',
+            '/game/:roomId',
+          ]),
+        );
       });
 
       test('should have all required route names', () {
@@ -48,14 +46,11 @@ void main() {
             .where((r) => r.name != null)
             .map((r) => r.name!)
             .toList();
-        
-        expect(names, containsAll([
-          'home',
-          'createRoom',
-          'joinRoom',
-          'roomLobby',
-          'game',
-        ]));
+
+        expect(
+          names,
+          containsAll(['home', 'createRoom', 'joinRoom', 'roomLobby', 'game']),
+        );
       });
 
       test('should have correct initial location', () {
@@ -71,18 +66,18 @@ void main() {
 
     group('Route Parameters', () {
       test('room lobby route should accept roomId parameter', () {
-        final route = router.configuration.routes
-            .cast<GoRoute>()
-            .firstWhere((r) => r.name == 'roomLobby');
-        
+        final route = router.configuration.routes.cast<GoRoute>().firstWhere(
+          (r) => r.name == 'roomLobby',
+        );
+
         expect(route.path, contains(':roomId'));
       });
 
       test('game route should accept roomId parameter', () {
-        final route = router.configuration.routes
-            .cast<GoRoute>()
-            .firstWhere((r) => r.name == 'game');
-        
+        final route = router.configuration.routes.cast<GoRoute>().firstWhere(
+          (r) => r.name == 'game',
+        );
+
         expect(route.path, contains(':roomId'));
       });
     });
@@ -97,7 +92,7 @@ void main() {
         // - GoRouter.of()
         // - context.goNamed()
         // - context.pushNamed()
-        
+
         expect(true, true); // Documentation test
       });
     });
@@ -106,7 +101,7 @@ void main() {
       test('should not have any guards currently', () {
         // No redirects or guards found in current implementation
         final routes = router.configuration.routes.cast<GoRoute>();
-        
+
         for (final route in routes) {
           expect(route.redirect, null);
         }
@@ -115,11 +110,7 @@ void main() {
 
     testWidgets('error page should be configured', (tester) async {
       await tester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp.router(
-            routerConfig: router,
-          ),
-        ),
+        ProviderScope(child: MaterialApp.router(routerConfig: router)),
       );
 
       // Navigate to invalid route
@@ -138,12 +129,7 @@ void main() {
       final router = container.read(routerProvider);
 
       await tester.pumpWidget(
-        ProviderScope(
-          parent: container,
-          child: MaterialApp.router(
-            routerConfig: router,
-          ),
-        ),
+        ProviderScope(child: MaterialApp.router(routerConfig: router)),
       );
 
       // Should start at home
@@ -153,7 +139,10 @@ void main() {
       router.go('/create-room');
       await tester.pumpAndSettle();
 
-      expect(router.routerDelegate.currentConfiguration.uri.toString(), '/create-room');
+      expect(
+        router.routerDelegate.currentConfiguration.uri.toString(),
+        '/create-room',
+      );
     });
 
     testWidgets('should navigate to room with ID', (tester) async {
@@ -162,12 +151,7 @@ void main() {
       const testRoomId = 'test-room-123';
 
       await tester.pumpWidget(
-        ProviderScope(
-          parent: container,
-          child: MaterialApp.router(
-            routerConfig: router,
-          ),
-        ),
+        ProviderScope(child: MaterialApp.router(routerConfig: router)),
       );
 
       // Navigate to room
@@ -186,12 +170,7 @@ void main() {
       const testRoomId = 'test-room-123';
 
       await tester.pumpWidget(
-        ProviderScope(
-          parent: container,
-          child: MaterialApp.router(
-            routerConfig: router,
-          ),
-        ),
+        ProviderScope(child: MaterialApp.router(routerConfig: router)),
       );
 
       // Navigate to game
@@ -209,7 +188,7 @@ void main() {
     test('should support deep link to home', () {
       final container = ProviderContainer();
       final router = container.read(routerProvider);
-      
+
       router.go('/');
       expect(router.routerDelegate.currentConfiguration.uri.toString(), '/');
     });
@@ -217,31 +196,40 @@ void main() {
     test('should support deep link to create room', () {
       final container = ProviderContainer();
       final router = container.read(routerProvider);
-      
+
       router.go('/create-room');
-      expect(router.routerDelegate.currentConfiguration.uri.toString(), '/create-room');
+      expect(
+        router.routerDelegate.currentConfiguration.uri.toString(),
+        '/create-room',
+      );
     });
 
     test('should support deep link to room with ID', () {
       final container = ProviderContainer();
       final router = container.read(routerProvider);
-      
+
       router.go('/room/abc123');
-      expect(router.routerDelegate.currentConfiguration.uri.toString(), '/room/abc123');
+      expect(
+        router.routerDelegate.currentConfiguration.uri.toString(),
+        '/room/abc123',
+      );
     });
 
     test('should support deep link to game with ID', () {
       final container = ProviderContainer();
       final router = container.read(routerProvider);
-      
+
       router.go('/game/xyz789');
-      expect(router.routerDelegate.currentConfiguration.uri.toString(), '/game/xyz789');
+      expect(
+        router.routerDelegate.currentConfiguration.uri.toString(),
+        '/game/xyz789',
+      );
     });
 
     test('should handle invalid deep links', () {
       final container = ProviderContainer();
       final router = container.read(routerProvider);
-      
+
       router.go('/invalid/path/here');
       // Should still navigate (error page will be shown)
       expect(

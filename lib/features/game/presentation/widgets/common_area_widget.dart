@@ -109,7 +109,9 @@ class CommonAreaWidget extends StatelessWidget {
             Text(
               'Tour de $currentPlayerName',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
+                color: theme.colorScheme.onSurface.withAlpha(
+                  (0.7 * 255).round(),
+                ),
               ),
             ),
           ],
@@ -125,7 +127,9 @@ class CommonAreaWidget extends StatelessWidget {
             Text(
               'Manche $roundNumber',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
+                color: theme.colorScheme.onSurface.withAlpha(
+                  (0.7 * 255).round(),
+                ),
               ),
             ),
           ],

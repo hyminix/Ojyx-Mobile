@@ -135,7 +135,7 @@ void main() {
       ).thenAnswer((_) async => Right(expectedScores));
 
       // Act
-      await container.read(endGameWithSaveProvider.future);
+      await container.read(endGameWithSaveProvider.notifier).saveScores();
 
       // Assert and capture in one call
       final captured = verify(() => mockUseCase(captureAny())).captured;
@@ -155,7 +155,7 @@ void main() {
 
       // Act & Assert
       expect(
-        () => container.read(endGameWithSaveProvider.future),
+        () => container.read(endGameWithSaveProvider.notifier).saveScores(),
         throwsA(isA<Exception>()),
       );
     });
@@ -176,7 +176,7 @@ void main() {
       );
 
       // Act
-      await container.read(endGameWithSaveProvider.future);
+      await container.read(endGameWithSaveProvider.notifier).saveScores();
 
       // Assert
       verifyNever(() => mockUseCase(any()));
@@ -196,7 +196,7 @@ void main() {
       );
 
       // Act
-      await container.read(endGameWithSaveProvider.future);
+      await container.read(endGameWithSaveProvider.notifier).saveScores();
 
       // Assert
       verifyNever(() => mockUseCase(any()));

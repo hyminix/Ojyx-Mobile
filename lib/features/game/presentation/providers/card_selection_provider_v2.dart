@@ -17,8 +17,8 @@ enum CardSelectionType {
   scout,
 }
 
-@freezed
-class CardSelectionState with _$CardSelectionState {
+@Freezed()
+abstract class CardSelectionState with _$CardSelectionState {
   const factory CardSelectionState({
     @Default(false) bool isSelecting,
     CardSelectionType? selectionType,

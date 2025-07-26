@@ -6,37 +6,39 @@ part of 'action_card.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ActionCardImpl _$$ActionCardImplFromJson(Map<String, dynamic> json) =>
-    $checkedCreate(r'_$ActionCardImpl', json, ($checkedConvert) {
-      final val = _$ActionCardImpl(
-        id: $checkedConvert('id', (v) => v as String),
-        type: $checkedConvert(
-          'type',
-          (v) => $enumDecode(_$ActionCardTypeEnumMap, v),
-        ),
-        name: $checkedConvert('name', (v) => v as String),
-        description: $checkedConvert('description', (v) => v as String),
-        timing: $checkedConvert(
-          'timing',
-          (v) =>
-              $enumDecodeNullable(_$ActionTimingEnumMap, v) ??
-              ActionTiming.optional,
-        ),
-        target: $checkedConvert(
-          'target',
-          (v) =>
-              $enumDecodeNullable(_$ActionTargetEnumMap, v) ??
-              ActionTarget.none,
-        ),
-        parameters: $checkedConvert(
-          'parameters',
-          (v) => v as Map<String, dynamic>? ?? const {},
-        ),
-      );
-      return val;
-    });
+_ActionCard _$ActionCardFromJson(Map<String, dynamic> json) => $checkedCreate(
+  '_ActionCard',
+  json,
+  ($checkedConvert) {
+    final val = _ActionCard(
+      id: $checkedConvert('id', (v) => v as String),
+      type: $checkedConvert(
+        'type',
+        (v) => $enumDecode(_$ActionCardTypeEnumMap, v),
+      ),
+      name: $checkedConvert('name', (v) => v as String),
+      description: $checkedConvert('description', (v) => v as String),
+      timing: $checkedConvert(
+        'timing',
+        (v) =>
+            $enumDecodeNullable(_$ActionTimingEnumMap, v) ??
+            ActionTiming.optional,
+      ),
+      target: $checkedConvert(
+        'target',
+        (v) =>
+            $enumDecodeNullable(_$ActionTargetEnumMap, v) ?? ActionTarget.none,
+      ),
+      parameters: $checkedConvert(
+        'parameters',
+        (v) => v as Map<String, dynamic>? ?? const {},
+      ),
+    );
+    return val;
+  },
+);
 
-Map<String, dynamic> _$$ActionCardImplToJson(_$ActionCardImpl instance) =>
+Map<String, dynamic> _$ActionCardToJson(_ActionCard instance) =>
     <String, dynamic>{
       'id': instance.id,
       'type': _$ActionCardTypeEnumMap[instance.type]!,

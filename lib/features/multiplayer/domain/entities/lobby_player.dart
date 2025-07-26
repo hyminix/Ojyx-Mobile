@@ -5,8 +5,8 @@ part 'lobby_player.g.dart';
 
 enum ConnectionStatus { online, offline, away }
 
-@freezed
-class LobbyPlayer with _$LobbyPlayer {
+@Freezed()
+abstract class LobbyPlayer with _$LobbyPlayer {
   const factory LobbyPlayer({
     required String id,
     required String name,

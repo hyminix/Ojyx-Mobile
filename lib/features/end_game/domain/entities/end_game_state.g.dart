@@ -6,12 +6,12 @@ part of 'end_game_state.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$EndGameStateImpl _$$EndGameStateImplFromJson(Map<String, dynamic> json) =>
+_EndGameState _$EndGameStateFromJson(Map<String, dynamic> json) =>
     $checkedCreate(
-      r'_$EndGameStateImpl',
+      '_EndGameState',
       json,
       ($checkedConvert) {
-        final val = _$EndGameStateImpl(
+        final val = _EndGameState(
           players: $checkedConvert(
             'players',
             (v) => (v as List<dynamic>)
@@ -44,7 +44,7 @@ _$EndGameStateImpl _$$EndGameStateImplFromJson(Map<String, dynamic> json) =>
       },
     );
 
-Map<String, dynamic> _$$EndGameStateImplToJson(_$EndGameStateImpl instance) =>
+Map<String, dynamic> _$EndGameStateToJson(_EndGameState instance) =>
     <String, dynamic>{
       'players': instance.players.map((e) => e.toJson()).toList(),
       'round_initiator_id': instance.roundInitiatorId,

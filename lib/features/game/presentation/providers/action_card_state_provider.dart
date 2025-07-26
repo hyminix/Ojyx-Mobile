@@ -5,8 +5,8 @@ part 'action_card_state_provider.g.dart';
 part 'action_card_state_provider.freezed.dart';
 
 // ActionCardState for UI state management
-@freezed
-class ActionCardState with _$ActionCardState {
+@Freezed()
+abstract class ActionCardState with _$ActionCardState {
   const factory ActionCardState({
     required int drawPileCount,
     required int discardPileCount,

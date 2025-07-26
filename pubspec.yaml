@@ -61,6 +61,7 @@ dependencies:
   shared_preferences: ^2.3.2
   connectivity_plus: ^6.0.5
 
+  path: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -81,6 +82,8 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+  crypto: any
+  riverpod: any
 flutter:
 
   # The following line ensures that the Material Icons font is

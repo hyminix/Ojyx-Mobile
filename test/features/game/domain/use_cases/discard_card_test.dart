@@ -4,6 +4,7 @@ import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
+import 'package:ojyx/core/errors/failures.dart';
 
 void main() {
   late DiscardCard discardCard;

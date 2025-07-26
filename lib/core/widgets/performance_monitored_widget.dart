@@ -17,25 +17,24 @@ abstract class PerformanceMonitoredWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Track navigation to this widget
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      SentryService.trackNavigation(
-        from: 'previous',
-        to: widgetName,
-      );
+      SentryService.trackNavigation(from: 'previous', to: widgetName);
     });
 
     // Track widget build performance
     return FutureBuilder<Widget>(
-      future: ref.read(performanceMonitorProvider).trackWidgetBuild(
-        widgetName: widgetName,
-        buildFunction: () async {
-          return buildWidget(context, ref);
-        },
-      ),
+      future: ref
+          .read(performanceMonitorProvider)
+          .trackWidgetBuild(
+            widgetName: widgetName,
+            buildFunction: () async {
+              return buildWidget(context, ref);
+            },
+          ),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return snapshot.data!;
         }
-        
+
         // Fallback to direct build if tracking fails
         return buildWidget(context, ref);
       },
@@ -44,22 +43,24 @@ abstract class PerformanceMonitoredWidget extends ConsumerWidget {
 }
 
 /// Example stateful widget with performance monitoring
-abstract class PerformanceMonitoredStatefulWidget extends ConsumerStatefulWidget {
+abstract class PerformanceMonitoredStatefulWidget
+    extends ConsumerStatefulWidget {
   const PerformanceMonitoredStatefulWidget({super.key});
-  
+
   String get widgetName;
 }
 
-abstract class PerformanceMonitoredState<T extends PerformanceMonitoredStatefulWidget> 
+abstract class PerformanceMonitoredState<
+  T extends PerformanceMonitoredStatefulWidget
+>
     extends ConsumerState<T> {
-  
   @override
   void initState() {
     super.initState();
-    
+
     // Track widget lifecycle
     SentryService.trackAppLifecycle('${widget.widgetName}.initState');
-    
+
     // Add breadcrumb for widget initialization
     SentryService.addBreadcrumb(
       message: '${widget.widgetName} initialized',
@@ -71,7 +72,7 @@ abstract class PerformanceMonitoredState<T extends PerformanceMonitoredStatefulW
   void dispose() {
     // Track widget disposal
     SentryService.trackAppLifecycle('${widget.widgetName}.dispose');
-    
+
     super.dispose();
   }
 
@@ -81,11 +82,13 @@ abstract class PerformanceMonitoredState<T extends PerformanceMonitoredStatefulW
     required Future<T> Function() operation,
     Map<String, dynamic>? context,
   }) {
-    return ref.read(performanceMonitorProvider).trackAsyncOperation(
-      operationName: '${widget.widgetName}.$operationName',
-      operation: operation,
-      context: context,
-    );
+    return ref
+        .read(performanceMonitorProvider)
+        .trackAsyncOperation(
+          operationName: '${widget.widgetName}.$operationName',
+          operation: operation,
+          context: context,
+        );
   }
 
   /// Track user interaction
@@ -113,9 +116,7 @@ class ExampleMonitoredWidget extends PerformanceMonitoredWidget {
   @override
   Widget buildWidget(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Performance Monitored Example'),
-      ),
+      appBar: AppBar(title: const Text('Performance Monitored Example')),
       body: Center(
         child: ElevatedButton(
           onPressed: () async {

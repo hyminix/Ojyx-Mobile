@@ -29,11 +29,8 @@ void main() {
 
       test('should throw error when accessing prefs before initialization', () {
         final uninitializedService = StorageService();
-        
-        expect(
-          () => uninitializedService.prefs,
-          throwsStateError,
-        );
+
+        expect(() => uninitializedService.prefs, throwsStateError);
       });
     });
 
@@ -51,7 +48,7 @@ void main() {
       test('should set string value', () async {
         final result = await storageService.setString('new_string', 'world');
         expect(result, isTrue);
-        
+
         final value = storageService.getString('new_string');
         expect(value, equals('world'));
       });
@@ -66,7 +63,7 @@ void main() {
       test('should set integer value', () async {
         final result = await storageService.setInt('new_int', 100);
         expect(result, isTrue);
-        
+
         final value = storageService.getInt('new_int');
         expect(value, equals(100));
       });
@@ -81,7 +78,7 @@ void main() {
       test('should set double value', () async {
         final result = await storageService.setDouble('new_double', 2.718);
         expect(result, isTrue);
-        
+
         final value = storageService.getDouble('new_double');
         expect(value, equals(2.718));
       });
@@ -96,7 +93,7 @@ void main() {
       test('should set boolean value', () async {
         final result = await storageService.setBool('new_bool', false);
         expect(result, isTrue);
-        
+
         final value = storageService.getBool('new_bool');
         expect(value, isFalse);
       });
@@ -112,7 +109,7 @@ void main() {
         final list = ['a', 'b', 'c'];
         final result = await storageService.setStringList('new_list', list);
         expect(result, isTrue);
-        
+
         final value = storageService.getStringList('new_list');
         expect(value, equals(list));
       });
@@ -136,7 +133,7 @@ void main() {
         final json = {'name': 'test', 'value': 456};
         final result = await storageService.setJson('new_json', json);
         expect(result, isTrue);
-        
+
         final value = storageService.getJson('new_json');
         expect(value, equals(json));
       });
@@ -156,7 +153,7 @@ void main() {
         ];
         final result = await storageService.setJsonList('new_json_list', list);
         expect(result, isTrue);
-        
+
         final value = storageService.getJsonList('new_json_list');
         expect(value, equals(list));
       });
@@ -171,7 +168,7 @@ void main() {
       test('should remove value', () async {
         await storageService.setString('to_remove', 'value');
         expect(storageService.containsKey('to_remove'), isTrue);
-        
+
         final result = await storageService.remove('to_remove');
         expect(result, isTrue);
         expect(storageService.containsKey('to_remove'), isFalse);
@@ -187,7 +184,7 @@ void main() {
       test('should clear all values', () async {
         final result = await storageService.clear();
         expect(result, isTrue);
-        
+
         final keys = storageService.getKeys();
         expect(keys.isEmpty, isTrue);
       });

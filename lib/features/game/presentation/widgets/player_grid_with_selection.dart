@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/player_grid.dart';
-import '../providers/card_selection_provider.dart';
+import '../providers/card_selection_provider_v2.dart';
 import 'player_grid_widget.dart';
 
 class PlayerGridWithSelection extends ConsumerWidget {
@@ -85,7 +85,7 @@ class PlayerGridWithSelection extends ConsumerWidget {
   Widget _buildSelectionHeader(
     BuildContext context,
     CardSelectionState selectionState,
-    CardSelectionNotifier selectionNotifier,
+    CardSelection selectionNotifier,
   ) {
     final theme = Theme.of(context);
 
@@ -186,7 +186,7 @@ class PlayerGridWithSelection extends ConsumerWidget {
   Widget _buildSelectionControls(
     BuildContext context,
     CardSelectionState selectionState,
-    CardSelectionNotifier selectionNotifier,
+    CardSelection selectionNotifier,
   ) {
     final theme = Theme.of(context);
 
@@ -223,15 +223,11 @@ class PlayerGridWithSelection extends ConsumerWidget {
     );
   }
 
-  void _handleSelectionTap(
-    CardSelectionNotifier selectionNotifier,
-    int row,
-    int col,
-  ) {
+  void _handleSelectionTap(CardSelection selectionNotifier, int row, int col) {
     selectionNotifier.selectCard(row, col);
   }
 
-  void _handleConfirmSelection(CardSelectionNotifier selectionNotifier) {
+  void _handleConfirmSelection(CardSelection selectionNotifier) {
     final targetData = selectionNotifier.completeSelection();
     if (targetData != null && onTeleportComplete != null) {
       onTeleportComplete!(targetData);

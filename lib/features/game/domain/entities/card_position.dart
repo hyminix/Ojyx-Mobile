@@ -2,8 +2,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'card_position.freezed.dart';
 
-@freezed
-class CardPosition with _$CardPosition {
+@Freezed()
+abstract class CardPosition with _$CardPosition {
   const factory CardPosition({required int row, required int col}) =
       _CardPosition;
 

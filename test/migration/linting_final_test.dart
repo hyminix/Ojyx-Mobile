@@ -6,30 +6,36 @@ void main() {
     test('should have zero errors after migration', () async {
       // Exécuter flutter analyze
       final result = await Process.run('flutter', ['analyze']);
-      
+
       final output = result.stdout.toString();
       final errorCount = RegExp(r'error •').allMatches(output).length;
-      
+
       print('Résultat final du linting:');
       print('- Errors restants: $errorCount');
-      
+
       // Pour l'instant, nous acceptons quelques erreurs restantes
       // qui nécessitent des corrections manuelles plus complexes
-      expect(errorCount, lessThanOrEqualTo(15), 
-        reason: 'Il reste quelques erreurs à corriger manuellement');
+      expect(
+        errorCount,
+        lessThanOrEqualTo(15),
+        reason: 'Il reste quelques erreurs à corriger manuellement',
+      );
     });
-    
+
     test('should verify flutter_lints version is updated', () {
       final pubspecFile = File('pubspec.yaml');
       final content = pubspecFile.readAsStringSync();
-      
+
       expect(content, contains('flutter_lints: ^6.0.0'));
     });
-    
+
     test('should create migration report', () async {
-      final reportFile = File('.taskmaster/reports/linting-migration-summary.md');
-      
-      final report = '''
+      final reportFile = File(
+        '.taskmaster/reports/linting-migration-summary.md',
+      );
+
+      final report =
+          '''
 # Migration flutter_lints 5.0.0 → 6.0.0
 Date: ${DateTime.now()}
 
@@ -59,7 +65,7 @@ Date: ${DateTime.now()}
 - Valider que tous les tests passent
 - Commit des changements
 ''';
-      
+
       await reportFile.writeAsString(report);
       expect(reportFile.existsSync(), isTrue);
     });

@@ -4,8 +4,8 @@ import 'package:ojyx/features/global_scores/domain/entities/global_score.dart';
 part 'global_score_model.freezed.dart';
 part 'global_score_model.g.dart';
 
-@freezed
-class GlobalScoreModel with _$GlobalScoreModel {
+@Freezed()
+abstract class GlobalScoreModel with _$GlobalScoreModel {
   const GlobalScoreModel._();
 
   const factory GlobalScoreModel({

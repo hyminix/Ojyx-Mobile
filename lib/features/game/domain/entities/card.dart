@@ -5,8 +5,8 @@ import 'package:ojyx/core/utils/extensions.dart';
 part 'card.freezed.dart';
 part 'card.g.dart';
 
-@freezed
-class Card with _$Card {
+@Freezed()
+abstract class Card with _$Card {
   @Assert('value >= kMinCardValue && value <= kMaxCardValue')
   const factory Card({required int value, @Default(false) bool isRevealed}) =
       _Card;

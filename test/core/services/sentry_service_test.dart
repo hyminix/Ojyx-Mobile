@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 
 // Mocks
 class MockHub extends Mock implements Hub {}
+
 class MockISentrySpan extends Mock implements ISentrySpan {}
 
 void main() {
@@ -13,7 +14,7 @@ void main() {
       test('should complete transaction successfully', () async {
         // Test transaction tracking
         var actionExecuted = false;
-        
+
         final result = await SentryService.trackTransaction(
           name: 'test_transaction',
           operation: 'test',
@@ -42,10 +43,7 @@ void main() {
       });
 
       test('should include custom data in transaction', () async {
-        final customData = {
-          'key1': 'value1',
-          'key2': 42,
-        };
+        final customData = {'key1': 'value1', 'key2': 42};
 
         await SentryService.trackTransaction(
           name: 'data_transaction',
@@ -173,7 +171,7 @@ void main() {
       test('should track app lifecycle event', () {
         SentryService.trackAppLifecycle('foreground');
         SentryService.trackAppLifecycle('background');
-        
+
         expect(true, isTrue);
       });
 
@@ -188,10 +186,7 @@ void main() {
       });
 
       test('should track navigation without params', () {
-        SentryService.trackNavigation(
-          from: '/game',
-          to: '/results',
-        );
+        SentryService.trackNavigation(from: '/game', to: '/results');
 
         expect(true, isTrue);
       });
@@ -233,21 +228,14 @@ void main() {
           stackTrace: StackTrace.current,
           extra: {'context': 'test'},
           tags: {'environment': 'test'},
-          breadcrumbs: [
-            Breadcrumb(
-              message: 'Before error',
-              category: 'test',
-            ),
-          ],
+          breadcrumbs: [Breadcrumb(message: 'Before error', category: 'test')],
         );
 
         expect(true, isTrue);
       });
 
       test('should capture exception with minimal context', () async {
-        await SentryService.captureException(
-          Exception('Simple error'),
-        );
+        await SentryService.captureException(Exception('Simple error'));
 
         expect(true, isTrue);
       });

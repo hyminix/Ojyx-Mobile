@@ -3,8 +3,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'global_score.freezed.dart';
 part 'global_score.g.dart';
 
-@freezed
-class GlobalScore with _$GlobalScore {
+@Freezed()
+abstract class GlobalScore with _$GlobalScore {
   const GlobalScore._();
 
   const factory GlobalScore({
@@ -30,8 +30,8 @@ class GlobalScore with _$GlobalScore {
   }
 }
 
-@freezed
-class PlayerStats with _$PlayerStats {
+@Freezed()
+abstract class PlayerStats with _$PlayerStats {
   const PlayerStats._();
 
   const factory PlayerStats({

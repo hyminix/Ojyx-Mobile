@@ -91,11 +91,7 @@ class SentryServiceProvider extends _$SentryServiceProvider {
     required String to,
     Map<String, dynamic>? params,
   }) {
-    SentryService.trackNavigation(
-      from: from,
-      to: to,
-      params: params,
-    );
+    SentryService.trackNavigation(from: from, to: to, params: params);
   }
 
   /// Track Supabase operation
@@ -123,7 +119,7 @@ PerformanceMonitor performanceMonitor(Ref ref) {
 /// Mixin for adding performance monitoring to widgets
 class PerformanceMonitor {
   final Ref _ref;
-  
+
   PerformanceMonitor(this._ref);
 
   /// Track widget build performance
@@ -132,7 +128,7 @@ class PerformanceMonitor {
     required Future<T> Function() buildFunction,
   }) async {
     final sentry = _ref.read(sentryServiceProviderProvider.notifier);
-    
+
     return sentry.trackTransaction(
       name: '$widgetName.build',
       operation: 'ui.render',
@@ -147,7 +143,7 @@ class PerformanceMonitor {
     Map<String, dynamic>? context,
   }) async {
     final sentry = _ref.read(sentryServiceProviderProvider.notifier);
-    
+
     return sentry.trackTransaction(
       name: operationName,
       operation: 'async',

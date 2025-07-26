@@ -6,13 +6,13 @@ part of 'player_grid_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PlayerGridModelImpl _$$PlayerGridModelImplFromJson(
+_PlayerGridModel _$PlayerGridModelFromJson(
   Map<String, dynamic> json,
 ) => $checkedCreate(
-  r'_$PlayerGridModelImpl',
+  '_PlayerGridModel',
   json,
   ($checkedConvert) {
-    final val = _$PlayerGridModelImpl(
+    final val = _PlayerGridModel(
       id: $checkedConvert('id', (v) => v as String),
       gameStateId: $checkedConvert('game_state_id', (v) => v as String),
       playerId: $checkedConvert('player_id', (v) => v as String),
@@ -53,18 +53,17 @@ _$PlayerGridModelImpl _$$PlayerGridModelImplFromJson(
   },
 );
 
-Map<String, dynamic> _$$PlayerGridModelImplToJson(
-  _$PlayerGridModelImpl instance,
-) => <String, dynamic>{
-  'id': instance.id,
-  'game_state_id': instance.gameStateId,
-  'player_id': instance.playerId,
-  'grid_cards': instance.gridCards,
-  'action_cards': instance.actionCards,
-  'score': instance.score,
-  'position': instance.position,
-  'is_active': instance.isActive,
-  'has_revealed_all': instance.hasRevealedAll,
-  'created_at': instance.createdAt.toIso8601String(),
-  'updated_at': instance.updatedAt.toIso8601String(),
-};
+Map<String, dynamic> _$PlayerGridModelToJson(_PlayerGridModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'game_state_id': instance.gameStateId,
+      'player_id': instance.playerId,
+      'grid_cards': instance.gridCards,
+      'action_cards': instance.actionCards,
+      'score': instance.score,
+      'position': instance.position,
+      'is_active': instance.isActive,
+      'has_revealed_all': instance.hasRevealedAll,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt.toIso8601String(),
+    };

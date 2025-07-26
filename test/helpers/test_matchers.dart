@@ -148,7 +148,10 @@ class _HasRevealedCardsCount extends Matcher {
   @override
   bool matches(dynamic item, Map matchState) {
     if (item is! PlayerGrid) return false;
-    final revealedCount = item.cards.where((card) => card?.isRevealed ?? false).length;
+    final revealedCount = item.cards
+        .expand((row) => row)
+        .where((card) => card?.isRevealed ?? false)
+        .length;
     return revealedCount == expectedCount;
   }
 
@@ -167,14 +170,19 @@ class _HasCompletedColumn extends Matcher {
 
     for (int col = 0; col < 4; col++) {
       final columnCards = [
-        item.cards[col], // Row 0
-        item.cards[col + 4], // Row 1
-        item.cards[col + 8], // Row 2
+        item.cards[0][col], // Row 0
+        item.cards[1][col], // Row 1
+        item.cards[2][col], // Row 2
       ];
 
-      final allRevealed = columnCards.every((card) => card?.isRevealed ?? false);
+      final allRevealed = columnCards.every(
+        (card) => card?.isRevealed ?? false,
+      );
       final sameValue = columnCards.every(
-        (card) => card != null && columnCards[0] != null && card.value == columnCards[0]!.value,
+        (card) =>
+            card != null &&
+            columnCards[0] != null &&
+            card.value == columnCards[0]!.value,
       );
 
       if (allRevealed && sameValue) {

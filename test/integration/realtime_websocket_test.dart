@@ -4,16 +4,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:async';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
-class MockRealtimeClient extends Mock implements RealtimeClient {}
-class MockRealtimeChannel extends Mock implements RealtimeChannel {}
-class MockRealtimeChannelOptions extends Mock implements RealtimeChannelOptions {}
 
-class FakeRealtimeChannelOptions extends Fake implements RealtimeChannelOptions {}
+class MockRealtimeClient extends Mock implements RealtimeClient {}
+
+class MockRealtimeChannel extends Mock implements RealtimeChannel {}
+
+// Remove MockRealtimeChannelOptions - not needed anymore
 
 void main() {
-  setUpAll(() {
-    registerFallbackValue(FakeRealtimeChannelOptions());
-  });
+  // No setUpAll needed anymore
 
   group('Realtime WebSocket Integration Tests', () {
     late MockSupabaseClient mockSupabase;
@@ -24,78 +23,105 @@ void main() {
       mockSupabase = MockSupabaseClient();
       mockRealtime = MockRealtimeClient();
       mockChannel = MockRealtimeChannel();
-      
+
       when(() => mockSupabase.realtime).thenReturn(mockRealtime);
     });
 
     test('should establish realtime connection successfully', () async {
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async => mockChannel);
-      
+      when(() => mockChannel.subscribe()).thenAnswer((_) async {
+        return ChannelResponse(
+          status: ChannelStatus.subscribed,
+          channel: mockChannel,
+        );
+      });
+
       final channel = mockSupabase.realtime.channel('test-channel');
-      final subscribedChannel = await channel.subscribe();
-      
-      expect(subscribedChannel, equals(mockChannel));
+      final response = await channel.subscribe();
+
+      expect(response.channel, equals(mockChannel));
+      expect(response.status, equals(ChannelStatus.subscribed));
       verify(() => mockRealtime.channel('test-channel', any())).called(1);
       verify(() => mockChannel.subscribe()).called(1);
     });
 
     test('should handle presence sync for multiplayer', () async {
-      final presenceController = StreamController<Map<String, dynamic>>.broadcast();
-      
+      final presenceController =
+          StreamController<Map<String, dynamic>>.broadcast();
+
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async => mockChannel);
+      when(() => mockChannel.subscribe()).thenAnswer((_) async {
+        return ChannelResponse(
+          status: ChannelStatus.subscribed,
+          channel: mockChannel,
+        );
+      });
       when(() => mockChannel.onPresenceSync(any())).thenAnswer((invocation) {
-        final callback = invocation.positionalArguments[0] as Function;
+        final callback =
+            invocation.positionalArguments[0]
+                as void Function(Map<String, dynamic>);
         presenceController.stream.listen(callback);
         return mockChannel;
       });
       when(() => mockChannel.track(any())).thenAnswer((_) async {});
-      
+
       final channel = mockSupabase.realtime.channel('game:lobby');
-      await channel.subscribe();
-      
+      channel.subscribe();
+
       final presenceStates = <Map<String, dynamic>>[];
       channel.onPresenceSync((payload) {
         presenceStates.add(payload);
       });
-      
-      await channel.track({'user_id': 'player1', 'online_at': DateTime.now().toIso8601String()});
-      
+
+      await channel.track({
+        'user_id': 'player1',
+        'online_at': DateTime.now().toIso8601String(),
+      });
+
       presenceController.add({
         'player1': {
           'user_id': 'player1',
           'online_at': DateTime.now().toIso8601String(),
-        }
+        },
       });
-      
+
       await Future.delayed(const Duration(milliseconds: 100));
-      
+
       expect(presenceStates, isNotEmpty);
       verify(() => mockChannel.track(any())).called(1);
     });
 
     test('should handle broadcast events for game actions', () async {
-      final broadcastController = StreamController<Map<String, dynamic>>.broadcast();
-      
+      final broadcastController =
+          StreamController<Map<String, dynamic>>.broadcast();
+
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async => mockChannel);
-      when(() => mockChannel.onBroadcast(
-        event: any(named: 'event'),
-        callback: any(named: 'callback'),
-      )).thenAnswer((invocation) {
+      when(() => mockChannel.subscribe()).thenAnswer((_) async {
+        return ChannelResponse(
+          status: ChannelStatus.subscribed,
+          channel: mockChannel,
+        );
+      });
+      when(
+        () => mockChannel.onBroadcast(
+          event: any(named: 'event'),
+          callback: any(named: 'callback'),
+        ),
+      ).thenAnswer((invocation) {
         final callback = invocation.namedArguments[#callback] as Function;
         broadcastController.stream.listen((event) => callback(event));
         return mockChannel;
       });
-      when(() => mockChannel.sendBroadcastMessage(
-        event: any(named: 'event'),
-        payload: any(named: 'payload'),
-      )).thenAnswer((_) async {});
-      
+      when(
+        () => mockChannel.sendBroadcastMessage(
+          event: any(named: 'event'),
+          payload: any(named: 'payload'),
+        ),
+      ).thenAnswer((_) async {});
+
       final channel = mockSupabase.realtime.channel('game:room123');
-      await channel.subscribe();
-      
+      channel.subscribe();
+
       final receivedEvents = <Map<String, dynamic>>[];
       channel.onBroadcast(
         event: 'card_played',
@@ -103,7 +129,7 @@ void main() {
           receivedEvents.add(payload);
         },
       );
-      
+
       await channel.sendBroadcastMessage(
         event: 'card_played',
         payload: {
@@ -112,7 +138,7 @@ void main() {
           'position': [0, 0],
         },
       );
-      
+
       broadcastController.add({
         'event': 'card_played',
         'payload': {
@@ -121,33 +147,41 @@ void main() {
           'position': [0, 0],
         },
       });
-      
+
       await Future.delayed(const Duration(milliseconds: 100));
-      
+
       expect(receivedEvents, hasLength(1));
       expect(receivedEvents.first['payload']['player_id'], equals('player1'));
     });
 
     test('should handle postgres changes for game state sync', () async {
-      final postgresController = StreamController<PostgresChangePayload>.broadcast();
-      
+      final postgresController =
+          StreamController<PostgresChangePayload>.broadcast();
+
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async => mockChannel);
-      when(() => mockChannel.onPostgresChanges(
-        event: any(named: 'event'),
-        schema: any(named: 'schema'),
-        table: any(named: 'table'),
-        filter: any(named: 'filter'),
-        callback: any(named: 'callback'),
-      )).thenAnswer((invocation) {
+      when(() => mockChannel.subscribe()).thenAnswer((_) async {
+        return ChannelResponse(
+          status: ChannelStatus.subscribed,
+          channel: mockChannel,
+        );
+      });
+      when(
+        () => mockChannel.onPostgresChanges(
+          event: any(named: 'event'),
+          schema: any(named: 'schema'),
+          table: any(named: 'table'),
+          filter: any(named: 'filter'),
+          callback: any(named: 'callback'),
+        ),
+      ).thenAnswer((invocation) {
         final callback = invocation.namedArguments[#callback] as Function;
         postgresController.stream.listen(callback);
         return mockChannel;
       });
-      
+
       final channel = mockSupabase.realtime.channel('db-changes');
-      await channel.subscribe();
-      
+      channel.subscribe();
+
       final gameStateChanges = <PostgresChangePayload>[];
       channel.onPostgresChanges(
         event: PostgresChangeEvent.update,
@@ -162,36 +196,31 @@ void main() {
           gameStateChanges.add(payload);
         },
       );
-      
+
       final mockPayload = PostgresChangePayload(
         schema: 'public',
         table: 'games',
         eventType: PostgresChangeEvent.update,
-        newRecord: {
-          'id': 'game123',
-          'current_player': 'player2',
-          'turn': 5,
-        },
-        oldRecord: {
-          'id': 'game123',
-          'current_player': 'player1',
-          'turn': 4,
-        },
+        newRecord: {'id': 'game123', 'current_player': 'player2', 'turn': 5},
+        oldRecord: {'id': 'game123', 'current_player': 'player1', 'turn': 4},
         commitTimestamp: DateTime.now(),
       );
-      
+
       postgresController.add(mockPayload);
-      
+
       await Future.delayed(const Duration(milliseconds: 100));
-      
+
       expect(gameStateChanges, hasLength(1));
-      expect(gameStateChanges.first.newRecord?['current_player'], equals('player2'));
+      expect(
+        gameStateChanges.first.newRecord['current_player'],
+        equals('player2'),
+      );
     });
 
     test('should handle connection errors and reconnection', () async {
       final completer = Completer<void>();
       int reconnectAttempts = 0;
-      
+
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
       when(() => mockChannel.subscribe()).thenAnswer((_) async {
         reconnectAttempts++;
@@ -201,33 +230,40 @@ void main() {
         completer.complete();
         return mockChannel;
       });
-      
+
       final channel = mockSupabase.realtime.channel('test-reconnect');
-      
+
       try {
-        await channel.subscribe();
+        channel.subscribe();
       } catch (e) {
         expect(e.toString(), contains('Connection failed'));
       }
-      
-      await channel.subscribe();
+
+      channel.subscribe();
       await completer.future;
-      
+
       expect(reconnectAttempts, equals(2));
     });
 
     test('should clean up channels on unsubscribe', () async {
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async => mockChannel);
+      when(() => mockChannel.subscribe()).thenAnswer((_) async {
+        return ChannelResponse(
+          status: ChannelStatus.subscribed,
+          channel: mockChannel,
+        );
+      });
       when(() => mockChannel.unsubscribe()).thenAnswer((_) async => 'ok');
-      when(() => mockRealtime.removeChannel(any())).thenAnswer((_) async => 'ok');
-      
+      when(
+        () => mockRealtime.removeChannel(any()),
+      ).thenAnswer((_) async => 'ok');
+
       final channel = mockSupabase.realtime.channel('test-cleanup');
-      await channel.subscribe();
-      
+      channel.subscribe();
+
       final result = await channel.unsubscribe();
       await mockSupabase.realtime.removeChannel(channel);
-      
+
       expect(result, equals('ok'));
       verify(() => mockChannel.unsubscribe()).called(1);
       verify(() => mockRealtime.removeChannel(mockChannel)).called(1);
@@ -236,43 +272,53 @@ void main() {
     test('should handle multiple channels for different game rooms', () async {
       final mockChannel1 = MockRealtimeChannel();
       final mockChannel2 = MockRealtimeChannel();
-      
-      when(() => mockRealtime.channel('game:room1', any())).thenReturn(mockChannel1);
-      when(() => mockRealtime.channel('game:room2', any())).thenReturn(mockChannel2);
-      when(() => mockChannel1.subscribe()).thenAnswer((_) async => mockChannel1);
-      when(() => mockChannel2.subscribe()).thenAnswer((_) async => mockChannel2);
-      
+
+      when(
+        () => mockRealtime.channel('game:room1', any()),
+      ).thenReturn(mockChannel1);
+      when(
+        () => mockRealtime.channel('game:room2', any()),
+      ).thenReturn(mockChannel2);
+      when(
+        () => mockChannel1.subscribe(),
+      ).thenAnswer((_) async => mockChannel1);
+      when(
+        () => mockChannel2.subscribe(),
+      ).thenAnswer((_) async => mockChannel2);
+
       final channel1 = mockSupabase.realtime.channel('game:room1');
       final channel2 = mockSupabase.realtime.channel('game:room2');
-      
-      await Future.wait([
-        channel1.subscribe(),
-        channel2.subscribe(),
-      ]);
-      
+
+      await Future.wait([channel1.subscribe(), channel2.subscribe()]);
+
       verify(() => mockRealtime.channel('game:room1', any())).called(1);
       verify(() => mockRealtime.channel('game:room2', any())).called(1);
     });
 
     test('should verify heartbeat mechanism for connection health', () async {
       final heartbeatController = StreamController<String>.broadcast();
-      
+
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async => mockChannel);
-      
+      when(() => mockChannel.subscribe()).thenAnswer((_) async {
+        return ChannelResponse(
+          status: ChannelStatus.subscribed,
+          channel: mockChannel,
+        );
+      });
+
       final channel = mockSupabase.realtime.channel('test-heartbeat');
-      await channel.subscribe();
-      
+      channel.subscribe();
+
       int heartbeatCount = 0;
       heartbeatController.stream.listen((_) {
         heartbeatCount++;
       });
-      
+
       for (int i = 0; i < 3; i++) {
         heartbeatController.add('heartbeat');
         await Future.delayed(const Duration(seconds: 1));
       }
-      
+
       expect(heartbeatCount, equals(3));
     });
   });

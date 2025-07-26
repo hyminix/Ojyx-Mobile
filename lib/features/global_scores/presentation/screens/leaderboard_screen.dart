@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/global_scores/domain/entities/global_score.dart';
-import 'package:ojyx/features/global_scores/presentation/providers/global_score_providers.dart';
+import 'package:ojyx/features/global_scores/presentation/providers/global_score_providers_v2.dart';
 
 class LeaderboardScreen extends ConsumerWidget {
   final void Function(PlayerStats)? onPlayerTap;
@@ -124,9 +124,8 @@ class _PlayerRankCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.primary.withAlpha((0.1 * 255).round()),
+                            color: Theme.of(context).colorScheme.primary
+                                .withAlpha((0.1 * 255).round()),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(

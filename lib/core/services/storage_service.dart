@@ -5,13 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Service for local storage using SharedPreferences
 class StorageService {
   SharedPreferences? _prefs;
-  
+
   /// Default constructor
   StorageService();
-  
+
   /// Create with a pre-initialized SharedPreferences instance (for testing)
   StorageService.createWithPrefs(SharedPreferences prefs) : _prefs = prefs;
-  
+
   /// Initialize the storage service
   Future<void> initialize() async {
     _prefs ??= await SharedPreferences.getInstance();
@@ -21,7 +21,9 @@ class StorageService {
   /// Get SharedPreferences instance
   SharedPreferences get prefs {
     if (_prefs == null) {
-      throw StateError('StorageService not initialized. Call initialize() first.');
+      throw StateError(
+        'StorageService not initialized. Call initialize() first.',
+      );
     }
     return _prefs!;
   }
@@ -30,7 +32,7 @@ class StorageService {
   bool get isInitialized => _prefs != null;
 
   // String operations
-  
+
   /// Get a string value
   String? getString(String key) {
     return prefs.getString(key);
@@ -40,12 +42,12 @@ class StorageService {
   Future<bool> setString(String key, String value) {
     return prefs.setString(key, value);
   }
-  
+
   /// Save a string value (alias for setString)
   Future<bool> saveString(String key, String value) => setString(key, value);
 
   // Integer operations
-  
+
   /// Get an integer value
   int? getInt(String key) {
     return prefs.getInt(key);
@@ -57,7 +59,7 @@ class StorageService {
   }
 
   // Double operations
-  
+
   /// Get a double value
   double? getDouble(String key) {
     return prefs.getDouble(key);
@@ -69,7 +71,7 @@ class StorageService {
   }
 
   // Boolean operations
-  
+
   /// Get a boolean value
   bool? getBool(String key) {
     return prefs.getBool(key);
@@ -81,7 +83,7 @@ class StorageService {
   }
 
   // List operations
-  
+
   /// Get a string list
   List<String>? getStringList(String key) {
     return prefs.getStringList(key);
@@ -91,17 +93,18 @@ class StorageService {
   Future<bool> setStringList(String key, List<String> value) {
     return prefs.setStringList(key, value);
   }
-  
+
   /// Save a string list (alias for setStringList)
-  Future<bool> saveStringList(String key, List<String> value) => setStringList(key, value);
+  Future<bool> saveStringList(String key, List<String> value) =>
+      setStringList(key, value);
 
   // JSON operations
-  
+
   /// Get a JSON object
   Map<String, dynamic>? getJson(String key) {
     final jsonString = getString(key);
     if (jsonString == null) return null;
-    
+
     try {
       return json.decode(jsonString) as Map<String, dynamic>;
     } catch (e) {
@@ -125,7 +128,7 @@ class StorageService {
   List<Map<String, dynamic>>? getJsonList(String key) {
     final jsonString = getString(key);
     if (jsonString == null) return null;
-    
+
     try {
       final list = json.decode(jsonString) as List;
       return list.map((item) => item as Map<String, dynamic>).toList();
@@ -147,7 +150,7 @@ class StorageService {
   }
 
   // Utility operations
-  
+
   /// Check if a key exists
   bool containsKey(String key) {
     return prefs.containsKey(key);
@@ -182,17 +185,17 @@ class StorageKeys {
   static const String userPreferences = 'user_preferences';
   static const String gameSettings = 'game_settings';
   static const String lastSyncTime = 'last_sync_time';
-  
+
   // Game data
   static const String currentGameId = 'current_game_id';
   static const String playerStats = 'player_stats';
   static const String gameHistory = 'game_history';
-  
+
   // App settings
   static const String appTheme = 'app_theme';
   static const String languageCode = 'language_code';
   static const String onboardingCompleted = 'onboarding_completed';
-  
+
   // Cache
   static const String cachedUserData = 'cached_user_data';
   static const String cachedGameData = 'cached_game_data';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/game_player.dart';
-import '../providers/card_selection_provider.dart';
+import '../providers/card_selection_provider_v2.dart';
 
 /// A reusable overlay widget for handling various selection modes
 /// Supports opponent selection, card selection from discard, and more

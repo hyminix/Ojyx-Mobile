@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/global_scores/domain/entities/global_score.dart';
-import 'package:ojyx/features/global_scores/presentation/providers/global_score_providers.dart';
+import 'package:ojyx/features/global_scores/presentation/providers/global_score_providers_v2.dart';
 
 class GameHistoryScreen extends ConsumerWidget {
   final String playerId;

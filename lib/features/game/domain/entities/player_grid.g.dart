@@ -6,9 +6,9 @@ part of 'player_grid.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PlayerGridImpl _$$PlayerGridImplFromJson(Map<String, dynamic> json) =>
-    $checkedCreate(r'_$PlayerGridImpl', json, ($checkedConvert) {
-      final val = _$PlayerGridImpl(
+_PlayerGrid _$PlayerGridFromJson(Map<String, dynamic> json) =>
+    $checkedCreate('_PlayerGrid', json, ($checkedConvert) {
+      final val = _PlayerGrid(
         cards: $checkedConvert(
           'cards',
           (v) => (v as List<dynamic>)
@@ -27,7 +27,7 @@ _$PlayerGridImpl _$$PlayerGridImplFromJson(Map<String, dynamic> json) =>
       return val;
     });
 
-Map<String, dynamic> _$$PlayerGridImplToJson(_$PlayerGridImpl instance) =>
+Map<String, dynamic> _$PlayerGridToJson(_PlayerGrid instance) =>
     <String, dynamic>{
       'cards': instance.cards
           .map((e) => e.map((e) => e?.toJson()).toList())

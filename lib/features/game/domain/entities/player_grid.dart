@@ -5,8 +5,8 @@ import 'card.dart';
 part 'player_grid.freezed.dart';
 part 'player_grid.g.dart';
 
-@freezed
-class PlayerGrid with _$PlayerGrid {
+@Freezed()
+abstract class PlayerGrid with _$PlayerGrid {
   const factory PlayerGrid({required List<List<Card?>> cards}) = _PlayerGrid;
 
   const PlayerGrid._();

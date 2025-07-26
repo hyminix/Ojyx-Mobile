@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/game_animation_provider.dart';
+import '../providers/game_animation_provider_v2.dart';
 import 'direction_change_animation.dart';
 
 class GameAnimationOverlay extends ConsumerWidget {

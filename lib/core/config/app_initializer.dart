@@ -28,7 +28,7 @@ class AppInitializer {
       // Log initialization errors
       debugPrint('App initialization failed: $e');
       debugPrint('Stack trace: $stackTrace');
-      
+
       // Re-throw to prevent app from starting in broken state
       rethrow;
     }
@@ -38,10 +38,10 @@ class AppInitializer {
   static Future<void> _loadEnvironmentVariables() async {
     try {
       await dotenv.load(fileName: '.env');
-      
+
       // Validate required environment variables
       _validateEnvironmentVariables();
-      
+
       debugPrint('Environment variables loaded successfully');
     } catch (e) {
       // In debug mode, allow running without .env file
@@ -57,10 +57,7 @@ class AppInitializer {
 
   /// Validate that all required environment variables are present
   static void _validateEnvironmentVariables() {
-    final requiredVars = [
-      'SUPABASE_URL',
-      'SUPABASE_ANON_KEY',
-    ];
+    final requiredVars = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'];
 
     for (final varName in requiredVars) {
       if (dotenv.env[varName] == null || dotenv.env[varName]!.isEmpty) {
@@ -80,7 +77,7 @@ class AppInitializer {
       // Override dotenv values with dart-define values
       dotenv.env['SUPABASE_URL'] = supabaseUrl;
       dotenv.env['SUPABASE_ANON_KEY'] = supabaseAnonKey;
-      
+
       if (sentryDsn.isNotEmpty) {
         dotenv.env['SENTRY_DSN'] = sentryDsn;
       }
@@ -107,9 +104,7 @@ class AppInitializer {
         logLevel: RealtimeLogLevel.info,
         timeout: Duration(seconds: 30),
       ),
-      storageOptions: const StorageClientOptions(
-        retryAttempts: 3,
-      ),
+      storageOptions: const StorageClientOptions(retryAttempts: 3),
     );
 
     debugPrint('Supabase initialized successfully');
@@ -118,40 +113,38 @@ class AppInitializer {
   /// Initialize Sentry with enhanced performance monitoring
   static Future<void> _initializeSentry() async {
     final sentryDsn = dotenv.env['SENTRY_DSN'];
-    
+
     if (sentryDsn == null || sentryDsn.isEmpty) {
       debugPrint('Sentry DSN not found, skipping Sentry initialization');
       return;
     }
 
-    await SentryFlutter.init(
-      (options) {
-        options.dsn = sentryDsn;
-        
-        // Enhanced configuration for performance monitoring
-        options.tracesSampleRate = _getTracesSampleRate();
-        options.profilesSampleRate = _getProfilesSampleRate();
-        options.enableAutoPerformanceTracing = true;
-        options.enableUserInteractionTracing = true;
-        
-        // Screenshot and view hierarchy for better debugging
-        options.attachScreenshot = _shouldAttachScreenshot();
-        options.attachViewHierarchy = true;
-        
-        // Environment configuration
-        options.environment = _getEnvironment();
-        
-        // Release tracking
-        options.release = _getAppRelease();
-        
-        // Breadcrumb configuration
-        options.maxBreadcrumbs = 100;
-        options.enableAutoNativeBreadcrumbs = true;
-        
-        // Session tracking
-        options.enableAutoSessionTracking = true;
-      },
-    );
+    await SentryFlutter.init((options) {
+      options.dsn = sentryDsn;
+
+      // Enhanced configuration for performance monitoring
+      options.tracesSampleRate = _getTracesSampleRate();
+      options.profilesSampleRate = _getProfilesSampleRate();
+      options.enableAutoPerformanceTracing = true;
+      options.enableUserInteractionTracing = true;
+
+      // Screenshot and view hierarchy for better debugging
+      options.attachScreenshot = _shouldAttachScreenshot();
+      options.attachViewHierarchy = true;
+
+      // Environment configuration
+      options.environment = _getEnvironment();
+
+      // Release tracking
+      options.release = _getAppRelease();
+
+      // Breadcrumb configuration
+      options.maxBreadcrumbs = 100;
+      options.enableAutoNativeBreadcrumbs = true;
+
+      // Session tracking
+      options.enableAutoSessionTracking = true;
+    });
 
     debugPrint('Sentry initialized successfully');
   }
@@ -159,7 +152,7 @@ class AppInitializer {
   /// Get traces sample rate based on environment
   static double _getTracesSampleRate() {
     final environment = _getEnvironment();
-    
+
     switch (environment) {
       case 'production':
         return 0.1; // 10% in production
@@ -173,7 +166,7 @@ class AppInitializer {
   /// Get profiles sample rate based on environment
   static double _getProfilesSampleRate() {
     final environment = _getEnvironment();
-    
+
     switch (environment) {
       case 'production':
         return 0.1; // 10% in production
