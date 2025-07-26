@@ -1,222 +1,92 @@
-# **PRD Ojyx : Mise à Niveau Technique et Compilation (TDD-Driven)**
+# **PRD Ojyx : Audit Technique et Modernisation Stratégique**
 
 ## **Overview**
 
-Ce document définit les prochaines étapes techniques pour le projet Ojyx. L'objectif principal est de moderniser la base de code en **mettant à jour toutes les dépendances obsolètes** et de **garantir que l'application compile avec succès pour Android**. La réalisation de ces deux objectifs est un prérequis indispensable avant de reprendre le développement.
+Ce document fait suite au PRD de "Mise à Niveau Technique" et définit la prochaine phase de travail sur le projet Ojyx. Les objectifs sont triples :
 
-**L'ensemble du processus de développement suivra rigoureusement la méthodologie TDD (Test-Driven Development), détaillée en annexe, pour garantir la stabilité, la non-régression et la qualité du code.**
+1. **Analyser et forcer la mise à jour majeure** des dépendances pour résoudre le retard de version identifié.  
+2. **Créer un script de compilation autonome** pour l'environnement WSL, permettant une validation automatisée (notamment par une IA).  
+3. **Réaliser un audit complet de la suite de tests** pour garantir sa pertinence, sa conformité et son efficacité.
+
+L'ensemble de ce processus reste rigoureusement piloté par la méthodologie **TDD (Test-Driven Development)**, détaillée en annexe, qui est notre garde-fou contre les régressions.
 
 ## **Core Tasks (Objectifs Principaux)**
 
-Ce PRD se concentre sur deux tâches fondamentales, considérées ici comme les "features" à développer.
+### **1\. Analyse, Mise à Jour Majeure et Adaptation du Code**
 
-### **1\. Mise à Niveau des Dépendances**
-
-* **Objectif** : Mettre à jour toutes les dépendances du projet (pubspec.yaml) vers leurs dernières versions stables.  
-* **Importance** : Crucial pour la **sécurité**, la **performance** et la **compatibilité** future. Permet de bénéficier des dernières améliorations des librairies et de réduire la dette technique.  
+* **Problématique** : La commande flutter pub get ou upgrade ne met pas à jour vers les dernières versions majeures (ex: freezed 2.5.8 vers 3.2.0). Ceci est dû au versionnement sémantique (^), qui empêche les "breaking changes" automatiques.  
+* **Objectif** : Forcer la mise à jour de **toutes les dépendances nécessaires** vers leurs dernières versions majeures disponibles. Cela implique de comprendre les changements introduits et d'**adapter l'intégralité du code de l'application** pour assurer une compatibilité totale.  
+* **Importance** : Résorber la dette technique, bénéficier des dernières optimisations et fonctionnalités, et assurer la pérennité de la stack technique.  
 * **Implémentation** :  
-  1. Analyser les dépendances actuelles et leurs versions cibles.  
-  2. Étudier les documentations pour identifier les "breaking changes".  
-  3. Mettre à jour les dépendances de manière incrémentale.  
-  4. Adapter le code existant en suivant un cycle TDD strict pour assurer la compatibilité.  
-  5. Valider chaque mise à jour avec la suite de tests existante.
+  1. **Analyse et Documentation** : Pour chaque dépendance majeure à mettre à jour, consulter sa documentation officielle (en utilisant les ressources disponibles comme "MCP context7") pour identifier précisément tous les "breaking changes" et les nouvelles API.  
+  2. **Mise à Jour Forcée** : Utiliser la commande flutter pub upgrade \--major-versions pour passer aux dernières versions.  
+  3. **Adaptation Complète du Code (TDD)** :  
+     * Lancer la suite de tests (flutter test) pour identifier toutes les erreurs de compilation et les tests échouants.  
+     * Modifier le code de l'application (pas seulement les tests) pour le rendre compatible avec les nouvelles versions, en se basant sur la documentation analysée.  
+     * Corriger chaque problème en suivant rigoureusement le cycle **Red-Green-Refactor**.
 
-### **2\. Compilation Android Fonctionnelle**
+### **2\. Script de Compilation Autonome pour WSL**
 
-* **Objectif** : Résoudre tous les problèmes de build pour générer un APK ou un App Bundle Android sans erreur.  
-* **Importance** : C'est le livrable technique le plus élémentaire. Sans une build fonctionnelle, aucun test sur appareil réel, déploiement ou publication n'est possible.  
+* **Objectif** : Créer un script shell (.sh) unique et robuste qui compile l'application pour Android au sein d'un environnement WSL (Windows Subsystem for Linux). Ce script doit être exécutable sans intervention manuelle.  
+* **Importance** : Permettre à n'importe quel développeur (ou à une IA) de valider la compilation de manière fiable et reproductible. C'est une étape clé vers l'automatisation complète et le CI/CD.  
 * **Implémentation** :  
-  1. Lancer le processus de build Android et analyser les erreurs.  
-  2. Écrire des tests (si applicable, pour des scripts de build custom) ou résoudre directement les erreurs de configuration Gradle et de SDK.  
-  3. S'assurer de la compatibilité de la configuration avec la dernière version de Flutter et des dépendances mises à jour.
+  1. **Définition** : Lister les prérequis (version de Flutter, SDK Android, etc.) et les variables d'environnement nécessaires.  
+  2. **Scripting** : Écrire un script qui exécute séquentiellement :  
+     * flutter clean  
+     * flutter pub get  
+     * flutter build apk \--debug (ou appbundle)  
+  3. **Robustesse** : Ajouter une gestion d'erreurs (le script doit s'arrêter et retourner un code d'erreur si une étape échoue) et des logs clairs.  
+  4. **Validation** : Tester le script dans un environnement WSL propre pour confirmer son autonomie.
 
-## **Technical Architecture**
+### **3\. Audit et Refonte de la Suite de Tests**
 
-### **Stack Actuelle**
-
-* **Framework** : Flutter 3.x, Riverpod 2.x, Freezed, go\_router  
-* **Backend** : Supabase (PostgreSQL, Realtime, Edge Functions)  
-* **CI/CD** : GitHub Actions
-
-### **Considérations pour la Mise à Niveau**
-
-* La mise à jour de Flutter peut nécessiter des ajustements dans la configuration Android (Gradle, build.gradle, AndroidManifest.xml).  
-* La mise à jour de Riverpod et go\_router entraînera très probablement des refactorings. **Chaque refactoring sera piloté par des tests** pour garantir que le comportement observable reste identique.  
-* Il faudra s'assurer que la librairie cliente Supabase est compatible avec les autres dépendances mises à jour.
+* **Problématique** : La suite de tests existante, bien que fournie, peut contenir des tests obsolètes, non conformes aux nouvelles TDD\_guidelines, ou redondants.  
+* **Objectif** : Purger, mettre à jour et optimiser l'ensemble de la suite de tests pour qu'elle soit fiable, pertinente et qu'elle passe à 100%.  
+* **Importance** : Une suite de tests saine est le fondement de la qualité et de la vélocité du développement. Elle doit inspirer confiance et non être une source de friction.  
+* **Implémentation** :  
+  1. **Purge** : Parcourir tous les tests et supprimer ceux qui sont inutiles (testent des détails d'implémentation, sont triviaux, ou dupliqués).  
+  2. **Mise en Conformité** : Réviser chaque test restant et s'assurer qu'il respecte le **Guide des Bonnes Pratiques TDD (Annexe B)** : nomenclature, structure AAA, usage des builders, etc.  
+  3. **Mise à Jour** : Adapter les tests aux nouvelles versions des dépendances (suite à la Tâche 1).  
+  4. **Validation** : Exécuter la suite de tests complète et corriger toutes les erreurs jusqu'à atteindre l'objectif **"0 erreur"**.
 
 ## **Development Roadmap**
 
-### **Phase 1: Mise à Niveau des Dépendances (TDD-Driven)**
+### **Phase 1: Mise à Jour Majeure & Stabilisation Initiale**
 
-* **1.1 Audit & Analyse d'Impact**  
-  * Lister toutes les dépendances et leurs versions actuelles et cibles.  
-  * Lire les "changelogs" des dépendances majeures pour anticiper les modifications de code requises et les tests à adapter.  
-* **1.2 Mise à Jour Incrémentale**  
-  * Mettre à jour les dépendances par petits groupes logiques.  
-  * Après chaque mise à jour, lancer la suite de tests pour voir ce qui échoue (Étape **Red** du cycle TDD).  
-* **1.3 Adaptation du Code (Cycle Red-Green-Refactor)**  
-  * **Application stricte du TDD** : Pour chaque adaptation nécessaire, le cycle Red-Green-Refactor sera appliqué.  
-    * **Red** : Confirmer que les tests existants échouent comme prévu.  
-    * **Green** : Écrire le code le plus simple pour que les tests passent.  
-    * **Refactor** : Améliorer le code tout en s'assurant que les tests continuent de passer.  
-  * Si le comportement d'une dépendance a changé, de **nouveaux tests seront écrits AVANT d'adapter le code** pour définir le nouveau comportement attendu.  
-  * Se référer systématiquement au **Guide des Bonnes Pratiques TDD en Annexe B**.
+* **1.1** : Forcer la mise à jour majeure des dépendances.  
+* **1.2** : Corriger les erreurs de compilation critiques pour que le projet soit analysable.  
+* **1.3** : Lancer la suite de tests et obtenir une première lecture des régressions (Étape **Red** à grande échelle).
 
-### **Phase 2: Compilation Android**
+### **Phase 2: Audit et Réparation des Tests (TDD-Driven)**
 
-* **2.1 Configuration de l'Environnement de Build**  
-  * Vérifier que les versions du JDK et du SDK Android sont compatibles avec la nouvelle version de Flutter.  
-  * Nettoyer le projet avec flutter clean.  
-* **2.2 Résolution des Erreurs de Build**  
-  * Lancer la commande flutter build apk \--debug.  
-  * Analyser et corriger méthodiquement chaque erreur rapportée par Gradle.  
-* **2.3 Validation**  
-  * Obtenir une build Android qui s'exécute avec succès.  
-  * Installer et lancer l'APK sur un émulateur ou un appareil physique pour confirmer son fonctionnement.
+* **2.1** : Commencer l'audit : purger et marquer les tests à refactoriser.  
+* **2.2** : Appliquer le cycle **Red-Green-Refactor** sur les tests échouants, en les mettant en conformité avec les guidelines au fur et à mesure.  
+* **2.3** : S'assurer que la couverture de test reste pertinente et que la suite de tests passe à 100%.
+
+### **Phase 3: Automatisation de la Compilation**
+
+* **3.1** : Développer et tester le script de compilation autonome pour WSL.  
+* **3.2** : Intégrer potentiellement ce script dans la CI (GitHub Actions) pour valider la compilation sur un runner Linux.
 
 ## **Logical Dependency Chain**
 
-1. **Mise à Niveau des Dépendances (Phase 1\)** : Une base de code stable et testée est nécessaire avant de tenter de la compiler.  
-2. **Compilation Android (Phase 2\)** : Le succès de la compilation dépend directement de la résolution des conflits de la phase 1\.
-
-L'objectif est de terminer la Phase 1 avant d'entamer la Phase 2\.
+1. **Mise à Jour Majeure (Phase 1\)** : C'est le prérequis absolu. Il est inutile d'auditer des tests basés sur des dépendances obsolètes.  
+2. **Audit des Tests (Phase 2\)** : Dépend directement de la Phase 1, car la mise à jour va casser de nombreux tests qui devront être audités et corrigés.  
+3. **Script de Compilation (Phase 3\)** : Doit être fait en dernier. Le script n'a de valeur que s'il compile un projet stable avec une suite de tests fiable.
 
 ## **Risks and Mitigations**
 
-* **Risque** : "Dependency Hell" – des conflits de versions insolubles entre les paquets.  
-  * **Mitigation** : Utiliser des contraintes de version flexibles (^) et analyser l'arbre de dépendances avec dart pub deps. Procéder par mises à jour atomiques pour isoler les problèmes.  
-* **Risque** : La mise à jour d'une dépendance majeure casse une grande partie de l'application.  
-  * **Mitigation** : Dédier une branche Git spécifique. **S'appuyer sur le cycle TDD et la suite de tests existante pour valider chaque micro-changement**, garantissant la non-régression de manière systématique, comme défini dans le guide en annexe.  
-* **Risque** : Les erreurs de build Android sont natives et difficiles à déboguer.  
-  * **Mitigation** : Consulter la documentation officielle de Flutter. Isoler le problème en créant un projet Flutter vierge avec les mêmes dépendances pour voir s'il persiste.
+* **Risque** : La montée de version majeure introduit des changements si profonds qu'elle rend la base de code quasi irrécupérable.  
+  * **Mitigation** : Procéder sur une branche dédiée. S'appuyer sur des commits atomiques pour chaque correction. Si une dépendance est trop problématique, envisager de la maintenir à une version inférieure temporairement.  
+* **Risque** : L'audit des tests devient un "tunnel" sans fin et subjectif.  
+  * **Mitigation** : Se baser strictement sur les **TDD Guidelines** comme critère objectif. Timeboxer l'effort de purge et se concentrer sur la correction des tests existants avant d'en créer de nouveaux.  
+* **Risque** : L'environnement WSL local diffère de celui de la CI ou d'autres développeurs, rendant le script peu fiable.  
+  * **Mitigation** : Documenter précisément les prérequis du script (ex: flutter version, java version). Utiliser des chemins relatifs ou des variables d'environnement pour éviter les chemins absolus.
 
 ## **Annexes**
 
+*(Les annexes A et B du précédent PRD restent valides et sont applicables ici)*
+
 ### **Annexe A : Commandes et Règles Générales**
 
-#### **Règles de Développement**
-
-* **TDD Obligatoire** : Tout nouveau code ou adaptation doit commencer par un test qui échoue.  
-* **Commits Atomiques** : Commiter chaque mise à jour ou correction de manière isolée.  
-* **CI/CD** : S'assurer que la CI passe après chaque phase de refactoring.
-
-#### **Commandes Essentielles**
-
-\# Vérifier les dépendances obsolètes  
-flutter pub outdated
-
-\# Mettre à jour les dépendances  
-flutter pub upgrade
-
-\# Lancer la suite de tests  
-flutter test
-
-\# Compiler pour Android  
-flutter build apk \--debug
-
 ### **Annexe B : Guide des Bonnes Pratiques TDD \- Projet Ojyx**
-
-#### **Les 5 Principes Fondamentaux du TDD**
-
-##### **1\. 🎯 Tester le Comportement, pas l'Implémentation**
-
-**✅ Bon :** Tester ce qui est observable
-
-test('should enable strategic card exchange for competitive advantage', () {  
-  // Test behavior: card exchange creates new strategic opportunities  
-  final result \= useCase.exchangeCards(position1, position2);  
-  expect(result.strategicValue, greaterThan(previousValue));  
-});
-
-##### **2\. 🔄 Éliminer la Redondance**
-
-**✅ Bon :** Tests paramétrés avec scénarios significatifs
-
-test('should scale competitive dynamics across different player counts', () {  
-  final scenarios \= \[  
-    (players: 2, dynamics: 'intense duel', complexity: 'low'),  
-    (players: 4, dynamics: 'strategic alliances', complexity: 'medium'),  
-    (players: 8, dynamics: 'chaotic competition', complexity: 'high'),  
-  \];  
-   
-  for (final scenario in scenarios) {  
-    // Test the behavioral differences at each scale  
-  }  
-});
-
-##### **3\. 🛡️ Isoler le Code avec des Mocks**
-
-**✅ Bon :** Mocks qui simulent des comportements externes
-
-when(() \=\> mockNetworkService.isConnected).thenReturn(false);  
-// Test how the system behaves when network is unavailable
-
-##### **4\. 📏 Assurer une Bonne Granularité**
-
-**✅ Bon :** Tests qui vérifient des comportements métier
-
-test('should prevent card selection during opponent turn for fair play', () {  
-  final gameState \= TestGameStateBuilder()  
-    .withCurrentPlayer('opponent-id')  
-    .build();  
-      
-  final canSelect \= selectionPolicy.canSelectCard(gameState, 'my-id');  
-  expect(canSelect, isFalse, reason: 'Turn-based fairness must be enforced');  
-});
-
-##### **5\. 📖 Favoriser la Lisibilité et la Clarté**
-
-**✅ Bon :** Noms expressifs et données métier
-
-test('should trigger strategic reshuffle when deck exhausted mid-game', () {  
-  // Given: A competitive game nearing deck exhaustion  
-  final gameState \= TestGameStateBuilder()  
-    .inLastRound()  
-    .withPartialDeck(2)  
-    .build();  
-      
-  // When: Player attempts to draw with insufficient cards  
-  final result \= drawCardUseCase(gameState);  
-   
-  // Then: System maintains game continuity through reshuffle  
-  expect(result.deck, hasLength(greaterThan(2)));  
-  expect(result.continuityMaintained, isTrue);  
-});
-
-#### **Format Standard des Tests**
-
-* **Nomenclature** : 'should \[expected behavior\] when \[condition/context\]'  
-* **Structure AAA (Arrange-Act-Assert)**
-
-#### **Utilisation des Test Builders**
-
-final player \= TestGamePlayerBuilder()  
-  .withId('strategic-player')  
-  .withRevealedGrid(revealedCount: 6\)  
-  .withActionCards(\[  
-    TestActionCardBuilder().asTeleport().build(),  
-    TestActionCardBuilder().asSwap().build(),  
-  \])  
-  .asHost()  
-  .build();
-
-#### **Custom Matchers Métier**
-
-expect(gameState, isPlaying);  
-expect(gameState, hasPlayerCount(4));  
-expect(player.grid, hasAllCardsRevealed);
-
-#### **Anti-patterns à Éviter**
-
-1. ❌ **Ne JAMAIS commenter des tests** \-\> Corriger ou supprimer.  
-2. ❌ **Éviter les tests qui testent le framework** \-\> Tester votre logique, pas celle de Flutter.  
-3. ❌ **Ne pas mocker les entités métier** \-\> Utiliser les builders pour créer de vraies entités.
-
-#### **Checklist Pré-Commit**
-
-* \[ \] Tous les tests suivent la nomenclature standard.  
-* \[ \] Utilisation des test builders pour réduire la duplication.  
-* \[ \] Custom matchers pour les assertions métier.  
-* \[ \] Aucun test commenté.  
-* \[ \] Coverage minimum de 80% sur le nouveau code / code adapté.  
-* \[ \] Les tests racontent une histoire claire sur le comportement attendu.

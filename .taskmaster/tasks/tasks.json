@@ -408,11 +408,1035 @@
             "testStrategy": "Exécuter une suite de tests complète incluant : tests unitaires, tests d'intégration, tests E2E sur le parcours utilisateur principal (création/jointure de partie, gameplay), tests de performance avec métriques de référence. Valider que la documentation est à jour en suivant les procédures documentées sur un environnement propre."
           }
         ]
+      },
+      {
+        "id": 7,
+        "title": "Analyser et documenter les changements majeurs des dépendances critiques",
+        "description": "Effectuer une analyse exhaustive des breaking changes pour les dépendances principales (freezed, riverpod, go_router, supabase) en utilisant MCP context7 et documenter les migrations nécessaires",
+        "details": "1. Utiliser MCP context7 pour récupérer la documentation officielle de:\n   - freezed 2.5.7 → 3.2.0+ (migration vers Dart 3 macros)\n   - riverpod 2.6.1 → 3.0.0+ (nouvelle API AsyncNotifier)\n   - go_router 14.6.2 → 15.0.0+ (changements de navigation)\n   - supabase_flutter 2.8.0 → 3.0.0+ (nouvelle architecture)\n2. Créer un fichier MIGRATION_GUIDE.md structuré par dépendance\n3. Identifier les patterns de code impactés dans le projet:\n   - Annotations @freezed et @unfreezed\n   - Providers Riverpod (StateNotifier → Notifier)\n   - Routes et guards go_router\n   - Appels Supabase (auth, realtime, storage)\n4. Prioriser les changements par ordre d'impact",
+        "testStrategy": "Créer des tests de migration pour valider chaque changement documenté. Utiliser des exemples concrets du codebase pour illustrer les transformations nécessaires. Vérifier que le guide couvre 100% des usages actuels des dépendances.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Collecter et analyser la documentation des breaking changes de Freezed",
+            "description": "Utiliser MCP context7 pour récupérer la documentation officielle de Freezed et analyser les changements majeurs entre la version 2.5.7 et 3.2.0+, particulièrement la migration vers les macros Dart 3",
+            "dependencies": [],
+            "details": "1. Utiliser context7 pour obtenir la documentation de migration Freezed 3.x\n2. Identifier les changements d'annotations (@freezed, @unfreezed, @Default, @JsonKey)\n3. Documenter les nouvelles syntaxes pour les unions types et sealed classes\n4. Analyser l'impact de la migration vers les macros Dart 3\n5. Créer une section dédiée dans MIGRATION_GUIDE.md avec exemples avant/après",
+            "status": "done",
+            "testStrategy": "Créer des tests unitaires comparant l'ancien et le nouveau comportement des modèles Freezed. Vérifier que les exemples de migration fonctionnent correctement avec build_runner."
+          },
+          {
+            "id": 2,
+            "title": "Documenter la migration Riverpod vers la nouvelle API AsyncNotifier",
+            "description": "Analyser les breaking changes de Riverpod 2.6.1 vers 3.0.0+ en se concentrant sur la migration StateNotifier vers AsyncNotifier et les nouvelles syntaxes de providers",
+            "dependencies": [],
+            "details": "1. Récupérer via context7 le guide de migration Riverpod 3.0\n2. Mapper tous les types de providers actuels vers leurs équivalents v3\n3. Documenter la migration StateNotifier → AsyncNotifier avec exemples concrets\n4. Identifier les changements dans ConsumerWidget et hooks_riverpod\n5. Créer des patterns de migration pour les providers complexes (FutureProvider, StreamProvider)",
+            "status": "done",
+            "testStrategy": "Écrire des tests parallèles montrant le même comportement avec l'ancienne et la nouvelle syntaxe. Créer des tests de régression pour chaque type de provider utilisé dans le projet."
+          },
+          {
+            "id": 3,
+            "title": "Analyser les changements de navigation dans go_router 15.0.0+",
+            "description": "Étudier les breaking changes de go_router depuis la version 14.6.2 vers 15.0.0+ et documenter les impacts sur la navigation, les guards et le deep linking",
+            "dependencies": [],
+            "details": "1. Utiliser context7 pour obtenir le changelog détaillé de go_router 15.x\n2. Identifier les changements dans GoRoute, GoRouter et ShellRoute\n3. Documenter les nouvelles syntaxes pour les redirections et guards\n4. Analyser l'impact sur les routes imbriquées et paramètres\n5. Créer des exemples de migration pour les patterns de navigation du projet",
+            "status": "done",
+            "testStrategy": "Développer des tests d'intégration vérifiant que toutes les routes existantes fonctionnent après migration. Tester spécifiquement les guards, redirections et deep links."
+          },
+          {
+            "id": 4,
+            "title": "Documenter la nouvelle architecture Supabase 3.0.0+",
+            "description": "Analyser les changements architecturaux de supabase_flutter 2.8.0 vers 3.0.0+ en couvrant auth, realtime, storage et les queries",
+            "dependencies": [],
+            "details": "1. Récupérer la documentation de migration Supabase 3.x via context7\n2. Documenter les changements dans l'API d'authentification (notamment auth anonyme)\n3. Analyser les modifications du système Realtime et des channels\n4. Identifier les changements dans Storage et les policies\n5. Créer des exemples de migration pour chaque type d'opération Supabase utilisée",
+            "status": "done",
+            "testStrategy": "Créer des mocks Supabase pour tester les anciennes et nouvelles syntaxes. Écrire des tests d'intégration pour auth, realtime et storage avec les nouvelles APIs."
+          },
+          {
+            "id": 5,
+            "title": "Identifier et prioriser les patterns de code impactés dans le projet Ojyx",
+            "description": "Scanner le codebase pour identifier tous les usages des APIs obsolètes et créer une roadmap de migration priorisée par impact et risque",
+            "dependencies": [
+              "7.1",
+              "7.2",
+              "7.3",
+              "7.4"
+            ],
+            "details": "1. Utiliser grep/ast pour scanner tous les fichiers .dart du projet\n2. Créer un inventaire des usages par dépendance:\n   - Compter les @freezed/@unfreezed annotations\n   - Lister tous les StateNotifierProvider\n   - Identifier toutes les routes go_router\n   - Mapper les appels Supabase\n3. Calculer l'effort de migration par composant\n4. Créer une matrice impact/effort\n5. Finaliser MIGRATION_GUIDE.md avec ordre de priorité recommandé",
+            "status": "done",
+            "testStrategy": "Vérifier que l'inventaire couvre 100% des fichiers du projet. Créer des scripts de validation automatique pour détecter les patterns obsolètes après migration."
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Forcer la mise à jour majeure des dépendances avec flutter pub upgrade",
+        "description": "Exécuter flutter pub upgrade --major-versions pour passer aux dernières versions majeures de toutes les dépendances et capturer les erreurs initiales",
+        "details": "1. Créer une branche feature/major-dependencies-upgrade\n2. Sauvegarder pubspec.yaml et pubspec.lock actuels\n3. Exécuter: flutter pub upgrade --major-versions\n4. Capturer la sortie complète dans upgrade_log.txt\n5. Documenter les nouvelles versions dans un tableau comparatif:\n   - Version actuelle → Version cible\n   - Changelog principal\n   - Niveau de breaking change (Low/Medium/High)\n6. Commiter les changements avec message descriptif\n7. Tenter flutter pub get pour identifier les incompatibilités",
+        "testStrategy": "Vérifier que pubspec.lock contient bien les versions majeures les plus récentes. S'assurer qu'aucune dépendance n'est restée en version mineure. Tester que flutter pub get s'exécute sans erreur de résolution de dépendances.",
+        "priority": "high",
+        "dependencies": [
+          7
+        ],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer la branche et sauvegarder l'état actuel des dépendances",
+            "description": "Créer une nouvelle branche feature/major-dependencies-upgrade et sauvegarder les fichiers pubspec.yaml et pubspec.lock actuels pour permettre un rollback si nécessaire",
+            "dependencies": [],
+            "details": "1. Vérifier que la branche main est à jour avec git pull\n2. Créer et basculer sur la branche: git checkout -b feature/major-dependencies-upgrade\n3. Créer un dossier de sauvegarde: mkdir -p .taskmaster/backups/dependencies\n4. Copier les fichiers actuels: cp pubspec.yaml .taskmaster/backups/dependencies/pubspec.yaml.backup && cp pubspec.lock .taskmaster/backups/dependencies/pubspec.lock.backup\n5. Créer un snapshot Git avec: git add . && git commit -m \"chore: backup current dependencies before major upgrade\"\n6. Documenter la date et l'heure de la sauvegarde dans .taskmaster/backups/dependencies/backup_info.txt",
+            "status": "done",
+            "testStrategy": "Vérifier que les fichiers de sauvegarde existent et sont identiques aux originaux avec diff. S'assurer que la branche est correctement créée et que le commit de sauvegarde est présent dans l'historique Git."
+          },
+          {
+            "id": 2,
+            "title": "Exécuter flutter pub upgrade --major-versions et capturer la sortie",
+            "description": "Lancer la commande de mise à jour majeure des dépendances et capturer toute la sortie dans un fichier de log pour analyse ultérieure",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "1. Créer le fichier de log: touch upgrade_log.txt\n2. Exécuter la commande avec capture complète: flutter pub upgrade --major-versions 2>&1 | tee upgrade_log.txt\n3. Capturer également la sortie dans un format timestampé: echo \"=== Flutter Major Upgrade - $(date) ===\" > upgrade_detailed.log && flutter pub upgrade --major-versions --verbose >> upgrade_detailed.log 2>&1\n4. Sauvegarder l'état du terminal avant/après pour debug: script -c \"flutter pub upgrade --major-versions\" upgrade_terminal.log\n5. Extraire les warnings et erreurs spécifiquement: grep -E \"Warning|Error|FAILED\" upgrade_log.txt > upgrade_issues.txt\n6. Générer un diff initial: diff pubspec.lock .taskmaster/backups/dependencies/pubspec.lock.backup > initial_changes.diff\n<info added on 2025-07-26T09:15:51.272Z>\n✅ Mise à jour majeure complétée avec succès\n\nRésultats de l'exécution:\n- 4 changements de contraintes majeures appliqués:\n  • freezed_annotation: ^2.4.4 → ^3.1.0\n  • go_router: ^14.6.2 → ^16.0.0\n  • sentry_flutter: ^8.10.1 → ^9.5.0\n  • freezed: ^2.5.7 → ^3.1.0\n\n- 10 dépendances mises à jour au total (incluant les transitives)\n- Freezed 3.1.0: Support des macros Dart 3 (breaking changes attendus dans la génération de code)\n- go_router 16.0.0: Changements API StatefulShellRoute nécessitant adaptation\n- Sentry 9.5.0: Nouvelle API de tracking d'erreurs à implémenter\n\nFichiers de logs générés:\n- upgrade_log.txt: Sortie complète de la commande\n- upgrade_detailed.log: Version verbose avec timestamps\n- upgrade_terminal.log: Capture complète du terminal\n- upgrade_issues.txt: Extraction des warnings/erreurs (vide = pas d'erreurs critiques)\n- initial_changes.diff: Comparaison des changements dans pubspec.lock\n\nNote: 23 packages ont encore des contraintes incompatibles empêchant leur mise à jour vers les dernières versions majeures (nécessiteront une résolution manuelle ou attente de compatibilité upstream)\n\nÉtat: Prêt pour l'analyse détaillée des changements de versions (subtask 8.3)\n</info added on 2025-07-26T09:15:51.272Z>",
+            "status": "done",
+            "testStrategy": "Vérifier que upgrade_log.txt contient la sortie complète de la commande. S'assurer que les fichiers de log sont non-vides et contiennent les timestamps. Valider que pubspec.lock a été modifié par rapport à la sauvegarde."
+          },
+          {
+            "id": 3,
+            "title": "Analyser et documenter les changements de versions dans un tableau comparatif",
+            "description": "Créer un tableau détaillé comparant les versions actuelles et cibles de chaque dépendance avec analyse des breaking changes",
+            "dependencies": [
+              "8.2"
+            ],
+            "details": "1. Créer le fichier de documentation: touch .taskmaster/docs/dependencies_upgrade_report.md\n2. Extraire les versions avant/après depuis les fichiers pubspec.lock\n3. Pour chaque dépendance modifiée:\n   - Noter la version actuelle et la version cible\n   - Identifier le niveau de changement (patch/minor/major)\n   - Rechercher le changelog sur pub.dev\n   - Classifier le niveau de breaking change: Low (patch), Medium (minor), High (major)\n4. Formater en tableau Markdown:\n   | Package | Version Actuelle | Version Cible | Type | Breaking Change | Notes |\n   |---------|-----------------|---------------|------|----------------|-------|\n5. Prioriser les dépendances critiques: flutter_riverpod, go_router, freezed, supabase_flutter\n6. Ajouter une section \"Risques Identifiés\" listant les incompatibilités potentielles\n7. Inclure les liens vers les guides de migration officiels\n<info added on 2025-07-26T09:17:24.093Z>\n✅ Analyse complète terminée et rapport détaillé créé\n\nIMPACT SUR LE PROJET:\n- 10 dépendances critiques mises à jour dont 4 avec breaking changes majeurs\n- 26 fichiers affectés nécessitant des modifications (principalement modèles Freezed)\n- Estimation totale: 3.5-4.5 jours de migration avec tests inclus\n- Freezed identifié comme point critique avec impact sur toute la base de code\n\nPROCHAINES ÉTAPES RECOMMANDÉES:\n1. Commit immédiat des changements pour snapshot de référence\n2. Créer branche dédiée pour chaque migration majeure (freezed-migration, router-migration, etc.)\n3. Commencer par Freezed (bloquant pour le reste)\n4. Tests de régression après chaque étape\n\nFICHIERS LIVRÉS:\n- .taskmaster/docs/dependencies_upgrade_report.md (rapport complet avec tableaux et analyses)\n- upgrade_log.txt (log brut de flutter pub upgrade)\n- pubspec.yaml et pubspec.lock mis à jour\n</info added on 2025-07-26T09:17:24.093Z>",
+            "status": "done",
+            "testStrategy": "Vérifier que le fichier dependencies_upgrade_report.md existe et contient un tableau valide. S'assurer que toutes les dépendances modifiées sont documentées. Valider que les classifications de breaking changes sont cohérentes avec les changements de version."
+          },
+          {
+            "id": 4,
+            "title": "Commiter les changements et tenter la résolution des dépendances",
+            "description": "Créer un commit descriptif avec les modifications et exécuter flutter pub get pour identifier les incompatibilités de résolution",
+            "dependencies": [
+              "8.3"
+            ],
+            "details": "1. Ajouter tous les fichiers modifiés: git add pubspec.yaml pubspec.lock\n2. Ajouter la documentation: git add .taskmaster/docs/dependencies_upgrade_report.md upgrade_log.txt\n3. Créer un commit détaillé: git commit -m \"feat: upgrade to major versions of all dependencies\" -m \"- Executed flutter pub upgrade --major-versions\" -m \"- Documented all version changes in upgrade report\" -m \"- See upgrade_log.txt for full output\"\n4. Tenter la résolution: flutter pub get 2>&1 | tee dependency_resolution.log\n5. Si échec, capturer les erreurs spécifiques: flutter pub get --verbose 2>&1 | grep -A 5 -B 5 \"error\\|conflict\" > resolution_errors.txt\n6. Analyser les conflits de versions avec: flutter pub deps --style=tree > dependency_tree.txt\n7. Documenter les incompatibilités dans .taskmaster/docs/incompatibilities.md",
+            "status": "in-progress",
+            "testStrategy": "Vérifier que le commit contient tous les fichiers attendus avec git show. S'assurer que dependency_resolution.log capture la sortie complète. Si flutter pub get échoue, vérifier que resolution_errors.txt documente les conflits spécifiques."
+          },
+          {
+            "id": 5,
+            "title": "Analyser les incompatibilités et préparer la stratégie de résolution",
+            "description": "Examiner toutes les erreurs de résolution de dépendances et établir un plan d'action pour résoudre chaque incompatibilité identifiée",
+            "dependencies": [
+              "8.4"
+            ],
+            "details": "1. Analyser dependency_resolution.log pour identifier tous les conflits\n2. Pour chaque incompatibilité:\n   - Identifier les packages en conflit\n   - Noter les contraintes de version conflictuelles\n   - Rechercher les issues GitHub correspondantes\n3. Créer .taskmaster/docs/resolution_strategy.md avec:\n   - Liste priorisée des conflits à résoudre\n   - Options de résolution pour chaque conflit (downgrade, override, fork)\n   - Estimation de l'effort pour chaque résolution\n4. Identifier les dépendances qui peuvent nécessiter:\n   - Des dependency_overrides temporaires\n   - Un downgrade vers une version intermédiaire\n   - Une mise à jour du code pour s'adapter aux breaking changes\n5. Préparer les commandes de résolution: echo \"flutter pub add package:^version\" pour chaque ajustement\n6. Créer un plan de test post-résolution pour valider la stabilité",
+            "status": "pending",
+            "testStrategy": "Vérifier que resolution_strategy.md contient une stratégie pour chaque incompatibilité identifiée. S'assurer que le plan d'action est réalisable et priorisé. Valider que les commandes de résolution proposées sont syntaxiquement correctes."
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Adapter les modèles Freezed aux nouvelles annotations et syntaxe",
+        "description": "Migrer tous les modèles utilisant Freezed vers la nouvelle syntaxe et résoudre les erreurs de génération de code",
+        "details": "1. Identifier tous les fichiers .freezed.dart et .g.dart\n2. Pour chaque modèle Freezed:\n   - Remplacer @freezed par @Freezed() si nécessaire\n   - Migrer factory constructors vers la nouvelle syntaxe\n   - Adapter copyWith pour les nullable fields\n   - Utiliser @Default() au lieu de = pour les valeurs par défaut\n3. Mettre à jour build_runner vers 2.4.13+\n4. Exécuter: flutter pub run build_runner build --delete-conflicting-outputs\n5. Résoudre les erreurs de génération une par une\n6. Adapter les imports des fichiers générés\n7. Vérifier la compatibilité avec json_serializable 6.8.0",
+        "testStrategy": "Créer des tests unitaires pour chaque modèle migré vérifiant: sérialisation/désérialisation JSON, copyWith avec valeurs null, égalité et hashCode, toString(). Utiliser des fixtures JSON existantes pour la non-régression.",
+        "priority": "high",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Identifier et analyser tous les modèles Freezed existants",
+            "description": "Scanner le codebase pour localiser tous les fichiers utilisant Freezed et analyser leur syntaxe actuelle",
+            "dependencies": [],
+            "details": "Utiliser grep/find pour identifier tous les fichiers contenant @freezed, *.freezed.dart et *.g.dart. Créer un inventaire des modèles avec leur localisation, nombre de propriétés, utilisation de unions/sealed classes, et patterns de valeurs par défaut. Documenter les patterns de code actuels pour planifier la migration.",
+            "status": "pending",
+            "testStrategy": "Vérifier que l'inventaire est exhaustif en comparant avec les imports de freezed_annotation dans pubspec.yaml. Valider que tous les fichiers générés correspondent à un fichier source."
+          },
+          {
+            "id": 2,
+            "title": "Mettre à jour les dépendances Freezed et build_runner",
+            "description": "Migrer vers freezed 2.5.7, json_serializable 6.8.0 et build_runner 2.4.13+ dans pubspec.yaml",
+            "dependencies": [
+              "9.1"
+            ],
+            "details": "Modifier pubspec.yaml pour utiliser freezed: ^2.5.7, freezed_annotation: ^2.5.7, json_serializable: ^6.8.0, build_runner: ^2.4.13. Exécuter flutter pub get et résoudre les conflits de versions. Nettoyer les anciens fichiers générés avec flutter clean et supprimer tous les *.freezed.dart et *.g.dart.",
+            "status": "pending",
+            "testStrategy": "Vérifier que flutter pub get s'exécute sans erreurs. Confirmer les versions installées avec flutter pub deps. Tester que build_runner démarre correctement."
+          },
+          {
+            "id": 3,
+            "title": "Migrer les annotations et syntaxe des modèles simples",
+            "description": "Adapter tous les modèles Freezed simples (sans unions) vers la nouvelle syntaxe avec @Freezed() et @Default()",
+            "dependencies": [
+              "9.2"
+            ],
+            "details": "Pour chaque modèle simple: remplacer @freezed par @Freezed(), migrer les valeurs par défaut de '= value' vers '@Default(value)', adapter les factory constructors pour la nouvelle syntaxe, vérifier les imports freezed_annotation. Commencer par les modèles les plus simples (entities de base) avant les modèles complexes.",
+            "status": "pending",
+            "testStrategy": "Après migration de chaque modèle, exécuter build_runner sur ce fichier spécifique. Créer des tests unitaires vérifiant la création d'instance, les valeurs par défaut, et la sérialisation JSON."
+          },
+          {
+            "id": 4,
+            "title": "Migrer les unions et sealed classes complexes",
+            "description": "Adapter les modèles Freezed utilisant des unions, sealed classes et patterns avancés",
+            "dependencies": [
+              "9.3"
+            ],
+            "details": "Identifier et migrer les unions avec la syntaxe @Freezed(unionKey: 'type'), adapter les sealed classes avec les nouveaux patterns, gérer les cas de copyWith sur les unions, migrer les custom converters et JsonKey. Porter une attention particulière aux états Riverpod utilisant des unions.",
+            "status": "pending",
+            "testStrategy": "Créer des tests exhaustifs pour chaque union: vérifier tous les cas de pattern matching, tester la sérialisation/désérialisation de chaque variante, valider les copyWith sur chaque branche de l'union."
+          },
+          {
+            "id": 5,
+            "title": "Résoudre les erreurs de génération et valider la migration",
+            "description": "Exécuter la génération de code complète, corriger toutes les erreurs et valider l'intégration",
+            "dependencies": [
+              "9.4"
+            ],
+            "details": "Exécuter flutter pub run build_runner build --delete-conflicting-outputs sur tout le projet. Résoudre les erreurs une par une: conflits de noms, imports manquants, syntaxe invalide. Adapter les imports dans les fichiers utilisant les modèles. Vérifier que tous les tests passent et que l'application compile.",
+            "status": "pending",
+            "testStrategy": "Exécuter la suite de tests complète avec flutter test. Vérifier la couverture de code sur les modèles migrés. Tester l'application en mode debug pour détecter les erreurs runtime. Valider les performances de sérialisation."
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Migrer les providers Riverpod vers la nouvelle API Notifier",
+        "description": "Transformer tous les StateNotifierProvider en NotifierProvider et adapter la gestion d'état selon les nouvelles pratiques Riverpod 3.0",
+        "details": "1. Scanner tous les fichiers .dart pour identifier les providers:\n   - StateNotifierProvider → NotifierProvider\n   - StateNotifier → Notifier/AsyncNotifier\n   - Consumer → ConsumerWidget/ConsumerStatefulWidget\n2. Pour chaque provider:\n   - Créer une classe héritant de Notifier<T> ou AsyncNotifier<T>\n   - Implémenter build() au lieu du constructeur\n   - Adapter state = vers les nouvelles méthodes\n   - Utiliser ref.invalidate() au lieu de ref.refresh()\n3. Mettre à jour les annotations @riverpod si utilisées\n4. Adapter les tests utilisant ProviderContainer\n5. Implémenter les nouveaux patterns de cache et invalidation",
+        "testStrategy": "Écrire des tests d'intégration pour chaque provider migré: vérifier l'état initial, les mutations, l'invalidation, la recomposition des widgets. Utiliser ProviderScope pour les tests isolés. Mesurer les performances avant/après migration.",
+        "priority": "high",
+        "dependencies": [
+          9
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Scanner et inventorier tous les providers existants",
+            "description": "Identifier et cataloguer tous les StateNotifierProvider, StateNotifier et Consumer dans le codebase pour planifier la migration",
+            "dependencies": [],
+            "details": "1. Utiliser grep et l'analyse statique pour trouver tous les fichiers contenant des providers Riverpod\n2. Créer un inventaire détaillé incluant:\n   - Chemin du fichier et nom du provider\n   - Type actuel (StateNotifierProvider, Provider, FutureProvider, etc.)\n   - État géré (type de données)\n   - Dépendances vers d'autres providers\n   - Utilisation dans les widgets\n3. Identifier les patterns de code récurrents\n4. Prioriser l'ordre de migration selon les dépendances\n5. Documenter les cas complexes nécessitant une attention particulière",
+            "status": "pending",
+            "testStrategy": "Créer un script de validation qui vérifie que tous les providers identifiés sont bien présents dans le code. Générer un rapport de couverture de l'inventaire."
+          },
+          {
+            "id": 2,
+            "title": "Migrer les providers de base sans dépendances",
+            "description": "Convertir les StateNotifierProvider simples en NotifierProvider en commençant par ceux sans dépendances externes",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "1. Pour chaque provider simple identifié:\n   - Créer d'abord les tests unitaires du comportement actuel\n   - Transformer StateNotifier en Notifier<T>\n   - Remplacer le constructeur par la méthode build()\n   - Adapter les mutations state = newState vers les méthodes appropriées\n   - Supprimer l'ancien StateNotifierProvider\n2. Créer la nouvelle déclaration avec @riverpod ou Provider()\n3. Vérifier que les tests passent toujours\n4. Adapter les imports dans les fichiers consommateurs\n5. Valider l'absence de régression avec hot reload",
+            "status": "pending",
+            "testStrategy": "Tests unitaires comparatifs avant/après migration: même état initial, mêmes mutations, mêmes résultats. Utiliser ProviderContainer pour isoler les tests."
+          },
+          {
+            "id": 3,
+            "title": "Migrer les providers asynchrones et complexes",
+            "description": "Transformer les FutureProvider et StreamProvider vers AsyncNotifier, ainsi que les providers avec dépendances inter-providers",
+            "dependencies": [
+              "10.2"
+            ],
+            "details": "1. Convertir les providers asynchrones:\n   - FutureProvider → AsyncNotifier avec build() async\n   - StreamProvider → AsyncNotifier avec ref.listen()\n   - Gérer les états loading/error/data avec AsyncValue\n2. Migrer les providers dépendants:\n   - Utiliser ref.watch() dans build() au lieu du constructeur\n   - Adapter ref.read() vers les nouvelles pratiques\n   - Implémenter ref.invalidate() pour le refresh\n3. Gérer les cas spéciaux:\n   - Providers avec autoDispose\n   - Family providers avec paramètres\n   - Providers avec keepAlive custom\n4. Optimiser les rebuilds avec les nouveaux select()",
+            "status": "pending",
+            "testStrategy": "Tests d'intégration vérifiant les flux asynchrones complets, la propagation des changements entre providers dépendants, et la gestion correcte des erreurs réseau."
+          },
+          {
+            "id": 4,
+            "title": "Adapter tous les widgets consommateurs",
+            "description": "Migrer les Consumer, ConsumerWidget et ConsumerStatefulWidget vers les nouvelles pratiques Riverpod 3.0",
+            "dependencies": [
+              "10.3"
+            ],
+            "details": "1. Remplacer les widgets Consumer:\n   - Consumer → ConsumerWidget pour les cas simples\n   - Utiliser ref.watch() au lieu de watch(provider)\n   - Adapter ref.read() pour les callbacks\n2. Migrer les hooks si utilisés:\n   - useProvider() → ref.watch() dans HookConsumerWidget\n   - Vérifier la compatibilité avec flutter_hooks\n3. Optimiser les rebuilds:\n   - Utiliser ref.watch(provider.select()) pour limiter les recompositions\n   - Implémenter ref.listen() pour les effets de bord\n4. Adapter les ProviderScope dans main.dart et les tests\n5. Mettre à jour les overrides dans les tests widgets",
+            "status": "pending",
+            "testStrategy": "Tests de widgets vérifiant que les recompositions se produisent correctement, que les listeners fonctionnent, et que les performances ne sont pas dégradées."
+          },
+          {
+            "id": 5,
+            "title": "Valider la migration et optimiser les performances",
+            "description": "Effectuer une validation complète de la migration, corriger les régressions et implémenter les optimisations Riverpod 3.0",
+            "dependencies": [
+              "10.4"
+            ],
+            "details": "1. Validation exhaustive:\n   - Exécuter tous les tests unitaires et d'intégration\n   - Tester manuellement les flux critiques de l'application\n   - Vérifier l'absence de fuites mémoire avec DevTools\n2. Corriger les régressions identifiées:\n   - Déboguer les providers qui ne se mettent pas à jour\n   - Résoudre les problèmes de timing asynchrone\n3. Implémenter les optimisations:\n   - Utiliser les nouveaux modifiers (cacheTime, etc.)\n   - Optimiser avec ref.invalidate() vs ref.refresh()\n   - Implémenter le lazy loading où approprié\n4. Documenter les changements et patterns\n5. Mesurer les gains de performance",
+            "status": "pending",
+            "testStrategy": "Benchmarks de performance avant/après migration, tests de charge simulant plusieurs utilisateurs, profiling mémoire avec Flutter DevTools."
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Adapter la navigation go_router aux changements de l'API v15",
+        "description": "Migrer la configuration du routeur et les mécanismes de navigation vers go_router 15.0 avec la nouvelle syntaxe et les guards modernisés",
+        "details": "1. Mettre à jour router_config.dart:\n   - GoRouter() → GoRouter.routerConfig()\n   - Nouvelle syntaxe pour les routes imbriquées\n   - StatefulShellRoute pour la navigation avec état\n2. Adapter les guards et redirections:\n   - redirect → onEnter/onExit callbacks\n   - Utiliser les nouveaux NavigationObserver\n   - Implémenter les guards asynchrones\n3. Migrer les navigations:\n   - context.go() → context.goNamed() quand approprié\n   - Adapter les paramètres de route (pathParameters, queryParameters)\n4. Gérer les deep links avec la nouvelle API\n5. Implémenter la navigation déclarative pour les flows complexes",
+        "testStrategy": "Créer des tests de navigation end-to-end: vérifier toutes les routes accessibles, tester les guards d'authentification, valider les paramètres de route, simuler les deep links. Utiliser MockGoRouter pour les tests unitaires.",
+        "priority": "medium",
+        "dependencies": [
+          10
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Analyser et documenter les changements breaking de go_router v15",
+            "description": "Créer une analyse complète des changements entre la version actuelle et go_router 15.0, en identifiant tous les breaking changes et leurs solutions",
+            "dependencies": [],
+            "details": "1. Lire le changelog officiel de go_router v15\n2. Identifier les APIs dépréciées utilisées dans le projet\n3. Documenter les changements de syntaxe pour GoRouter.routerConfig()\n4. Analyser l'impact sur StatefulShellRoute et les routes imbriquées\n5. Créer une checklist de migration avec priorités",
+            "status": "pending",
+            "testStrategy": "Créer un script de détection automatique des APIs obsolètes dans le codebase"
+          },
+          {
+            "id": 2,
+            "title": "Migrer router_config.dart vers la nouvelle API GoRouter v15",
+            "description": "Refactorer complètement le fichier router_config.dart pour utiliser GoRouter.routerConfig() et la nouvelle syntaxe des routes",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "1. Remplacer GoRouter() par GoRouter.routerConfig()\n2. Migrer les routes vers la nouvelle syntaxe avec builders\n3. Implémenter StatefulShellRoute pour la navigation avec état (bottom nav)\n4. Configurer les errorBuilder et errorPageBuilder v15\n5. Adapter les routes imbriquées avec ShellRoute moderne",
+            "status": "pending",
+            "testStrategy": "Tests unitaires vérifiant: initialisation du router, toutes les routes accessibles, configuration des paramètres, gestion des erreurs 404"
+          },
+          {
+            "id": 3,
+            "title": "Adapter les guards et redirections aux nouveaux callbacks onEnter/onExit",
+            "description": "Remplacer tous les redirect legacy par les nouveaux callbacks onEnter/onExit et implémenter les NavigationObserver",
+            "dependencies": [
+              "11.2"
+            ],
+            "details": "1. Identifier tous les redirects dans les GoRoute\n2. Migrer redirect → onEnter pour les vérifications d'accès\n3. Implémenter onExit pour le cleanup des états\n4. Créer un NavigationObserver custom pour le tracking\n5. Implémenter les guards asynchrones avec Future<bool>\n6. Gérer les cas d'authentification avec les nouveaux patterns",
+            "status": "pending",
+            "testStrategy": "Tests d'intégration: simuler connexion/déconnexion, vérifier redirections auth, tester guards asynchrones avec délais, valider NavigationObserver callbacks"
+          },
+          {
+            "id": 4,
+            "title": "Migrer toutes les navigations vers les nouvelles APIs go_router v15",
+            "description": "Parcourir tout le codebase et adapter chaque appel de navigation aux nouvelles méthodes et paramètres",
+            "dependencies": [
+              "11.3"
+            ],
+            "details": "1. Rechercher tous les context.go() dans le projet\n2. Remplacer par context.goNamed() quand des noms de routes existent\n3. Adapter pathParameters et queryParameters à la nouvelle syntaxe\n4. Migrer extra parameters vers la nouvelle API\n5. Gérer les pushReplacement avec les nouvelles méthodes\n6. Adapter les pop() avec résultats",
+            "status": "pending",
+            "testStrategy": "Tests de navigation end-to-end pour chaque écran: navigation avant/arrière, passage de paramètres, vérification des états après navigation"
+          },
+          {
+            "id": 5,
+            "title": "Implémenter et tester deep links et navigation déclarative",
+            "description": "Configurer les deep links avec la nouvelle API et créer des flows de navigation déclarative pour les processus complexes",
+            "dependencies": [
+              "11.4"
+            ],
+            "details": "1. Configurer les deep links dans AndroidManifest et Info.plist\n2. Implémenter le parsing des deep links avec go_router v15\n3. Créer des flows déclaratifs pour: onboarding, game flow, résultats\n4. Gérer les états de navigation avec NavigationNotifier\n5. Implémenter la restauration d'état après kill app\n6. Tester tous les schémas d'URL supportés",
+            "status": "pending",
+            "testStrategy": "Tests deep links: lancer avec différentes URLs, vérifier navigation correcte, tester restauration d'état, simuler liens invalides"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Migrer l'intégration Supabase vers la v3 avec nouvelle architecture",
+        "description": "Adapter tous les appels Supabase (auth, database, realtime, storage) vers la nouvelle API v3 et implémenter les patterns recommandés",
+        "details": "1. Mettre à jour l'initialisation Supabase:\n   - Supabase.initialize() avec les nouvelles options\n   - Configurer les retry policies et timeouts\n2. Migrer l'authentification:\n   - auth.signIn() → auth.signInWithPassword()\n   - Adapter la gestion des sessions (onAuthStateChange)\n   - Implémenter le refresh token automatique\n3. Adapter les queries database:\n   - .execute() n'est plus nécessaire\n   - Utiliser les nouveaux modifiers (.single(), .maybeSingle())\n   - Gérer les erreurs avec les nouveaux types\n4. Migrer Realtime:\n   - Nouvelle syntaxe pour les channels\n   - Presence et Broadcast avec la v3\n5. Adapter Storage avec les nouvelles méthodes upload/download",
+        "testStrategy": "Créer des tests d'intégration avec mock Supabase: auth flow complet, CRUD operations, realtime subscriptions, file upload/download. Utiliser supabase_flutter_test pour les mocks. Vérifier la gestion des erreurs réseau.",
+        "priority": "high",
+        "dependencies": [
+          11
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Mettre à jour l'initialisation et la configuration Supabase",
+            "description": "Migrer l'initialisation de Supabase vers la v3 avec les nouvelles options de configuration, retry policies et gestion des timeouts",
+            "dependencies": [],
+            "details": "1. Localiser le fichier d'initialisation Supabase (généralement dans lib/core/config/)\n2. Remplacer l'ancienne initialisation par Supabase.initialize() v3:\n   - Ajouter les options de retry (maxRetries, retryInterval)\n   - Configurer les timeouts personnalisés (connectionTimeout, queryTimeout)\n   - Implémenter les headers personnalisés si nécessaire\n   - Configurer le localStorage pour la persistance des sessions\n3. Créer un service SupabaseConfig avec les patterns v3:\n   - Singleton pour l'instance Supabase\n   - Méthodes helper pour accéder aux différents clients\n   - Gestion centralisée des erreurs de connexion\n4. Adapter les imports dans tous les fichiers utilisant Supabase",
+            "status": "pending",
+            "testStrategy": "Créer des tests unitaires vérifiant l'initialisation correcte, mocker les appels réseau pour tester les retry policies, vérifier les timeouts avec des délais simulés, tester la persistance de session"
+          },
+          {
+            "id": 2,
+            "title": "Migrer le système d'authentification vers l'API v3",
+            "description": "Adapter tous les appels d'authentification Supabase aux nouvelles méthodes v3 et implémenter la gestion automatique des tokens",
+            "dependencies": [
+              "12.1"
+            ],
+            "details": "1. Scanner et identifier tous les appels auth dans le codebase:\n   - auth.signIn() → auth.signInWithPassword()\n   - auth.signUp() → auth.signUp() (vérifier les changements de paramètres)\n   - auth.signOut() → auth.signOut() (vérifier le comportement async)\n2. Adapter onAuthStateChange:\n   - Nouvelle syntaxe avec listen() et subscription\n   - Gérer les événements SIGNED_IN, SIGNED_OUT, TOKEN_REFRESHED\n   - Implémenter la logique de refresh token automatique\n3. Créer un AuthRepository avec les patterns v3:\n   - Méthodes async pour toutes les opérations\n   - Gestion des erreurs AuthException spécifiques\n   - Stream pour l'état d'authentification\n4. Mettre à jour les providers Riverpod liés à l'auth",
+            "status": "pending",
+            "testStrategy": "Tests d'intégration avec mock Supabase auth: flow de login complet, refresh token automatique, gestion des sessions expirées, tests des différents états d'authentification"
+          },
+          {
+            "id": 3,
+            "title": "Adapter les requêtes database à la nouvelle syntaxe",
+            "description": "Migrer toutes les queries Supabase database en supprimant .execute() et en utilisant les nouveaux modifiers",
+            "dependencies": [
+              "12.1"
+            ],
+            "details": "1. Identifier toutes les queries database (select, insert, update, delete):\n   - Supprimer tous les .execute() qui ne sont plus nécessaires\n   - Remplacer .single() par .single() ou .maybeSingle() selon le cas\n   - Adapter .eq(), .in(), .order() si changements de syntaxe\n2. Gérer les nouveaux types d'erreurs:\n   - PostgrestException remplace les anciennes erreurs\n   - Implémenter une gestion d'erreur centralisée\n   - Mapper les codes d'erreur pour l'UI\n3. Optimiser les queries avec les nouvelles features:\n   - Utiliser les computed columns si disponibles\n   - Implémenter le batching pour les opérations multiples\n   - Utiliser les nouvelles options de count\n4. Mettre à jour tous les repositories utilisant la database",
+            "status": "pending",
+            "testStrategy": "Tests unitaires pour chaque repository avec des mocks PostgrestClient, vérifier les transformations de données, tester tous les cas d'erreur possibles, valider les performances des queries"
+          },
+          {
+            "id": 4,
+            "title": "Migrer le système Realtime vers les channels v3",
+            "description": "Adapter toutes les souscriptions Realtime à la nouvelle API des channels avec Presence et Broadcast",
+            "dependencies": [
+              "12.1",
+              "12.3"
+            ],
+            "details": "1. Migrer les souscriptions Realtime existantes:\n   - Remplacer from().on() par channel().on()\n   - Utiliser les nouveaux filtres postgres_changes\n   - Adapter les callbacks avec les nouveaux payloads\n2. Implémenter les channels pour le jeu multijoueur:\n   - Un channel par partie de jeu\n   - Utiliser Presence pour tracker les joueurs connectés\n   - Broadcast pour les actions de jeu instantanées\n3. Gérer les reconnexions et la synchronisation:\n   - Implémenter les retry automatiques\n   - Gérer l'état offline/online\n   - Synchroniser l'état après reconnexion\n4. Créer un RealtimeService centralisé:\n   - Gestion des subscriptions actives\n   - Méthodes helper pour les patterns courants\n   - Cleanup automatique des channels",
+            "status": "pending",
+            "testStrategy": "Tests d'intégration avec WebSocket mocks, simuler les déconnexions/reconnexions, tester la synchronisation d'état, vérifier les performances avec plusieurs channels actifs"
+          },
+          {
+            "id": 5,
+            "title": "Adapter le Storage aux nouvelles méthodes v3",
+            "description": "Migrer toutes les opérations de Storage (upload, download, URLs) vers les nouvelles méthodes de l'API v3",
+            "dependencies": [
+              "12.1"
+            ],
+            "details": "1. Identifier et migrer les opérations Storage:\n   - upload() avec les nouvelles options (upsert, contentType)\n   - download() et getPublicUrl() avec la nouvelle syntaxe\n   - Gérer les transformations d'images si utilisées\n2. Adapter la gestion des buckets:\n   - Vérifier les permissions avec les nouvelles méthodes\n   - Implémenter la création de buckets si nécessaire\n   - Gérer les policies RLS pour le storage\n3. Optimiser les uploads:\n   - Implémenter le chunked upload pour les gros fichiers\n   - Ajouter des progress callbacks\n   - Gérer les retry en cas d'échec\n4. Créer un StorageRepository avec:\n   - Méthodes typées pour chaque type de fichier\n   - Gestion centralisée des erreurs storage\n   - Cache local des URLs publiques",
+            "status": "pending",
+            "testStrategy": "Tests unitaires avec mock Storage client, tester upload/download avec différentes tailles de fichiers, vérifier la gestion des erreurs réseau, tester les transformations d'images"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "Résoudre les conflits de dépendances et erreurs de compilation",
+        "description": "Identifier et résoudre tous les conflits entre dépendances après la mise à jour majeure, en ajustant les versions si nécessaire",
+        "details": "1. Analyser les erreurs de flutter pub get:\n   - Conflits de versions transitives\n   - Dépendances incompatibles\n   - Constraints non satisfaites\n2. Utiliser dependency_overrides temporairement si nécessaire\n3. Pour chaque conflit:\n   - Identifier la source (quelle dépendance requiert quelle version)\n   - Chercher des versions compatibles\n   - Contacter les mainteneurs si bloquant\n4. Mettre à jour les imports obsolètes\n5. Résoudre les erreurs de compilation Dart:\n   - Null safety stricte\n   - Nouvelles règles de linting\n   - APIs dépréciées\n6. Documenter chaque résolution dans MIGRATION_ISSUES.md",
+        "testStrategy": "Vérifier que 'flutter analyze --no-fatal-infos' passe sans erreur. S'assurer que 'dart fix --apply' a été exécuté. Tester la compilation debug et release sur Android. Valider que tous les imports sont résolus.",
+        "priority": "high",
+        "dependencies": [
+          12
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Analyser et documenter tous les conflits de dépendances",
+            "description": "Exécuter flutter pub get et capturer toutes les erreurs de résolution de dépendances, puis analyser chaque conflit pour identifier les sources et les versions en conflit",
+            "dependencies": [],
+            "details": "1. Exécuter `flutter pub get --verbose` et capturer la sortie complète\n2. Identifier chaque erreur de type:\n   - Version solving failed\n   - Conflicting constraints\n   - Transitive dependency conflicts\n3. Pour chaque conflit, documenter:\n   - Package principal causant le conflit\n   - Versions demandées vs disponibles\n   - Dépendances transitives impliquées\n4. Utiliser `flutter pub deps --style=tree` pour visualiser l'arbre complet\n5. Créer MIGRATION_ISSUES.md avec une section 'Dependency Conflicts' structurée",
+            "status": "pending",
+            "testStrategy": "Vérifier que toutes les erreurs de pub get sont documentées dans MIGRATION_ISSUES.md avec leur analyse complète"
+          },
+          {
+            "id": 2,
+            "title": "Résoudre les conflits de versions avec dependency_overrides",
+            "description": "Implémenter des dependency_overrides temporaires pour forcer des versions compatibles et permettre la résolution des dépendances",
+            "dependencies": [
+              "13.1"
+            ],
+            "details": "1. Dans pubspec.yaml, ajouter une section dependency_overrides:\n   ```yaml\n   dependency_overrides:\n     # Documenter la raison de chaque override\n   ```\n2. Pour chaque conflit identifié:\n   - Déterminer la version la plus récente compatible\n   - Ajouter l'override avec commentaire explicatif\n   - Exemple: `intl: ^0.19.0 # Override pour compatibilité avec flutter_localizations`\n3. Après chaque ajout, exécuter `flutter pub get`\n4. Documenter dans MIGRATION_ISSUES.md:\n   - Package overridé\n   - Version forcée\n   - Raison de l'override\n   - Plan pour retirer l'override",
+            "status": "pending",
+            "testStrategy": "S'assurer que flutter pub get s'exécute sans erreur avec les overrides et que chaque override est documenté avec un plan de retrait"
+          },
+          {
+            "id": 3,
+            "title": "Mettre à jour les imports et résoudre les APIs dépréciées",
+            "description": "Identifier et corriger tous les imports obsolètes et les utilisations d'APIs dépréciées dans le code source",
+            "dependencies": [
+              "13.2"
+            ],
+            "details": "1. Exécuter `dart fix --dry-run` pour identifier les corrections disponibles\n2. Appliquer automatiquement les corrections sûres: `dart fix --apply`\n3. Pour les imports manuels à corriger:\n   - Rechercher les patterns d'import obsolètes\n   - Mettre à jour vers les nouveaux paths\n   - Exemple: `package:flutter/material.dart` au lieu de paths spécifiques\n4. Identifier les APIs dépréciées:\n   - Utiliser `flutter analyze --no-fatal-warnings`\n   - Rechercher les annotations @deprecated\n   - Migrer vers les nouvelles APIs recommandées\n5. Documenter chaque changement d'API dans MIGRATION_ISSUES.md",
+            "status": "pending",
+            "testStrategy": "Vérifier que dart fix --dry-run ne trouve plus de corrections et que flutter analyze ne montre aucune dépréciation"
+          },
+          {
+            "id": 4,
+            "title": "Résoudre les erreurs de null safety et de compilation Dart",
+            "description": "Corriger toutes les erreurs liées à la null safety stricte et aux nouvelles règles de compilation Dart",
+            "dependencies": [
+              "13.3"
+            ],
+            "details": "1. Activer l'analyse null safety stricte dans analysis_options.yaml:\n   ```yaml\n   analyzer:\n     language:\n       strict-casts: true\n       strict-inference: true\n       strict-raw-types: true\n   ```\n2. Résoudre les erreurs de null safety:\n   - Variables non-nullable utilisées avant initialisation\n   - Casts implicites interdits\n   - Types génériques manquants\n3. Pour chaque erreur:\n   - Analyser si le type peut être nullable (ajouter ?)\n   - Ou garantir l'initialisation (late, valeur par défaut)\n   - Utiliser les assertions null-check (!)\n4. Mettre à jour les règles de linting problématiques\n5. Documenter les patterns de migration utilisés",
+            "status": "pending",
+            "testStrategy": "Exécuter flutter analyze --no-fatal-infos sans aucune erreur et compiler en mode debug et release avec succès"
+          },
+          {
+            "id": 5,
+            "title": "Finaliser la résolution et retirer les overrides progressivement",
+            "description": "Valider que toutes les erreurs sont résolues, retirer les dependency_overrides un par un et contacter les mainteneurs si nécessaire",
+            "dependencies": [
+              "13.4"
+            ],
+            "details": "1. Compiler l'application en mode debug et release:\n   - `flutter build apk --debug`\n   - `flutter build apk --release`\n2. Pour chaque dependency_override:\n   - Commenter l'override\n   - Exécuter flutter pub get\n   - Si succès: retirer définitivement\n   - Si échec: analyser les alternatives\n3. Pour les dépendances problématiques restantes:\n   - Vérifier les issues GitHub du package\n   - Proposer une PR si correction simple\n   - Contacter les mainteneurs via issues\n   - Envisager des alternatives si abandon\n4. Mettre à jour MIGRATION_ISSUES.md avec:\n   - Statut final de chaque conflit\n   - Overrides permanents restants\n   - Issues ouvertes sur packages tiers",
+            "status": "pending",
+            "testStrategy": "Vérifier que l'application compile sans aucun dependency_override ou avec documentation complète pour ceux conservés, et que tous les tests passent"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Créer le script de compilation autonome pour WSL",
+        "description": "Développer un script shell robuste permettant la compilation automatique de l'application Android dans un environnement WSL sans intervention manuelle",
+        "details": "1. Créer scripts/build_wsl_android.sh avec shebang #!/bin/bash\n2. Implémenter les vérifications de prérequis:\n   - Flutter SDK (version 3.32.6+)\n   - Java 17+ (pour Android 34)\n   - Android SDK et cmdline-tools\n   - Variables d'environnement (ANDROID_HOME, PATH)\n3. Structure du script:\n   ```bash\n   set -e  # Exit on error\n   set -o pipefail\n   # Logging avec timestamps\n   log() { echo \"[$(date +'%Y-%m-%d %H:%M:%S')] $*\"; }\n   ```\n4. Étapes de compilation:\n   - flutter clean\n   - flutter pub get\n   - flutter pub run build_runner build --delete-conflicting-outputs\n   - flutter build apk --debug --dart-define-from-file=.env\n5. Gestion d'erreurs avec codes de sortie spécifiques\n6. Génération d'un rapport de build dans logs/",
+        "testStrategy": "Tester le script dans un container Docker avec WSL2. Vérifier l'idempotence (exécutions multiples). Simuler des erreurs (SDK manquant, compilation échouée) et valider les codes de sortie. Mesurer le temps d'exécution.",
+        "priority": "medium",
+        "dependencies": [
+          13
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implémenter la structure de base et le système de logging",
+            "description": "Créer le fichier scripts/build_wsl_android.sh avec la structure de base incluant la gestion des erreurs, le système de logging avec timestamps et les fonctions utilitaires",
+            "dependencies": [],
+            "details": "1. Créer le fichier avec shebang #!/bin/bash et permissions d'exécution (chmod +x)\n2. Implémenter les options set -e et set -o pipefail pour la gestion d'erreurs\n3. Créer la fonction log() avec format timestamp [YYYY-MM-DD HH:MM:SS]\n4. Ajouter des fonctions utilitaires:\n   - error_exit() pour sortir avec message et code d'erreur\n   - check_command() pour vérifier l'existence d'une commande\n   - create_log_dir() pour créer le dossier logs/ si inexistant\n5. Implémenter la capture du début d'exécution et le nettoyage en cas d'interruption (trap)",
+            "status": "pending",
+            "testStrategy": "Créer un script de test vérifiant: l'exécution du script avec bash -n pour la syntaxe, la création correcte des logs avec timestamps, le comportement des fonctions d'erreur avec différents codes de sortie, la gestion des signaux d'interruption"
+          },
+          {
+            "id": 2,
+            "title": "Développer le module de vérification des prérequis",
+            "description": "Implémenter un système complet de vérification de tous les prérequis nécessaires à la compilation Android dans WSL avec messages d'erreur détaillés",
+            "dependencies": [
+              "14.1"
+            ],
+            "details": "1. Vérifier Flutter SDK:\n   - Présence de la commande flutter\n   - Version minimale 3.32.6 avec parsing de 'flutter --version'\n   - Validation du channel (stable recommandé)\n2. Vérifier Java:\n   - Présence de java et javac\n   - Version 17+ avec parsing de 'java -version'\n   - JAVA_HOME correctement défini\n3. Vérifier Android SDK:\n   - ANDROID_HOME défini et répertoire existant\n   - cmdline-tools installés (sdkmanager, avdmanager)\n   - Build-tools version 34.0.0+\n4. Vérifier les variables PATH:\n   - $ANDROID_HOME/cmdline-tools/latest/bin\n   - $ANDROID_HOME/platform-tools\n5. Générer un rapport de prérequis dans logs/prerequisites_check.log",
+            "status": "pending",
+            "testStrategy": "Tester avec des environnements simulés: sans Flutter, avec Flutter ancien, sans Java, avec Java 11, sans ANDROID_HOME, avec ANDROID_HOME invalide. Vérifier que chaque cas génère le bon code d'erreur et message"
+          },
+          {
+            "id": 3,
+            "title": "Créer le processus de préparation et nettoyage",
+            "description": "Développer les étapes de préparation de l'environnement de build incluant le nettoyage, la récupération des dépendances et la génération de code",
+            "dependencies": [
+              "14.1",
+              "14.2"
+            ],
+            "details": "1. Implémenter la phase de nettoyage:\n   - flutter clean avec capture des erreurs\n   - Suppression des fichiers générés (.dart_tool/, build/)\n   - Nettoyage du cache Gradle si demandé (option --clean-gradle)\n2. Récupération des dépendances:\n   - flutter pub get avec retry automatique (3 tentatives)\n   - Vérification du pubspec.lock\n   - Cache des packages pour builds futurs\n3. Génération de code:\n   - Détection si build_runner est nécessaire (présence dans pubspec.yaml)\n   - flutter pub run build_runner build --delete-conflicting-outputs\n   - Gestion du timeout (5 minutes max)\n4. Validation de l'environnement .env:\n   - Vérifier l'existence du fichier\n   - Parser et valider les clés requises (SUPABASE_URL, SUPABASE_ANON_KEY)\n5. Créer un checkpoint de préparation dans logs/",
+            "status": "pending",
+            "testStrategy": "Simuler des échecs réseau pour pub get, corrompre le cache pour tester le nettoyage, créer des conflits pour build_runner, tester avec .env manquant ou invalide"
+          },
+          {
+            "id": 4,
+            "title": "Implémenter le processus de compilation avec gestion avancée",
+            "description": "Développer la phase de compilation Android avec support des différents modes, gestion de la mémoire et options de personnalisation",
+            "dependencies": [
+              "14.1",
+              "14.2",
+              "14.3"
+            ],
+            "details": "1. Paramètres de compilation configurables:\n   - Mode: --debug (défaut), --release, --profile\n   - Architecture: --target-platform android-arm,android-arm64\n   - Options supplémentaires passées à flutter build\n2. Gestion de la mémoire pour WSL:\n   - Détection de la RAM disponible\n   - Configuration Gradle avec -Xmx approprié\n   - Option --low-memory pour environnements limités\n3. Compilation avec monitoring:\n   - flutter build apk avec les options choisies\n   - Progress bar ou indicateur d'avancement\n   - Capture détaillée des logs Gradle\n   - Timeout configurable (défaut 30 minutes)\n4. Gestion des artifacts:\n   - Copie de l'APK vers un dossier de sortie défini\n   - Renommage avec version et timestamp\n   - Génération du SHA256 de l'APK\n5. Support du --dart-define-from-file=.env",
+            "status": "pending",
+            "testStrategy": "Compiler en debug/release/profile, simuler une compilation longue pour tester le timeout, tester avec peu de RAM disponible, vérifier l'intégrité des APKs générés"
+          },
+          {
+            "id": 5,
+            "title": "Développer le système de rapport et intégration continue",
+            "description": "Créer un système complet de génération de rapports de build et préparer l'intégration avec GitHub Actions et autres systèmes CI",
+            "dependencies": [
+              "14.1",
+              "14.2",
+              "14.3",
+              "14.4"
+            ],
+            "details": "1. Génération du rapport de build:\n   - Format JSON et HTML dans logs/build_report_[timestamp]\n   - Informations: durée totale, taille APK, versions utilisées\n   - Graphiques de performance (temps par étape)\n   - Logs d'erreurs consolidés si échec\n2. Intégration CI/CD:\n   - Mode --ci pour output adapté aux runners\n   - Export des variables pour GitHub Actions\n   - Support des annotations GitHub pour les erreurs\n   - Exit codes standardisés pour chaque type d'erreur\n3. Notifications et hooks:\n   - Hook post-build configurable\n   - Support pour notifications (webhook, email via curl)\n   - Intégration Slack/Discord optionnelle\n4. Mode batch et automation:\n   - Support des builds multiples (différentes variantes)\n   - Configuration via fichier YAML\n   - Mode --watch pour rebuild automatique\n5. Documentation et aide intégrée (--help)",
+            "status": "pending",
+            "testStrategy": "Vérifier la génération des rapports dans tous les cas (succès/échec), tester l'intégration avec un workflow GitHub Actions minimal, valider les exit codes, tester le mode batch avec plusieurs configurations"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Auditer et purger les tests obsolètes ou non conformes",
+        "description": "Parcourir l'intégralité de la suite de tests pour identifier et supprimer les tests inutiles, redondants ou qui violent les principes TDD",
+        "details": "1. Scanner tous les fichiers *_test.dart et créer un inventaire:\n   - Nombre de tests par fichier\n   - Tests commentés (à supprimer immédiatement)\n   - Tests avec skip: true\n2. Critères de suppression:\n   - Tests d'implémentation (testent des détails privés)\n   - Tests triviaux (getters/setters simples)\n   - Tests dupliqués ou très similaires\n   - Tests sans assertions significatives\n3. Pour chaque test conservé, vérifier:\n   - Nomenclature correcte (describe/it ou group/test)\n   - Structure AAA (Arrange, Act, Assert)\n   - Isolation complète (pas d'état partagé)\n   - Assertions explicites et significatives\n4. Documenter les suppressions dans TEST_AUDIT.md\n5. Réorganiser les tests par feature/domain",
+        "testStrategy": "Comparer la couverture avant/après purge (doit rester stable ou augmenter). Vérifier qu'aucun comportement critique n'est plus testé. Exécuter les tests en parallèle pour valider l'isolation. Mesurer le temps d'exécution total.",
+        "priority": "medium",
+        "dependencies": [
+          13
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Scanner et inventorier tous les fichiers de tests",
+            "description": "Parcourir récursivement le répertoire test/ pour créer un inventaire complet de tous les fichiers *_test.dart avec leurs statistiques",
+            "dependencies": [],
+            "details": "Utiliser un script Dart pour analyser automatiquement tous les fichiers de tests et générer un rapport structuré incluant : le chemin de chaque fichier, le nombre total de tests, le nombre de tests commentés (lignes contenant //.*test ou /*.*test), le nombre de tests avec skip: true, la taille du fichier en lignes, et la date de dernière modification. Exporter le résultat dans un fichier JSON structuré pour faciliter l'analyse ultérieure.",
+            "status": "pending",
+            "testStrategy": "Créer un test unitaire pour le script d'inventaire vérifiant qu'il détecte correctement les différents patterns de tests commentés et skippés dans des fichiers de test échantillons"
+          },
+          {
+            "id": 2,
+            "title": "Identifier et supprimer les tests commentés et skippés",
+            "description": "Localiser tous les tests commentés ou avec skip: true et les supprimer immédiatement selon les règles TDD strictes du projet",
+            "dependencies": [
+              "15.1"
+            ],
+            "details": "À partir de l'inventaire généré, parcourir chaque fichier identifié comme contenant des tests commentés ou skippés. Supprimer automatiquement : toutes les lignes de test commentées (// test, /* test */), tous les blocs de code test avec skip: true, et les imports inutilisés après suppression. Générer un rapport de suppression listant chaque test supprimé avec sa localisation pour traçabilité. Commiter les changements par batch de 10 fichiers maximum pour faciliter la revue.",
+            "status": "pending",
+            "testStrategy": "Vérifier que le script de suppression préserve l'indentation et la structure des fichiers. Exécuter flutter test après chaque batch pour s'assurer qu'aucun test valide n'a été supprimé par erreur"
+          },
+          {
+            "id": 3,
+            "title": "Analyser et supprimer les tests triviaux et redondants",
+            "description": "Examiner chaque test restant pour identifier ceux qui violent les principes TDD ou n'apportent pas de valeur réelle",
+            "dependencies": [
+              "15.2"
+            ],
+            "details": "Analyser chaque test selon les critères de suppression définis : tests d'implémentation testant des méthodes privées ou des détails internes, tests triviaux vérifiant uniquement des getters/setters sans logique, tests dupliqués ayant la même structure Arrange-Act-Assert, tests sans assertions significatives ou avec des expect triviaux. Utiliser l'AST (Abstract Syntax Tree) Dart pour analyser la structure des tests programmatiquement. Créer un rapport détaillé justifiant chaque suppression proposée avant d'effectuer les suppressions.",
+            "status": "pending",
+            "testStrategy": "Comparer la couverture de code avant et après suppression pour s'assurer qu'aucune logique métier critique n'est plus couverte. La couverture doit rester stable ou augmenter"
+          },
+          {
+            "id": 4,
+            "title": "Vérifier et corriger la structure des tests conservés",
+            "description": "S'assurer que chaque test restant respecte les conventions de nomenclature et la structure AAA (Arrange-Act-Assert)",
+            "dependencies": [
+              "15.3"
+            ],
+            "details": "Pour chaque test conservé, vérifier et corriger : la nomenclature en utilisant group/test pour Dart (pas describe/it), la structure claire avec les trois sections AAA identifiables (ajouter des commentaires // Arrange, // Act, // Assert si nécessaire), l'isolation complète sans état partagé entre tests (vérifier l'absence de variables globales ou de setUp mal utilisés), les assertions explicites et significatives avec des messages d'erreur clairs. Refactoriser les tests qui ne respectent pas ces critères en préservant leur intention originale.",
+            "status": "pending",
+            "testStrategy": "Exécuter les tests en mode aléatoire (--test-randomize-ordering-seed) pour vérifier l'isolation. Chaque test doit passer indépendamment de l'ordre d'exécution"
+          },
+          {
+            "id": 5,
+            "title": "Documenter l'audit et réorganiser par feature",
+            "description": "Créer la documentation finale de l'audit et restructurer les tests selon l'architecture Clean du projet",
+            "dependencies": [
+              "15.4"
+            ],
+            "details": "Créer le fichier TEST_AUDIT.md documentant : le nombre total de tests avant/après purge, la liste détaillée des tests supprimés avec justification, les patterns de tests problématiques identifiés, les recommandations pour éviter ces anti-patterns. Réorganiser les tests restants selon la structure features/[nom_feature]/[layer]/ pour matcher l'architecture Clean Architecture. Déplacer les tests unitaires dans les bons répertoires (presentation/domain/data). Mettre à jour tous les imports après réorganisation. Mesurer et documenter l'amélioration du temps d'exécution de la suite de tests.",
+            "status": "pending",
+            "testStrategy": "Valider que tous les tests passent après réorganisation. Vérifier que la structure des dossiers de test reflète exactement la structure du code source"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "title": "Mettre à jour les tests existants pour la conformité TDD",
+        "description": "Refactoriser chaque test conservé pour qu'il respecte strictement les guidelines TDD du projet, avec focus sur la clarté et la maintenabilité",
+        "details": "1. Appliquer les patterns de test modernes:\n   - Utiliser les Test Data Builders pour les fixtures\n   - Implémenter des Custom Matchers pour les assertions complexes\n   - Extraire les helpers de test réutilisables\n2. Pour chaque test:\n   - Renommer selon la convention: 'should_[expected]_when_[condition]'\n   - Séparer clairement Arrange/Act/Assert avec commentaires\n   - Utiliser des noms de variables explicites\n   - Éviter les nombres magiques (extraire en constantes)\n3. Améliorer les messages d'erreur:\n   - expect(value, equals(expected), reason: 'contexte')\n   - Assertions multiples avec des messages distincts\n4. Implémenter des setUp/tearDown appropriés\n5. Grouper les tests logiquement avec group()",
+        "testStrategy": "Réviser chaque test modifié en peer review simulée. Vérifier que les tests échouent pour les bonnes raisons (mutation testing manuel). S'assurer que les messages d'échec sont clairs et actionnables.",
+        "priority": "medium",
+        "dependencies": [
+          15
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer l'infrastructure de patterns de test modernes",
+            "description": "Mettre en place les Test Data Builders, Custom Matchers et helpers réutilisables pour standardiser l'écriture des tests",
+            "dependencies": [],
+            "details": "1. Créer un dossier test/helpers/ pour centraliser les utilitaires\n2. Implémenter des Test Data Builders pour chaque entité principale:\n   - CardBuilder pour créer des cartes de test\n   - PlayerBuilder pour les joueurs\n   - GameStateBuilder pour les états de jeu\n3. Développer des Custom Matchers spécifiques:\n   - isValidCard() pour valider les propriétés des cartes\n   - hasScore() pour vérifier les scores\n   - isInState() pour les états de jeu\n4. Créer des helpers de test communs:\n   - createMockSupabaseClient()\n   - setupTestProviders()\n   - waitForAnimation()\n5. Documenter chaque pattern avec des exemples d'utilisation",
+            "status": "pending",
+            "testStrategy": "Écrire des tests unitaires pour chaque Builder et Matcher créé. Vérifier que les helpers génèrent des données cohérentes et que les Matchers produisent des messages d'erreur clairs"
+          },
+          {
+            "id": 2,
+            "title": "Refactoriser les tests du domaine métier",
+            "description": "Mettre à jour tous les tests des entités, use cases et logique métier selon les conventions TDD strictes",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "1. Identifier tous les tests dans lib/features/*/domain/\n2. Pour chaque fichier de test:\n   - Renommer selon 'should_[expected]_when_[condition]'\n   - Restructurer avec sections Arrange/Act/Assert commentées\n   - Remplacer les données en dur par des Test Data Builders\n   - Extraire les constantes (ex: MAX_CARDS = 12)\n3. Exemples de refactoring:\n   - 'test card validation' → 'should_return_error_when_card_value_exceeds_maximum'\n   - Utiliser CardBuilder().withValue(15).build() au lieu de Card(value: 15)\n4. Améliorer les assertions:\n   - expect(result.isError, isTrue, reason: 'Card validation should fail for value > 13')\n5. Grouper les tests par fonctionnalité avec group()",
+            "status": "pending",
+            "testStrategy": "Exécuter chaque test refactorisé en mode verbose pour vérifier la clarté des messages. Introduire des erreurs volontaires pour valider que les tests échouent avec des messages explicites"
+          },
+          {
+            "id": 3,
+            "title": "Moderniser les tests de la couche data",
+            "description": "Refactoriser les tests des repositories, datasources et modèles en appliquant les patterns TDD et en améliorant la gestion des mocks",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "1. Localiser tous les tests dans lib/features/*/data/\n2. Implémenter des mocks structurés:\n   - Créer MockSupabaseClient avec comportements prédéfinis\n   - Utiliser when().thenAnswer() pour simuler les délais réseau\n   - Implémenter des stubs pour les WebSockets Realtime\n3. Refactoring des tests:\n   - Séparer clairement les tests unitaires des tests d'intégration\n   - Utiliser PlayerBuilder et GameStateBuilder pour les fixtures\n   - Ajouter des tests de cas limites (timeout, erreurs réseau)\n4. Améliorer la lisibilité:\n   - Variables explicites: 'validAuthResponse' au lieu de 'response'\n   - Commentaires sur les comportements attendus des mocks\n5. Implémenter tearDown() pour nettoyer les ressources",
+            "status": "pending",
+            "testStrategy": "Vérifier que chaque mock est utilisé correctement avec verify(). S'assurer que les tests d'intégration peuvent être désactivés facilement pour les builds rapides"
+          },
+          {
+            "id": 4,
+            "title": "Optimiser les tests de la couche présentation",
+            "description": "Mettre à jour les tests de widgets, screens et providers Riverpod avec les meilleures pratiques Flutter et TDD",
+            "dependencies": [
+              "16.1",
+              "16.2"
+            ],
+            "details": "1. Analyser tous les tests dans lib/features/*/presentation/\n2. Standardiser les tests de widgets:\n   - Utiliser pumpWidget avec un wrapper de test commun\n   - Implémenter des helpers comme findButtonByText()\n   - Tester les interactions utilisateur de manière exhaustive\n3. Pour les providers Riverpod:\n   - Créer ProviderContainer de test avec overrides\n   - Tester chaque état possible du StateNotifier\n   - Vérifier les effets de bord avec des mocks\n4. Améliorer les assertions visuelles:\n   - findsOneWidget avec reason descriptif\n   - Vérifier les animations avec pumpAndSettle()\n5. Grouper par écran/fonctionnalité:\n   - group('LoginScreen', () => { /* tests */ })\n   - Sous-groupes pour les différents états",
+            "status": "pending",
+            "testStrategy": "Utiliser golden tests pour les composants critiques. Vérifier l'accessibilité avec les Semantics. Tester sur différentes tailles d'écran avec des MediaQuery overrides"
+          },
+          {
+            "id": 5,
+            "title": "Créer une suite de validation et documentation des tests",
+            "description": "Mettre en place un système de validation automatique de la conformité TDD et documenter les patterns de test adoptés",
+            "dependencies": [
+              "16.2",
+              "16.3",
+              "16.4"
+            ],
+            "details": "1. Créer un script de validation test/validate_tdd_compliance.dart:\n   - Vérifier la nomenclature des tests (should_when pattern)\n   - Détecter les tests sans assertions claires\n   - Identifier les tests commentés ou skip\n   - Calculer le ratio de couverture par feature\n2. Implémenter un test de mutation manuel:\n   - Liste de mutations communes à tester\n   - Script pour introduire des bugs et vérifier la détection\n3. Créer test/README.md avec:\n   - Guide des patterns de test utilisés\n   - Exemples de chaque type de test\n   - Conventions de nommage\n   - Checklist de revue\n4. Configurer les hooks pre-commit:\n   - Exécution du script de validation\n   - Rejet si non-conformité détectée\n5. Générer un rapport de conformité TDD",
+            "status": "pending",
+            "testStrategy": "Tester le script de validation avec des cas positifs et négatifs. Vérifier que la documentation est synchronisée avec le code. Faire une revue croisée simulée de 5 tests aléatoires"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "title": "Adapter les tests aux nouvelles versions des dépendances",
+        "description": "Modifier tous les tests pour qu'ils soient compatibles avec les APIs des nouvelles versions majeures des dépendances",
+        "details": "1. Tests Freezed:\n   - Adapter les tests de sérialisation aux nouveaux formats\n   - Mettre à jour les tests de copyWith pour nullable\n   - Vérifier les unions et sealed classes\n2. Tests Riverpod:\n   - Migrer ProviderContainer vers les nouveaux patterns\n   - Utiliser les nouveaux TestWidgets pour Riverpod\n   - Adapter les mocks de providers (mockito → riverpod_test)\n3. Tests go_router:\n   - Utiliser MockGoRouter de la v15\n   - Adapter les tests de navigation aux nouvelles APIs\n   - Tester les nouveaux guards asynchrones\n4. Tests Supabase:\n   - Implémenter les mocks v3 avec supabase_test\n   - Adapter les tests realtime aux channels\n   - Mocker les nouvelles erreurs typées\n5. Créer des helpers de test spécifiques par dépendance",
+        "testStrategy": "Exécuter les tests par catégorie (unit, widget, integration) et corriger jusqu'à 100% de passage. Utiliser --coverage pour identifier les zones non testées. Valider avec flutter test --reporter=expanded.",
+        "priority": "high",
+        "dependencies": [
+          16
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Adapter les tests des modèles Freezed aux nouvelles APIs",
+            "description": "Migrer tous les tests unitaires des modèles Freezed pour utiliser les nouvelles annotations et méthodes de la version 2.5.7",
+            "dependencies": [],
+            "details": "1. Identifier tous les fichiers de test *_test.dart testant des modèles Freezed\n2. Adapter les tests de sérialisation:\n   - Utiliser les nouvelles méthodes fromJson/toJson générées\n   - Vérifier la compatibilité avec json_serializable 6.8.0\n   - Tester les @JsonKey avec les nouvelles options\n3. Mettre à jour les tests copyWith:\n   - Tester explicitement les valeurs nullable avec copyWith\n   - Vérifier que copyWith(field: null) fonctionne correctement\n   - Ajouter des tests pour les @Default() values\n4. Adapter les tests des unions et sealed classes:\n   - Utiliser les nouveaux patterns de pattern matching\n   - Tester les méthodes when/maybeWhen/map générées\n   - Vérifier l'exhaustivité des switch statements\n5. Créer un helper de test freezed_test_utils.dart avec des matchers personnalisés",
+            "status": "pending",
+            "testStrategy": "Exécuter flutter test test/models --reporter=expanded pour identifier tous les tests échouants. Corriger par ordre de priorité: entités métier critiques (Card, Player, Game) puis modèles secondaires. Viser 100% de couverture sur les modèles."
+          },
+          {
+            "id": 2,
+            "title": "Migrer les tests Riverpod vers les nouveaux patterns de test",
+            "description": "Adapter tous les tests utilisant Riverpod pour utiliser riverpod_test et les nouvelles APIs de la version 2.6.1",
+            "dependencies": [],
+            "details": "1. Remplacer les imports mockito par riverpod_test:\n   - Installer riverpod_test: ^2.0.0\n   - Remplacer MockProviderContainer par TestProviderContainer\n   - Utiliser les nouveaux ProviderScope.overrides\n2. Migrer les tests de providers:\n   - Utiliser createContainer() au lieu de ProviderContainer()\n   - Adapter les overrides avec la nouvelle syntaxe\n   - Implémenter les AsyncNotifier mocks correctement\n3. Adapter les widget tests avec Riverpod:\n   - Utiliser testWidgets avec ProviderScope wrapper\n   - Implémenter les nouveaux patterns pour tester les ConsumerWidget\n   - Créer des helpers pour les tests de ConsumerStatefulWidget\n4. Mettre à jour les tests d'état:\n   - Utiliser container.listen() pour observer les changements\n   - Tester les AsyncValue.guard patterns\n   - Vérifier les AutoDispose providers\n5. Créer riverpod_test_helpers.dart avec des utilities réutilisables",
+            "status": "pending",
+            "testStrategy": "Commencer par les tests des providers critiques (auth, game state). Utiliser flutter test test/providers --coverage pour identifier les zones non couvertes. Documenter les nouveaux patterns dans test/README.md."
+          },
+          {
+            "id": 3,
+            "title": "Adapter les tests de navigation go_router v15",
+            "description": "Migrer tous les tests de navigation pour utiliser les nouvelles APIs de go_router 15.0 et MockGoRouter",
+            "dependencies": [
+              "17.1",
+              "17.2"
+            ],
+            "details": "1. Installer et configurer go_router_test:\n   - Ajouter go_router_test: ^15.0.0 aux dev_dependencies\n   - Importer MockGoRouter et les helpers de test\n   - Configurer les mocks de navigation de base\n2. Adapter les tests de routes:\n   - Utiliser les nouveaux matchers pour tester les routes\n   - Tester StatefulShellRoute avec les états préservés\n   - Vérifier les routes imbriquées avec la nouvelle syntaxe\n3. Migrer les tests de guards:\n   - Tester les nouveaux onEnter/onExit callbacks\n   - Implémenter des tests pour les guards asynchrones\n   - Vérifier les redirections avec NavigationObserver\n4. Adapter les tests de deep links:\n   - Utiliser les nouveaux patterns pour pathParameters\n   - Tester queryParameters et extra objects\n   - Vérifier la navigation avec goNamed vs go\n5. Créer go_router_test_utils.dart avec des factories de routes mockées",
+            "status": "pending",
+            "testStrategy": "Tester d'abord les routes critiques (auth flow, game flow). Utiliser des tests d'intégration pour valider les parcours utilisateur complets. Documenter les cas de test de navigation complexes."
+          },
+          {
+            "id": 4,
+            "title": "Migrer les tests Supabase vers la v3 avec mocks appropriés",
+            "description": "Adapter tous les tests utilisant Supabase pour utiliser supabase_test et les nouvelles APIs de la version 3.0",
+            "dependencies": [
+              "17.1",
+              "17.2",
+              "17.3"
+            ],
+            "details": "1. Installer et configurer supabase_test:\n   - Ajouter supabase_test: ^3.0.0 aux dev_dependencies\n   - Configurer MockSupabaseClient avec les nouvelles options\n   - Créer des fixtures pour les réponses Supabase\n2. Adapter les tests d'authentification:\n   - Mocker signInWithPassword() au lieu de signIn()\n   - Tester onAuthStateChange avec les nouveaux events\n   - Implémenter les tests de refresh token automatique\n3. Migrer les tests de database:\n   - Retirer les .execute() obsolètes des tests\n   - Utiliser .single() et .maybeSingle() dans les assertions\n   - Tester les nouvelles erreurs typées PostgrestException\n4. Adapter les tests realtime:\n   - Mocker les nouveaux RealtimeChannel\n   - Tester subscribe() avec les callbacks modernes\n   - Vérifier les presence et broadcast features\n5. Créer supabase_test_helpers.dart avec des builders de réponses mockées",
+            "status": "pending",
+            "testStrategy": "Prioriser les tests critiques: auth anonyme, sync des parties, realtime updates. Créer des scénarios de test end-to-end simulant des parties complètes. Utiliser des fixtures JSON pour les données de test."
+          },
+          {
+            "id": 5,
+            "title": "Créer une suite de tests d'intégration pour valider toutes les migrations",
+            "description": "Développer des tests d'intégration complets vérifiant que toutes les dépendances migrées fonctionnent ensemble correctement",
+            "dependencies": [
+              "17.1",
+              "17.2",
+              "17.3",
+              "17.4"
+            ],
+            "details": "1. Créer integration_test/migration_validation_test.dart:\n   - Test complet du flow d'authentification anonyme\n   - Test de création et synchronisation de partie\n   - Test de navigation entre tous les écrans\n   - Test des modèles Freezed avec données réelles\n2. Implémenter des tests de performance:\n   - Mesurer les temps de démarrage de l'app\n   - Vérifier la consommation mémoire avec les nouvelles versions\n   - Tester les rebuilds Riverpod et optimisations\n3. Créer des tests de régression:\n   - Comparer les comportements avant/après migration\n   - Vérifier la rétrocompatibilité des données\n   - Tester les edge cases identifiés durant la migration\n4. Documenter les helpers de test:\n   - Créer test/helpers/README.md avec exemples\n   - Fournir des templates pour nouveaux tests\n   - Lister les patterns de test recommandés\n5. Configurer CI/CD pour les nouveaux tests:\n   - Adapter les GitHub Actions pour les tests d'intégration\n   - Configurer les rapports de couverture détaillés\n   - Mettre en place des benchmarks de performance",
+            "status": "pending",
+            "testStrategy": "Exécuter flutter test --coverage --merge-coverage pour obtenir une vue globale. Viser minimum 85% de couverture. Utiliser flutter drive pour les tests d'intégration sur émulateur. Documenter tous les cas de test critiques."
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "title": "Implémenter une couverture de tests pour les nouvelles APIs",
+        "description": "Créer de nouveaux tests pour couvrir les fonctionnalités introduites par les mises à jour majeures et garantir une utilisation correcte",
+        "details": "1. Nouvelles features à tester:\n   - Riverpod 3: AsyncNotifier, ref.invalidate, keepAlive\n   - go_router 15: StatefulShellRoute, onEnter/onExit\n   - Supabase 3: Retry policies, connection management\n   - Freezed 3: Macros (si disponibles), pattern matching\n2. Créer des tests d'intégration pour:\n   - Flows d'authentification complets avec Supabase v3\n   - Navigation complexe avec état préservé\n   - Gestion d'état avec les nouveaux Notifiers\n3. Tests de performance:\n   - Mesurer les rebuilds avec Riverpod 3\n   - Benchmarker les queries Supabase\n   - Profiler la navigation\n4. Tests de résilience:\n   - Coupures réseau avec Supabase\n   - États concurrents avec Riverpod\n5. Documentation des patterns de test",
+        "testStrategy": "Viser une couverture de 90%+ sur les nouvelles APIs. Créer des tests de régression pour les bugs connus des versions précédentes. Utiliser les golden tests pour l'UI. Implémenter des smoke tests end-to-end.",
+        "priority": "medium",
+        "dependencies": [
+          17
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer une suite de tests pour les nouvelles fonctionnalités Riverpod 3",
+            "description": "Implémenter des tests unitaires et d'intégration pour AsyncNotifier, ref.invalidate et keepAlive en suivant l'approche TDD",
+            "dependencies": [],
+            "details": "1. Tests unitaires pour AsyncNotifier:\n   - Tester la création et l'initialisation d'AsyncNotifier\n   - Vérifier la gestion des états loading/data/error\n   - Tester les méthodes build() et update()\n   - Valider le comportement avec les mutations concurrentes\n2. Tests pour ref.invalidate:\n   - Tester l'invalidation simple d'un provider\n   - Vérifier l'invalidation en cascade des dépendances\n   - Tester l'invalidation avec des providers family\n   - Valider le comportement avec autoDispose\n3. Tests pour keepAlive:\n   - Tester la persistance des providers avec keepAlive\n   - Vérifier le comportement avec différentes durées\n   - Tester l'interaction avec autoDispose\n   - Valider la libération mémoire après expiration\n4. Tests d'intégration:\n   - Créer des scénarios complexes combinant les 3 features\n   - Tester les performances avec de multiples providers\n   - Vérifier l'absence de memory leaks",
+            "status": "pending",
+            "testStrategy": "Utiliser flutter_test et mocktail pour les mocks. Créer des helpers de test réutilisables pour AsyncNotifier. Implémenter des matchers personnalisés pour vérifier les états asynchrones. Mesurer la couverture avec lcov pour atteindre 95%+ sur ces features."
+          },
+          {
+            "id": 2,
+            "title": "Développer des tests complets pour go_router 15 avec StatefulShellRoute",
+            "description": "Créer des tests pour la navigation complexe avec préservation d'état, incluant onEnter/onExit et les shells imbriqués",
+            "dependencies": [],
+            "details": "1. Tests pour StatefulShellRoute:\n   - Tester la création de routes avec état préservé\n   - Vérifier la navigation entre branches avec restauration d'état\n   - Tester les shells imbriqués et leur hiérarchie\n   - Valider la gestion mémoire lors des changements de branche\n2. Tests pour les callbacks onEnter/onExit:\n   - Tester l'exécution des callbacks dans le bon ordre\n   - Vérifier la propagation des paramètres de route\n   - Tester les cas d'erreur et leur gestion\n   - Valider l'annulation de navigation via onEnter\n3. Tests de navigation complexe:\n   - Créer des scénarios multi-branches avec état\n   - Tester la navigation profonde avec paramètres\n   - Vérifier la restauration après kill de l'app\n   - Tester les redirections conditionnelles\n4. Tests de performance:\n   - Mesurer le temps de navigation entre branches\n   - Profiler la consommation mémoire avec états multiples\n   - Benchmarker les rebuilds de widgets lors des navigations",
+            "status": "pending",
+            "testStrategy": "Utiliser patrol_test pour les tests d'intégration UI. Créer des mocks de GoRouter avec mockito. Implémenter des golden tests pour vérifier l'état visuel. Utiliser flutter_driver pour les tests de performance end-to-end."
+          },
+          {
+            "id": 3,
+            "title": "Implémenter des tests de résilience pour Supabase 3",
+            "description": "Développer des tests pour les retry policies, la gestion de connexion et les scénarios de défaillance réseau",
+            "dependencies": [
+              "18.1",
+              "18.2"
+            ],
+            "details": "1. Tests des retry policies:\n   - Tester la configuration des politiques de retry\n   - Vérifier le comportement avec différents types d'erreurs\n   - Tester l'exponential backoff et les limites\n   - Valider la propagation des erreurs après épuisement\n2. Tests de gestion de connexion:\n   - Simuler des coupures réseau avec connectivity_plus\n   - Tester la reconnexion automatique\n   - Vérifier la persistance des requêtes en attente\n   - Tester la synchronisation après reconnexion\n3. Tests Realtime sous contraintes:\n   - Tester les WebSockets avec latence élevée\n   - Vérifier la gestion des timeouts\n   - Tester la reconnexion des channels\n   - Valider l'ordre des messages après reconnexion\n4. Tests de charge:\n   - Simuler 100+ requêtes simultanées\n   - Tester la limitation de débit (rate limiting)\n   - Vérifier la gestion de la file d'attente\n   - Mesurer les performances sous charge",
+            "status": "pending",
+            "testStrategy": "Utiliser dio_mock_adapter pour simuler les réponses réseau. Créer un serveur mock Supabase local avec wiremock. Implémenter des tests de chaos engineering avec des coupures aléatoires. Utiliser integration_test pour les scénarios end-to-end."
+          },
+          {
+            "id": 4,
+            "title": "Créer des tests de performance et de profiling",
+            "description": "Développer une suite de tests mesurant les performances des nouvelles APIs et identifiant les régressions",
+            "dependencies": [
+              "18.1",
+              "18.2",
+              "18.3"
+            ],
+            "details": "1. Benchmarks Riverpod 3:\n   - Mesurer les rebuilds avec ProviderObserver personnalisé\n   - Comparer AsyncNotifier vs StateNotifier (performances)\n   - Profiler la consommation mémoire des providers\n   - Tester les performances avec 1000+ providers\n2. Profiling go_router:\n   - Mesurer le temps de navigation entre routes\n   - Analyser les rebuilds lors des changements de route\n   - Profiler la mémoire avec routes complexes\n   - Benchmarker StatefulShellRoute vs routes classiques\n3. Métriques Supabase:\n   - Mesurer la latence des queries (p50, p95, p99)\n   - Profiler la bande passante utilisée\n   - Benchmarker les batch operations\n   - Analyser les performances Realtime\n4. Outils et rapports:\n   - Intégrer flutter_profiler pour les métriques\n   - Créer des dashboards de performance\n   - Configurer des alertes sur régressions\n   - Générer des rapports HTML avec graphiques",
+            "status": "pending",
+            "testStrategy": "Utiliser benchmark_harness pour les micro-benchmarks. Implémenter des tests de charge avec k6. Créer des profils de performance baseline. Intégrer les résultats dans la CI avec seuils de régression à 5%."
+          },
+          {
+            "id": 5,
+            "title": "Développer des tests d'intégration end-to-end complets",
+            "description": "Créer des scénarios utilisateur complets testant l'interaction entre toutes les nouvelles APIs",
+            "dependencies": [
+              "18.1",
+              "18.2",
+              "18.3",
+              "18.4"
+            ],
+            "details": "1. Scénario d'authentification complète:\n   - Tester le flow de connexion anonyme Supabase\n   - Vérifier la navigation post-auth avec go_router\n   - Tester la persistance de session avec Riverpod\n   - Valider la gestion des erreurs d'auth\n2. Scénario de jeu multijoueur:\n   - Tester la création de partie avec Realtime\n   - Vérifier la synchronisation d'état entre joueurs\n   - Tester la reconnexion en cours de partie\n   - Valider la sauvegarde d'état avec keepAlive\n3. Scénario de résilience:\n   - Simuler des coupures pendant les actions critiques\n   - Tester la récupération d'état après crash\n   - Vérifier l'intégrité des données\n   - Tester les edge cases (partie pleine, timeout, etc.)\n4. Tests visuels:\n   - Créer des golden tests pour chaque écran\n   - Tester les transitions entre états\n   - Vérifier le rendu sur différentes tailles\n   - Valider l'accessibilité avec semantics",
+            "status": "pending",
+            "testStrategy": "Utiliser patrol pour l'automatisation UI native. Créer des fixtures de données réalistes. Implémenter des smoke tests prioritaires pour la CI. Documenter chaque scénario avec des vidéos de test. Viser 80% de couverture sur les user journeys critiques."
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "title": "Valider et optimiser la suite de tests complète",
+        "description": "Exécuter la suite de tests finale, corriger les dernières erreurs, optimiser les performances et garantir la fiabilité à 100%",
+        "details": "1. Exécution complète avec métriques:\n   ```bash\n   flutter test --coverage --reporter=json > test_results.json\n   genhtml coverage/lcov.info -o coverage/html\n   ```\n2. Analyser et corriger:\n   - Tests flaky (qui échouent aléatoirement)\n   - Tests lents (> 1 seconde)\n   - Dépendances entre tests\n   - Fuites mémoire dans les tests\n3. Optimisations:\n   - Paralléliser avec --concurrency=4\n   - Utiliser test tags pour grouper\n   - Implémenter des test suites\n   - Cache des fixtures coûteuses\n4. Mettre en place des seuils:\n   - Coverage minimum: 80%\n   - Temps max par test: 2s\n   - Temps total suite: < 5 minutes\n5. Créer un dashboard de santé des tests",
+        "testStrategy": "Exécuter les tests 10 fois consécutives pour détecter les flaky tests. Utiliser --seed pour la reproductibilité. Profiler avec --profile pour identifier les bottlenecks. Valider sur différentes configurations.",
+        "priority": "high",
+        "dependencies": [
+          18
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Exécuter et analyser la suite de tests complète avec métriques",
+            "description": "Lancer tous les tests avec génération de rapports détaillés, identifier les tests problématiques et collecter les métriques de performance",
+            "dependencies": [],
+            "details": "1. Exécuter la suite complète avec collecte de métriques:\n   ```bash\n   flutter test --coverage --reporter=json > test_results.json\n   flutter test --reporter=expanded --no-pub > test_output.txt\n   genhtml coverage/lcov.info -o coverage/html\n   ```\n2. Analyser les résultats JSON pour identifier:\n   - Tests échoués avec stacktraces\n   - Tests lents (> 1 seconde)\n   - Couverture par module\n3. Créer un script d'analyse automatique:\n   - Parser test_results.json\n   - Générer un rapport markdown\n   - Identifier les patterns d'échec\n4. Documenter tous les problèmes trouvés dans un fichier test_issues.md",
+            "status": "pending",
+            "testStrategy": "Exécuter les tests 3 fois consécutives pour identifier la variabilité. Utiliser --seed=42 pour la reproductibilité. Capturer les temps d'exécution et la consommation mémoire avec --profile."
+          },
+          {
+            "id": 2,
+            "title": "Corriger les tests flaky et les dépendances inter-tests",
+            "description": "Éliminer tous les tests instables et garantir l'isolation complète entre chaque test pour une fiabilité à 100%",
+            "dependencies": [
+              "19.1"
+            ],
+            "details": "1. Identifier et corriger les tests flaky:\n   - Utiliser `flutter test --seed=random` 10 fois\n   - Isoler les tests qui échouent aléatoirement\n   - Corriger les race conditions et timers mal gérés\n2. Éliminer les dépendances entre tests:\n   - Vérifier l'ordre d'exécution avec --test-randomize-ordering-seed\n   - Implémenter setUp() et tearDown() complets\n   - Nettoyer tous les états globaux\n3. Techniques de correction:\n   - Remplacer Timer par FakeAsync\n   - Utiliser TestWidgetsFlutterBinding.ensureInitialized()\n   - Implémenter des retry mechanisms pour les tests réseau\n4. Valider avec 50 exécutions consécutives sans échec",
+            "status": "pending",
+            "testStrategy": "Créer une matrice de tests isolés vs groupés. Utiliser pump() et pumpAndSettle() correctement. Implémenter des timeouts explicites pour chaque test async."
+          },
+          {
+            "id": 3,
+            "title": "Optimiser les performances et paralléliser l'exécution",
+            "description": "Réduire le temps total d'exécution de la suite de tests sous 5 minutes en implémentant la parallélisation et l'optimisation",
+            "dependencies": [
+              "19.2"
+            ],
+            "details": "1. Implémenter la parallélisation:\n   ```bash\n   flutter test --concurrency=4\n   flutter test --shard-count=4 --shard-index=0\n   ```\n2. Optimiser les tests lents:\n   - Profiler avec --profile pour identifier les bottlenecks\n   - Implémenter des mocks légers pour Supabase\n   - Réutiliser les fixtures coûteuses avec setUpAll()\n3. Créer des test suites par feature:\n   - @Tags(['unit']) pour tests unitaires rapides\n   - @Tags(['integration']) pour tests plus lents\n   - @Tags(['widget']) pour tests UI\n4. Mettre en cache les dépendances de test:\n   - Créer des factories pour les objets de test\n   - Implémenter un TestDataCache singleton\n5. Objectif: < 2min pour unit, < 3min pour integration",
+            "status": "pending",
+            "testStrategy": "Mesurer les gains de performance avec hyperfine. Comparer les temps avant/après optimisation. Vérifier que la parallélisation ne crée pas de nouveaux flaky tests."
+          },
+          {
+            "id": 4,
+            "title": "Implémenter les seuils de qualité et les garde-fous",
+            "description": "Configurer des seuils stricts de couverture, performance et qualité avec échec automatique si non respectés",
+            "dependencies": [
+              "19.3"
+            ],
+            "details": "1. Configurer les seuils de couverture:\n   - Créer coverage_check.dart analysant lcov.info\n   - Seuil global: 80% minimum\n   - Seuils par module: 75% pour UI, 90% pour domain\n2. Implémenter les limites de performance:\n   - Script vérifiant temps max par test: 2s\n   - Temps total suite: < 5 minutes\n   - Alerte si test > 500ms\n3. Créer des pre-commit hooks:\n   ```bash\n   #!/bin/bash\n   flutter test --coverage || exit 1\n   dart coverage_check.dart || exit 1\n   ```\n4. Intégrer dans CI/CD:\n   - Fail si couverture < 80%\n   - Fail si tests > 5 minutes\n   - Rapport automatique dans PR\n5. Configurer les badges de statut GitHub",
+            "status": "pending",
+            "testStrategy": "Tester les scripts de vérification avec des cas limites. Valider que les seuils bloquent bien les commits non conformes. Simuler des échecs pour vérifier les alertes."
+          },
+          {
+            "id": 5,
+            "title": "Créer un dashboard de monitoring et documentation des tests",
+            "description": "Mettre en place un tableau de bord visuel pour suivre la santé des tests et documenter les bonnes pratiques",
+            "dependencies": [
+              "19.4"
+            ],
+            "details": "1. Créer un dashboard HTML généré automatiquement:\n   - Graphiques de couverture par module\n   - Historique des temps d'exécution\n   - Top 10 des tests les plus lents\n   - Matrice de fiabilité (% succès sur 30 jours)\n2. Intégrer avec GitHub Pages:\n   - Déploiement automatique après chaque CI\n   - Lien dans le README principal\n3. Documentation des tests:\n   - Guide de rédaction des tests TDD\n   - Patterns recommandés pour Riverpod\n   - Exemples de tests pour chaque couche\n4. Métriques avancées:\n   - Mutation testing score\n   - Complexité cyclomatique couverte\n   - Debt technique des tests\n5. Alertes Slack/Discord pour régression de couverture",
+            "status": "pending",
+            "testStrategy": "Valider la génération automatique du dashboard. Tester l'intégration CI/CD complète. Vérifier l'accessibilité du dashboard depuis GitHub Pages."
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "title": "Intégrer le script WSL dans la CI/CD GitHub Actions",
+        "description": "Adapter et intégrer le script de compilation WSL dans le pipeline CI existant pour valider la compilation sur un runner Linux",
+        "details": "1. Créer .github/workflows/wsl-build.yml:\n   - Trigger sur PR et push to main\n   - Runner: ubuntu-latest\n   - Matrix build: [debug, release]\n2. Adapter le script pour GitHub Actions:\n   - Utiliser les actions/cache@v4 pour Flutter\n   - Secrets pour les variables d'environnement\n   - Artifacts pour les APKs générés\n3. Étapes du workflow:\n   ```yaml\n   - uses: actions/checkout@v4\n   - uses: subosito/flutter-action@v2\n     with:\n       flutter-version: '3.32.6'\n       channel: 'stable'\n       cache: true\n   - run: ./scripts/build_wsl_android.sh\n   ```\n4. Notifications et rapports:\n   - Slack/Discord webhook sur échec\n   - Commentaire automatique sur PR\n   - Badge de build status\n5. Optimiser les temps de build avec cache agressif",
+        "testStrategy": "Créer une PR de test pour valider le workflow. Simuler des échecs de build et vérifier les notifications. Mesurer les temps de CI avant/après optimisations. Tester la restauration du cache.",
+        "priority": "low",
+        "dependencies": [
+          14,
+          19
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer et configurer le workflow WSL build",
+            "description": "Créer le fichier .github/workflows/wsl-build.yml avec la configuration de base pour déclencher les builds sur PR et push vers main",
+            "dependencies": [],
+            "details": "Créer le fichier workflow avec les triggers appropriés (on: push branches: [main], pull_request). Configurer le runner ubuntu-latest et définir la stratégie de matrix pour les builds debug et release. Ajouter les permissions nécessaires pour les artifacts et les commentaires PR. Définir les variables d'environnement globales et les timeouts appropriés.",
+            "status": "pending",
+            "testStrategy": "Créer une PR de test avec un changement mineur pour valider le déclenchement. Vérifier que les deux jobs (debug/release) se lancent en parallèle. Tester l'annulation automatique des workflows obsolètes."
+          },
+          {
+            "id": 2,
+            "title": "Adapter le script build_wsl_android.sh pour GitHub Actions",
+            "description": "Modifier le script de compilation WSL existant pour qu'il fonctionne correctement dans l'environnement GitHub Actions",
+            "dependencies": [
+              "20.1"
+            ],
+            "details": "Adapter les chemins pour l'environnement GitHub (GITHUB_WORKSPACE). Remplacer les interactions utilisateur par des valeurs par défaut ou variables d'environnement. Ajouter la gestion des codes de sortie pour CI. Implémenter un mode --ci qui désactive les couleurs et active les logs détaillés. Gérer les secrets via variables d'environnement GitHub.",
+            "status": "pending",
+            "testStrategy": "Tester le script localement avec les flags CI. Vérifier que le script retourne les bons codes d'erreur. Valider la sortie des logs dans GitHub Actions. Simuler des erreurs de compilation pour vérifier la propagation."
+          },
+          {
+            "id": 3,
+            "title": "Implémenter le cache agressif pour optimiser les temps de build",
+            "description": "Configurer actions/cache@v4 pour Flutter SDK, pub dependencies, gradle et build outputs afin de réduire drastiquement les temps de CI",
+            "dependencies": [
+              "20.2"
+            ],
+            "details": "Configurer le cache Flutter avec hash de pubspec.lock comme clé. Implémenter le cache Gradle (~/.gradle/caches et ~/.gradle/wrapper). Cacher le dossier build/cache pour les outputs intermédiaires. Utiliser des clés de cache avec restore-keys pour fallback. Ajouter un job de warm-up du cache sur schedule (nightly). Implémenter la stratégie de cache par branche.",
+            "status": "pending",
+            "testStrategy": "Mesurer les temps avant/après cache (objectif: 70% de réduction). Tester l'invalidation du cache lors de changements de dépendances. Vérifier la taille totale du cache (<10GB limite GitHub). Simuler un cache corrompu et valider la récupération."
+          },
+          {
+            "id": 4,
+            "title": "Configurer les artifacts et les rapports de build",
+            "description": "Mettre en place l'upload des APKs générés et la génération de rapports de build accessibles depuis l'interface GitHub",
+            "dependencies": [
+              "20.3"
+            ],
+            "details": "Utiliser actions/upload-artifact@v4 pour les APKs avec retention de 30 jours. Nommer les artifacts avec version et SHA du commit. Générer un rapport de build (taille APK, temps de compilation, warnings). Créer un job summary avec les liens de téléchargement. Implémenter la compression des artifacts pour économiser l'espace. Ajouter les checksums SHA256 pour vérification.",
+            "status": "pending",
+            "testStrategy": "Vérifier que les APKs sont téléchargeables depuis l'UI GitHub. Tester l'expiration des artifacts après la période de rétention. Valider les checksums des APKs téléchargés. Vérifier la lisibilité du job summary."
+          },
+          {
+            "id": 5,
+            "title": "Intégrer les notifications et le feedback automatique",
+            "description": "Configurer les webhooks de notification et les commentaires automatiques sur les PRs pour informer l'équipe du statut des builds",
+            "dependencies": [
+              "20.4"
+            ],
+            "details": "Configurer les webhooks Slack/Discord via secrets GitHub pour notifier sur échec uniquement. Utiliser actions/github-script pour commenter les PRs avec le statut, les liens artifacts et les métriques. Ajouter un badge de build status dans le README. Implémenter un résumé des changements de taille d'APK entre commits. Créer des notifications différenciées selon le type d'échec (compilation, tests, linting).",
+            "status": "pending",
+            "testStrategy": "Créer une PR avec échec intentionnel pour tester les notifications. Vérifier que les commentaires PR sont mis à jour et non dupliqués. Tester les webhooks avec des payloads de test. Valider l'affichage correct du badge de status."
+          }
+        ]
+      },
+      {
+        "id": 21,
+        "title": "Documenter le processus de migration et créer un playbook",
+        "description": "Créer une documentation complète du processus de migration effectué, incluant les leçons apprises et un guide pour les futures mises à jour",
+        "details": "1. Créer MIGRATION_PLAYBOOK.md structuré:\n   - Executive summary des changements\n   - Timeline et efforts par tâche\n   - Problèmes rencontrés et solutions\n   - Décisions techniques prises\n2. Guide des mises à jour futures:\n   - Checklist pré-migration\n   - Stratégie de branches Git\n   - Rollback procedures\n   - Communication avec l'équipe\n3. Sections techniques:\n   - Scripts et commandes utiles\n   - Patterns de migration réutilisables\n   - Pièges à éviter\n   - Outils de debugging\n4. Métriques du projet:\n   - Temps total de migration\n   - Nombre de commits\n   - Tests ajoutés/supprimés\n   - Impact sur les performances\n5. Créer des templates pour futures migrations",
+        "testStrategy": "Faire relire la documentation par un développeur n'ayant pas participé à la migration. Tester les commandes documentées dans un environnement vierge. Valider que le playbook est actionnable et complet.",
+        "priority": "low",
+        "dependencies": [
+          20
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer la structure et le sommaire exécutif du MIGRATION_PLAYBOOK.md",
+            "description": "Établir la structure complète du document de migration avec un sommaire exécutif détaillant les changements majeurs, les objectifs atteints et les bénéfices de la migration",
+            "dependencies": [],
+            "details": "1. Créer le fichier MIGRATION_PLAYBOOK.md avec une structure claire:\n   - Table des matières interactive\n   - Executive Summary (1-2 pages)\n   - Vue d'ensemble des changements (Flutter 3.32.6, Dart 3.8.1, etc.)\n   - Chronologie de la migration avec jalons clés\n2. Rédiger le sommaire exécutif incluant:\n   - Contexte et motivations de la migration\n   - Scope technique (dépendances, architecture, CI/CD)\n   - Impact business (performance, maintenabilité)\n   - Statistiques clés (nombre de fichiers modifiés, tests ajoutés)\n3. Créer des visualisations (diagrammes mermaid) pour:\n   - Timeline de migration\n   - Dépendances avant/après\n   - Architecture mise à jour",
+            "status": "pending",
+            "testStrategy": "Valider la structure avec un template checker. Vérifier que tous les liens de la table des matières fonctionnent. Faire relire le sommaire par un stakeholder non-technique pour s'assurer de la clarté."
+          },
+          {
+            "id": 2,
+            "title": "Documenter les problèmes rencontrés et leurs solutions techniques",
+            "description": "Compiler et structurer tous les problèmes techniques rencontrés pendant la migration avec leurs solutions détaillées, incluant les workarounds et les décisions d'architecture",
+            "dependencies": [
+              "21.1"
+            ],
+            "details": "1. Section 'Défis et Solutions':\n   - Problèmes de build Android (Gradle 8.12, Java 17)\n   - Incompatibilités de packages (flutter_lints, freezed)\n   - Breaking changes des dépendances majeures\n   - Problèmes de CI/CD et leur résolution\n2. Pour chaque problème documenté:\n   - Description du problème\n   - Stacktrace ou message d'erreur\n   - Solution appliquée avec code snippets\n   - Alternative envisagées et pourquoi rejetées\n   - Temps de résolution estimé\n3. Créer une matrice de décision pour:\n   - Choix de versions de dépendances\n   - Trade-offs performance vs compatibilité\n   - Décisions d'architecture (Clean Architecture maintenue)\n4. Ajouter une section 'Pièges à éviter' avec les erreurs communes",
+            "status": "pending",
+            "testStrategy": "Reproduire au moins 3 problèmes documentés dans un environnement de test pour valider les solutions. Vérifier que chaque solution inclut des commandes exécutables."
+          },
+          {
+            "id": 3,
+            "title": "Créer le guide opérationnel et les procédures de rollback",
+            "description": "Développer un guide pratique pour les futures migrations incluant checklists, procédures de rollback, stratégies de branches Git et communication d'équipe",
+            "dependencies": [
+              "21.1",
+              "21.2"
+            ],
+            "details": "1. Checklist pré-migration complète:\n   - Vérifications environnement (Flutter doctor, versions)\n   - Backup du projet et des données\n   - Création de branches de travail\n   - Tests de régression baseline\n2. Stratégie Git détaillée:\n   - Workflow de branches pour migration (feature/migration-*)\n   - Politique de merge et de rebase\n   - Gestion des conflits pendant migration\n   - Tags et versioning sémantique\n3. Procédures de rollback par étape:\n   - Rollback de dépendances individuelles\n   - Rollback de changements CI/CD\n   - Scripts de restauration d'état\n   - Validation post-rollback\n4. Plan de communication:\n   - Templates d'annonces équipe\n   - Calendrier de migration\n   - Points de synchronisation\n   - Escalation en cas de blocage",
+            "status": "pending",
+            "testStrategy": "Simuler un rollback complet sur une branche test. Valider chaque item de la checklist sur un nouveau projet. Tester les scripts de rollback dans un environnement isolé."
+          },
+          {
+            "id": 4,
+            "title": "Compiler les scripts, outils et patterns de migration réutilisables",
+            "description": "Rassembler et documenter tous les scripts automatisés, commandes utiles et patterns de code développés pendant la migration pour créer une boîte à outils réutilisable",
+            "dependencies": [
+              "21.2",
+              "21.3"
+            ],
+            "details": "1. Section 'Boîte à outils de migration':\n   - Scripts bash pour validation projet (validate_project.sh)\n   - Scripts de nettoyage build (clean_build.sh)\n   - Hooks Git personnalisés (pre-commit, commit-msg)\n   - Scripts d'installation automatisée\n2. Commandes utiles catégorisées:\n   - Commandes Flutter (analyze, test, build)\n   - Commandes Gradle pour Android\n   - Commandes de génération de code\n   - Commandes de debugging\n3. Patterns de migration de code:\n   - Migration Freezed v2 vers v2.5+\n   - Migration Riverpod providers\n   - Adaptation go_router\n   - Patterns Clean Architecture maintenus\n4. Créer un dépôt 'migration-toolkit' avec:\n   - Scripts prêts à l'emploi\n   - Templates de configuration\n   - Snippets VS Code/IDE",
+            "status": "pending",
+            "testStrategy": "Exécuter chaque script sur un projet vierge. Valider que les patterns de code compilent sans erreur. Tester l'installation complète du toolkit sur une nouvelle machine."
+          },
+          {
+            "id": 5,
+            "title": "Générer les métriques du projet et créer les templates pour futures migrations",
+            "description": "Analyser et compiler toutes les métriques de la migration, créer des visualisations et développer des templates réutilisables pour standardiser les futures mises à jour",
+            "dependencies": [
+              "21.1",
+              "21.2",
+              "21.3",
+              "21.4"
+            ],
+            "details": "1. Collecte et analyse des métriques:\n   - Temps total par tâche (données Task Master)\n   - Nombre de commits et PR par phase\n   - Tests ajoutés/modifiés/supprimés\n   - Couverture de code avant/après\n   - Performance build (temps de compilation)\n   - Taille APK avant/après\n2. Créer des visualisations:\n   - Graphiques de progression temporelle\n   - Burndown chart des tâches\n   - Heatmap des fichiers modifiés\n   - Dashboard de santé du projet\n3. Templates de migration:\n   - Template PRD pour migration Flutter\n   - Template de tracking de tâches\n   - Template de rapport post-mortem\n   - Checklist de validation QA\n4. Section 'Retour d'expérience':\n   - Ce qui a bien fonctionné\n   - Améliorations pour la prochaine fois\n   - Recommandations d'équipe\n   - Estimation de ROI",
+            "status": "pending",
+            "testStrategy": "Valider l'exactitude des métriques avec les logs Git et Task Master. Tester les templates sur un cas d'usage fictif. Faire valider les visualisations par l'équipe projet."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-26T08:33:15.007Z",
+      "updated": "2025-07-26T09:17:33.954Z",
       "description": "Tasks for master context"
     }
   }
