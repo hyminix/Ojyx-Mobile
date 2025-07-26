@@ -33,9 +33,9 @@ grep -m1 '"title"' .taskmaster/tasks/tasks.json
 
 ### 5. État Actuel (2025-07-26)
 - Branche : `feat/continue-refactoring-work`
-- PRD : "Plan de Développement Ojyx - PRD de Finalisation"
-- Focus : Refactoring architecture (GamePlayer/LobbyPlayer)
-- Tâche en cours : ID 1 - Refactoring des entités Player
+- PRD : "PRD Ojyx : Mise à Niveau Technique et Compilation (TDD-Driven)"
+- Focus : Mise à jour des dépendances et compilation Android
+- Tâche en cours : ID 2 - Mise à Jour Incrémentale des Dépendances Core (in-progress)
 
 ## Commandes de Récupération en Cas de Problème
 ```bash
