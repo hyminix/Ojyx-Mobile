@@ -191,7 +191,7 @@ ENABLE_PERFORMANCE_MONITORING=true
       try {
         throw Exception('Test error for Sentry');
       } catch (e, stack) {
-        await sentryService.captureException(e, stackTrace: stack);
+        await SentryService.captureException(e, stackTrace: stack);
       }
 
       // Calculate metrics
@@ -272,7 +272,7 @@ ENABLE_PERFORMANCE_MONITORING=true
       // 3. Join game room (realtime)
       final mockChannel = MockRealtimeChannel();
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async {
+      when(() => mockChannel.subscribe()).thenAnswer((_) {
         sessionMetrics['game_joined'] = true;
         return mockChannel;
       });

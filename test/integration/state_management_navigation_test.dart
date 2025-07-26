@@ -5,8 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:ojyx/core/config/router_config.dart';
 import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
 import 'package:ojyx/features/game/presentation/providers/card_selection_provider_v2.dart';
-import 'package:ojyx/features/game/presentation/providers/action_card_provider_v2.dart';
+import 'package:ojyx/features/game/presentation/providers/action_card_state_provider_v2.dart';
 import 'package:ojyx/features/game/presentation/providers/game_animation_provider_v2.dart';
+import 'package:ojyx/features/game/domain/entities/play_direction.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -35,69 +36,59 @@ void main() {
       test('all migrated providers should initialize correctly', () {
         // Test CardSelection provider
         final cardSelection = container.read(cardSelectionProvider);
-        expect(cardSelection.selectedCard, isNull);
-        expect(cardSelection.mode, CardSelectionMode.none);
+        expect(cardSelection.isSelecting, isFalse);
+        expect(cardSelection.selectionType, isNull);
 
         // Test ActionCard provider
-        final actionCard = container.read(actionCardProvider);
-        expect(actionCard.availableCards, isEmpty);
-        expect(actionCard.playerHands, isEmpty);
+        final actionCard = container.read(actionCardStateNotifierProvider);
+        expect(actionCard.drawPileCount, 37);
+        expect(actionCard.discardPileCount, 0);
 
         // Test GameAnimation provider
         final gameAnimation = container.read(gameAnimationProvider);
-        expect(gameAnimation.animatingCards, isEmpty);
-        expect(gameAnimation.currentAnimationType, isNull);
+        expect(gameAnimation.showingDirectionChange, isFalse);
+        expect(gameAnimation.direction, PlayDirection.forward);
       });
 
       test('providers should handle state updates correctly', () {
-        // Update CardSelection
+        // Update CardSelection - start peek selection
         container
             .read(cardSelectionProvider.notifier)
-            .selectCard(
-              playerId: 'player1',
-              cardIndex: 5,
-              mode: CardSelectionMode.peek,
-            );
+            .startPeekSelection(maxCards: 3);
 
-        final updatedSelection = container.read(cardSelectionProvider);
-        expect(updatedSelection.selectedCard, isNotNull);
-        expect(updatedSelection.selectedCard!.playerId, 'player1');
-        expect(updatedSelection.selectedCard!.cardIndex, 5);
-        expect(updatedSelection.mode, CardSelectionMode.peek);
+        var updatedSelection = container.read(cardSelectionProvider);
+        expect(updatedSelection.isSelecting, isTrue);
+        expect(updatedSelection.selectionType, CardSelectionType.peek);
+
+        // Select a card
+        container.read(cardSelectionProvider.notifier).selectCard(1, 2);
+        
+        updatedSelection = container.read(cardSelectionProvider);
+        expect(updatedSelection.selections, isNotEmpty);
+        expect(updatedSelection.selections.first.row, 1);
+        expect(updatedSelection.selections.first.col, 2);
 
         // Clear selection
-        container.read(cardSelectionProvider.notifier).clearSelection();
-        expect(container.read(cardSelectionProvider).selectedCard, isNull);
+        container.read(cardSelectionProvider.notifier).cancelSelection();
+        expect(container.read(cardSelectionProvider).isSelecting, isFalse);
       });
 
       test('providers should interact correctly', () {
-        // Simulate card swap with animation
+        // Simulate card swap selection
         container
             .read(cardSelectionProvider.notifier)
-            .selectCard(
-              playerId: 'player1',
-              cardIndex: 2,
-              mode: CardSelectionMode.swap,
-            );
+            .startSwapSelection();
 
-        // Start animation
+        expect(container.read(cardSelectionProvider).isSelecting, isTrue);
+        expect(container.read(cardSelectionProvider).selectionType, CardSelectionType.swap);
+
+        // Simulate direction change animation
         container
             .read(gameAnimationProvider.notifier)
-            .startAnimation(
-              type: AnimationType.cardSwap,
-              cards: [
-                AnimatingCard(
-                  playerId: 'player1',
-                  cardIndex: 2,
-                  startPosition: const Offset(0, 0),
-                  endPosition: const Offset(100, 100),
-                ),
-              ],
-            );
+            .showDirectionChange(PlayDirection.backward);
 
-        final animation = container.read(gameAnimationProvider);
-        expect(animation.currentAnimationType, AnimationType.cardSwap);
-        expect(animation.animatingCards.length, 1);
+        expect(container.read(gameAnimationProvider).showingDirectionChange, isTrue);
+        expect(container.read(gameAnimationProvider).direction, PlayDirection.backward);
       });
     });
 

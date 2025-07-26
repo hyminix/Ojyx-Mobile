@@ -817,7 +817,7 @@
         "dependencies": [
           12
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -847,7 +847,7 @@
               "13.2"
             ],
             "details": "1. Exécuter `dart fix --dry-run` pour identifier les corrections disponibles\n2. Appliquer automatiquement les corrections sûres: `dart fix --apply`\n3. Pour les imports manuels à corriger:\n   - Rechercher les patterns d'import obsolètes\n   - Mettre à jour vers les nouveaux paths\n   - Exemple: `package:flutter/material.dart` au lieu de paths spécifiques\n4. Identifier les APIs dépréciées:\n   - Utiliser `flutter analyze --no-fatal-warnings`\n   - Rechercher les annotations @deprecated\n   - Migrer vers les nouvelles APIs recommandées\n5. Documenter chaque changement d'API dans MIGRATION_ISSUES.md",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Vérifier que dart fix --dry-run ne trouve plus de corrections et que flutter analyze ne montre aucune dépréciation"
           },
           {
@@ -858,7 +858,7 @@
               "13.3"
             ],
             "details": "1. Activer l'analyse null safety stricte dans analysis_options.yaml:\n   ```yaml\n   analyzer:\n     language:\n       strict-casts: true\n       strict-inference: true\n       strict-raw-types: true\n   ```\n2. Résoudre les erreurs de null safety:\n   - Variables non-nullable utilisées avant initialisation\n   - Casts implicites interdits\n   - Types génériques manquants\n3. Pour chaque erreur:\n   - Analyser si le type peut être nullable (ajouter ?)\n   - Ou garantir l'initialisation (late, valeur par défaut)\n   - Utiliser les assertions null-check (!)\n4. Mettre à jour les règles de linting problématiques\n5. Documenter les patterns de migration utilisés",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Exécuter flutter analyze --no-fatal-infos sans aucune erreur et compiler en mode debug et release avec succès"
           },
           {
@@ -869,7 +869,7 @@
               "13.4"
             ],
             "details": "1. Compiler l'application en mode debug et release:\n   - `flutter build apk --debug`\n   - `flutter build apk --release`\n2. Pour chaque dependency_override:\n   - Commenter l'override\n   - Exécuter flutter pub get\n   - Si succès: retirer définitivement\n   - Si échec: analyser les alternatives\n3. Pour les dépendances problématiques restantes:\n   - Vérifier les issues GitHub du package\n   - Proposer une PR si correction simple\n   - Contacter les mainteneurs via issues\n   - Envisager des alternatives si abandon\n4. Mettre à jour MIGRATION_ISSUES.md avec:\n   - Statut final de chaque conflit\n   - Overrides permanents restants\n   - Issues ouvertes sur packages tiers",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Vérifier que l'application compile sans aucun dependency_override ou avec documentation complète pour ceux conservés, et que tous les tests passent"
           }
         ]
@@ -884,7 +884,7 @@
         "dependencies": [
           13
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -892,7 +892,7 @@
             "description": "Créer le fichier scripts/build_wsl_android.sh avec la structure de base incluant la gestion des erreurs, le système de logging avec timestamps et les fonctions utilitaires",
             "dependencies": [],
             "details": "1. Créer le fichier avec shebang #!/bin/bash et permissions d'exécution (chmod +x)\n2. Implémenter les options set -e et set -o pipefail pour la gestion d'erreurs\n3. Créer la fonction log() avec format timestamp [YYYY-MM-DD HH:MM:SS]\n4. Ajouter des fonctions utilitaires:\n   - error_exit() pour sortir avec message et code d'erreur\n   - check_command() pour vérifier l'existence d'une commande\n   - create_log_dir() pour créer le dossier logs/ si inexistant\n5. Implémenter la capture du début d'exécution et le nettoyage en cas d'interruption (trap)",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Créer un script de test vérifiant: l'exécution du script avec bash -n pour la syntaxe, la création correcte des logs avec timestamps, le comportement des fonctions d'erreur avec différents codes de sortie, la gestion des signaux d'interruption"
           },
           {
@@ -902,8 +902,8 @@
             "dependencies": [
               "14.1"
             ],
-            "details": "1. Vérifier Flutter SDK:\n   - Présence de la commande flutter\n   - Version minimale 3.32.6 avec parsing de 'flutter --version'\n   - Validation du channel (stable recommandé)\n2. Vérifier Java:\n   - Présence de java et javac\n   - Version 17+ avec parsing de 'java -version'\n   - JAVA_HOME correctement défini\n3. Vérifier Android SDK:\n   - ANDROID_HOME défini et répertoire existant\n   - cmdline-tools installés (sdkmanager, avdmanager)\n   - Build-tools version 34.0.0+\n4. Vérifier les variables PATH:\n   - $ANDROID_HOME/cmdline-tools/latest/bin\n   - $ANDROID_HOME/platform-tools\n5. Générer un rapport de prérequis dans logs/prerequisites_check.log",
-            "status": "pending",
+            "details": "1. Vérifier Flutter SDK:\n   - Présence de la commande flutter\n   - Version minimale 3.32.6 avec parsing de 'flutter --version'\n   - Validation du channel (stable recommandé)\n2. Vérifier Java:\n   - Présence de java et javac\n   - Version 17+ avec parsing de 'java -version'\n   - JAVA_HOME correctement défini\n3. Vérifier Android SDK:\n   - ANDROID_HOME défini et répertoire existant\n   - cmdline-tools installés (sdkmanager, avdmanager)\n   - Build-tools version 34.0.0+\n4. Vérifier les variables PATH:\n   - $ANDROID_HOME/cmdline-tools/latest/bin\n   - $ANDROID_HOME/platform-tools\n5. Générer un rapport de prérequis dans logs/prerequisites_check.log\n<info added on 2025-07-26T18:14:33.227Z>\nTest réussi: Implémentation complète du module de vérification des prérequis\n- Création de check_prerequisites() avec vérifications séquentielles\n- Détection correcte de Flutter 3.32.6 dans les tests\n- Parsing robuste des versions avec regex pour Java et build-tools\n- Codes d'erreur spécifiques pour chaque type d'échec (10-36)\n- Génération du rapport dans logs/prerequisites_check.log avec formatage détaillé\n- Tests validés: détection Flutter OK, erreur Java manquant, rapport généré correctement\n</info added on 2025-07-26T18:14:33.227Z>",
+            "status": "done",
             "testStrategy": "Tester avec des environnements simulés: sans Flutter, avec Flutter ancien, sans Java, avec Java 11, sans ANDROID_HOME, avec ANDROID_HOME invalide. Vérifier que chaque cas génère le bon code d'erreur et message"
           },
           {
@@ -914,8 +914,8 @@
               "14.1",
               "14.2"
             ],
-            "details": "1. Implémenter la phase de nettoyage:\n   - flutter clean avec capture des erreurs\n   - Suppression des fichiers générés (.dart_tool/, build/)\n   - Nettoyage du cache Gradle si demandé (option --clean-gradle)\n2. Récupération des dépendances:\n   - flutter pub get avec retry automatique (3 tentatives)\n   - Vérification du pubspec.lock\n   - Cache des packages pour builds futurs\n3. Génération de code:\n   - Détection si build_runner est nécessaire (présence dans pubspec.yaml)\n   - flutter pub run build_runner build --delete-conflicting-outputs\n   - Gestion du timeout (5 minutes max)\n4. Validation de l'environnement .env:\n   - Vérifier l'existence du fichier\n   - Parser et valider les clés requises (SUPABASE_URL, SUPABASE_ANON_KEY)\n5. Créer un checkpoint de préparation dans logs/",
-            "status": "pending",
+            "details": "1. Implémenter la phase de nettoyage:\n   - flutter clean avec capture des erreurs\n   - Suppression des fichiers générés (.dart_tool/, build/)\n   - Nettoyage du cache Gradle si demandé (option --clean-gradle)\n2. Récupération des dépendances:\n   - flutter pub get avec retry automatique (3 tentatives)\n   - Vérification du pubspec.lock\n   - Cache des packages pour builds futurs\n3. Génération de code:\n   - Détection si build_runner est nécessaire (présence dans pubspec.yaml)\n   - flutter pub run build_runner build --delete-conflicting-outputs\n   - Gestion du timeout (5 minutes max)\n4. Validation de l'environnement .env:\n   - Vérifier l'existence du fichier\n   - Parser et valider les clés requises (SUPABASE_URL, SUPABASE_ANON_KEY)\n5. Créer un checkpoint de préparation dans logs/\n<info added on 2025-07-26T18:25:39.404Z>\nLe processus de préparation et nettoyage a été implémenté avec succès. Le module inclut :\n- Nettoyage Flutter avec suppression des fichiers générés et option --clean-gradle\n- Récupération des dépendances avec retry automatique (3 tentatives, backoff exponentiel)\n- Génération de code avec build_runner et timeout de 5 minutes\n- Validation du fichier .env avec vérification des clés requises (SUPABASE_URL, SUPABASE_ANON_KEY)\n- Création d'un checkpoint JSON avec toutes les informations de préparation\n- Codes d'erreur spécifiques (40-51) pour chaque type d'échec\n</info added on 2025-07-26T18:25:39.404Z>",
+            "status": "done",
             "testStrategy": "Simuler des échecs réseau pour pub get, corrompre le cache pour tester le nettoyage, créer des conflits pour build_runner, tester avec .env manquant ou invalide"
           },
           {
@@ -927,8 +927,8 @@
               "14.2",
               "14.3"
             ],
-            "details": "1. Paramètres de compilation configurables:\n   - Mode: --debug (défaut), --release, --profile\n   - Architecture: --target-platform android-arm,android-arm64\n   - Options supplémentaires passées à flutter build\n2. Gestion de la mémoire pour WSL:\n   - Détection de la RAM disponible\n   - Configuration Gradle avec -Xmx approprié\n   - Option --low-memory pour environnements limités\n3. Compilation avec monitoring:\n   - flutter build apk avec les options choisies\n   - Progress bar ou indicateur d'avancement\n   - Capture détaillée des logs Gradle\n   - Timeout configurable (défaut 30 minutes)\n4. Gestion des artifacts:\n   - Copie de l'APK vers un dossier de sortie défini\n   - Renommage avec version et timestamp\n   - Génération du SHA256 de l'APK\n5. Support du --dart-define-from-file=.env",
-            "status": "pending",
+            "details": "1. Paramètres de compilation configurables:\n   - Mode: --debug (défaut), --release, --profile\n   - Architecture: --target-platform android-arm,android-arm64\n   - Options supplémentaires passées à flutter build\n2. Gestion de la mémoire pour WSL:\n   - Détection de la RAM disponible\n   - Configuration Gradle avec -Xmx approprié\n   - Option --low-memory pour environnements limités\n3. Compilation avec monitoring:\n   - flutter build apk avec les options choisies\n   - Progress bar ou indicateur d'avancement\n   - Capture détaillée des logs Gradle\n   - Timeout configurable (défaut 30 minutes)\n4. Gestion des artifacts:\n   - Copie de l'APK vers un dossier de sortie défini\n   - Renommage avec version et timestamp\n   - Génération du SHA256 de l'APK\n5. Support du --dart-define-from-file=.env\n<info added on 2025-07-26T18:27:55.909Z>\nL'implémentation du processus de compilation a été réalisée avec succès, incluant toutes les fonctionnalités planifiées et des améliorations supplémentaires. Configuration dynamique de la mémoire implémentée avec allocation de 50% de la RAM disponible jusqu'à un maximum de 4GB pour Gradle. Mode --low-memory ajouté configurant un heap de 1GB et désactivant le daemon Gradle pour les environnements contraints. Support complet des trois modes de compilation (debug, release, profile) avec leurs options spécifiques respectives. Système de monitoring en temps réel développé avec indicateur de progression basé sur l'analyse des logs Gradle et timeout configurable via --timeout. Gestion avancée des APKs split en mode release générant automatiquement les builds arm et arm64 séparés. Processus de traitement des artifacts implémenté avec renommage intelligent incluant la version extraite du pubspec.yaml et un timestamp au format YYYYMMDD_HHMMSS. Génération automatique des checksums SHA256 pour tous les APKs produits avec sauvegarde dans des fichiers .sha256. Support natif de --dart-define-from-file=.env intégré permettant l'injection sécurisée des variables d'environnement. Codes d'erreur 60 et 61 définis respectivement pour les échecs de compilation Flutter et les erreurs de traitement des artifacts. Tests manuels effectués confirmant le bon fonctionnement dans différentes configurations WSL2.\n</info added on 2025-07-26T18:27:55.909Z>",
+            "status": "done",
             "testStrategy": "Compiler en debug/release/profile, simuler une compilation longue pour tester le timeout, tester avec peu de RAM disponible, vérifier l'intégrité des APKs générés"
           },
           {
@@ -942,7 +942,7 @@
               "14.4"
             ],
             "details": "1. Génération du rapport de build:\n   - Format JSON et HTML dans logs/build_report_[timestamp]\n   - Informations: durée totale, taille APK, versions utilisées\n   - Graphiques de performance (temps par étape)\n   - Logs d'erreurs consolidés si échec\n2. Intégration CI/CD:\n   - Mode --ci pour output adapté aux runners\n   - Export des variables pour GitHub Actions\n   - Support des annotations GitHub pour les erreurs\n   - Exit codes standardisés pour chaque type d'erreur\n3. Notifications et hooks:\n   - Hook post-build configurable\n   - Support pour notifications (webhook, email via curl)\n   - Intégration Slack/Discord optionnelle\n4. Mode batch et automation:\n   - Support des builds multiples (différentes variantes)\n   - Configuration via fichier YAML\n   - Mode --watch pour rebuild automatique\n5. Documentation et aide intégrée (--help)",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Vérifier la génération des rapports dans tous les cas (succès/échec), tester l'intégration avec un workflow GitHub Actions minimal, valider les exit codes, tester le mode batch avec plusieurs configurations"
           }
         ]
@@ -1436,7 +1436,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-26T16:17:20.340Z",
+      "updated": "2025-07-26T18:57:59.404Z",
       "description": "Tasks for master context"
     }
   }

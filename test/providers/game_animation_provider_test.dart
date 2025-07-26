@@ -6,7 +6,7 @@ import 'package:ojyx/features/game/domain/entities/play_direction.dart';
 void main() {
   group('GameAnimationProvider', () {
     late ProviderContainer container;
-    late GameAnimationNotifier notifier;
+    late GameAnimation notifier;
 
     setUp(() {
       container = ProviderContainer();

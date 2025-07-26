@@ -9,10 +9,18 @@ class MockRealtimeClient extends Mock implements RealtimeClient {}
 
 class MockRealtimeChannel extends Mock implements RealtimeChannel {}
 
-// Remove MockRealtimeChannelOptions - not needed anymore
+class FakeRealtimeChannelConfig extends Fake implements RealtimeChannelConfig {}
 
 void main() {
-  // No setUpAll needed anymore
+  setUpAll(() {
+    registerFallbackValue(FakeRealtimeChannelConfig());
+    registerFallbackValue(PostgresChangeEvent.insert);
+    registerFallbackValue(PostgresChangeFilter(
+      type: PostgresChangeFilterType.eq,
+      column: 'id',
+      value: 'test',
+    ));
+  });
 
   group('Realtime WebSocket Integration Tests', () {
     late MockSupabaseClient mockSupabase;
@@ -29,18 +37,12 @@ void main() {
 
     test('should establish realtime connection successfully', () async {
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async {
-        return ChannelResponse(
-          status: ChannelStatus.subscribed,
-          channel: mockChannel,
-        );
-      });
+      when(() => mockChannel.subscribe()).thenReturn(mockChannel);
 
       final channel = mockSupabase.realtime.channel('test-channel');
-      final response = await channel.subscribe();
+      final response = channel.subscribe();
 
-      expect(response.channel, equals(mockChannel));
-      expect(response.status, equals(ChannelStatus.subscribed));
+      expect(response, equals(mockChannel));
       verify(() => mockRealtime.channel('test-channel', any())).called(1);
       verify(() => mockChannel.subscribe()).called(1);
     });
@@ -50,25 +52,20 @@ void main() {
           StreamController<Map<String, dynamic>>.broadcast();
 
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async {
-        return ChannelResponse(
-          status: ChannelStatus.subscribed,
-          channel: mockChannel,
-        );
-      });
+      when(() => mockChannel.subscribe()).thenReturn(mockChannel);
       when(() => mockChannel.onPresenceSync(any())).thenAnswer((invocation) {
         final callback =
-            invocation.positionalArguments[0]
-                as void Function(Map<String, dynamic>);
-        presenceController.stream.listen(callback);
+            invocation.positionalArguments[0] as Function;
+        presenceController.stream.listen((event) => callback(event));
         return mockChannel;
       });
-      when(() => mockChannel.track(any())).thenAnswer((_) async {});
+      when(() => mockChannel.track(any())).thenAnswer((_) async => 
+        ChannelResponse(status: RealtimeSubscribeStatus.subscribed));
 
       final channel = mockSupabase.realtime.channel('game:lobby');
       channel.subscribe();
 
-      final presenceStates = <Map<String, dynamic>>[];
+      final presenceStates = <dynamic>[];
       channel.onPresenceSync((payload) {
         presenceStates.add(payload);
       });
@@ -96,12 +93,7 @@ void main() {
           StreamController<Map<String, dynamic>>.broadcast();
 
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async {
-        return ChannelResponse(
-          status: ChannelStatus.subscribed,
-          channel: mockChannel,
-        );
-      });
+      when(() => mockChannel.subscribe()).thenReturn(mockChannel);
       when(
         () => mockChannel.onBroadcast(
           event: any(named: 'event'),
@@ -117,7 +109,8 @@ void main() {
           event: any(named: 'event'),
           payload: any(named: 'payload'),
         ),
-      ).thenAnswer((_) async {});
+      ).thenAnswer((_) async => 
+        ChannelResponse(status: RealtimeSubscribeStatus.subscribed));
 
       final channel = mockSupabase.realtime.channel('game:room123');
       channel.subscribe();
@@ -159,12 +152,7 @@ void main() {
           StreamController<PostgresChangePayload>.broadcast();
 
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async {
-        return ChannelResponse(
-          status: ChannelStatus.subscribed,
-          channel: mockChannel,
-        );
-      });
+      when(() => mockChannel.subscribe()).thenReturn(mockChannel);
       when(
         () => mockChannel.onPostgresChanges(
           event: any(named: 'event'),
@@ -175,7 +163,7 @@ void main() {
         ),
       ).thenAnswer((invocation) {
         final callback = invocation.namedArguments[#callback] as Function;
-        postgresController.stream.listen(callback);
+        postgresController.stream.listen((event) => callback(event));
         return mockChannel;
       });
 
@@ -204,6 +192,7 @@ void main() {
         newRecord: {'id': 'game123', 'current_player': 'player2', 'turn': 5},
         oldRecord: {'id': 'game123', 'current_player': 'player1', 'turn': 4},
         commitTimestamp: DateTime.now(),
+        errors: null,
       );
 
       postgresController.add(mockPayload);
@@ -222,7 +211,7 @@ void main() {
       int reconnectAttempts = 0;
 
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async {
+      when(() => mockChannel.subscribe()).thenAnswer((_) {
         reconnectAttempts++;
         if (reconnectAttempts == 1) {
           throw Exception('Connection failed');
@@ -247,12 +236,7 @@ void main() {
 
     test('should clean up channels on unsubscribe', () async {
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async {
-        return ChannelResponse(
-          status: ChannelStatus.subscribed,
-          channel: mockChannel,
-        );
-      });
+      when(() => mockChannel.subscribe()).thenReturn(mockChannel);
       when(() => mockChannel.unsubscribe()).thenAnswer((_) async => 'ok');
       when(
         () => mockRealtime.removeChannel(any()),
@@ -281,15 +265,16 @@ void main() {
       ).thenReturn(mockChannel2);
       when(
         () => mockChannel1.subscribe(),
-      ).thenAnswer((_) async => mockChannel1);
+      ).thenReturn(mockChannel1);
       when(
         () => mockChannel2.subscribe(),
-      ).thenAnswer((_) async => mockChannel2);
+      ).thenReturn(mockChannel2);
 
       final channel1 = mockSupabase.realtime.channel('game:room1');
       final channel2 = mockSupabase.realtime.channel('game:room2');
 
-      await Future.wait([channel1.subscribe(), channel2.subscribe()]);
+      channel1.subscribe();
+      channel2.subscribe();
 
       verify(() => mockRealtime.channel('game:room1', any())).called(1);
       verify(() => mockRealtime.channel('game:room2', any())).called(1);
@@ -299,12 +284,7 @@ void main() {
       final heartbeatController = StreamController<String>.broadcast();
 
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
-      when(() => mockChannel.subscribe()).thenAnswer((_) async {
-        return ChannelResponse(
-          status: ChannelStatus.subscribed,
-          channel: mockChannel,
-        );
-      });
+      when(() => mockChannel.subscribe()).thenReturn(mockChannel);
 
       final channel = mockSupabase.realtime.channel('test-heartbeat');
       channel.subscribe();
