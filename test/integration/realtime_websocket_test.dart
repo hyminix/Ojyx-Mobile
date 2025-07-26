@@ -15,11 +15,13 @@ void main() {
   setUpAll(() {
     registerFallbackValue(FakeRealtimeChannelConfig());
     registerFallbackValue(PostgresChangeEvent.insert);
-    registerFallbackValue(PostgresChangeFilter(
-      type: PostgresChangeFilterType.eq,
-      column: 'id',
-      value: 'test',
-    ));
+    registerFallbackValue(
+      PostgresChangeFilter(
+        type: PostgresChangeFilterType.eq,
+        column: 'id',
+        value: 'test',
+      ),
+    );
   });
 
   group('Realtime WebSocket Integration Tests', () {
@@ -54,13 +56,13 @@ void main() {
       when(() => mockRealtime.channel(any(), any())).thenReturn(mockChannel);
       when(() => mockChannel.subscribe()).thenReturn(mockChannel);
       when(() => mockChannel.onPresenceSync(any())).thenAnswer((invocation) {
-        final callback =
-            invocation.positionalArguments[0] as Function;
+        final callback = invocation.positionalArguments[0] as Function;
         presenceController.stream.listen((event) => callback(event));
         return mockChannel;
       });
-      when(() => mockChannel.track(any())).thenAnswer((_) async => 
-        ChannelResponse(status: RealtimeSubscribeStatus.subscribed));
+      when(
+        () => mockChannel.track(any()),
+      ).thenAnswer((_) async => 'ok' as dynamic);
 
       final channel = mockSupabase.realtime.channel('game:lobby');
       channel.subscribe();
@@ -109,8 +111,7 @@ void main() {
           event: any(named: 'event'),
           payload: any(named: 'payload'),
         ),
-      ).thenAnswer((_) async => 
-        ChannelResponse(status: RealtimeSubscribeStatus.subscribed));
+      ).thenAnswer((_) async => 'ok' as dynamic);
 
       final channel = mockSupabase.realtime.channel('game:room123');
       channel.subscribe();
@@ -263,12 +264,8 @@ void main() {
       when(
         () => mockRealtime.channel('game:room2', any()),
       ).thenReturn(mockChannel2);
-      when(
-        () => mockChannel1.subscribe(),
-      ).thenReturn(mockChannel1);
-      when(
-        () => mockChannel2.subscribe(),
-      ).thenReturn(mockChannel2);
+      when(() => mockChannel1.subscribe()).thenReturn(mockChannel1);
+      when(() => mockChannel2.subscribe()).thenReturn(mockChannel2);
 
       final channel1 = mockSupabase.realtime.channel('game:room1');
       final channel2 = mockSupabase.realtime.channel('game:room2');

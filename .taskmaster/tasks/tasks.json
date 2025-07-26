@@ -1032,7 +1032,7 @@
             "description": "Mettre en place les Test Data Builders, Custom Matchers et helpers réutilisables pour standardiser l'écriture des tests",
             "dependencies": [],
             "details": "1. Créer un dossier test/helpers/ pour centraliser les utilitaires\n2. Implémenter des Test Data Builders pour chaque entité principale:\n   - CardBuilder pour créer des cartes de test\n   - PlayerBuilder pour les joueurs\n   - GameStateBuilder pour les états de jeu\n3. Développer des Custom Matchers spécifiques:\n   - isValidCard() pour valider les propriétés des cartes\n   - hasScore() pour vérifier les scores\n   - isInState() pour les états de jeu\n4. Créer des helpers de test communs:\n   - createMockSupabaseClient()\n   - setupTestProviders()\n   - waitForAnimation()\n5. Documenter chaque pattern avec des exemples d'utilisation",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Écrire des tests unitaires pour chaque Builder et Matcher créé. Vérifier que les helpers génèrent des données cohérentes et que les Matchers produisent des messages d'erreur clairs"
           },
           {
@@ -1102,7 +1102,7 @@
             "description": "Migrer tous les tests unitaires des modèles Freezed pour utiliser les nouvelles annotations et méthodes de la version 2.5.7",
             "dependencies": [],
             "details": "1. Identifier tous les fichiers de test *_test.dart testant des modèles Freezed\n2. Adapter les tests de sérialisation:\n   - Utiliser les nouvelles méthodes fromJson/toJson générées\n   - Vérifier la compatibilité avec json_serializable 6.8.0\n   - Tester les @JsonKey avec les nouvelles options\n3. Mettre à jour les tests copyWith:\n   - Tester explicitement les valeurs nullable avec copyWith\n   - Vérifier que copyWith(field: null) fonctionne correctement\n   - Ajouter des tests pour les @Default() values\n4. Adapter les tests des unions et sealed classes:\n   - Utiliser les nouveaux patterns de pattern matching\n   - Tester les méthodes when/maybeWhen/map générées\n   - Vérifier l'exhaustivité des switch statements\n5. Créer un helper de test freezed_test_utils.dart avec des matchers personnalisés",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Exécuter flutter test test/models --reporter=expanded pour identifier tous les tests échouants. Corriger par ordre de priorité: entités métier critiques (Card, Player, Game) puis modèles secondaires. Viser 100% de couverture sur les modèles."
           },
           {
@@ -1436,7 +1436,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-26T20:30:08.772Z",
+      "updated": "2025-07-26T20:37:29.231Z",
       "description": "Tasks for master context"
     }
   }
