@@ -150,7 +150,6 @@ class AppInitializer {
         
         // Session tracking
         options.enableAutoSessionTracking = true;
-        options.sessionTrackingIntervalMillis = 30000;
       },
     );
 

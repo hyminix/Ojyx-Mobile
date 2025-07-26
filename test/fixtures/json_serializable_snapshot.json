@@ -1,7 +1,8 @@
 {
-  "timestamp": "2025-07-26T08:15:23.136172",
+  "timestamp": "2025-07-26T09:41:41.109407",
   "jsonSerializableVersion": "6.8.0",
   "files": {
+    "lib/core/providers/supabase_provider_v2.g.dart": "6809d037dbb176d51d68731c9b4c3aef",
     "lib/features/auth/presentation/providers/auth_provider.g.dart": "97af6e15cd7a7e0a898b5223adb2800a",
     "lib/features/end_game/domain/entities/end_game_state.g.dart": "6ab37e5d962ef77fedefb6dcf36686fd",
     "lib/features/game/data/models/db_player_grid_model.g.dart": "1f89b8539604c0c717944709fba1c556",
@@ -14,6 +15,9 @@
     "lib/features/game/domain/entities/player_grid.g.dart": "73c693c2d516ed474fa91b89980c008e",
     "lib/features/game/domain/entities/player_state.g.dart": "783791402d40a1ec64646cee2a734029",
     "lib/features/game/presentation/providers/action_card_providers.g.dart": "127c4888ca6ada25d384f1e70d881d66",
+    "lib/features/game/presentation/providers/action_card_state_provider.g.dart": "56baa5a2b25be623518ad0fbb2fcc2a2",
+    "lib/features/game/presentation/providers/card_selection_provider_v2.g.dart": "3b4b167dd499d9dd9678b9d0b298b5aa",
+    "lib/features/game/presentation/providers/game_animation_provider_v2.g.dart": "1115d8d5efb17cd8100777c19260e6f3",
     "lib/features/game/presentation/providers/game_state_notifier.g.dart": "a4e8370abee93252aab515f3deca2426",
     "lib/features/game/presentation/providers/repository_providers.g.dart": "9aeb902d028894fdebc38fb1793cce13",
     "lib/features/global_scores/data/models/global_score_model.g.dart": "7bb554005f093a3c7dbd8c1c8a4805c5",

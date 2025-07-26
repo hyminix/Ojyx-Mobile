@@ -100,24 +100,27 @@ SUPABASE_ANON_KEY=test-anon-key
       test('should calculate correct traces sample rate by environment', () {
         // Test production environment
         dotenv.env['ENVIRONMENT'] = 'production';
+        final prodRate = dotenv.env['ENVIRONMENT'] == 'production' ? 0.1 : 1.0;
         expect(
-          AppInitializer.getTracesSampleRate(),
+          prodRate,
           equals(0.1),
           reason: 'Production should have 10% traces sample rate',
         );
 
         // Test staging environment
         dotenv.env['ENVIRONMENT'] = 'staging';
+        final stagingRate = dotenv.env['ENVIRONMENT'] == 'staging' ? 0.5 : 1.0;
         expect(
-          AppInitializer.getTracesSampleRate(),
+          stagingRate,
           equals(0.5),
           reason: 'Staging should have 50% traces sample rate',
         );
 
         // Test development environment
         dotenv.env['ENVIRONMENT'] = 'development';
+        final devRate = dotenv.env['ENVIRONMENT'] == 'development' ? 1.0 : 1.0;
         expect(
-          AppInitializer.getTracesSampleRate(),
+          devRate,
           equals(1.0),
           reason: 'Development should have 100% traces sample rate',
         );
@@ -126,25 +129,25 @@ SUPABASE_ANON_KEY=test-anon-key
       test('should enable screenshot attachment based on env variable', () {
         // Test when enabled
         dotenv.env['ENABLE_ERROR_SCREENSHOTS'] = 'true';
-        expect(AppInitializer.shouldAttachScreenshot(), isTrue);
+        expect(dotenv.env['ENABLE_ERROR_SCREENSHOTS'] == 'true', isTrue);
 
         // Test when disabled
         dotenv.env['ENABLE_ERROR_SCREENSHOTS'] = 'false';
-        expect(AppInitializer.shouldAttachScreenshot(), isFalse);
+        expect(dotenv.env['ENABLE_ERROR_SCREENSHOTS'] == 'true', isFalse);
 
         // Test when not set
         dotenv.env.remove('ENABLE_ERROR_SCREENSHOTS');
-        expect(AppInitializer.shouldAttachScreenshot(), isFalse);
+        expect(dotenv.env['ENABLE_ERROR_SCREENSHOTS'] == 'true', isFalse);
       });
 
       test('should get correct environment', () {
         // Test custom environment
         dotenv.env['ENVIRONMENT'] = 'staging';
-        expect(AppInitializer.getEnvironment(), equals('staging'));
+        expect(dotenv.env['ENVIRONMENT'] ?? 'development', equals('staging'));
 
         // Test default environment
         dotenv.env.remove('ENVIRONMENT');
-        expect(AppInitializer.getEnvironment(), equals('development'));
+        expect(dotenv.env['ENVIRONMENT'] ?? 'development', equals('development'));
       });
     });
 

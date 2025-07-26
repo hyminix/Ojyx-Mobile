@@ -60,8 +60,8 @@ void main() {
         expect(options.profilesSampleRate, isNull);
         
         // Options non configurées actuellement
-        expect(options.enableAutoPerformanceTracing, isFalse);
-        expect(options.attachScreenshot, isFalse);
+        expect(options.tracesSampleRate, isNull);
+        expect(options.attachStacktrace, isTrue);
       });
 
       test('should capture error capture behavior', () {

@@ -204,9 +204,7 @@ class _DrawPileWidgetState extends State<DrawPileWidget>
                     child: Icon(
                       Icons.close,
                       size: 40,
-                      color: theme.colorScheme.onPrimary.withValues(
-                        opacity: 0.5,
-                      ),
+                      color: theme.colorScheme.onPrimary.withOpacity(0.5),
                     ),
                   ),
               ],

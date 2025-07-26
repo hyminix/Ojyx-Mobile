@@ -27,6 +27,9 @@ class FileService {
     
     debugPrint('FileService initialized');
   }
+  
+  /// Check if service is initialized
+  bool get isInitialized => _tempDir != null && _appDocumentsDir != null && _appSupportDir != null;
 
   /// Get temporary directory
   Future<Directory> getTempDirectory() async {

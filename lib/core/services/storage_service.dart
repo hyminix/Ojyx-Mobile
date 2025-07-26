@@ -6,9 +6,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 class StorageService {
   SharedPreferences? _prefs;
   
+  /// Default constructor
+  StorageService();
+  
+  /// Create with a pre-initialized SharedPreferences instance (for testing)
+  StorageService.createWithPrefs(SharedPreferences prefs) : _prefs = prefs;
+  
   /// Initialize the storage service
   Future<void> initialize() async {
-    _prefs = await SharedPreferences.getInstance();
+    _prefs ??= await SharedPreferences.getInstance();
     debugPrint('StorageService initialized');
   }
 
@@ -34,6 +40,9 @@ class StorageService {
   Future<bool> setString(String key, String value) {
     return prefs.setString(key, value);
   }
+  
+  /// Save a string value (alias for setString)
+  Future<bool> saveString(String key, String value) => setString(key, value);
 
   // Integer operations
   
@@ -82,6 +91,9 @@ class StorageService {
   Future<bool> setStringList(String key, List<String> value) {
     return prefs.setStringList(key, value);
   }
+  
+  /// Save a string list (alias for setStringList)
+  Future<bool> saveStringList(String key, List<String> value) => setStringList(key, value);
 
   // JSON operations
   

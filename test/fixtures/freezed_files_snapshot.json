@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-07-26T08:15:20.290243",
+  "timestamp": "2025-07-26T09:40:55.146417",
   "freezedVersion": "2.5.7",
   "files": {
     "lib/core/errors/failures.freezed.dart": "711c4e833340b39791126c3c06316ce4",
@@ -16,8 +16,11 @@
     "lib/features/game/domain/entities/player_grid.freezed.dart": "ad614895694193edc8a644e650155120",
     "lib/features/game/domain/entities/player_state.freezed.dart": "2efed7a9730af7922c0deb2dd1e353fc",
     "lib/features/game/presentation/providers/action_card_providers.freezed.dart": "0e01db3331529b7c765a58708e8e60eb",
+    "lib/features/game/presentation/providers/action_card_state_provider.freezed.dart": "f37c2b64295fefcc83074511985d4eae",
     "lib/features/game/presentation/providers/card_selection_provider.freezed.dart": "68f08db77043cf3b0052de2c1d2f3852",
+    "lib/features/game/presentation/providers/card_selection_provider_v2.freezed.dart": "f854f0df7f4d5a1252c06d0b4c2103de",
     "lib/features/game/presentation/providers/game_animation_provider.freezed.dart": "dad4268d4094141eac6adbfd586e5eec",
+    "lib/features/game/presentation/providers/game_animation_provider_v2.freezed.dart": "64750945bb7ea6936b2ea27326d60111",
     "lib/features/global_scores/data/models/global_score_model.freezed.dart": "75c497681d4d17e16221ffb882d4fad8",
     "lib/features/global_scores/domain/entities/global_score.freezed.dart": "bbe66eddb127d106920bccb108e74164",
     "lib/features/multiplayer/data/models/player_model.freezed.dart": "cb40061d39d9c01f38d61d05ff65b61f",

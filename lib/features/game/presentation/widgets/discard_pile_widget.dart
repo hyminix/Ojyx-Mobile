@@ -78,17 +78,13 @@ class _DiscardPileWidgetState extends State<DiscardPileWidget> {
                       border: Border.all(
                         color: _isDragOver
                             ? theme.colorScheme.primary
-                            : theme.colorScheme.primary.withValues(
-                                opacity: 0.5,
-                              ),
+                            : theme.colorScheme.primary.withOpacity(0.5),
                         width: 3,
                       ),
                       boxShadow: [
                         if (_isDragOver)
                           BoxShadow(
-                            color: theme.colorScheme.primary.withValues(
-                              opacity: 0.3,
-                            ),
+                            color: theme.colorScheme.primary.withOpacity(0.3),
                             blurRadius: 12,
                             spreadRadius: 2,
                           ),
@@ -112,9 +108,9 @@ class _DiscardPileWidgetState extends State<DiscardPileWidget> {
           setState(() => _isDragOver = true);
           return widget.canDiscard;
         },
-        onAcceptWithDetails: (card) {
+        onAcceptWithDetails: (details) {
           setState(() => _isDragOver = false);
-          widget.onCardDropped!(card);
+          widget.onCardDropped!(details.data);
         },
         onLeave: (_) {
           setState(() => _isDragOver = false);
