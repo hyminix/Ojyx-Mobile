@@ -957,7 +957,7 @@
         "dependencies": [
           13
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -998,7 +998,7 @@
               "15.3"
             ],
             "details": "Pour chaque test conservé, vérifier et corriger : la nomenclature en utilisant group/test pour Dart (pas describe/it), la structure claire avec les trois sections AAA identifiables (ajouter des commentaires // Arrange, // Act, // Assert si nécessaire), l'isolation complète sans état partagé entre tests (vérifier l'absence de variables globales ou de setUp mal utilisés), les assertions explicites et significatives avec des messages d'erreur clairs. Refactoriser les tests qui ne respectent pas ces critères en préservant leur intention originale.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Exécuter les tests en mode aléatoire (--test-randomize-ordering-seed) pour vérifier l'isolation. Chaque test doit passer indépendamment de l'ordre d'exécution"
           },
           {
@@ -1009,7 +1009,7 @@
               "15.4"
             ],
             "details": "Créer le fichier TEST_AUDIT.md documentant : le nombre total de tests avant/après purge, la liste détaillée des tests supprimés avec justification, les patterns de tests problématiques identifiés, les recommandations pour éviter ces anti-patterns. Réorganiser les tests restants selon la structure features/[nom_feature]/[layer]/ pour matcher l'architecture Clean Architecture. Déplacer les tests unitaires dans les bons répertoires (presentation/domain/data). Mettre à jour tous les imports après réorganisation. Mesurer et documenter l'amélioration du temps d'exécution de la suite de tests.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Valider que tous les tests passent après réorganisation. Vérifier que la structure des dossiers de test reflète exactement la structure du code source"
           }
         ]
@@ -1436,7 +1436,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-26T20:26:32.107Z",
+      "updated": "2025-07-26T20:30:08.772Z",
       "description": "Tasks for master context"
     }
   }
