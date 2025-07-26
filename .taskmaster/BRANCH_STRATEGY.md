@@ -32,10 +32,11 @@ grep -m1 '"title"' .taskmaster/tasks/tasks.json
 ```
 
 ### 5. État Actuel (2025-07-26)
-- Branche : `feat/continue-refactoring-work`
+- Branche : `feat/update-dependencies-tdd`
 - PRD : "PRD Ojyx : Mise à Niveau Technique et Compilation (TDD-Driven)"
 - Focus : Mise à jour des dépendances et compilation Android
 - Tâche en cours : ID 2 - Mise à Jour Incrémentale des Dépendances Core (in-progress)
+- Main : Synchronisé avec l'état actuel - toujours stable et à jour
 
 ## Commandes de Récupération en Cas de Problème
 ```bash
