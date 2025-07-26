@@ -81,7 +81,7 @@ dependencies {
 configurations.all {
     resolutionStrategy {
         force("androidx.core:core:1.12.0")
-        force("androidx.lifecycle:lifecycle-runtime:2.7.0")
+        force("androidx.lifecycle:lifecycle-runtime:2.9.2")
     }
 }
 
