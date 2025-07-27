@@ -8,6 +8,7 @@ import 'package:ojyx/features/multiplayer/presentation/providers/room_providers.
 import 'package:ojyx/features/multiplayer/domain/use_cases/create_room_use_case.dart';
 import 'package:ojyx/features/multiplayer/domain/entities/room.dart';
 import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
+import '../../../../helpers/go_router_test_helpers.dart';
 
 class MockCreateRoomUseCase extends Mock implements CreateRoomUseCase {}
 

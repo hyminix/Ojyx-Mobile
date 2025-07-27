@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ojyx/core/config/router_config.dart';
+import '../helpers/riverpod_test_helpers.dart';
 
 void main() {
   group('go_router Audit Tests', () {
@@ -10,12 +11,12 @@ void main() {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
+      container = createTestContainer();
       router = container.read(routerProvider);
     });
 
     tearDown(() {
-      container.dispose();
+      // Container disposal handled by createTestContainer
     });
 
     group('Route Configuration', () {
@@ -125,7 +126,7 @@ void main() {
 
   group('Navigation Flow Tests', () {
     testWidgets('should navigate from home to create room', (tester) async {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
 
       await tester.pumpWidget(
@@ -146,7 +147,7 @@ void main() {
     });
 
     testWidgets('should navigate to room with ID', (tester) async {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
       const testRoomId = 'test-room-123';
 
@@ -165,7 +166,7 @@ void main() {
     });
 
     testWidgets('should navigate to game with ID', (tester) async {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
       const testRoomId = 'test-room-123';
 
@@ -186,7 +187,7 @@ void main() {
 
   group('Deep Linking', () {
     test('should support deep link to home', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
 
       router.go('/');
@@ -194,7 +195,7 @@ void main() {
     });
 
     test('should support deep link to create room', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
 
       router.go('/create-room');
@@ -205,7 +206,7 @@ void main() {
     });
 
     test('should support deep link to room with ID', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
 
       router.go('/room/abc123');
@@ -216,7 +217,7 @@ void main() {
     });
 
     test('should support deep link to game with ID', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
 
       router.go('/game/xyz789');
@@ -227,7 +228,7 @@ void main() {
     });
 
     test('should handle invalid deep links', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
 
       router.go('/invalid/path/here');

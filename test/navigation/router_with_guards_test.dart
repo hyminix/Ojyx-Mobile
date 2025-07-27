@@ -2,17 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../helpers/riverpod_test_helpers.dart';
 
 void main() {
   group('Router with Guards Tests', () {
-    late ProviderContainer container;
-
     setUp(() {
-      container = ProviderContainer();
-    });
-
-    tearDown(() {
-      container.dispose();
+      // Container would be created here if needed for auth guards
+      // For now, these tests document the expected behavior
     });
 
     test('should redirect to home when authenticated', () {
@@ -38,7 +34,9 @@ void main() {
                 const Scaffold(body: Center(child: Text('Game'))),
             redirect: (context, state) {
               // Simulate auth check
-              const isAuthenticated = false;
+              // In real implementation, this would check auth state
+              // ignore: dead_code
+              const isAuthenticated = false; // Example: not authenticated
               if (!isAuthenticated) {
                 return '/';
               }
@@ -75,7 +73,9 @@ void main() {
                 const Scaffold(body: Center(child: Text('Game'))),
             redirect: (context, state) {
               // Simulate auth check
-              const isAuthenticated = true;
+              // In real implementation, this would check auth state
+              // ignore: dead_code
+              const isAuthenticated = true; // Example: authenticated
               if (!isAuthenticated) {
                 return '/';
               }
