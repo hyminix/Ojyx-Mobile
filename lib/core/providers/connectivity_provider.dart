@@ -26,7 +26,7 @@ ConnectivityStatus connectivityStatus(Ref ref) {
   final service = ref.watch(connectivityServiceProvider);
 
   // Listen to connectivity changes
-  ref.listen(connectivityStatusStreamProvider.stream, (previous, next) {
+  ref.listen(connectivityStatusStreamProvider, (previous, next) {
     // Status will be updated via stream
   });
 

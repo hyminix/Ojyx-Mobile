@@ -2,7 +2,7 @@
 # Copy this file to local.properties and update with your system paths
 
 # For Windows (Android Studio):
-# sdk.dir=C:\\Users\\[YOUR_USERNAME]\\AppData\\Local\\Android\\sdk
+# sdk.dir=C:\\Users\\yarri\\AppData\\Local\\Android\\sdk
 # flutter.sdk=D:\\dev\\flutter\\flutter
 
 # For WSL2:

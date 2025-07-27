@@ -20,10 +20,8 @@ class AppInitializer {
       // Initialize Supabase
       await _initializeSupabase();
 
-      // Initialize Sentry (if not in debug mode)
-      if (!kDebugMode) {
-        await _initializeSentry();
-      }
+      // Initialize Sentry if enabled
+      await _initializeSentry();
     } catch (e, stackTrace) {
       // Log initialization errors
       debugPrint('App initialization failed: $e');
@@ -112,7 +110,13 @@ class AppInitializer {
 
   /// Initialize Sentry with enhanced performance monitoring
   static Future<void> _initializeSentry() async {
+    final sentryEnabled = dotenv.env['SENTRY_ENABLED']?.toLowerCase() == 'true';
     final sentryDsn = dotenv.env['SENTRY_DSN'];
+
+    if (!sentryEnabled) {
+      debugPrint('Sentry is disabled in configuration');
+      return;
+    }
 
     if (sentryDsn == null || sentryDsn.isEmpty) {
       debugPrint('Sentry DSN not found, skipping Sentry initialization');

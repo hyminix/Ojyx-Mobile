@@ -74,4 +74,5 @@ Future<List<Room>> availableRooms(AvailableRoomsRef ref) async {
 }
 
 // Provider pour stocker l'ID de la room courante
-final currentRoomIdProvider = Provider<String?>((ref) => null);
+@riverpod
+String? currentRoomId(CurrentRoomIdRef ref) => null;

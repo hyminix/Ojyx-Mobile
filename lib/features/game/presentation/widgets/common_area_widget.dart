@@ -31,8 +31,6 @@ class CommonAreaWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Semantics(
       label: 'Zone commune de jeu',
       child: AnimatedContainer(

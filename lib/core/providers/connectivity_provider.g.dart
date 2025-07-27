@@ -27,7 +27,7 @@ final connectivityServiceProvider = Provider<ConnectivityService>.internal(
 // ignore: unused_element
 typedef ConnectivityServiceRef = ProviderRef<ConnectivityService>;
 String _$connectivityStatusHash() =>
-    r'9ddfabf3d9f85166e84099abe0b7738510740286';
+    r'30e9a74b4df81898e82a272b78aac6410826fb78';
 
 /// Provider for current connectivity status
 ///

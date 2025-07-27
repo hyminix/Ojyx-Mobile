@@ -36,31 +36,58 @@ lib/
 - **Domain** : Logique métier pure, entités, interfaces
 - **Data** : Implémentation concrète, API, modèles sérialisables
 
-## Stack Technique Obligatoire
+## Philosophie de Développement Feature-First
 
-### Versions Actuelles (Mises à jour 2025-07-26)
+### Principes Fondamentaux
+- **Livraison rapide de valeur** : Chaque feature doit apporter de la valeur utilisateur rapidement
+- **Itération continue** : Implémenter, tester manuellement, améliorer
+- **Simplicité avant tout** : Code simple et fonctionnel > code parfait mais complexe
+- **Tests pragmatiques** : Écrits après stabilisation, focus sur les parties critiques
+
+### Workflow de Développement
+1. **Implémenter** la fonctionnalité de manière directe
+2. **Tester manuellement** le comportement utilisateur
+3. **Itérer** rapidement selon les retours
+4. **Stabiliser** le code une fois la feature validée
+5. **Ajouter des tests** de régression sur les parties critiques
+
+### Avantages de l'Approche
+- ✅ Vélocité maximale
+- ✅ Flexibilité face aux changements
+- ✅ Feedback utilisateur rapide
+- ✅ Moins de code inutile
+- ✅ Focus sur la valeur business
+
+## Stack Technique
+
+### Versions Actuelles (Mises à jour 2025-07-27)
 - **Flutter**: 3.32.6 (stable)
 - **Dart**: 3.8.1 (stable)
 - **Java**: 17 (requis pour Android 34)
 - **Gradle**: 8.12 (dernière version LTS)
 
 ### Gestion d'État et DI
-- **Riverpod** : OBLIGATOIRE pour toute gestion d'état et injection de dépendances
-  - Version : 2.6.1 (dernière mise à jour)
-  - Syntaxe moderne avec `@riverpod` et `Notifier` obligatoire
-- Convention de nommage stricte :
+- **Riverpod** : Pour toute gestion d'état et injection de dépendances
+  - flutter_riverpod: 2.6.1
+  - riverpod_annotation: 2.6.1
+  - riverpod_generator: 2.6.3
+  - riverpod_lint: 2.6.1
+  - Syntaxe moderne avec `@riverpod` et `Notifier` recommandée
+- Convention de nommage :
   - Providers : `[entity]RepositoryProvider`, `[feature]StateNotifierProvider`
   - États : `[Feature]State` avec Freezed
 
 ### Modèles de Données
-- **Freezed + json_serializable** : OBLIGATOIRE pour TOUS les modèles et états
-  - freezed: 2.5.7
-  - json_serializable: 6.8.0
-- Garantir l'immuabilité de toutes les structures de données
+- **Freezed + json_serializable** : Pour les modèles et états
+  - freezed: 3.1.0
+  - freezed_annotation: 3.1.0
+  - json_serializable: 6.9.5
+  - json_annotation: 4.9.0
+- Garantir l'immuabilité des structures de données
 - Utiliser les unions types pour les états complexes
 
 ### Navigation
-- **go_router** : Toute navigation doit être déclarative
+- **go_router** : Navigation déclarative (16.0.0)
 - Configuration centralisée dans `/lib/core/config/router_config.dart`
 - Pas de Navigator.push direct
 
@@ -70,143 +97,38 @@ lib/
   - Auth mode anonyme
   - Realtime via WebSockets pour le multijoueur
   - Storage pour les assets
-- **Sentry Flutter** : Tracking des erreurs en production
-- **MCP Integrations** : Utilisation obligatoire de Supabase MCP, Context7, et Sentry MCP
+  - supabase_flutter: 2.9.1
+- **Sentry Flutter** : Tracking des erreurs en production (9.5.0)
+- **MCP Integrations** : Supabase MCP, TaskMaster AI, IDE MCP
 
-## Processus de Développement (NON-NÉGOCIABLE)
+### Autres Dépendances
+- **Utilities** :
+  - flutter_dotenv: 5.2.1
+  - path_provider: 2.1.5
+  - shared_preferences: 2.5.3
+  - connectivity_plus: 6.1.4
+- **UI** :
+  - cupertino_icons: 1.0.8
+- **Linting** :
+  - flutter_lints: 6.0.0
+- **Build** :
+  - build_runner: 2.5.4
 
-### Workflow Git
-1. **Protection de main** : Aucun commit direct sur main
-2. **Branches dédiées** : 
-   - Format : `feat/[description]`, `fix/[description]`, `chore/[description]`
-   - Pas de branche develop - PR directement vers main
-3. **Pull Requests obligatoires** : Tout code passe par PR
-4. **Conditions de merge** :
-   - CI/CD au vert (tous les checks passent)
-   - Revue de code effectuée
-   - Pas de conflits
+## Processus de Développement
 
-### CI/CD GitHub Actions (Configuration Moderne 2025)
+### Workflow Git Simple
+1. **Branches feature** : `feat/[description]`, `fix/[description]`
+2. **Commits directs** sur main autorisés pour les hotfixes
+3. **Pull Requests** recommandées pour les features majeures
+4. **Merge rapide** dès que fonctionnel
 
-Le pipeline CI/CD est configuré dans `.github/workflows/ci.yml` avec 5 jobs parallèles :
+### CI/CD Allégé
 
-1. **validate** : Validation de l'environnement Flutter 3.32.6
-2. **analyze** : `flutter analyze --no-fatal-infos` - Analyse statique stricte
-3. **test** : `flutter test --coverage` avec rapports de couverture
-4. **format** : `dart format --set-exit-if-changed .` - Formatage obligatoire
-5. **build** : Build Android APK debug/release avec cache optimisé
+Pipeline minimal dans `.github/workflows/ci.yml` :
+- **build** : Vérification que l'app compile
+- **release** : Génération APK/AAB sur tags
 
-**Workflows additionnels :**
-- **Release** (`.github/workflows/release.yml`) : Génération APK/AAB automatique sur tags
-- **Dependabot** (`.github/dependabot.yml`) : Mises à jour automatiques Dart, Actions, Gradle
-
-**Cache optimisé pour performance :**
-- Cache Pub dependencies avec clé basée sur pubspec.lock
-- Cache Gradle avec distribution et wrapper
-- Timeouts configurés (10-20 minutes selon job)
-
-### Approche Test-First (OBLIGATOIRE ET NON-NÉGOCIABLE)
-
-⚠️ **RÈGLE ABSOLUE** : AUCUN code de production ne doit être écrit sans test préalable. Cette règle s'applique à TOUS les niveaux :
-
-1. **Écrire les tests AVANT le code** - TOUJOURS
-   - Si tu oublies, STOP et reviens en arrière
-   - Crée d'abord le fichier de test avec des cas qui échouent
-   - Définis le comportement attendu via les tests
-
-2. **Tests unitaires obligatoires pour :**
-   - Toute logique métier (domain/entities, use_cases)
-   - Tous les repositories (avec mocks)
-   - Tous les providers Riverpod
-   - Toutes les méthodes de conversion/transformation
-
-3. **Tests d'intégration obligatoires pour :**
-   - Datasources (avec mocks Supabase)
-   - Navigation et routing
-   - Synchronisation temps réel
-
-4. **Tests de widgets obligatoires pour :**
-   - Tous les écrans (screens)
-   - Widgets interactifs (boutons, formulaires)
-   - Widgets avec logique d'état
-
-5. **Workflow strict :**
-   - RED : Écrire le test qui échoue
-   - GREEN : Implémenter le minimum pour que le test passe
-   - REFACTOR : Améliorer le code en gardant les tests verts
-
-6. **Coverage minimum : 80%**
-   - Vérifier avec `flutter test --coverage`
-   - Utiliser `lcov` pour visualiser la couverture
-
-### 🚫 INTERDICTIONS ABSOLUES EN TDD (ZÉRO TOLÉRANCE)
-
-**JAMAIS, SOUS AUCUN PRÉTEXTE :**
-
-1. **NE JAMAIS COMMENTER DE TESTS**
-   - Un test qui ne passe pas = le code doit être corrigé
-   - Si un test pose problème, il faut le RÉPARER, pas le désactiver
-   - Commenter un test = ÉCHEC TOTAL du TDD
-
-2. **NE JAMAIS CRÉER DE FICHIERS "TEST_SUMMARY"**
-   - Les tests doivent tester du code réel, pas documenter
-   - Pas de fichiers qui "résument" les tests créés
-   - Chaque test doit avoir une vraie valeur de vérification
-
-3. **NE JAMAIS IGNORER UN TEST QUI ÉCHOUE**
-   - Si un test échoue après implémentation, STOP
-   - Corriger l'implémentation ou le test immédiatement
-   - Ne JAMAIS passer à la suite avec des tests qui échouent
-
-4. **TOUS LES TESTS DOIVENT PASSER AVANT DE CONTINUER**
-   - 100% des tests créés doivent être verts
-   - Pas d'exception, pas de "on corrigera plus tard"
-   - Si ça prend du temps, ça prend du temps
-
-5. **EN CAS DE PROBLÈME TECHNIQUE**
-   - Si un test ne peut pas passer (bug framework), trouver une ALTERNATIVE
-   - Réécrire le test différemment
-   - Changer l'approche d'implémentation
-   - MAIS NE JAMAIS ABANDONNER LE TEST
-
-**⚠️ RAPPEL** : Le TDD n'est pas négociable. C'est la FONDATION du projet. Toute déviation compromet la qualité et la maintenabilité du code.
-
-### 🚨 CONSÉQUENCES DES VIOLATIONS TDD (AUTOMATIQUES)
-
-**Toute violation des règles TDD entraîne des conséquences IMMÉDIATES et AUTOMATIQUES :**
-
-#### 1. Hooks Git Automatiques (scripts/)
-
-**Pre-commit Hook** (`scripts/pre-commit-hook.sh`):
-- Détection tests commentés : `grep -r "//.*test\|/\*.*test\|skip.*true"`
-- Formatage obligatoire : `dart format --set-exit-if-changed`
-- Analyse statique : `flutter analyze --no-fatal-infos`
-- Tests passants : `flutter test --coverage --reporter=compact`
-- Couverture calculée avec lcov (recommandé 80%+)
-- Interdiction fichiers `*test_summary*`
-
-**Commit-msg Hook** (`scripts/commit-msg-hook.sh`):
-- Format conventional : `type(scope?): description`
-- Types valides : feat|fix|docs|style|refactor|test|chore|perf|ci|build
-- Max 50 caractères, minuscule, sans point final
-
-**Installation** (`scripts/install-hooks.sh`):
-- Hooks installés dans `.git/hooks/` automatiquement
-- Validation permissions et intégrité
-- Tests complets avec `scripts/test-hooks.sh`
-
-#### 2. Pipeline CI/CD Strict
-- Double validation de TOUS les checks pre-commit
-- Jobs parallèles avec cache optimisé
-- Labels automatiques sur violations
-- Blocage merge si un job échoue
-
-#### 3. Aucune Exception Possible
-- Contournement avec `--no-verify` découragé
-- Protection main empêche force push
-- Logs détaillés pour debugging
-
-**RAPPEL POUR L'IA** : Ces mécanismes sont en place pour VOUS aider à maintenir la qualité. Les violations ne sont pas des "erreurs" mais des garde-fous pour garantir le succès du projet.
+Pas de blocage strict, focus sur la livraison.
 
 ### Gestion des Secrets
 - Utiliser GitHub Secrets pour CI/CD
@@ -214,20 +136,26 @@ Le pipeline CI/CD est configuré dans `.github/workflows/ci.yml` avec 5 jobs par
 - Utiliser `--dart-define` pour les builds
 - JAMAIS de clés en dur dans le code
 
-## Standards de Qualité
+## Standards de Qualité Pragmatiques
 
 ### Linting
-- `flutter_lints` avec règles strictes activées
-- Pas de warnings autorisés
+- `flutter_lints` activé mais warnings non bloquants
+- Correction progressive des issues
 
 ### Génération de Code
 - `build_runner` pour Freezed, json_serializable
 - Commande : `flutter pub run build_runner build --delete-conflicting-outputs`
 
 ### Documentation
-- Commenter les logiques complexes
-- Documenter les APIs publiques
-- Maintenir ce fichier CLAUDE.md à jour
+- Commenter uniquement les logiques complexes
+- README à jour pour l'onboarding
+- Ce fichier CLAUDE.md comme référence
+
+### Tests (Post-Implementation)
+- Tests de régression sur les features stabilisées
+- Focus sur les chemins critiques
+- Tests d'intégration pour les flows principaux
+- Pas de coverage minimum imposé
 
 ## Règles Métier Spécifiques
 
@@ -253,69 +181,51 @@ Le pipeline CI/CD est configuré dans `.github/workflows/ci.yml` avec 5 jobs par
 
 ## Commandes Essentielles
 
-### Configuration Initiale
-```bash
-# Installation des hooks Git (OBLIGATOIRE après clone)
-./scripts/install-hooks.sh
-
-# Validation complète du projet
-./scripts/validate_project.sh
-
-# Test des hooks installés
-./scripts/test-hooks.sh
-```
-
 ### Développement Quotidien
 ```bash
 # Installation des dépendances
 flutter pub get
 
-# Génération de code (hooks l'exécutent aussi)
+# Génération de code
 flutter pub run build_runner build --delete-conflicting-outputs
 
-# Tests avec couverture
-flutter test --coverage
+# Analyse du code (non bloquante)
+flutter analyze
 
-# Analyse du code
-flutter analyze --no-fatal-infos
-
-# Formatage (obligatoire avant commit)
+# Formatage
 dart format .
 
-# Nettoyage complet Android
-./scripts/clean_build.sh
+# Lancement rapide
+flutter run
 ```
 
-### Build et Lancement
+### Build et Release
 ```bash
-# Lancement avec variables d'environnement
-flutter run --dart-define=SUPABASE_URL=xxx --dart-define=SUPABASE_ANON_KEY=xxx
+# Build APK debug
+flutter build apk --debug
 
 # Build APK release
 flutter build apk --release
 
-# Validation build Android
-./scripts/validate_android_build.sh
+# Avec variables d'environnement
+flutter run --dart-define=SUPABASE_URL=xxx --dart-define=SUPABASE_ANON_KEY=xxx
 ```
 
-## Checklist Pré-Commit
-- [ ] Tests écrits et passants
-- [ ] Code formaté (`dart format .`)
-- [ ] Pas de warnings (`flutter analyze`)
-- [ ] Génération de code à jour
-- [ ] Documentation des nouvelles fonctionnalités
+## Checklist Pré-Release (Non Bloquante)
+- [ ] Features testées manuellement
+- [ ] Pas de crashes évidents
+- [ ] Build release fonctionnel
+- [ ] Variables d'environnement configurées
 
 ## Versioning
-- Suivre le Versionnage Sémantique : MAJOR.MINOR.PATCH
-- MAJOR : Changements incompatibles
-- MINOR : Nouvelles fonctionnalités rétrocompatibles
-- PATCH : Corrections de bugs
+- Versionnage Sémantique : MAJOR.MINOR.PATCH
+- Incrémentation libre selon l'importance des changements
 
 ## Points d'Attention
-- Mobile First : Toutes les UI doivent être optimisées pour Android
-- Performance : Attention aux rebuilds inutiles avec Riverpod
-- Sécurité : Validation côté serveur pour toutes les actions de jeu
-- UX : Feedback visuel immédiat pour toutes les actions
+- Mobile First : UI optimisée pour Android
+- Performance : Éviter les rebuilds inutiles avec Riverpod
+- Sécurité : Validation côté serveur pour les actions critiques
+- UX : Feedback visuel immédiat
 
 ## Task Master AI Instructions
 **Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**

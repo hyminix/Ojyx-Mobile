@@ -7,7 +7,7 @@ part of 'game_realtime_service.dart';
 // **************************************************************************
 
 String _$gameRealtimeServiceHash() =>
-    r'46f8a1bfec882cd1f996609e1e8ec67c8f5af0e5';
+    r'4526e072cb17d6edb2c0d8c2063e3b4207343c17';
 
 /// Service moderne pour gérer le realtime des parties avec Supabase v2
 ///

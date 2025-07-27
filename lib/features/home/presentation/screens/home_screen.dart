@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../widgets/ojyx_logo.dart';
+import '../widgets/animated_button.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({this.redirectUrl, super.key});
@@ -12,16 +15,73 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+  String _appVersion = '';
+
   @override
   void initState() {
     super.initState();
+    
+    // Setup animations
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+    ));
+    
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
+    ));
+    
+    _animationController.forward();
+    
+    // Load app version
+    _loadAppVersion();
+    
     // Handle redirect after auth is complete
     if (widget.redirectUrl != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _checkAndRedirect();
       });
     }
+  }
+  
+  Future<void> _loadAppVersion() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() {
+          _appVersion = 'v${packageInfo.version}';
+        });
+      }
+    } catch (e) {
+      // Fallback to version from pubspec
+      if (mounted) {
+        setState(() {
+          _appVersion = 'v1.0.0';
+        });
+      }
+    }
+  }
+  
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   void _checkAndRedirect() {
@@ -61,36 +121,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Logo/Title
-                    Icon(
-                      Icons.style,
-                      size: 80,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'OJYX',
-                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 4,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Le jeu de cartes stratégique',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.7),
-                      ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isTablet = constraints.maxWidth > 600;
+              final contentWidth = isTablet ? 500.0 : 400.0;
+              
+              return Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: contentWidth),
+                  child: Padding(
+                    padding: EdgeInsets.all(isTablet ? 32.0 : 24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Spacer(flex: 1),
+                    // Logo/Title with Animation
+                    AnimatedBuilder(
+                      animation: _animationController,
+                      builder: (context, child) {
+                        return FadeTransition(
+                          opacity: _fadeAnimation,
+                          child: ScaleTransition(
+                            scale: _scaleAnimation,
+                            child: Column(
+                              children: [
+                                const OjyxLogo(size: 120),
+                                const SizedBox(height: 24),
+                                Text(
+                                  'OJYX',
+                                  style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 8,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Le jeu de cartes stratégique',
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 48),
 
@@ -145,36 +222,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         return Column(
                           children: [
                             // Create Room Button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56,
-                              child: ElevatedButton.icon(
-                                onPressed: () => context.go('/create-room'),
-                                icon: const Icon(Icons.add),
-                                label: const Text('Créer une partie'),
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              ),
+                            AnimatedButton(
+                              onPressed: () => context.go('/create-room'),
+                              icon: Icons.add,
+                              label: 'Créer une partie',
+                              variant: AnimatedButtonVariant.elevated,
+                              delay: const Duration(milliseconds: 1600),
                             ),
                             const SizedBox(height: 16),
 
                             // Join Room Button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56,
-                              child: OutlinedButton.icon(
-                                onPressed: () => context.go('/join-room'),
-                                icon: const Icon(Icons.login),
-                                label: const Text('Rejoindre une partie'),
-                                style: OutlinedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              ),
+                            AnimatedButton(
+                              onPressed: () => context.go('/join-room'),
+                              icon: Icons.login,
+                              label: 'Rejoindre une partie',
+                              variant: AnimatedButtonVariant.outlined,
+                              delay: const Duration(milliseconds: 1700),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Rules Button
+                            AnimatedButton(
+                              onPressed: () => context.go('/rules'),
+                              icon: Icons.help_outline,
+                              label: 'Règles du Jeu',
+                              variant: AnimatedButtonVariant.text,
+                              delay: const Duration(milliseconds: 1800),
                             ),
                             const SizedBox(height: 32),
 
@@ -258,10 +331,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ],
                       ),
                     ),
-                  ],
+                        const Spacer(flex: 2),
+                        
+                        // Footer with version
+                        if (_appVersion.isNotEmpty)
+                          FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: Text(
+                              _appVersion,
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ),

@@ -301,7 +301,6 @@ class RoomLobbyScreen extends ConsumerWidget {
   }
 
   void _shareRoom(BuildContext context, String roomId) {
-    final link = DeepLinkService.generateRoomLink(roomId);
     final message = DeepLinkService.generateShareMessage(roomId);
 
     // TODO: Implement actual sharing using share_plus package

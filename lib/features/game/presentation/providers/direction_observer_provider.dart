@@ -1,11 +1,14 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'game_state_notifier.dart';
 import 'game_animation_provider_v2.dart';
 import '../../domain/entities/game_state.dart';
 import '../../domain/entities/play_direction.dart';
 
+part 'direction_observer_provider.g.dart';
+
 // Provider that observes direction changes and triggers animations
-final directionObserverProvider = Provider<void>((ref) {
+@riverpod
+void directionObserver(DirectionObserverRef ref) {
   TurnDirection? previousDirection;
 
   ref.listen(gameStateNotifierProvider, (previous, next) {
@@ -28,4 +31,4 @@ final directionObserverProvider = Provider<void>((ref) {
       previousDirection = nextDir;
     }
   });
-});
+}

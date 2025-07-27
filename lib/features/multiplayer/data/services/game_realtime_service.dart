@@ -148,29 +148,29 @@ class GameRealtimeService extends _$GameRealtimeService {
   void _handleGameStateChange(PostgresChangePayload payload, String roomId) {
     // Notifier les listeners des changements
     // Les providers qui écoutent ce service peuvent réagir
-    print('Game state changed for room $roomId: ${payload.eventType}');
+    // Game state changed for room $roomId: ${payload.eventType}
   }
 
   /// Gère les actions des joueurs
   void _handlePlayerAction(Map<String, dynamic> payload, String roomId) {
-    print('Player action in room $roomId: $payload');
+    // Player action in room $roomId: $payload
   }
 
   /// Gère la synchronisation de présence
   void _handlePresenceSync(Map<String, dynamic> payload) {
     _presenceState.clear();
     _presenceState.addAll(payload);
-    print('Presence synced: $_presenceState');
+    // Presence synced: $_presenceState
   }
 
   /// Gère l'arrivée d'un joueur
   void _handlePresenceJoin(Map<String, dynamic> payload) {
-    print('Player joined: $payload');
+    // Player joined: $payload
   }
 
   /// Gère le départ d'un joueur
   void _handlePresenceLeave(Map<String, dynamic> payload) {
-    print('Player left: $payload');
+    // Player left: $payload
   }
 
   /// Récupère l'état de présence actuel

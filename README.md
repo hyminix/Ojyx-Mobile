@@ -23,28 +23,28 @@ cd Ojyx-Mobile
 # Installer les dépendances
 flutter pub get
 
-# IMPORTANT: Installer les git hooks TDD (OBLIGATOIRE)
-./.githooks/install-hooks.sh
+# Installer les git hooks (optionnel)
+./scripts/install-hooks.sh
 
 # Générer le code
 flutter pub run build_runner build --delete-conflicting-outputs
 ```
 
-## 🛡️ Règles de Développement (TDD OBLIGATOIRE)
+## 🚀 Philosophie de Développement Feature-First
 
-Ce projet suit strictement le Test-Driven Development. **AUCUN code ne doit être écrit sans test préalable.**
+Ce projet suit une approche Feature-First pour maximiser la livraison de valeur :
 
-### Workflow TDD
-1. **RED** : Écrire un test qui échoue
-2. **GREEN** : Écrire le minimum de code pour faire passer le test
-3. **REFACTOR** : Améliorer le code en gardant les tests verts
+### Principes
+- **Livraison rapide** : Focus sur les fonctionnalités utilisateur
+- **Code simple** : Éviter la sur-ingénierie
+- **Tests pragmatiques** : Tests de régression après stabilisation
+- **Itération continue** : Améliorer progressivement
 
-### Vérifications automatiques
-- Pre-commit hooks : Vérifient le respect du TDD localement
-- GitHub Actions : Bloquent toute PR qui viole les règles TDD
-- Coverage minimum : 80%
-
-**⚠️ Les violations TDD entraînent la fermeture automatique des PR.**
+### Workflow
+1. Implémenter la fonctionnalité
+2. Tester manuellement
+3. Ajouter des tests de régression si nécessaire
+4. Refactoriser si besoin
 
 ## 📁 Architecture
 
@@ -60,17 +60,15 @@ lib/
 └── main.dart         # Point d'entrée
 ```
 
-## 🧪 Tests
+## 🧪 Tests de Régression
+
+Dans l'esprit Feature-First, les tests sont écrits après l'implémentation pour verrouiller les comportements critiques.
 
 ```bash
-# Lancer tous les tests
+# Lancer les tests
 flutter test
 
-# Tests avec coverage
-flutter test --coverage
-
-# Vérifier la coverage
-lcov --summary coverage/lcov.info
+# Note : Un simple smoke test vérifie que l'app démarre
 ```
 
 ## 📖 Documentation

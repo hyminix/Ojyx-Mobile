@@ -8,10 +8,8 @@ Future<void> main() async {
   // Initialize all app services
   await AppInitializer.initialize();
 
-  // Run app with Sentry performance monitoring
-  await SentryFlutter.init((options) {
-    // Options are already configured in AppInitializer
-  }, appRunner: () => runApp(const ProviderScope(child: OjyxApp())));
+  // Run app directly since Sentry is already initialized in AppInitializer
+  runApp(const ProviderScope(child: OjyxApp()));
 }
 
 class OjyxApp extends ConsumerWidget {

@@ -67,8 +67,8 @@ class ActionCardDrawPileWidget extends ConsumerWidget {
                         Text(
                           'Cartes Actions',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.white.withOpacity(
-                              canDraw ? 1.0 : 0.6,
+                            color: Colors.white.withValues(
+                              alpha: canDraw ? 1.0 : 0.6,
                             ),
                             fontWeight: FontWeight.bold,
                             fontSize: 11,
