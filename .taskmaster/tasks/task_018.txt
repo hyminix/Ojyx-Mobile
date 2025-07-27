@@ -1,0 +1,43 @@
+# Task ID: 18
+# Title: FileLogger pour logs locaux accessibles sous Windows
+# Status: pending
+# Dependencies: 17
+# Priority: high
+# Description: Implémenter système d'écriture de logs dans dossier /logs/ accessible depuis l'explorateur Windows
+# Details:
+Utiliser path_provider: ^2.1.4 pour getApplicationDocumentsDirectory, créer sous-dossier 'logs', implémenter rotation automatique (max 7 jours, 100MB), écriture asynchrone avec buffer pour performances, compression des anciens logs avec archive: ^3.6.1. Nommage: ojyx_logs_YYYY-MM-DD.json. Buffer avec Timer.periodic pour flush toutes les 30s. Code: final logsDir = await getApplicationDocumentsDirectory(); final file = File('${logsDir.path}/logs/ojyx_logs_${DateFormat('yyyy-MM-dd').format(DateTime.now())}.json')
+
+# Test Strategy:
+Vérifier création dossier logs accessible Windows, tester rotation automatique, valider compression anciens fichiers, confirmer performances écriture asynchrone
+
+# Subtasks:
+## 1. Configurer l'architecture du FileLogger et les dépendances [pending]
+### Dependencies: None
+### Description: Créer la structure de base du FileLogger avec intégration de path_provider et archive pour la gestion des logs
+### Details:
+Ajouter les dépendances path_provider: ^2.1.4 et archive: ^3.6.1 dans pubspec.yaml. Créer la classe FileLogger dans lib/core/utils/file_logger.dart avec singleton pattern. Implémenter la méthode d'initialisation qui obtient le répertoire documents via getApplicationDocumentsDirectory() et crée le sous-dossier 'logs' s'il n'existe pas. Définir les constantes: MAX_LOG_SIZE = 100MB, MAX_LOG_DAYS = 7, FLUSH_INTERVAL = 30 secondes.
+
+## 2. Implémenter le système de buffer et d'écriture asynchrone [pending]
+### Dependencies: 18.1
+### Description: Développer le mécanisme de buffering avec flush périodique pour optimiser les performances d'écriture
+### Details:
+Créer une List<Map<String, dynamic>> comme buffer interne pour stocker les logs en mémoire. Implémenter la méthode log() qui ajoute les entrées au buffer avec timestamp, level, message et metadata. Configurer un Timer.periodic de 30 secondes pour déclencher automatiquement le flush. Créer la méthode _flushBuffer() asynchrone qui écrit le contenu du buffer dans le fichier JSON du jour au format ojyx_logs_YYYY-MM-DD.json. Utiliser jsonEncode pour la sérialisation et File.writeAsString en mode append.
+
+## 3. Développer la rotation automatique des fichiers de logs [pending]
+### Dependencies: 18.2
+### Description: Créer le système de rotation qui gère la taille maximale et l'ancienneté des fichiers de logs
+### Details:
+Implémenter _checkRotation() appelée avant chaque écriture pour vérifier: 1) Si le fichier actuel dépasse 100MB, créer un nouveau fichier avec suffixe incrémental (ojyx_logs_YYYY-MM-DD_2.json). 2) Scanner le répertoire logs pour identifier les fichiers de plus de 7 jours via DateTime.parse sur le nom de fichier. Créer _rotateOldLogs() qui supprime ou archive les fichiers dépassant la limite d'âge. Intégrer la vérification de rotation dans le processus de flush.
+
+## 4. Intégrer la compression des anciens logs avec archive [pending]
+### Dependencies: 18.3
+### Description: Implémenter la compression automatique des fichiers de logs avant suppression pour économiser l'espace disque
+### Details:
+Utiliser le package archive pour créer _compressOldLogs() qui compresse les fichiers de plus de 1 jour en .zip. Implémenter: 1) Lecture du fichier JSON à compresser, 2) Création d'une Archive avec ArchiveFile contenant les données, 3) Encodage avec ZipEncoder en ojyx_logs_YYYY-MM-DD.zip, 4) Suppression du fichier JSON original après compression réussie. Modifier _rotateOldLogs() pour supprimer les .zip de plus de 7 jours au lieu des .json.
+
+## 5. Finaliser l'intégration et l'accessibilité Windows [pending]
+### Dependencies: 18.4
+### Description: Assurer l'accessibilité complète des logs depuis l'explorateur Windows et intégrer le FileLogger dans l'application
+### Details:
+Créer une méthode openLogsFolder() utilisant url_launcher pour ouvrir l'explorateur Windows directement dans le dossier logs. Ajouter un bouton dans les paramètres de debug pour accéder aux logs. Intégrer FileLogger.instance.log() dans les points stratégiques de l'app: erreurs Supabase, changements d'état critiques, actions utilisateur importantes. Implémenter différents niveaux (debug, info, warning, error) avec filtrage configurable. Documenter le chemin complet des logs pour les utilisateurs Windows: C:\Users\[Username]\Documents\logs\
+

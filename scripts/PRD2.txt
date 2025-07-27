@@ -1,0 +1,225 @@
+<context>
+# Overview
+Ojyx est un jeu de cartes stratégique multijoueur qui a déjà une base solide implémentée. Cette phase 2 vise à compléter les fonctionnalités manquantes essentielles pour une expérience utilisateur complète, avec un focus particulier sur le monitoring et le debug à distance pour faciliter le développement collaboratif entre le développeur (Claude) et le testeur (utilisateur sur Windows).
+
+# Core Features
+1. **Page des Règles du Jeu** - Interface claire expliquant comment jouer à Ojyx
+   - Affichage des règles complètes du jeu
+   - Illustrations visuelles des mécaniques
+   - Section FAQ pour les cas spéciaux
+   - Navigation facile entre sections
+
+2. **Système de Logs & Monitoring Complet** - Infrastructure de debug et monitoring
+   - Sentry actif en Debug ET Release pour capture totale des erreurs
+   - Logs locaux dans /logs/ en mode debug pour accès direct Windows
+   - Console de debug in-app accessible via geste secret
+   - Export et partage des logs facilité
+
+3. **Configuration Sentry Avancée** - Monitoring professionnel des erreurs
+   - Capture des erreurs Flutter/Dart avec stack traces
+   - Capture des erreurs Supabase et base de données
+   - Performance monitoring (temps de réponse, FPS)
+   - User feedback widget intégré
+   - Breadcrumbs pour tracer le parcours utilisateur
+
+4. **Tutoriel/Onboarding Interactif** - Guide pour nouveaux joueurs
+   - Tutorial step-by-step des mécaniques de base
+   - Mode pratique contre IA simple
+   - Tooltips contextuels durant les premières parties
+   - Progression sauvegardée
+
+5. **Écran Paramètres** - Personnalisation de l'expérience
+   - Contrôle du volume sons/musique
+   - Activation/désactivation vibrations
+   - Choix du thème (clair/sombre/auto)
+   - Langue de l'interface
+   - Gestion du compte (pour futur)
+
+6. **Mode Hors-ligne avec IA** - Jouer sans connexion
+   - IA basique pour remplacer les joueurs
+   - Sauvegarde locale des parties
+   - Synchronisation différée quand connexion revenue
+   - Différents niveaux de difficulté
+
+7. **Profil Joueur** - Identité et progression
+   - Choix du pseudo
+   - Avatar personnalisable
+   - Statistiques de jeu (victoires, scores moyens)
+   - Historique des parties
+   - Achievements/Badges
+
+# User Experience
+**Personas principaux:**
+- **Nouveau Joueur** : Besoin de comprendre les règles, veut un tutoriel clair
+- **Joueur Régulier** : Veut personnaliser son expérience, voir ses stats
+- **Développeur/Testeur** : Besoin d'accès aux logs et monitoring pour debug
+
+**Flux utilisateur clés:**
+1. Premier lancement → Tutoriel → Première partie guidée
+2. Joueur existant → Home → Paramètres pour ajuster l'expérience
+3. Debug → Geste secret → Console logs → Export/Analyse
+
+**Considérations UI/UX:**
+- Design cohérent avec l'existant (Material Design)
+- Animations fluides mais désactivables
+- Accessibilité (tailles de texte, contrastes)
+- Feedback immédiat sur toutes les actions
+</context>
+<PRD>
+# Technical Architecture
+
+## Système de Logs Multi-Niveaux
+**Architecture modulaire:**
+```
+lib/core/services/
+├── log_service.dart          # Service principal avec façade
+├── file_logger.dart          # Écriture fichiers locaux Windows
+├── sentry_logger.dart        # Intégration Sentry avancée
+└── debug_console_overlay.dart # UI console debug in-app
+```
+
+**Format de log structuré (JSON):**
+```json
+{
+  "timestamp": "2024-01-27T10:30:45.123Z",
+  "level": "error|warning|info|debug",
+  "category": "game|network|ui|database",
+  "message": "Description claire",
+  "data": { /* contexte spécifique */ },
+  "stackTrace": "...",
+  "deviceInfo": { "platform": "android|ios|windows" },
+  "userId": "anonymous_123",
+  "sessionId": "session_456"
+}
+```
+
+## Intégration Sentry Complète
+- DSN configuré via variables d'environnement
+- Environments: debug, staging, production
+- Release tracking avec versions
+- Source maps pour stack traces lisibles
+- Attachments automatiques (logs locaux)
+- Custom contexts (game state, room info)
+
+## Stockage Local
+- SharedPreferences pour paramètres simples
+- SQLite pour données complexes (stats, parties offline)
+- Path Provider pour accès dossier logs
+- Hive pour cache rapide
+
+## APIs et Intégrations
+- Supabase Realtime (déjà en place)
+- Sentry SDK Flutter
+- Package Info Plus pour versions
+- Device Info Plus pour contexte
+
+# Development Roadmap
+
+## Phase 1: Infrastructure de Monitoring (Priorité MAXIMALE)
+**Objectif: Permettre le debug à distance efficace**
+1. Configuration Sentry complète avec DSN
+2. LogService avec multi-outputs (Sentry + fichiers)
+3. FileLogger pour logs locaux Windows (/logs/)
+4. Console debug overlay basique
+5. Test avec erreurs volontaires
+
+## Phase 2: Fonctionnalités Utilisateur Essentielles
+**Objectif: Compléter l'expérience de base**
+1. Page des règles avec contenu réel
+2. Écran paramètres fonctionnel
+3. Stockage local des préférences
+4. Intégration sons/vibrations
+
+## Phase 3: Expérience Nouveaux Joueurs
+**Objectif: Faciliter l'onboarding**
+1. Tutoriel interactif step-by-step
+2. Mode pratique vs IA simple
+3. Tooltips première partie
+4. Progression tutoriel sauvegardée
+
+## Phase 4: Fonctionnalités Avancées
+**Objectif: Enrichir l'expérience**
+1. Mode hors-ligne complet
+2. IA avec niveaux de difficulté
+3. Profil joueur avec stats
+4. Système d'achievements
+
+# Logical Dependency Chain
+
+1. **Monitoring FIRST** (Phase 1)
+   - Sans logs, impossible de debugger efficacement
+   - Sentry + logs locaux = visibilité totale
+   - Console debug = diagnostic rapide
+
+2. **Core UX Second** (Phase 2)
+   - Règles nécessaires pour comprendre le jeu
+   - Paramètres pour personnaliser
+   - Base solide avant features avancées
+
+3. **Onboarding Third** (Phase 3)
+   - S'appuie sur règles existantes
+   - Utilise paramètres pour adaptation
+   - Guide vers features core
+
+4. **Advanced Last** (Phase 4)
+   - Nécessite toute l'infra précédente
+   - IA s'appuie sur règles codifiées
+   - Stats utilisent système de logs
+
+# Risks and Mitigations
+
+## Risques Techniques
+1. **Performances logs en debug**
+   - Mitigation: Buffer et écriture asynchrone
+   - Rotation automatique des fichiers
+
+2. **Taille des logs sur disque**
+   - Mitigation: Limite 7 jours, max 100MB
+   - Compression des anciens logs
+
+3. **Sentry quota dépassé**
+   - Mitigation: Rate limiting intelligent
+   - Filtrage des erreurs dupliquées
+
+## Risques UX
+1. **Tutoriel trop long/ennuyeux**
+   - Mitigation: Skippable, progression sauvegardée
+   - Récompenses pour complétion
+
+2. **IA trop facile/difficile**
+   - Mitigation: 3 niveaux de difficulté
+   - Adaptation dynamique
+
+## Contraintes Ressources
+1. **Temps de développement**
+   - Focus sur monitoring d'abord
+   - Features incrementales
+   - Réutilisation maximum du code existant
+
+# Appendix
+
+## Standards de Logs
+- **DEBUG**: Infos développement uniquement
+- **INFO**: Actions utilisateur importantes
+- **WARNING**: Comportements inattendus non-bloquants
+- **ERROR**: Erreurs nécessitant attention
+
+## Gestes Secrets Debug
+- 5 taps rapides coin supérieur droit = Console
+- Long press 3s sur logo = Export logs
+- Shake device = Report bug avec screenshot
+
+## Métriques Sentry à Tracker
+- Temps de chargement app
+- FPS durant le jeu
+- Temps de réponse réseau
+- Crashes par version
+- Erreurs par feature
+
+## Format Export Logs
+- ZIP contenant:
+  - Logs JSON des 24h
+  - Device info
+  - App version
+  - Screenshots si disponibles
+</PRD>

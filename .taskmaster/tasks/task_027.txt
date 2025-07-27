@@ -1,0 +1,43 @@
+# Task ID: 27
+# Title: Mode pratique vs IA simple pour apprentissage
+# Status: pending
+# Dependencies: 26
+# Priority: medium
+# Description: Implémenter mode de jeu contre IA basique pour s'exercer sans pression multijoueur
+# Details:
+Créer AIOpponent class avec stratégie simple: révéler cartes aléatoirement, jouer cartes actions basiques selon règles. Implémenter PracticeGameScreen réutilisant GameScreen existant mais avec AI players. 3 niveaux: Easy (actions aléatoires), Medium (stratégie basique), Hard (anticipation coups joueur). Code: class AIPlayer extends Player avec makeMove() retournant AIAction, intégration dans GameLogic existant via isAI flag
+
+# Test Strategy:
+Tester comportement IA réaliste, vérifier respect des règles, valider différence niveaux difficulté, confirmer expérience apprentissage
+
+# Subtasks:
+## 1. Créer la classe AIPlayer et l'architecture de base [pending]
+### Dependencies: None
+### Description: Implémenter la classe AIPlayer qui étend Player avec les méthodes nécessaires pour les décisions de l'IA
+### Details:
+Créer AIPlayer extends Player dans features/game/domain/entities/ai_player.dart. Ajouter propriétés: difficultyLevel (enum: Easy, Medium, Hard), strategyEngine. Implémenter méthode abstraite makeMove() qui retourne Future<AIAction>. Créer AIAction model avec type (reveal, playCard, discard) et target. Ajouter flag isAI dans Player existant. Créer AIStrategy interface pour permettre différentes implémentations selon niveau.
+
+## 2. Implémenter les stratégies d'IA par niveau de difficulté [pending]
+### Dependencies: 27.1
+### Description: Développer les trois stratégies d'IA (Easy, Medium, Hard) avec leurs logiques de décision respectives
+### Details:
+Créer EasyAIStrategy: actions totalement aléatoires, révèle cartes au hasard, joue cartes actions sans logique. MediumAIStrategy: révèle d'abord cartes aux coins, évite de révéler cartes déjà vues si possible, utilise cartes actions basiques (Spy sur adversaire avec moins de cartes révélées). HardAIStrategy: mémorise cartes vues avec Spy/Exchange, calcule score probable, anticipe colonnes à défausser, utilise cartes actions stratégiquement. Implémenter dans features/game/domain/use_cases/ai_strategies/.
+
+## 3. Adapter GameLogic pour supporter les joueurs IA [pending]
+### Dependencies: 27.2
+### Description: Modifier la logique de jeu existante pour gérer automatiquement les tours des joueurs IA
+### Details:
+Dans GameLogic/GameService, ajouter détection isAI dans processNextTurn(). Implémenter autoPlayForAI() qui: attend 1-2 secondes (simuler réflexion), appelle aiPlayer.makeMove(), exécute l'action retournée via les méthodes existantes (revealCard, playActionCard). Ajouter gestion des timeouts spécifiques IA (plus courts). Assurer que les animations et feedbacks visuels fonctionnent aussi pour actions IA. Modifier GameStateNotifier pour trigger automatiquement tours IA.
+
+## 4. Créer PracticeGameScreen et menu de sélection [pending]
+### Dependencies: 27.3
+### Description: Développer l'écran de jeu pratique réutilisant GameScreen avec configuration spéciale IA
+### Details:
+Créer PracticeGameScreen dans features/practice/presentation/screens/. Ajouter PracticeModeSelectionDialog: choix nombre adversaires IA (1-7), sélection niveau pour chaque IA, option 'Tous même niveau'. Réutiliser GameScreen existant en passant configuration avec AI players. Créer PracticeGameProvider qui initialise GameState avec joueurs IA. Ajouter entrée menu principal 'Mode Pratique' dans HomeScreen. Router: ajouter route '/practice' dans go_router config.
+
+## 5. Ajouter indicateurs visuels et statistiques mode pratique [pending]
+### Dependencies: 27.4
+### Description: Implémenter feedback visuel pour actions IA et tracking des performances du joueur
+### Details:
+Ajouter badge 'IA' avec niveau sur avatars joueurs IA dans GameScreen. Créer AnimatedAIThinking widget (points animés '...') pendant réflexion IA. Implémenter PracticeStatsTracker: victoires/défaites par niveau, score moyen, meilleures performances. Afficher mini récap fin de partie pratique avec suggestions ('Essayez niveau supérieur' si victoire facile). Sauvegarder stats pratique dans SharedPreferences. Optionnel: replay des coups IA pour apprentissage.
+

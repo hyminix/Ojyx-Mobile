@@ -1,0 +1,133 @@
+# Task ID: 8
+# Title: Mise à Jour de Riverpod et State Management
+# Status: done
+# Dependencies: 7
+# Priority: high
+# Description: Vérifier l'utilisation actuelle de Riverpod et migrer vers la syntaxe moderne avec annotations si nécessaire
+# Details:
+1. Analyser l'état actuel de Riverpod dans le projet :
+   - flutter_riverpod: 2.6.1 (déjà installé)
+   - riverpod_annotation: 2.3.5 (installé, mais pas la dernière 2.6.1+)
+   - Vérifier si riverpod_generator et riverpod_lint sont installés
+2. Identifier la syntaxe utilisée :
+   - Rechercher les providers legacy (Provider, StateNotifierProvider, etc.)
+   - Vérifier la présence de fichiers .g.dart (génération de code)
+   - Identifier les @riverpod annotations existantes
+3. Si syntaxe legacy détectée, migrer vers @riverpod :
+   - Installer/mettre à jour riverpod_generator et riverpod_lint
+   - Remplacer les providers legacy par annotations
+   - Utiliser part files pour la génération
+   - Adopter les Notifier modernes
+4. Mettre à jour riverpod_annotation vers 2.6.1+
+5. Régénérer tous les fichiers si nécessaire
+6. Configurer riverpod_lint dans analysis_options.yaml
+
+# Test Strategy:
+Analyser le code pour identifier la syntaxe Riverpod utilisée. Si migration nécessaire, compiler après chaque étape. Vérifier que 'flutter analyze' ne montre aucune erreur Riverpod.
+
+# Subtasks:
+## 1. Audit de l'utilisation actuelle de Riverpod [done]
+### Dependencies: None
+### Description: Analyser le codebase pour identifier la syntaxe Riverpod utilisée (legacy vs moderne) et l'état des dépendances
+### Details:
+1. Vérifier les versions installées dans pubspec.yaml :
+   - flutter_riverpod: 2.6.1 (confirmé)
+   - riverpod_annotation: 2.3.5 (à mettre à jour)
+   - Présence de riverpod_generator et riverpod_lint ?
+2. Rechercher dans le code :
+   - Fichiers contenant 'Provider(' ou 'StateNotifierProvider('
+   - Présence d'annotations @riverpod
+   - Fichiers .g.dart générés
+   - Import de 'riverpod_annotation'
+3. Identifier les patterns utilisés :
+   - Providers legacy (final myProvider = Provider...)
+   - Providers annotés (@riverpod ...)
+   - StateNotifier vs Notifier/AsyncNotifier
+4. Créer un inventaire des providers à migrer
+<info added on 2025-07-27T10:36:26.807Z>
+Résultats détaillés de l'audit complet :
+
+**Syntaxe moderne dominante :** La majorité du codebase utilise déjà la syntaxe @riverpod moderne avec code généré (.g.dart présents). Providers modernes identifiés : auth_provider, action_card_providers, room_providers et leurs fichiers associés.
+
+**4 providers legacy identifiés nécessitant migration :**
+- supabaseClientProvider : Provider simple pour l'instance Supabase
+- routerProvider : Provider dans le backup, utilise la syntaxe legacy
+- directionObserverProvider : StateNotifierProvider à migrer vers AsyncNotifier
+- currentRoomIdProvider : StateProvider à migrer vers Notifier
+
+**État des dépendances :**
+- riverpod_generator: 2.6.3 (déjà installé et à jour)
+- riverpod_lint: ABSENT - à ajouter pour les analyses statiques
+- riverpod_annotation: 2.3.5 - DOIT être mis à jour vers 2.6.1 pour cohérence
+
+**Actions requises :** Migration minimale (4 providers), ajout de riverpod_lint, mise à jour de riverpod_annotation.
+</info added on 2025-07-27T10:36:26.807Z>
+
+## 2. Mise à jour des dépendances Riverpod manquantes [done]
+### Dependencies: 8.1
+### Description: Mettre à jour riverpod_annotation vers 2.6.1 et ajouter les packages de génération si absents
+### Details:
+1. Mettre à jour dans pubspec.yaml :
+   - riverpod_annotation: ^2.6.1 (depuis 2.3.5)
+2. Ajouter si absents dans dev_dependencies :
+   - riverpod_generator: ^2.6.1
+   - riverpod_lint: ^2.6.1
+   - build_runner: ^2.4.0 (vérifier version actuelle)
+3. Exécuter 'flutter pub get'
+4. Vérifier la résolution des dépendances
+5. S'assurer qu'aucun conflit de version n'est présent
+6. Noter : flutter_riverpod 2.6.1 est déjà installé
+
+## 3. Configuration de riverpod_lint (si nécessaire) [done]
+### Dependencies: 8.2
+### Description: Configurer riverpod_lint dans analysis_options.yaml uniquement si ce n'est pas déjà fait
+### Details:
+1. Vérifier si riverpod_lint est déjà configuré dans analysis_options.yaml
+2. Si non configuré :
+   - Ajouter aux plugins d'analyse :
+     analyzer:
+       plugins:
+         - riverpod_lint
+   - Activer les règles recommandées
+3. Si déjà configuré :
+   - Vérifier que la configuration est à jour
+   - S'assurer qu'elle est compatible avec la version 2.6.1
+4. Exécuter 'flutter analyze'
+5. Corriger les avertissements Riverpod signalés
+6. Documenter les changements nécessaires
+
+## 4. Migration conditionnelle des providers legacy [done]
+### Dependencies: 8.3
+### Description: Migrer les providers legacy vers la syntaxe @riverpod uniquement si des providers legacy sont détectés dans l'audit
+### Details:
+1. Si aucun provider legacy détecté (étape 1) :
+   - Documenter que le projet utilise déjà la syntaxe moderne
+   - Passer à l'étape suivante
+2. Si providers legacy détectés :
+   - Pour chaque fichier avec providers legacy :
+     * Ajouter import 'package:riverpod_annotation/riverpod_annotation.dart'
+     * Ajouter part 'nom_fichier.g.dart'
+     * Convertir Provider((ref) => ...) en @riverpod fonctions
+     * Convertir StateNotifierProvider en @riverpod classes
+   - Maintenir la logique métier identique
+   - Documenter chaque migration effectuée
+3. Générer le code après chaque migration
+
+## 5. Génération finale et validation complète [done]
+### Dependencies: 8.4
+### Description: Exécuter la génération de code si nécessaire et valider que tout le système Riverpod fonctionne correctement
+### Details:
+1. Si des migrations ont été effectuées ou si riverpod_generator ajouté :
+   - Exécuter : flutter pub run build_runner build --delete-conflicting-outputs
+   - Vérifier que tous les .g.dart sont générés
+2. Valider l'ensemble du système :
+   - Compiler l'application complète
+   - Vérifier qu'aucune erreur Riverpod n'apparaît
+   - Tester que les providers fonctionnent (watch, read)
+3. Exécuter 'flutter analyze' final
+4. Corriger les derniers warnings riverpod_lint
+5. Documenter l'état final :
+   - Nombre de providers migrés (si applicable)
+   - Version finale de toutes les dépendances Riverpod
+   - Syntaxe utilisée (legacy vs moderne)
+

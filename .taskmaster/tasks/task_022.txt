@@ -1,0 +1,43 @@
+# Task ID: 22
+# Title: Page des règles du jeu avec contenu structuré
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Créer interface claire expliquant toutes les règles d'Ojyx avec navigation intuitive
+# Details:
+Créer RulesScreen avec sections: Objectif du jeu, Mise en place, Déroulement tour, Cartes actions, Fin de partie, Cas spéciaux. Utiliser ExpansionTile pour navigation, illustrations avec des widgets custom cards mockup. Intégrer video explicative future. Structure: AppBar avec titre, body ScrollView avec sections expandables, FloatingActionButton pour retour rapide home. Code: class RulesScreen extends ConsumerWidget avec sections List<RuleSection>
+
+# Test Strategy:
+Vérifier lisibilité contenu règles, tester navigation entre sections, valider illustrations cartes, confirmer accessibilité taille texte
+
+# Subtasks:
+## 1. Créer la structure de base RulesScreen [pending]
+### Dependencies: None
+### Description: Implémenter le widget RulesScreen avec navigation de base et structure des sections
+### Details:
+Créer lib/features/rules/presentation/screens/rules_screen.dart avec ConsumerWidget. Définir la structure List<RuleSection> avec propriétés title, content, iconData. Implémenter AppBar personnalisé avec titre 'Règles d'Ojyx' et action de retour. Ajouter ScrollView principal et FloatingActionButton pour retour rapide en haut. Intégrer route dans go_router configuration.
+
+## 2. Implémenter le système d'ExpansionTile pour les sections [pending]
+### Dependencies: 22.1
+### Description: Créer des widgets ExpansionTile personnalisés pour chaque section de règles avec animations fluides
+### Details:
+Créer RulesSectionTile widget personnalisé héritant d'ExpansionTile avec styling cohérent. Implémenter les 6 sections principales: Objectif du jeu, Mise en place, Déroulement tour, Cartes actions, Fin de partie, Cas spéciaux. Ajouter icônes thématiques pour chaque section (ex: Target pour Objectif, Settings pour Mise en place). Gérer état expansion avec ExpansionTileController pour permettre fermeture automatique des autres sections.
+
+## 3. Rédiger et structurer le contenu textuel des règles [pending]
+### Dependencies: 22.2
+### Description: Écrire le contenu complet des règles en français avec formatage riche et hiérarchie claire
+### Details:
+Rédiger texte complet pour chaque section en utilisant RichText avec TextSpan pour formattage. Structurer avec titres, sous-titres, listes à puces, texte en gras pour points importants. Contenu: Objectif (obtenir score le plus bas), Mise en place (distribution 12 cartes face cachée), Déroulement (piocher/défausser, révéler, actions), Cartes actions (détail de chaque carte avec effets), Fin de partie (déclenchement, calcul scores), Cas spéciaux (colonnes identiques, déconnexions).
+
+## 4. Créer les illustrations de cartes mockup [pending]
+### Dependencies: 22.3
+### Description: Développer des widgets custom pour illustrer visuellement les exemples de cartes et situations de jeu
+### Details:
+Créer CardIllustrationWidget réutilisable avec CustomPainter pour dessiner cartes. Implémenter variations: carte face cachée, cartes numériques (valeurs), cartes actions avec symboles. Créer GameSituationWidget pour illustrer exemples: grille 3x4, colonnes identiques, défausse. Utiliser Container avec decoration et Transform pour effets 3D légers. Intégrer illustrations dans sections appropriées des règles.
+
+## 5. Préparer l'intégration vidéo et finaliser l'UX [pending]
+### Dependencies: 22.4
+### Description: Ajouter placeholder pour vidéo explicative future et optimiser l'expérience utilisateur globale
+### Details:
+Créer VideoPlaceholderWidget avec message 'Vidéo explicative bientôt disponible' et icône play. Prévoir structure pour future intégration video_player package. Implémenter recherche dans les règles avec TextField filtrant sections. Ajouter mode lecture continue avec auto-expansion sections. Optimiser tailles police selon préférences utilisateur (intégration avec SettingsScreen). Ajouter analytics pour tracker sections les plus consultées.
+

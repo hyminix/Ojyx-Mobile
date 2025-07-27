@@ -1,0 +1,80 @@
+# Task ID: 4
+# Title: Analyse et Inventaire des Dépendances Actuelles
+# Status: done
+# Dependencies: 2, 3
+# Priority: high
+# Description: Analyser toutes les dépendances Flutter/Dart et composants Android pour préparer la mise à jour complète de la stack
+# Details:
+1. Analyser pubspec.yaml :
+   - Lister toutes les dépendances avec leurs versions actuelles
+   - Identifier les dépendances critiques (Supabase, Riverpod, etc.)
+   - Noter les dépendances obsolètes ou non utilisées
+2. Analyser la configuration Android :
+   - android/build.gradle : versions de Gradle, Kotlin
+   - android/app/build.gradle : compileSdkVersion, targetSdkVersion, minSdkVersion
+   - android/gradle/wrapper/gradle-wrapper.properties : version Gradle wrapper
+3. Exécuter 'flutter pub outdated' pour voir l'état des mises à jour
+4. Créer un document temporaire listant :
+   - Version actuelle vs dernière version stable
+   - Breaking changes potentiels
+   - Ordre de mise à jour recommandé
+5. Vérifier la compatibilité Flutter SDK avec 'flutter doctor -v'
+
+# Test Strategy:
+S'assurer que le rapport d'analyse est complet et que toutes les dépendances principales sont documentées avec leurs versions cibles.
+
+# Subtasks:
+## 1. Analyser et documenter les dépendances pubspec.yaml [done]
+### Dependencies: None
+### Description: Extraire et documenter toutes les dépendances Flutter/Dart actuelles avec leurs versions, identifier les dépendances critiques et obsolètes
+### Details:
+1. Lire et parser le fichier pubspec.yaml complet
+2. Créer une liste structurée de toutes les dépendances avec leurs versions actuelles
+3. Catégoriser les dépendances par type : critiques (Supabase, Riverpod, Freezed), UI (go_router), utilitaires, dev_dependencies
+4. Identifier les dépendances potentiellement obsolètes ou non utilisées dans le code
+5. Documenter les contraintes de version et les dépendances transitives importantes
+
+## 2. Analyser la configuration Android et Gradle [done]
+### Dependencies: None
+### Description: Examiner tous les fichiers de configuration Android pour documenter les versions de SDK, Gradle, Kotlin et autres composants de build
+### Details:
+1. Analyser android/build.gradle : versions de Gradle plugin, Kotlin, repositories utilisés
+2. Analyser android/app/build.gradle : compileSdkVersion, targetSdkVersion, minSdkVersion, buildToolsVersion
+3. Vérifier android/gradle/wrapper/gradle-wrapper.properties : version exacte du Gradle wrapper
+4. Examiner android/gradle.properties pour les flags de configuration (AndroidX, Jetifier)
+5. Noter les dépendances Android natives si présentes
+6. Documenter la version Java requise (JavaVersion.VERSION_17)
+
+## 3. Exécuter et analyser flutter pub outdated [done]
+### Dependencies: 4.1
+### Description: Lancer la commande flutter pub outdated pour obtenir l'état actuel des mises à jour disponibles et analyser les résultats
+### Details:
+1. Exécuter 'flutter pub outdated' dans le terminal
+2. Capturer et analyser la sortie complète incluant : versions actuelles, versions upgradables, dernières versions
+3. Identifier les packages avec des mises à jour majeures disponibles (breaking changes potentiels)
+4. Noter les packages qui sont déjà à jour
+5. Créer une matrice de compatibilité entre les versions pour éviter les conflits
+6. Prioriser les mises à jour selon leur criticité et interdépendances
+
+## 4. Vérifier l'environnement Flutter et documenter la compatibilité [done]
+### Dependencies: 4.2
+### Description: Exécuter flutter doctor et analyser la compatibilité de l'environnement de développement avec les dépendances actuelles
+### Details:
+1. Exécuter 'flutter doctor -v' pour obtenir les détails complets de l'environnement
+2. Documenter la version Flutter SDK actuelle (3.32.6) et Dart (3.8.1)
+3. Vérifier la compatibilité des outils : Android toolchain, Android Studio, VS Code
+4. Noter les éventuels warnings ou issues signalés par flutter doctor
+5. Vérifier que Java 17 est bien configuré pour Android 34
+6. Documenter les contraintes de compatibilité entre Flutter SDK et les dépendances principales
+
+## 5. Créer le rapport d'inventaire complet avec recommandations [done]
+### Dependencies: 4.1, 4.2, 4.3, 4.4
+### Description: Compiler toutes les analyses dans un document structuré avec l'ordre de mise à jour recommandé et les risques identifiés
+### Details:
+1. Créer un fichier temporaire .taskmaster/reports/dependency-inventory.md
+2. Structurer le rapport en sections : Dépendances Flutter, Configuration Android, État des mises à jour
+3. Pour chaque dépendance critique, documenter : version actuelle, version cible, breaking changes connus, risques
+4. Établir un ordre de mise à jour optimal : Android/Gradle d'abord, puis Flutter core, puis packages critiques
+5. Identifier les dépendances qui peuvent être mises à jour en groupe
+6. Ajouter une section de recommandations avec les précautions à prendre
+

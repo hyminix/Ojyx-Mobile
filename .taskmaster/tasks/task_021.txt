@@ -1,0 +1,43 @@
+# Task ID: 21
+# Title: Tests monitoring avec erreurs volontaires et validation
+# Status: pending
+# Dependencies: 18, 19, 20
+# Priority: high
+# Description: Créer suite de tests pour valider le bon fonctionnement du système de monitoring complet
+# Details:
+Créer écran debug test avec boutons pour déclencher erreurs volontaires: Exception Dart, Error network, Warning business logic, Info action user. Valider réception dans Sentry dashboard, vérification fichiers logs locaux, test console debug. Implémenter TestErrorService avec différents types d'erreurs. Code: TestErrorService().triggerNetworkError() qui lance http timeout, triggerDartError() qui lance null pointer exception, etc.
+
+# Test Strategy:
+Déclencher chaque type d'erreur, vérifier présence dans Sentry dashboard, confirmer écriture fichiers logs, valider affichage console debug, mesurer délais transmission
+
+# Subtasks:
+## 1. Création du TestErrorService avec différents types d'erreurs [pending]
+### Dependencies: None
+### Description: Implémenter un service centralisé pour déclencher différents types d'erreurs volontaires pour les tests de monitoring
+### Details:
+Créer TestErrorService dans lib/core/services/test_error_service.dart avec méthodes: triggerDartError() pour null pointer exception, triggerNetworkError() pour timeout HTTP, triggerBusinessWarning() pour logique métier, triggerUserInfo() pour action utilisateur. Utiliser dio pour erreurs réseau, throw Exception pour Dart errors. Ajouter delay configurable pour simuler latence réseau.
+
+## 2. Création de l'écran de debug avec interface de test [pending]
+### Dependencies: 21.1
+### Description: Développer un écran dédié aux tests de monitoring avec boutons pour déclencher chaque type d'erreur
+### Details:
+Créer DebugTestScreen dans lib/features/debug/presentation/screens/ avec GridView de boutons colorés: rouge pour Dart Exception, orange pour Network Error, jaune pour Business Warning, bleu pour User Info. Ajouter indicateurs visuels de confirmation après déclenchement. Intégrer route dans go_router accessible uniquement en mode debug. Afficher timestamp et type d'erreur déclenchée.
+
+## 3. Validation de la réception dans Sentry Dashboard [pending]
+### Dependencies: 21.2
+### Description: Configurer et vérifier que toutes les erreurs déclenchées apparaissent correctement dans Sentry
+### Details:
+Se connecter au dashboard Sentry du projet, créer vue filtrée par environment (debug/dev). Déclencher chaque type d'erreur depuis l'app, noter timestamps. Vérifier présence dans Issues avec bon niveau (error/warning/info), contexte device enrichi, stack traces complètes. Documenter délais de transmission typiques (< 30s attendu). Créer alertes Sentry pour notifications temps réel.
+
+## 4. Vérification des fichiers logs locaux [pending]
+### Dependencies: 21.2
+### Description: Valider que le système de logging local enregistre correctement toutes les erreurs dans les fichiers
+### Details:
+Utiliser path_provider pour localiser répertoire logs de l'app. Implémenter LogFileViewer pour lire et afficher contenu des logs directement dans l'app. Vérifier format JSON des entrées, présence des timestamps, niveaux de log corrects. Tester rotation des fichiers si taille > 10MB. Ajouter bouton export logs dans l'écran debug pour partage facile.
+
+## 5. Tests de la console debug et métriques de performance [pending]
+### Dependencies: 21.3, 21.4
+### Description: Valider l'affichage dans la console de développement et mesurer l'impact performance du monitoring
+### Details:
+Configurer flutter_logs pour affichage coloré dans console (rouge=error, jaune=warning, blanc=info). Mesurer overhead mémoire/CPU avec DevTools pendant déclenchement massif d'erreurs. Implémenter compteurs dans TestErrorService pour statistiques (total errors, par type, temps moyen). Créer rapport de synthèse avec graphiques performance. Vérifier aucune fuite mémoire après 100+ erreurs.
+

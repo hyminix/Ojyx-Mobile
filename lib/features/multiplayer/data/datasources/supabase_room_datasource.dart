@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/errors/supabase_exceptions.dart';
 import '../models/room_model.dart';
 
 class SupabaseRoomDatasource {
@@ -10,17 +11,24 @@ class SupabaseRoomDatasource {
     required String creatorId,
     required int maxPlayers,
   }) async {
-    final response = await _supabase
-        .from('rooms')
-        .insert({
-          'creator_id': creatorId,
-          'player_ids': [creatorId],
-          'status': 'waiting',
-          'max_players': maxPlayers,
-          'created_at': DateTime.now().toIso8601String(),
-        })
-        .select()
-        .single();
+    final response = await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase
+          .from('rooms')
+          .insert({
+            'creator_id': creatorId,
+            'player_ids': [creatorId],
+            'status': 'waiting',
+            'max_players': maxPlayers,
+            'created_at': DateTime.now().toIso8601String(),
+          })
+          .select()
+          .single(),
+      operation: 'create_room',
+      context: {
+        'creator_id': creatorId,
+        'max_players': maxPlayers,
+      },
+    );
 
     return RoomModel.fromJson(response);
   }
@@ -42,15 +50,24 @@ class SupabaseRoomDatasource {
 
     final updatedPlayerIds = [...room.playerIds, playerId];
 
-    final response = await _supabase
-        .from('rooms')
-        .update({
-          'player_ids': updatedPlayerIds,
-          'updated_at': DateTime.now().toIso8601String(),
-        })
-        .eq('id', roomId)
-        .select()
-        .single();
+    final response = await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase
+          .from('rooms')
+          .update({
+            'player_ids': updatedPlayerIds,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', roomId)
+          .select()
+          .single(),
+      operation: 'join_room',
+      context: {
+        'room_id': roomId,
+        'player_id': playerId,
+        'current_players': room.playerIds.length,
+        'max_players': room.maxPlayers,
+      },
+    );
 
     return RoomModel.fromJson(response);
   }
@@ -66,25 +83,37 @@ class SupabaseRoomDatasource {
         .where((id) => id != playerId)
         .toList();
 
-    await _supabase
-        .from('rooms')
-        .update({
-          'player_ids': updatedPlayerIds,
-          'updated_at': DateTime.now().toIso8601String(),
-        })
-        .eq('id', roomId);
+    await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase
+          .from('rooms')
+          .update({
+            'player_ids': updatedPlayerIds,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', roomId),
+      operation: 'leave_room',
+      context: {
+        'room_id': roomId,
+        'player_id': playerId,
+      },
+    );
   }
 
   Future<RoomModel?> getRoom(String roomId) async {
     try {
-      final response = await _supabase
-          .from('rooms')
-          .select()
-          .eq('id', roomId)
-          .single();
+      final response = await SupabaseExceptionHandler.handleSupabaseCall(
+        call: () => _supabase
+            .from('rooms')
+            .select()
+            .eq('id', roomId)
+            .single(),
+        operation: 'get_room',
+        context: {'room_id': roomId},
+      );
 
       return RoomModel.fromJson(response);
     } catch (e) {
+      // Si la room n'existe pas, retourner null
       return null;
     }
   }
@@ -101,12 +130,19 @@ class SupabaseRoomDatasource {
     required String roomId,
     required Map<String, dynamic> eventData,
   }) async {
-    await _supabase.from('room_events').insert({
-      'room_id': roomId,
-      'event_type': eventData['type'],
-      'event_data': eventData,
-      'created_at': DateTime.now().toIso8601String(),
-    });
+    await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase.from('room_events').insert({
+        'room_id': roomId,
+        'event_type': eventData['type'],
+        'event_data': eventData,
+        'created_at': DateTime.now().toIso8601String(),
+      }),
+      operation: 'send_room_event',
+      context: {
+        'room_id': roomId,
+        'event_type': eventData['type'],
+      },
+    );
   }
 
   Stream<Map<String, dynamic>> watchRoomEvents(String roomId) {
@@ -119,11 +155,14 @@ class SupabaseRoomDatasource {
   }
 
   Future<List<RoomModel>> getAvailableRooms() async {
-    final response = await _supabase
-        .from('rooms')
-        .select()
-        .eq('status', 'waiting')
-        .order('created_at', ascending: false);
+    final response = await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase
+          .from('rooms')
+          .select()
+          .eq('status', 'waiting')
+          .order('created_at', ascending: false),
+      operation: 'get_available_rooms',
+    );
 
     return (response as List).map((json) => RoomModel.fromJson(json)).toList();
   }
@@ -142,6 +181,14 @@ class SupabaseRoomDatasource {
       updates['current_game_id'] = gameId;
     }
 
-    await _supabase.from('rooms').update(updates).eq('id', roomId);
+    await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase.from('rooms').update(updates).eq('id', roomId),
+      operation: 'update_room_status',
+      context: {
+        'room_id': roomId,
+        'status': status,
+        if (gameId != null) 'game_id': gameId,
+      },
+    );
   }
 }

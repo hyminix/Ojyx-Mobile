@@ -1,0 +1,54 @@
+# Task ID: 5
+# Title: Mise à Jour de Flutter SDK et Dart
+# Status: done
+# Dependencies: 4
+# Priority: high
+# Description: Valider que Flutter/Dart sont sur les dernières versions stables et optimiser l'environnement de développement
+# Details:
+1. Confirmer les versions actuelles : Flutter 3.32.6 et Dart 3.8.1 (déjà les dernières stables)
+2. Vérifier le channel : déjà sur 'stable'
+3. Exécuter 'flutter doctor -v' pour identifier d'éventuels problèmes
+4. Ajuster les contraintes SDK dans pubspec.yaml pour correspondre aux versions actuelles :
+   environment:
+     sdk: '>=3.8.0 <4.0.0'
+     flutter: '>=3.32.0'
+5. Nettoyer le cache si nécessaire : 'flutter clean' puis 'flutter pub cache clean'
+6. Valider l'environnement avec un projet test
+
+# Test Strategy:
+Exécuter 'flutter doctor' et s'assurer que tous les checks sont verts. Compiler un projet vide pour valider que l'environnement est optimal.
+
+# Subtasks:
+## 2. Valider les versions et résoudre les problèmes flutter doctor [done]
+### Dependencies: 5.1
+### Description: Confirmer que les versions actuelles sont les dernières stables et corriger tout problème signalé
+### Details:
+Confirmer que Flutter 3.32.6 et Dart 3.8.1 sont bien les versions actuelles (déjà les dernières stables de juillet 2025). Vérifier que le channel est sur 'stable'. Analyser le rapport de 'flutter doctor -v' et résoudre uniquement les problèmes réels : accepter les licences Android si nécessaire, vérifier les plugins IDE. Pas besoin de mise à jour car déjà sur les dernières versions.
+<info added on 2025-07-27T10:10:57.546Z>
+Statut confirmé avec flutter doctor -v : Flutter 3.32.6 et Dart 3.8.1 sont effectivement les dernières versions stables disponibles en date de juillet 2025. Le channel Flutter est correctement configuré sur stable. L'environnement Android est parfaitement opérationnel avec Java 17 installé et toutes les licences Android SDK acceptées. Les seuls éléments signalés par flutter doctor concernent les outils de développement Linux desktop (GTK, CMake, ninja) qui ne sont pas installés, mais ceux-ci ne sont pas critiques pour le développement Android ciblé par le projet Ojyx. Aucune mise à jour du SDK n'est nécessaire, l'environnement est déjà optimal pour le développement.
+</info added on 2025-07-27T10:10:57.546Z>
+
+## 3. Ajuster les contraintes SDK dans pubspec.yaml [done]
+### Dependencies: 5.2
+### Description: Mettre à jour les contraintes de versions pour correspondre aux versions actuelles
+### Details:
+Modifier pubspec.yaml pour ajuster les contraintes d'environnement aux versions actuelles : sdk: '>=3.8.0 <4.0.0' et flutter: '>=3.32.0'. Ces contraintes reflètent les versions stables actuelles tout en permettant les mises à jour mineures futures. Exécuter 'flutter pub get' pour valider la compatibilité.
+<info added on 2025-07-27T10:11:35.685Z>
+Les versions ont été confirmées et appliquées avec succès. La validation avec flutter pub get montre que tous les packages sont compatibles avec les nouvelles contraintes. Bien que 23 packages aient des versions plus récentes disponibles, elles restent dans les limites acceptables des contraintes définies. L'environnement est stable et prêt pour le développement.
+</info added on 2025-07-27T10:11:35.685Z>
+
+## 4. Nettoyer le cache et valider l'environnement [done]
+### Dependencies: 5.3
+### Description: Effectuer un nettoyage du cache si nécessaire et valider le bon fonctionnement
+### Details:
+Si des problèmes de cache sont détectés, exécuter 'flutter clean' et 'flutter pub cache clean'. Réinstaller les dépendances avec 'flutter pub get'. Créer un projet test minimal avec 'flutter create test_validation' et le compiler pour confirmer que l'environnement fonctionne parfaitement.
+<info added on 2025-07-27T10:15:48.452Z>
+Validation réussie le 2025-01-27. Flutter clean exécuté avec succès, suivi du build APK debug du projet Ojyx complété en 203.4 secondes. L'environnement Flutter 3.32.6 avec Dart 3.8.1 est pleinement opérationnel. L'APK a été généré dans build/app/outputs/flutter-apk/app-debug.apk. Avertissement non-critique détecté concernant le support x86 à retirer après la version 3.27 de Flutter.
+</info added on 2025-07-27T10:15:48.452Z>
+
+## 1. Vérifier et documenter l'environnement Flutter actuel [done]
+### Dependencies: None
+### Description: Analyser l'état actuel de Flutter SDK, Dart et l'environnement de développement pour identifier les mises à jour nécessaires
+### Details:
+Exécuter 'flutter --version' et documenter la version actuelle de Flutter, Dart SDK, et le channel actif. Exécuter 'flutter doctor -v' pour obtenir un rapport détaillé de l'environnement incluant Android toolchain, IDE, et éventuels problèmes. Sauvegarder ces informations dans un fichier pour référence future avant la mise à jour.
+

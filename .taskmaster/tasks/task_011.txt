@@ -1,0 +1,95 @@
+# Task ID: 11
+# Title: Mise à Jour de la Documentation IA (CLAUDE.md)
+# Status: done
+# Dependencies: 10
+# Priority: high
+# Description: Réviser complètement CLAUDE.md et autres documents IA pour refléter l'abandon du TDD et la nouvelle philosophie Feature-First
+# Details:
+1. Ouvrir CLAUDE.md et .taskmaster/CLAUDE.md
+2. Supprimer toutes les sections relatives au TDD :
+   - Règles sur l'écriture des tests en premier
+   - Workflow Red-Green-Refactor
+   - Interdictions et conséquences TDD
+3. Ajouter une nouvelle section 'Philosophie Feature-First' :
+   - Priorité absolue : livraison rapide de fonctionnalités
+   - Tests écrits après stabilisation
+   - Focus sur la simplicité et la vélocité
+4. Supprimer les références aux hooks Git de validation
+5. Simplifier les commandes essentielles
+6. Mettre à jour les versions des dépendances documentées
+7. Supprimer les références aux workflows CI/CD complexes
+8. Ajouter des exemples de développement Feature-First
+9. Réviser les instructions TaskMaster si nécessaire
+10. S'assurer que le ton reflète la nouvelle approche pragmatique
+
+# Test Strategy:
+Relire le document pour s'assurer qu'il ne contient plus aucune référence au TDD obligatoire. Vérifier la cohérence avec la nouvelle philosophie.
+
+# Subtasks:
+## 1. Suppression des Sections TDD dans CLAUDE.md [done]
+### Dependencies: None
+### Description: Identifier et supprimer toutes les sections relatives au Test-Driven Development dans le fichier principal CLAUDE.md
+### Details:
+Ouvrir CLAUDE.md et supprimer : la section 'Approche Test-First (OBLIGATOIRE ET NON-NÉGOCIABLE)', les interdictions absolues en TDD, les conséquences des violations TDD, les références aux hooks Git automatiques de validation des tests, le workflow Red-Green-Refactor, et toute mention obligatoire d'écrire les tests avant le code. Conserver uniquement les parties neutres sur les tests qui peuvent être adaptées pour des tests post-implémentation.
+<info added on 2025-07-27T11:32:00.665Z>
+Suppression effective réalisée : sections "Approche Test-First (OBLIGATOIRE ET NON-NÉGOCIABLE)", "Interdictions absolues en TDD", "Conséquences des violations TDD", "Références aux hooks Git automatiques de validation des tests", et "Workflow Red-Green-Refactor" entièrement retirées du fichier CLAUDE.md. Le document a été nettoyé de toute mention contraignante sur l'obligation d'écrire les tests avant le code. Une nouvelle approche pragmatique orientée Feature-First a été préparée pour remplacer ces sections supprimées.
+</info added on 2025-07-27T11:32:00.665Z>
+
+## 2. Ajout de la Section Philosophie Feature-First [done]
+### Dependencies: 11.1
+### Description: Créer et rédiger une nouvelle section documentant l'approche Feature-First avec ses principes et exemples pratiques
+### Details:
+Ajouter après la section Architecture une nouvelle section 'Philosophie de Développement Feature-First' incluant : principe de livraison rapide de valeur, focus sur la simplicité et l'itération, tests écrits après stabilisation des fonctionnalités, exemples concrets de workflow (implémenter -> tester manuellement -> itérer -> tests de régression), avantages de cette approche (vélocité, flexibilité, pragmatisme), et comment équilibrer qualité et rapidité de livraison.
+<info added on 2025-07-27T11:32:23.019Z>
+La section a été implémentée avec succès comme prévu dans le fichier CLAUDE.md. Elle suit l'ordre défini (après Architecture obligatoire), présente les principes fondamentaux avec des points clairs, détaille le workflow en 5 étapes numérotées, et liste les avantages avec des checkmarks visuels. La structure est cohérente avec le reste du document et facilement repérable.
+</info added on 2025-07-27T11:32:23.019Z>
+
+## 3. Simplification des Commandes et Workflows CI/CD [done]
+### Dependencies: 11.2
+### Description: Réviser les sections de commandes essentielles et CI/CD pour refléter un processus de développement plus simple et direct
+### Details:
+Simplifier la section 'Commandes Essentielles' en gardant uniquement les commandes vraiment utiles au quotidien. Supprimer ou alléger la section CI/CD GitHub Actions en ne gardant que les workflows de base (build et release). Retirer les références aux hooks Git de pré-commit obligatoires. Simplifier le workflow Git en supprimant les conditions strictes de merge liées aux tests. Adapter la checklist pré-commit pour être plus pragmatique et moins contraignante.
+<info added on 2025-07-27T11:32:50.659Z>
+J'ai mis à jour la documentation CLAUDE.md avec les changements suivants :
+
+**Modifications apportées** :
+
+1. **Workflow Git Simplifié** :
+   - Branches feature simples : `feat/[description]`, `fix/[description]`
+   - Commits directs sur main autorisés pour les hotfixes
+   - Pull Requests recommandées (pas obligatoires) pour features majeures
+   - Merge rapide dès que fonctionnel
+
+2. **CI/CD Allégé** :
+   - Pipeline minimal avec seulement `build` et `release`
+   - Pas de blocage strict
+   - Focus sur la livraison
+
+3. **Commandes Essentielles Simplifiées** :
+   - Suppression des commandes de test obligatoires
+   - Commandes réduites au strict nécessaire
+   - Organisation claire entre développement quotidien et build/release
+
+4. **Suppression des Contraintes** :
+   - Plus de hooks Git pré-commit
+   - Checklist pré-release non bloquante
+   - Warnings de linting non bloquants
+
+La documentation reflète maintenant une approche pragmatique orientée livraison rapide, sans contraintes artificielles qui ralentissent le développement.
+</info added on 2025-07-27T11:32:50.659Z>
+
+## 4. Mise à Jour des Versions et Dépendances Documentées [done]
+### Dependencies: 11.3
+### Description: Actualiser toutes les versions de dépendances mentionnées dans la documentation pour refléter l'état actuel du projet
+### Details:
+Mettre à jour les versions dans la section 'Stack Technique Obligatoire' : Flutter vers la dernière stable (3.32.6+), Dart correspondant, versions des packages principaux (Riverpod 2.6.1+, Freezed 2.5.7+, go_router 14.6.0+, Supabase dernière version). Vérifier que les versions correspondent à celles du pubspec.yaml actuel ou planifié. Ajouter une note sur la politique de mise à jour régulière des dépendances.
+
+## 5. Révision du Document .taskmaster/CLAUDE.md [done]
+### Dependencies: 11.4
+### Description: Adapter le document TaskMaster pour qu'il soit cohérent avec la nouvelle philosophie et supprimer les références TDD
+### Details:
+Ouvrir .taskmaster/CLAUDE.md et vérifier s'il contient des références au TDD ou aux pratiques abandonnées. Adapter les exemples de workflow pour refléter l'approche Feature-First. S'assurer que les instructions d'utilisation de TaskMaster restent pertinentes. Ajouter si nécessaire des notes sur comment utiliser TaskMaster efficacement dans un contexte Feature-First. Vérifier la cohérence entre les deux documents CLAUDE.md.
+<info added on 2025-07-27T11:35:35.405Z>
+Révision effectuée avec succès. Analyse du fichier confirme qu'il est totalement indépendant de la philosophie de développement - aucune référence au TDD trouvée. Le document est exclusivement dédié aux commandes et workflows TaskMaster, qui fonctionnent parfaitement dans un contexte Feature-First. La cohérence entre les deux CLAUDE.md est maintenue, chacun ayant son rôle spécifique : le principal pour les règles du projet, celui de TaskMaster pour l'utilisation de l'outil. Document validé sans modification nécessaire.
+</info added on 2025-07-27T11:35:35.405Z>
+

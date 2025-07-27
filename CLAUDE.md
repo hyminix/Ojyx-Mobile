@@ -227,6 +227,28 @@ flutter run --dart-define=SUPABASE_URL=xxx --dart-define=SUPABASE_ANON_KEY=xxx
 - Sécurité : Validation côté serveur pour les actions critiques
 - UX : Feedback visuel immédiat
 
+## Monitoring avec Sentry
+
+### Configuration Automatique
+- **Activation** : Automatique dès `flutter run` si DSN présent dans `.env`
+- **Aucune configuration requise** : Sentry s'initialise transparemment via `AppInitializer`
+- **Détection d'environnement** : Debug/Release détecté automatiquement via `kDebugMode`
+
+### Comportement par Environnement
+- **Debug** : Capture 100% des erreurs, logs verbeux, screenshots activés
+- **Release** : Capture échantillonnée (10%), optimisé pour performance
+
+### Capture d'Erreurs
+- **Erreurs Flutter** : Automatiques via `FlutterError.onError`
+- **Erreurs Dart** : Automatiques via `runZonedGuarded`
+- **Erreurs Platform** : Automatiques via `PlatformDispatcher.onError`
+- **Filtrage intelligent** : Ignore les erreurs de développement non critiques
+
+### Fallback Silencieux
+- L'app démarre normalement même si Sentry échoue à s'initialiser
+- Aucune intervention utilisateur requise
+- Logs d'erreur en mode debug uniquement
+
 ## Task Master AI Instructions
 **Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
 @./.taskmaster/CLAUDE.md

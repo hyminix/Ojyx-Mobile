@@ -1,0 +1,43 @@
+# Task ID: 23
+# Title: Écran paramètres avec personnalisation utilisateur
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Implémenter interface de paramètres pour contrôle volume, thème, langue, vibrations
+# Details:
+Créer SettingsScreen avec sections: Audio (volume sounds/music), Haptics (vibrations on/off), Display (theme light/dark/auto), Language (français/anglais), Account (futur). Utiliser ListTile avec Switch/Slider widgets, intégration avec SettingsService et SharedPreferences. Provider: @riverpod class SettingsNotifier extends _$SettingsNotifier avec state SettingsState. Code: SharedPreferences.getInstance() pour persistance, theme switching avec ThemeMode
+
+# Test Strategy:
+Tester sauvegarde préférences, valider changement thème temps réel, vérifier contrôle volume, confirmer activation/désactivation vibrations
+
+# Subtasks:
+## 1. Créer la structure de base de SettingsScreen [pending]
+### Dependencies: None
+### Description: Implémenter l'écran de paramètres avec scaffold et navigation de base
+### Details:
+Créer settings_screen.dart dans lib/features/settings/presentation/screens/. Implémenter StatelessWidget avec Scaffold contenant AppBar 'Paramètres' et body avec SingleChildScrollView. Ajouter route dans router_config.dart. Structure initiale avec sections placeholder pour Audio, Haptics, Display, Language et Account (désactivé). Utiliser Material Design avec ListTile pour chaque section.
+
+## 2. Implémenter SettingsService avec SharedPreferences [pending]
+### Dependencies: None
+### Description: Créer service de persistance des préférences utilisateur avec SharedPreferences
+### Details:
+Créer settings_service.dart dans lib/features/settings/data/datasources/. Implémenter classe SettingsService avec méthodes: getSoundVolume(), setSoundVolume(), getMusicVolume(), setMusicVolume(), getVibrationsEnabled(), setVibrationsEnabled(), getThemeMode(), setThemeMode(), getLanguage(), setLanguage(). Utiliser SharedPreferences.getInstance() avec gestion async. Définir valeurs par défaut: volumes 0.5, vibrations true, theme auto, langue français.
+
+## 3. Créer SettingsNotifier et SettingsState avec Riverpod [pending]
+### Dependencies: 23.2
+### Description: Implémenter la gestion d'état des paramètres avec Riverpod et Freezed
+### Details:
+Créer settings_state.dart avec @freezed class SettingsState contenant: soundVolume, musicVolume, vibrationsEnabled, themeMode, language. Créer settings_provider.dart avec @riverpod class SettingsNotifier extends _$SettingsNotifier. Implémenter méthodes: updateSoundVolume(), updateMusicVolume(), toggleVibrations(), updateTheme(), updateLanguage(). Charger état initial depuis SettingsService dans build(). Sauvegarder automatiquement dans SharedPreferences à chaque modification.
+
+## 4. Implémenter les widgets de contrôle pour chaque paramètre [pending]
+### Dependencies: 23.1, 23.3
+### Description: Créer les widgets interactifs pour modifier chaque paramètre dans l'interface
+### Details:
+Dans settings_screen.dart, implémenter sections complètes: Audio avec 2 Slider (0.0 à 1.0) pour sons/musique avec IconButton mute. Haptics avec SwitchListTile pour vibrations on/off. Display avec SegmentedButton pour thème (clair/sombre/auto) avec preview immédiat. Language avec RadioListTile (français/anglais) avec drapeaux. Connecter chaque widget au SettingsNotifier via ref.watch/read. Ajouter animations fluides pour les changements.
+
+## 5. Intégrer le changement de thème et langue dans l'app [pending]
+### Dependencies: 23.4
+### Description: Appliquer les changements de thème et langue à toute l'application en temps réel
+### Details:
+Dans main.dart, écouter settingsProvider pour themeMode et l'appliquer à MaterialApp. Créer ThemeData light/dark dans theme_config.dart avec couleurs Ojyx. Pour la langue, intégrer flutter_localizations et créer fichiers ARB pour français/anglais dans lib/l10n/. Utiliser AppLocalizations.of(context) pour les textes. Implémenter LocaleProvider écoutant settingsProvider.language. Redémarrage non requis pour changements.
+

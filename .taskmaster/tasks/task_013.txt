@@ -1,0 +1,76 @@
+# Task ID: 13
+# Title: Implémentation du Premier Feature - Écran d'Accueil
+# Status: done
+# Dependencies: 12
+# Priority: high
+# Description: Développer rapidement l'écran d'accueil du jeu Ojyx en suivant l'approche Feature-First sans tests préalables
+# Details:
+1. Créer la structure de base dans lib/features/home/ :
+   - presentation/screens/home_screen.dart
+   - presentation/widgets/ pour composants
+2. Implémenter l'UI directement :
+   - Logo/titre du jeu Ojyx
+   - Bouton 'Nouvelle Partie' principal
+   - Bouton 'Rejoindre une Partie'
+   - Bouton 'Règles du Jeu'
+   - Design simple mais attrayant
+3. Configurer la route dans go_router
+4. Connecter avec Riverpod pour l'état si nécessaire
+5. Ajouter les assets (logo, images) dans pubspec.yaml
+6. Implémenter la navigation vers les écrans futurs
+7. Tester manuellement sur émulateur
+8. Itérer rapidement sur le design
+9. Une fois satisfait, committer la feature complète
+
+# Test Strategy:
+Test manuel : l'écran doit s'afficher correctement, les boutons doivent être cliquables, la navigation doit fonctionner. Tester sur différentes tailles d'écran.
+
+# Subtasks:
+## 1. Créer la structure de base du feature home et configurer les routes [done]
+### Dependencies: None
+### Description: Mettre en place l'architecture du feature home avec la structure Clean Architecture et configurer la route dans go_router
+### Details:
+Créer les dossiers lib/features/home/presentation/screens/ et lib/features/home/presentation/widgets/. Créer le fichier home_screen.dart avec un scaffold de base. Ajouter la route HomeRoute dans lib/core/config/router_config.dart avec le path '/' pointant vers HomeScreen. S'assurer que le router est correctement configuré dans l'application principale.
+<info added on 2025-07-27T12:03:39.111Z>
+La structure complète du feature home est maintenant en place et opérationnelle. Le router pointe correctement vers HomeScreen qui implémente un design moderne avec gradient de fond, logo Ojyx centré, et boutons stylisés pour la création et la jonction de parties. L'authentification anonyme Supabase est fonctionnelle et gérée via le SupabaseProvider. Les prochaines étapes consistent à raffiner le design visuel, ajouter des animations et transitions, puis connecter les boutons aux fonctionnalités de création/jonction de parties.
+</info added on 2025-07-27T12:03:39.111Z>
+
+## 2. Concevoir et implémenter l'interface utilisateur de l'écran d'accueil [done]
+### Dependencies: 13.1
+### Description: Créer une UI attrayante avec le logo Ojyx, le titre du jeu et les trois boutons principaux en suivant les guidelines Material Design
+### Details:
+Dans home_screen.dart, implémenter un design centré verticalement avec : un espace pour le logo/titre 'Ojyx' en haut (utiliser un Text stylisé pour commencer), trois boutons ElevatedButton espacés : 'Nouvelle Partie' (primary), 'Rejoindre une Partie', et 'Règles du Jeu'. Utiliser les couleurs du thème Material et ajouter des paddings appropriés. Implémenter un fond attrayant avec un gradient ou une couleur unie.
+<info added on 2025-07-27T12:05:27.365Z>
+Interface utilisateur améliorée avec succès : ajout du bouton "Règles du Jeu" avec icône help_outline, remplacement de l'icône du logo par un effet de cartes empilées utilisant 3 rectangles avec rotation et transparence, implémentation d'animations au démarrage incluant fade in et scale avec effet elastique, amélioration du style du titre avec lettrage plus espacé en couleur primaire et sous-titre en style italique, structuration des boutons en trois niveaux visuels (ElevatedButton pour l'action principale, OutlinedButton pour l'action secondaire, TextButton pour l'action tertiaire), design cohérent avec Material Design et animations fluides pour une expérience utilisateur moderne et engageante.
+</info added on 2025-07-27T12:05:27.365Z>
+
+## 3. Intégrer les assets visuels et configurer pubspec.yaml [done]
+### Dependencies: 13.2
+### Description: Ajouter les ressources graphiques nécessaires (logo, images de fond) et les déclarer dans pubspec.yaml
+### Details:
+Créer le dossier assets/images/ à la racine du projet. Créer un logo temporaire pour Ojyx (peut être un simple fichier PNG avec le texte stylisé). Ajouter la section flutter: assets: dans pubspec.yaml avec - assets/images/. Remplacer le Text du titre par un Image.asset() pointant vers le logo. Optionnellement, ajouter une image de fond pour l'écran d'accueil.
+<info added on 2025-07-27T12:07:35.611Z>
+Assets visuels intégrés avec succès :
+- Créé dossier assets/images/ et configuré dans pubspec.yaml
+- Créé widget OjyxLogo personnalisé dans lib/features/home/presentation/widgets/
+- Logo design : cercle avec gradient, 3 cartes empilées avec rotations, lettre "O" sur carte principale
+- Intégré le widget OjyxLogo dans home_screen.dart avec taille 120
+- Widget réutilisable avec paramètres size et showText
+- Design cohérent avec le thème Material et animations existantes
+</info added on 2025-07-27T12:07:35.611Z>
+
+## 4. Implémenter la navigation et les callbacks des boutons [done]
+### Dependencies: 13.2, 13.3
+### Description: Ajouter les fonctions de navigation pour chaque bouton et préparer les routes futures
+### Details:
+Dans home_screen.dart, implémenter les onPressed pour chaque bouton. Pour 'Nouvelle Partie': utiliser context.push('/game/new') (route à créer plus tard). Pour 'Rejoindre une Partie': context.push('/game/join'). Pour 'Règles du Jeu': context.push('/rules'). Ajouter des routes placeholder dans router_config.dart qui retournent un Scaffold avec un message 'En construction'. Utiliser des méthodes séparées pour chaque action de navigation.
+<info added on 2025-07-27T12:08:43.200Z>
+Implémentation réussie de la navigation selon les exigences actualisées. Routes finales configurées : '/create-room' pour créer une partie (remplace '/game/new'), '/join-room' pour rejoindre (remplace '/game/join'), et '/rules' pour les règles du jeu. Nouvelle page placeholder RulesScreen créée avec icône book_outlined et message "Règles du jeu en cours de rédaction". Toutes les navigations utilisent context.go() conformément à go_router. Configuration de sécurité ajoutée : routes /create-room et /room-lobby protégées par AuthGuard, tandis que /home, /join-room et /rules restent accessibles sans authentification.
+</info added on 2025-07-27T12:08:43.200Z>
+
+## 5. Ajouter l'état Riverpod et finaliser l'écran [done]
+### Dependencies: 13.4
+### Description: Intégrer Riverpod pour gérer l'état si nécessaire et peaufiner les détails de l'écran d'accueil
+### Details:
+Créer un home_provider.dart dans presentation/providers/ si besoin d'état (ex: pour tracker les préférences utilisateur). Convertir HomeScreen en ConsumerWidget si utilisation de providers. Ajouter des animations subtiles (fade in des boutons, animation du logo). Implémenter un responsive design avec LayoutBuilder. Ajouter un footer avec la version de l'app. Nettoyer le code et s'assurer qu'il suit les conventions du projet.
+

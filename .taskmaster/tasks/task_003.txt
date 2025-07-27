@@ -1,0 +1,56 @@
+# Task ID: 3
+# Title: Désactivation des Protections GitHub et CI/CD
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Supprimer toutes les contraintes GitHub incluant protections de branches, workflows CI/CD obligatoires et règles de validation
+# Details:
+1. Via l'interface GitHub ou GitHub CLI :
+   - Aller dans Settings > Branches
+   - Supprimer toutes les règles de protection sur 'main'
+   - Désactiver 'Require pull request reviews'
+   - Désactiver 'Require status checks'
+   - Désactiver 'Require branches to be up to date'
+2. Supprimer ou désactiver les workflows GitHub Actions :
+   - Supprimer tous les fichiers dans .github/workflows/
+   - Ou renommer en .github/workflows.disabled/ temporairement
+3. Supprimer les hooks Git locaux :
+   - rm -rf .git/hooks/*
+   - Supprimer scripts/install-hooks.sh et associés
+4. Mettre à jour README.md pour refléter le nouveau workflow simplifié
+5. Supprimer les badges CI/CD du README
+
+# Test Strategy:
+Tester en pushant directement sur main sans PR. Vérifier qu'aucun workflow ne se déclenche et que le push est accepté sans validation.
+
+# Subtasks:
+## 1. Désactiver les protections de branches sur GitHub [done]
+### Dependencies: None
+### Description: Supprimer toutes les règles de protection configurées sur la branche main via l'interface GitHub ou GitHub CLI
+### Details:
+Se connecter à l'interface GitHub du projet, naviguer vers Settings > Branches. Identifier toutes les règles de protection actives sur la branche 'main'. Désactiver systématiquement : 'Require pull request reviews before merging', 'Require status checks to pass before merging', 'Require branches to be up to date before merging', 'Include administrators', et toute autre restriction. Si utilisation de GitHub CLI : gh api repos/:owner/:repo/branches/main/protection -X DELETE
+
+## 2. Supprimer ou désactiver les workflows GitHub Actions [done]
+### Dependencies: None
+### Description: Éliminer tous les fichiers de workflows CI/CD dans .github/workflows/ pour empêcher leur exécution automatique
+### Details:
+Naviguer vers le répertoire .github/workflows/. Lister tous les fichiers YAML présents (ci.yml, release.yml, etc.). Option 1 : Supprimer définitivement avec 'rm -rf .github/workflows/*.yml'. Option 2 : Créer un répertoire .github/workflows.disabled/ et déplacer tous les fichiers dedans pour conservation temporaire. Vérifier aussi la présence de .github/dependabot.yml et le supprimer/désactiver si présent.
+
+## 3. Éliminer les hooks Git locaux et scripts associés [done]
+### Dependencies: None
+### Description: Supprimer tous les hooks Git du projet ainsi que les scripts d'installation et de validation qui les gèrent
+### Details:
+Exécuter 'rm -rf .git/hooks/*' pour supprimer tous les hooks actifs. Naviguer vers le répertoire scripts/ et identifier tous les fichiers liés aux hooks : install-hooks.sh, pre-commit-hook.sh, commit-msg-hook.sh, test-hooks.sh, validate_project.sh. Supprimer ces fichiers avec 'rm scripts/*hook*.sh scripts/validate*.sh'. Vérifier qu'aucun autre script ne fait référence aux hooks supprimés.
+
+## 4. Mettre à jour la documentation pour refléter le nouveau workflow [done]
+### Dependencies: 3.1, 3.2, 3.3
+### Description: Modifier README.md et CLAUDE.md pour supprimer toutes les références aux protections GitHub et CI/CD désactivées
+### Details:
+Ouvrir README.md et rechercher toutes les sections mentionnant : workflows GitHub Actions, protection de branches, pull requests obligatoires, CI/CD, hooks Git. Supprimer ou commenter ces sections. Retirer tous les badges de statut CI/CD en haut du fichier. Dans CLAUDE.md, localiser la section 'Processus de Développement' et supprimer les parties sur la protection de main, les PR obligatoires et les conditions de merge. Ajouter une note temporaire indiquant que les protections sont désactivées pour accélérer le développement.
+
+## 5. Valider la désactivation complète et documenter l'état [done]
+### Dependencies: 3.1, 3.2, 3.3, 3.4
+### Description: Effectuer une validation globale que toutes les protections sont bien désactivées et créer un fichier de statut temporaire
+### Details:
+Créer un fichier temporaire .taskmaster/PROTECTIONS_DISABLED.md listant toutes les protections désactivées avec la date. Faire un test complet : créer un fichier test, le committer avec un message simple, et pusher directement sur main. Vérifier sur GitHub que : aucune PR n'est requise, aucun workflow ne s'exécute, le commit apparaît immédiatement sur main. Documenter dans le fichier créé la procédure pour réactiver les protections si nécessaire plus tard.
+

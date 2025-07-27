@@ -1,0 +1,43 @@
+# Task ID: 28
+# Title: Tooltips contextuels durant premières parties réelles
+# Status: pending
+# Dependencies: 26
+# Priority: low
+# Description: Système de hints intelligents pendant les vraies parties pour guider nouveaux joueurs
+# Details:
+Créer TooltipService qui détecte contexte de jeu et affiche hints appropriés: 'Cliquez pour révéler carte', 'Vous pouvez défausser cette colonne', 'Carte action disponible'. Utiliser Tooltip widget avec custom styling, déclenchement conditionnel basé sur GameState et tutorial completion. Code: if (!tutorialCompleted && isFirstGame) showTooltip('hint_reveal_card'), utilisation Overlay pour positionnement dynamique
+
+# Test Strategy:
+Vérifier pertinence hints selon contexte, tester déclenchement conditionnel, valider non-intrusion pour joueurs expérimentés, confirmer aide réelle apprentissage
+
+# Subtasks:
+## 1. Créer TooltipService avec détection contextuelle intelligente [pending]
+### Dependencies: None
+### Description: Implémenter un service qui analyse le contexte de jeu en temps réel pour déclencher les tooltips appropriés
+### Details:
+Créer tooltip_service.dart dans features/game/domain/services. Implémenter classe TooltipService avec méthodes: shouldShowTooltip(TooltipType type, GameState state, PlayerProfile profile), getTooltipForContext(GameContext context). Utiliser pattern Singleton avec Riverpod. Gérer conditions: isFirstGame, tutorialCompleted, currentGamePhase, lastPlayerAction. Enum TooltipType: revealCard, discardColumn, useActionCard, endTurn, specialCardEffect
+
+## 2. Implémenter système de widgets Tooltip personnalisés avec animations [pending]
+### Dependencies: None
+### Description: Créer des widgets tooltip réutilisables avec styling Ojyx et animations fluides
+### Details:
+Créer game_tooltip.dart dans features/game/presentation/widgets. Widget GameTooltip avec propriétés: message, position (top/bottom/left/right), arrowDirection, backgroundColor, textStyle. Utiliser AnimatedContainer pour transitions smooth. Implémenter auto-positionnement pour éviter débordement écran. Ajouter effet pulsation subtile pour attirer attention. Support multi-lignes et icônes optionnelles. Durée affichage configurable (3-5 secondes)
+
+## 3. Intégrer détection d'événements de jeu pour déclencher les hints [pending]
+### Dependencies: 28.1, 28.2
+### Description: Connecter le TooltipService aux événements du GameState pour afficher les tooltips au bon moment
+### Details:
+Dans game_screen.dart, ajouter listeners sur GameState changes. Détecter événements: playerTurnStarted, cardRevealed, columnCompleted, actionCardDrawn. Appeler TooltipService.shouldShowTooltip() à chaque événement. Utiliser Overlay.of(context) pour afficher tooltips au-dessus du jeu. Gérer queue de tooltips pour éviter superposition. Ajouter délai entre tooltips consécutifs (minimum 2 secondes). Stocker tooltips déjà vus en SharedPreferences
+
+## 4. Créer catalogue de messages hints contextuels en français [pending]
+### Dependencies: None
+### Description: Définir tous les messages d'aide avec variations pour éviter répétition
+### Details:
+Créer tooltip_messages.dart avec Map<TooltipType, List<String>>. Messages pour: révéler première carte ('Touchez une carte pour la révéler'), défausser colonne ('Bravo! 3 cartes identiques, touchez pour défausser'), utiliser carte action ('Glissez la carte action sur votre stock'), fin de tour ('Piochez une carte ou défaussez'), carte spéciale ('Cette carte s'active immédiatement!'). Ajouter variations pour chaque type. Utiliser ton encourageant et tutoriel
+
+## 5. Implémenter système de désactivation progressive des hints [pending]
+### Dependencies: 28.1, 28.3, 28.4
+### Description: Créer logique pour réduire puis désactiver les tooltips au fur et à mesure que le joueur progresse
+### Details:
+Dans TooltipService, tracker nombre de fois où chaque tooltip a été vu (Map<TooltipType, int>). Réduire fréquence après 3 affichages, désactiver après 5. Ajouter bouton 'Désactiver les conseils' dans GameScreen. Persister préférences utilisateur. Option dans ProfileScreen pour réactiver. Logique spéciale: toujours afficher hints pour nouvelles mécaniques (cartes action rares). Reset hints si joueur n'a pas joué depuis 30 jours
+

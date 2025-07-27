@@ -1,0 +1,43 @@
+# Task ID: 16
+# Title: Configuration Sentry automatique avec DSN depuis .env
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Configurer Sentry pour activation automatique au démarrage de l'app en utilisant le DSN déjà présent dans .env, sans configuration utilisateur requise
+# Details:
+Le DSN Sentry est déjà dans .env et accessible via flutter_dotenv. Objectif : Sentry actif automatiquement dès flutter run, détection auto de l'environnement debug/release, aucune configuration manuelle. Intégration dans AppInitializer pour transparence totale.
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Initialiser Sentry dans AppInitializer avec détection automatique d'environnement [pending]
+### Dependencies: None
+### Description: Intégrer l'initialisation de Sentry dans la classe AppInitializer existante avec détection automatique debug/release
+### Details:
+Modifier AppInitializer pour ajouter l'initialisation Sentry après le chargement de dotenv. Utiliser kDebugMode et kReleaseMode de Flutter pour détecter l'environnement. Configurer SentryFlutter.init avec le DSN depuis dotenv.env['SENTRY_DSN']. Définir environment: kDebugMode ? 'debug' : 'release' et désactiver Sentry si DSN absent ou vide.
+
+## 2. Configurer la capture automatique des erreurs Flutter et Dart [pending]
+### Dependencies: 16.1
+### Description: Mettre en place la capture globale des erreurs non gérées dans Flutter et Dart
+### Details:
+Dans main.dart, wrapper runApp avec SentryFlutter.wrapApp() pour capturer les erreurs Flutter. Configurer FlutterError.onError = SentryFlutter.captureException. Pour les erreurs Dart, utiliser runZonedGuarded et rediriger vers Sentry. Ajouter beforeSend pour filtrer les erreurs de développement non pertinentes.
+
+## 3. Implémenter la configuration avancée Sentry pour l'environnement Ojyx [pending]
+### Dependencies: 16.1
+### Description: Personnaliser Sentry avec les métadonnées spécifiques au projet et optimiser les performances
+### Details:
+Configurer tracesSampleRate: kDebugMode ? 1.0 : 0.1 pour limiter l'impact en production. Définir dist avec le numéro de version depuis pubspec.yaml. Ajouter des tags personnalisés (platform, flavor). Configurer attachScreenshot: true pour les erreurs critiques. Définir maxBreadcrumbs: 50 et considérer l'ajout d'intégrations spécifiques (dio, sqflite si utilisés).
+
+## 4. Créer un système de fallback silencieux si Sentry échoue [pending]
+### Dependencies: 16.1, 16.2
+### Description: Implémenter une gestion d'erreur robuste pour que l'app continue même si Sentry ne peut pas s'initialiser
+### Details:
+Entourer l'initialisation Sentry dans un try-catch pour gérer les échecs silencieusement. Logger l'échec dans la console en mode debug uniquement. Créer une variable _sentryEnabled pour tracker l'état. Si Sentry échoue, continuer l'exécution normale de l'app. Implémenter un mécanisme de retry optionnel après 30 secondes si le DSN est valide.
+
+## 5. Documenter la configuration automatique et tester l'intégration complète [pending]
+### Dependencies: 16.1, 16.2, 16.3, 16.4
+### Description: Ajouter une documentation minimale dans CLAUDE.md et valider le système end-to-end
+### Details:
+Ajouter une section 'Monitoring avec Sentry' dans CLAUDE.md expliquant : activation automatique via .env, aucune config requise, comportement en debug/release. Créer un test d'intégration simple qui vérifie que Sentry est bien initialisé au démarrage. Tester avec flutter run en mode debug et release pour confirmer le comportement transparent.
+

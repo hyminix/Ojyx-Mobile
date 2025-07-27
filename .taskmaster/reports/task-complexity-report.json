@@ -1,8 +1,8 @@
 {
 	"meta": {
-		"generatedAt": "2025-07-27T07:51:32.437Z",
+		"generatedAt": "2025-07-27T14:15:48.833Z",
 		"tasksAnalyzed": 15,
-		"totalTasks": 15,
+		"totalTasks": 30,
 		"analysisCount": 15,
 		"thresholdScore": 5,
 		"projectName": "Taskmaster",
@@ -10,124 +10,124 @@
 	},
 	"complexityAnalysis": [
 		{
-			"taskId": 1,
-			"taskTitle": "Exécution de la Grande Purge des Fichiers",
+			"taskId": 16,
+			"taskTitle": "Configuration Sentry complète avec DSN et environnements",
+			"complexityScore": 6,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Décomposer la configuration Sentry en étapes distinctes : installation des dépendances, configuration du DSN avec variables d'environnement, création du wrapper SentryConfig, intégration dans main.dart avec runZonedGuarded, configuration des filtres beforeSend, ajout du tracking de release, activation du performance monitoring, et configuration des sessions utilisateur. Chaque sous-tâche doit inclure le code spécifique et les tests de validation.",
+			"reasoning": "Configuration complexe nécessitant plusieurs étapes interdépendantes : gestion des environnements, configuration avancée avec filtres, intégration avec Flutter zones, et multiple features Sentry. Nécessite une bonne compréhension de la gestion d'erreurs Flutter et des capacités Sentry."
+		},
+		{
+			"taskId": 17,
+			"taskTitle": "Implémentation LogService multi-outputs avec façade unifiée",
 			"complexityScore": 7,
-			"recommendedSubtasks": 8,
-			"expansionPrompt": "Décomposer la purge en phases distinctes : analyse détaillée des patterns de fichiers, création du script de purge sécurisé avec backup, exécution par catégorie de fichiers, validation post-purge et documentation des changements",
-			"reasoning": "Tâche complexe nécessitant une analyse minutieuse pour éviter de supprimer des fichiers essentiels. Risque élevé d'impact sur le projet, nécessite une approche méthodique avec possibilité de rollback"
-		},
-		{
-			"taskId": 2,
-			"taskTitle": "Suppression Complète des Tests et Infrastructure TDD",
-			"complexityScore": 6,
-			"recommendedSubtasks": 7,
-			"expansionPrompt": "Organiser la suppression en étapes : suppression des répertoires de test, nettoyage des dépendances dans pubspec.yaml, suppression des imports et références dans le code, nettoyage des fichiers de configuration et validation finale",
-			"reasoning": "Bien que conceptuellement simple, cette tâche touche de nombreux aspects du projet et nécessite une vérification approfondie pour s'assurer qu'aucune référence résiduelle ne subsiste"
-		},
-		{
-			"taskId": 3,
-			"taskTitle": "Désactivation des Protections GitHub et CI/CD",
-			"complexityScore": 5,
-			"recommendedSubtasks": 6,
-			"expansionPrompt": "Séparer les actions GitHub des configurations locales : désactivation des protections de branche via l'interface GitHub, suppression des workflows Actions, nettoyage des hooks Git locaux, mise à jour de la documentation",
-			"reasoning": "Tâche principalement administrative avec des étapes claires, mais nécessitant un accès aux paramètres du repository et une compréhension des implications sur le workflow de l'équipe"
-		},
-		{
-			"taskId": 4,
-			"taskTitle": "Analyse et Inventaire des Dépendances Actuelles",
-			"complexityScore": 4,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "Créer un inventaire structuré : analyse des dépendances Dart/Flutter, examen de la configuration Android, identification des dépendances obsolètes, évaluation des risques de mise à jour et création d'un plan de migration",
-			"reasoning": "Tâche d'analyse pure sans modification de code, mais nécessitant une compréhension approfondie de l'écosystème Flutter et des implications des mises à jour"
-		},
-		{
-			"taskId": 5,
-			"taskTitle": "Mise à Jour de Flutter SDK et Dart",
-			"complexityScore": 6,
-			"recommendedSubtasks": 7,
-			"expansionPrompt": "Structurer la mise à jour en phases : sauvegarde de l'environnement actuel, mise à jour du SDK Flutter, résolution des problèmes détectés par flutter doctor, mise à jour des contraintes dans pubspec.yaml, configuration des outils de développement",
-			"reasoning": "La mise à jour du SDK peut entraîner des incompatibilités et nécessite souvent la résolution de problèmes d'environnement spécifiques à la machine de développement"
-		},
-		{
-			"taskId": 6,
-			"taskTitle": "Mise à Jour des Composants Android",
-			"complexityScore": 8,
-			"recommendedSubtasks": 9,
-			"expansionPrompt": "Organiser la modernisation Android par composant : mise à jour Gradle et wrapper, migration vers AGP 8+, configuration des SDK versions, adaptation aux nouvelles APIs Android, configuration Java 17, tests de compilation debug et release",
-			"reasoning": "Les mises à jour Android sont particulièrement délicates avec de nombreuses dépendances croisées entre Gradle, AGP, Kotlin et les SDK versions. Risque élevé de breaking changes"
-		},
-		{
-			"taskId": 7,
-			"taskTitle": "Mise à Jour de Supabase et Dépendances Critiques",
-			"complexityScore": 8,
-			"recommendedSubtasks": 9,
-			"expansionPrompt": "Planifier la migration Supabase méthodiquement : analyse des breaking changes via documentation, mise à jour des dépendances, adaptation de l'initialisation, migration des appels API, adaptation du realtime, tests de connexion et validation complète",
-			"reasoning": "Supabase étant au cœur de l'architecture, sa mise à jour impacte de nombreux aspects du code. Les breaking changes nécessitent une adaptation minutieuse de tous les appels API"
-		},
-		{
-			"taskId": 8,
-			"taskTitle": "Mise à Jour de Riverpod et State Management",
-			"complexityScore": 9,
 			"recommendedSubtasks": 10,
-			"expansionPrompt": "Décomposer la migration Riverpod en étapes granulaires : mise à jour des dépendances, migration vers la syntaxe @riverpod provider par provider, adaptation des Notifiers, configuration de la génération de code, migration des widgets consumers, configuration du linting",
-			"reasoning": "La migration vers Riverpod moderne avec annotations touche l'ensemble de l'architecture de gestion d'état. Chaque provider doit être migré individuellement avec régénération de code"
+			"expansionPrompt": "Créer les sous-tâches pour : définir l'interface ILogger, implémenter le modèle LogEntry avec Freezed, créer le LogService singleton avec Riverpod, implémenter SentryLogger output, implémenter FileLogger output, ajouter le système de rate limiting, configurer le formatage JSON structuré, implémenter la gestion multi-outputs, créer les providers Riverpod, et ajouter les tests d'intégration. Chaque output doit être indépendant et configurable.",
+			"reasoning": "Architecture complexe avec pattern façade, multiple outputs, rate limiting, et intégration Riverpod. Nécessite une conception solide pour gérer efficacement les différents canaux de sortie et la performance avec le rate limiting."
 		},
 		{
-			"taskId": 9,
-			"taskTitle": "Mise à Jour des Autres Dépendances Flutter",
-			"complexityScore": 5,
-			"recommendedSubtasks": 6,
-			"expansionPrompt": "Organiser par catégorie de dépendances : génération de code (Freezed, json_serializable), navigation (go_router), utilitaires système, packages UI, outils de développement, résolution finale des conflits",
-			"reasoning": "Bien que moins critique que Supabase ou Riverpod, ces dépendances peuvent avoir des interdépendances complexes nécessitant une approche ordonnée"
-		},
-		{
-			"taskId": 10,
-			"taskTitle": "Adaptation du Code aux Breaking Changes",
-			"complexityScore": 9,
-			"recommendedSubtasks": 11,
-			"expansionPrompt": "Structurer l'adaptation par type de changement : analyse initiale des erreurs, correction des imports, migration Riverpod complète, adaptation API Supabase, mise à jour navigation go_router, résolution des problèmes null-safety, régénération Freezed, élimination des warnings",
-			"reasoning": "Cette tâche est la plus complexe car elle nécessite de corriger tous les problèmes introduits par les mises à jour précédentes. Chaque type de breaking change nécessite une approche spécifique"
-		},
-		{
-			"taskId": 11,
-			"taskTitle": "Mise à Jour de la Documentation IA (CLAUDE.md)",
-			"complexityScore": 4,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "Restructurer la documentation en sections : suppression des références TDD, ajout de la philosophie Feature-First, mise à jour des versions techniques, simplification des workflows, ajout d'exemples pratiques",
-			"reasoning": "Tâche principalement éditoriale mais importante pour aligner la documentation avec la nouvelle philosophie de développement"
-		},
-		{
-			"taskId": 12,
-			"taskTitle": "Configuration d'un Environnement de Développement Optimisé",
+			"taskId": 18,
+			"taskTitle": "FileLogger pour logs locaux accessibles sous Windows",
 			"complexityScore": 5,
 			"recommendedSubtasks": 7,
-			"expansionPrompt": "Organiser par outil et optimisation : configuration IDE et extensions, création de snippets personnalisés, setup des launch configurations, installation DevTools, optimisation émulateur Android, création de scripts utilitaires",
-			"reasoning": "Configuration nécessitant plusieurs outils et optimisations, mais avec des étapes bien définies et documentées"
+			"expansionPrompt": "Diviser en : obtenir le chemin documents avec path_provider, créer la structure de dossiers logs, implémenter l'écriture asynchrone avec buffer, configurer la rotation automatique par date et taille, implémenter la compression des anciens logs, créer le système de flush périodique, et valider l'accessibilité Windows. Focus sur la performance avec buffer et flush asynchrone.",
+			"reasoning": "Complexité modérée avec gestion de fichiers, rotation automatique, et optimisation des performances. La principale difficulté réside dans la gestion efficace du buffer et de la rotation sans impacter les performances de l'app."
 		},
 		{
-			"taskId": 13,
-			"taskTitle": "Implémentation du Premier Feature - Écran d'Accueil",
-			"complexityScore": 6,
+			"taskId": 19,
+			"taskTitle": "Console debug overlay in-app avec geste secret",
+			"complexityScore": 5,
 			"recommendedSubtasks": 8,
-			"expansionPrompt": "Développer l'écran en couches : création de la structure Clean Architecture, implémentation de l'UI de base, ajout des assets et styling, configuration du routing, ajout de l'état Riverpod si nécessaire, connexion navigation, tests manuels et polissage final",
-			"reasoning": "Première implémentation Feature-First nécessitant la mise en place de patterns qui seront réutilisés, incluant architecture, navigation et gestion d'état"
+			"expansionPrompt": "Créer les étapes : implémenter la détection du geste secret multi-tap, créer le widget DebugConsoleOverlay, configurer l'Overlay pour superposition, implémenter l'affichage temps réel avec StreamBuilder, ajouter les filtres par niveau/catégorie, créer la fonctionnalité de recherche, implémenter l'export vers clipboard, et designer l'UI avec backdrop blur. Chaque fonctionnalité doit être testable indépendamment.",
+			"reasoning": "UI complexe avec gestion d'overlay, stream temps réel, et multiple fonctionnalités interactives. La détection de geste et l'intégration overlay nécessitent une bonne maîtrise des widgets Flutter avancés."
 		},
 		{
-			"taskId": 14,
-			"taskTitle": "Création des Tests de Régression pour l'Écran d'Accueil",
+			"taskId": 20,
+			"taskTitle": "Device Info et Context enrichi pour monitoring",
+			"complexityScore": 4,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Décomposer en : installer et configurer device_info_plus, installer et configurer package_info_plus, créer DeviceInfoService pour collecter les infos, implémenter UserContext avec génération d'ID anonyme, intégrer les contexts dans LogEntry, et configurer les contexts Sentry. Assurer la compatibilité Android/iOS pour chaque collecte d'information.",
+			"reasoning": "Tâche relativement simple mais nécessitant attention aux détails pour la compatibilité cross-platform et l'anonymisation correcte. L'intégration avec les systèmes existants est directe."
+		},
+		{
+			"taskId": 21,
+			"taskTitle": "Tests monitoring avec erreurs volontaires et validation",
 			"complexityScore": 3,
 			"recommendedSubtasks": 5,
-			"expansionPrompt": "Structurer les tests par aspect : setup de l'environnement de test, tests de présence des éléments UI, tests d'interaction basiques, mocking de la navigation, validation et documentation",
-			"reasoning": "Tests simples après coup sur une fonctionnalité déjà implémentée, focus sur les comportements critiques uniquement"
+			"expansionPrompt": "Créer : l'écran de test debug, implémenter TestErrorService avec méthodes pour chaque type d'erreur, ajouter les boutons déclencheurs dans l'UI, valider la réception Sentry, et vérifier les logs locaux et console. Chaque type d'erreur doit avoir son propre déclencheur et validation.",
+			"reasoning": "Tâche simple de validation mais importante pour vérifier le bon fonctionnement. Principalement de l'UI et des appels de service, sans complexité architecturale."
 		},
 		{
-			"taskId": 15,
-			"taskTitle": "Documentation du Nouveau Workflow de Développement",
+			"taskId": 22,
+			"taskTitle": "Page des règles du jeu avec contenu structuré",
 			"complexityScore": 3,
-			"recommendedSubtasks": 4,
-			"expansionPrompt": "Créer une documentation pratique : rédaction du workflow Feature-First, ajout d'exemples concrets, documentation des anti-patterns, création d'un guide quickstart",
-			"reasoning": "Tâche de documentation pure avec un scope bien défini et un format simple à suivre"
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Diviser en : créer RulesScreen avec structure de base, implémenter les sections avec ExpansionTile, ajouter le contenu textuel des règles, créer les illustrations de cartes mockup, et configurer la navigation avec FloatingActionButton. Focus sur la clarté et l'accessibilité du contenu.",
+			"reasoning": "Principalement du travail UI avec contenu statique. La complexité réside dans l'organisation claire du contenu et la création d'illustrations explicatives."
+		},
+		{
+			"taskId": 23,
+			"taskTitle": "Écran paramètres avec personnalisation utilisateur",
+			"complexityScore": 4,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Créer : SettingsScreen avec layout de base, implémenter section Audio avec sliders, ajouter section Haptics avec switches, créer section Display pour thème, implémenter section Language, et intégrer avec SettingsNotifier Riverpod. Chaque section doit être fonctionnelle indépendamment avec sauvegarde immédiate.",
+			"reasoning": "UI modérément complexe avec multiple types de contrôles et intégration état Riverpod. Nécessite une bonne organisation des préférences et gestion d'état réactive."
+		},
+		{
+			"taskId": 24,
+			"taskTitle": "SettingsService pour gestion préférences avec SharedPreferences",
+			"complexityScore": 4,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Décomposer en : créer SettingsService classe de base, implémenter méthodes get/set pour chaque préférence, configurer SharedPreferences avec initialisation, ajouter cache mémoire pour performances, créer le provider Riverpod, implémenter valeurs par défaut, et gérer la migration de préférences. Assurer la robustesse avec gestion d'erreurs appropriée.",
+			"reasoning": "Service backend simple mais nécessitant attention aux détails pour la persistance, le cache, et la gestion d'erreurs. Pattern standard mais important pour l'expérience utilisateur."
+		},
+		{
+			"taskId": 25,
+			"taskTitle": "Intégration sons et vibrations avec contrôles utilisateur",
+			"complexityScore": 5,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Créer les étapes : installer audioplayers et vibration packages, créer AudioService avec gestion volume, implémenter HapticService avec contrôles, précharger tous les sons au démarrage, implémenter sons pour chaque action (flip, place, win, tap), ajouter vibrations contextuelles, intégrer avec SettingsService, et optimiser les performances. Chaque son/vibration doit respecter les préférences utilisateur.",
+			"reasoning": "Intégration de multiples services externes avec gestion de ressources et performance. Le preloading et la gestion du volume ajoutent de la complexité technique."
+		},
+		{
+			"taskId": 26,
+			"taskTitle": "Tutoriel interactif step-by-step pour nouveaux joueurs",
+			"complexityScore": 7,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "Diviser en : créer TutorialScreen avec PageView, implémenter chaque étape du tutoriel (grille, révélation, pioche, actions, colonnes, fin), ajouter animations guidées pour chaque étape, créer système de tooltips avec OverlayEntry, implémenter indicateur de progression, gérer la navigation entre étapes, sauvegarder progression avec TutorialProgress, permettre skip du tutoriel, intégrer avec sons/vibrations, et valider l'apprentissage. Chaque étape doit être claire et engageante.",
+			"reasoning": "UI complexe avec animations, overlays, et progression sauvegardée. Nécessite une excellente UX pour guider efficacement les nouveaux joueurs sans les frustrer."
+		},
+		{
+			"taskId": 27,
+			"taskTitle": "Mode pratique vs IA simple pour apprentissage",
+			"complexityScore": 8,
+			"recommendedSubtasks": 12,
+			"expansionPrompt": "Créer : classe AIPlayer de base, implémenter stratégie Easy (aléatoire), développer stratégie Medium (règles basiques), créer stratégie Hard (anticipation), intégrer AIPlayer dans GameLogic existant, adapter PracticeGameScreen, gérer les tours IA avec délais réalistes, implémenter logique de décision pour cartes actions, ajouter évaluation de position, créer animations pour actions IA, intégrer difficulté sélectionnable, et valider comportement réaliste. L'IA doit respecter toutes les règles du jeu.",
+			"reasoning": "Implémentation IA avec 3 niveaux de difficulté nécessitant algorithmes de décision, évaluation de position, et intégration complexe avec le système de jeu existant. La difficulté principale est de créer une IA crédible et éducative."
+		},
+		{
+			"taskId": 28,
+			"taskTitle": "Tooltips contextuels durant premières parties réelles",
+			"complexityScore": 4,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Décomposer en : créer TooltipService avec détection de contexte, définir règles de déclenchement des hints, implémenter affichage conditionnel basé sur état du jeu, créer custom Tooltip widgets, gérer positionnement dynamique avec Overlay, et intégrer avec système de tutoriel complété. Les hints doivent être pertinents sans être intrusifs.",
+			"reasoning": "Système de hints intelligent nécessitant analyse du contexte de jeu et affichage conditionnel. La difficulté est dans la pertinence et le timing des hints."
+		},
+		{
+			"taskId": 29,
+			"taskTitle": "Mode hors-ligne avec sauvegarde locale SQLite",
+			"complexityScore": 9,
+			"recommendedSubtasks": 14,
+			"expansionPrompt": "Créer les sous-tâches : installer et configurer sqflite, designer schema base de données (games, moves, stats), créer DatabaseService avec migrations, implémenter OfflineGameRepository CRUD, ajouter détection connectivité avec connectivity_plus, créer système de queue pour sync, modifier GameService pour mode dual online/offline, implémenter sauvegarde automatique des moves, gérer conflits de synchronisation, créer stratégie de résolution de conflits, implémenter retry logic pour sync, ajouter indicateurs UI mode offline, valider intégrité des données, et tester scenarios de perte de connexion. La synchronisation doit être transparente et robuste.",
+			"reasoning": "Architecture complexe nécessitant gestion base de données locale, synchronisation bidirectionnelle, gestion des conflits, et mode dual online/offline. C'est la tâche la plus complexe avec nombreux cas limites à gérer."
+		},
+		{
+			"taskId": 30,
+			"taskTitle": "Profil joueur avec statistiques et historique parties",
+			"complexityScore": 6,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Diviser en : créer ProfileScreen avec layout sections, implémenter affichage info utilisateur (pseudo/avatar), calculer et afficher statistiques globales, créer liste historique parties paginée, intégrer fl_chart pour visualisations, implémenter ProfileRepository avec cache, configurer synchronisation Supabase/SQLite, permettre modification pseudo/avatar, et optimiser performances requêtes. Les statistiques doivent être précises et les charts lisibles sur mobile.",
+			"reasoning": "UI riche avec calculs statistiques, visualisations graphiques, et gestion de données hybride local/distant. La complexité vient de l'agrégation de données et des performances avec historique potentiellement large."
 		}
 	]
 }

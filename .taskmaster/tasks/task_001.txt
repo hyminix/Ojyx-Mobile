@@ -1,0 +1,54 @@
+# Task ID: 1
+# Title: Exécution de la Grande Purge des Fichiers
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Identifier et supprimer massivement tous les fichiers inutiles incluant documentation obsolète, scripts de test, configurations CI/CD, logs et autres artefacts qui ralentissent le développement
+# Details:
+1. Analyser l'arborescence complète du projet avec 'find' ou 'ls -la' récursif
+2. Identifier les patterns de fichiers à supprimer :
+   - Tous les fichiers *.test.dart, *_test.dart
+   - Répertoire complet /test et /integration_test
+   - Scripts dans /scripts sauf ceux absolument essentiels
+   - Fichiers .github/workflows/* sauf le strict minimum
+   - Documentation technique complexe (*.md) sauf README.md et CLAUDE.md
+   - Fichiers de configuration de test (test_driver/, coverage/, .lcov)
+3. Créer un script de purge ou utiliser des commandes bash directes
+4. Exécuter la suppression avec confirmation
+5. Valider que le projet reste fonctionnel après purge
+6. Commit avec message clair 'chore: purge massive des fichiers superflus'
+
+# Test Strategy:
+Validation manuelle post-purge : vérifier que 'flutter pub get' et 'flutter analyze' passent sans erreur. S'assurer que le projet compile toujours.
+
+# Subtasks:
+## 1. Analyse complète de l'arborescence du projet [done]
+### Dependencies: None
+### Description: Scanner récursivement tous les répertoires et fichiers du projet pour créer un inventaire détaillé des éléments à purger
+### Details:
+Utiliser 'find . -type f -name "*.dart" | grep -E "(_test\.dart|test\.dart)$"' pour lister tous les fichiers de test. Utiliser 'ls -la' récursif ou 'tree' pour visualiser la structure complète. Créer une liste exhaustive dans un fichier temporaire 'files_to_delete.txt' avec tous les chemins des fichiers identifiés pour suppression. Inclure : /test/*, /integration_test/*, /scripts/* (sauf essentiels), /.github/workflows/* (sauf ci.yml minimal), tous les *.md sauf README.md et CLAUDE.md, /test_driver/*, /coverage/*, *.lcov
+
+## 2. Suppression des répertoires de test complets [done]
+### Dependencies: 1.1
+### Description: Supprimer entièrement les répertoires /test et /integration_test qui contiennent tous les tests unitaires et d'intégration
+### Details:
+Exécuter 'rm -rf test/' pour supprimer le répertoire de tests unitaires. Exécuter 'rm -rf integration_test/' pour supprimer les tests d'intégration. Vérifier aussi la présence de 'test_driver/' et le supprimer si présent avec 'rm -rf test_driver/'. Supprimer également tout répertoire 'coverage/' avec 'rm -rf coverage/'. Ces suppressions doivent être faites en une seule commande pour éviter les confirmations : 'rm -rf test/ integration_test/ test_driver/ coverage/'
+
+## 3. Purge des scripts et configurations CI/CD [done]
+### Dependencies: 1.1
+### Description: Nettoyer le répertoire /scripts en gardant uniquement les scripts essentiels et supprimer les workflows GitHub Actions superflus
+### Details:
+Dans /scripts/, identifier et garder UNIQUEMENT : clean_build.sh (si nécessaire pour le build). Supprimer tous les autres scripts notamment : install-hooks.sh, test-hooks.sh, validate_*.sh, pre-commit-hook.sh, commit-msg-hook.sh. Pour .github/workflows/, supprimer TOUS les fichiers sauf un ci.yml minimal si absolument nécessaire. Commandes : 'cd scripts && ls -la' puis 'rm -f install-hooks.sh test-hooks.sh validate_*.sh *-hook.sh'. Pour workflows : 'rm -f .github/workflows/release.yml .github/dependabot.yml'
+
+## 4. Suppression des fichiers de test individuels et documentation technique [done]
+### Dependencies: 1.2, 1.3
+### Description: Rechercher et supprimer tous les fichiers *_test.dart restants dans /lib et supprimer la documentation technique non essentielle
+### Details:
+Utiliser 'find . -name "*_test.dart" -o -name "*.test.dart" | grep -v node_modules | xargs rm -f' pour supprimer tous les fichiers de test restants. Pour la documentation, lister tous les *.md avec 'find . -name "*.md"' et supprimer tout sauf README.md et CLAUDE.md. Supprimer spécifiquement : CONTRIBUTING.md, CHANGELOG.md, CODE_OF_CONDUCT.md, SECURITY.md, docs/*.md. Supprimer aussi tous les fichiers .lcov et de coverage : 'find . -name "*.lcov" -delete'. Nettoyer aussi les fichiers de configuration de test comme .test_config, darttest.yaml
+
+## 5. Validation finale et commit de la purge [done]
+### Dependencies: 1.4
+### Description: Vérifier que le projet reste fonctionnel après la purge massive et committer tous les changements
+### Details:
+Exécuter 'flutter clean' puis 'flutter pub get' pour réinitialiser les dépendances. Vérifier avec 'flutter analyze --no-fatal-infos' que le code compile toujours. Tester un build rapide avec 'flutter build apk --debug' pour confirmer la compilation. Faire un 'git status' pour voir tous les fichiers supprimés. Utiliser 'git add -A' pour stager toutes les suppressions. Committer avec exactement ce message : 'chore: purge massive des fichiers superflus - suppression tests, CI/CD, docs'. Optionnel : créer un tag 'pre-purge' avant le commit pour pouvoir revenir en arrière si nécessaire
+

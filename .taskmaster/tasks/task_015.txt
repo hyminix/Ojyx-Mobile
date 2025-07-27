@@ -1,0 +1,58 @@
+# Task ID: 15
+# Title: Documentation du Nouveau Workflow de Développement
+# Status: pending
+# Dependencies: 14
+# Priority: low
+# Description: Créer une documentation claire et concise expliquant le nouveau processus Feature-First pour les futurs développeurs
+# Details:
+1. Créer docs/DEVELOPMENT_WORKFLOW.md
+2. Documenter le processus Feature-First :
+   - Étape 1 : Implémenter la fonctionnalité directement
+   - Étape 2 : Tester manuellement
+   - Étape 3 : Itérer jusqu'à satisfaction
+   - Étape 4 : Écrire tests de régression
+   - Étape 5 : Committer
+3. Ajouter des exemples concrets
+4. Lister les anti-patterns à éviter :
+   - Ne pas écrire de tests avant le code
+   - Ne pas sur-engineer
+   - Ne pas créer d'abstractions prématurées
+5. Expliquer quand refactorer (sessions dédiées)
+6. Garder le document court (2-3 pages max)
+7. Ajouter un quickstart pour nouveaux devs
+8. Référencer ce document dans README.md
+
+# Test Strategy:
+Faire relire le document par un tiers pour s'assurer qu'il est clair et actionnable. Le workflow doit pouvoir être suivi par un nouveau développeur.
+
+# Subtasks:
+## 1. Créer la structure et l'en-tête du document DEVELOPMENT_WORKFLOW.md [pending]
+### Dependencies: None
+### Description: Initialiser le fichier de documentation avec une structure claire incluant titre, table des matières et introduction expliquant la philosophie Feature-First
+### Details:
+Créer docs/DEVELOPMENT_WORKFLOW.md avec : 1) Titre principal 'Workflow de Développement Ojyx - Approche Feature-First', 2) Table des matières avec liens internes, 3) Introduction courte (5-10 lignes) expliquant pourquoi cette approche a été choisie (rapidité, pragmatisme, focus sur la valeur), 4) Mention que ce document remplace l'approche TDD précédente, 5) Structure avec sections principales : Vue d'ensemble, Processus étape par étape, Exemples, Anti-patterns, Refactoring
+
+## 2. Documenter le processus Feature-First en 5 étapes avec explications détaillées [pending]
+### Dependencies: 15.1
+### Description: Rédiger la section principale détaillant chaque étape du processus de développement Feature-First avec des instructions claires et des conseils pratiques
+### Details:
+Dans la section 'Processus Feature-First', documenter : 1) Étape 1 - Implémenter directement (focus sur le MVP fonctionnel, pas de sur-ingénierie), 2) Étape 2 - Tester manuellement (lancer l'app, vérifier visuellement, tester les interactions), 3) Étape 3 - Itérer rapidement (ajuster selon les retours, améliorer l'UX), 4) Étape 4 - Écrire tests de régression (uniquement après stabilisation, focus sur les cas critiques), 5) Étape 5 - Committer avec message descriptif. Chaque étape doit avoir 3-5 lignes d'explication avec des tips pratiques
+
+## 3. Ajouter des exemples concrets tirés du projet Ojyx [pending]
+### Dependencies: 15.2
+### Description: Illustrer le workflow avec 2-3 exemples réels de fonctionnalités qui pourraient être développées dans le jeu Ojyx
+### Details:
+Créer section 'Exemples Pratiques' avec : 1) Exemple 1 - Création de l'écran d'accueil (boutons navigation, design simple, tests manuels visuels), 2) Exemple 2 - Système de cartes du jeu (affichage grille 3x4, interactions drag&drop, validation visuelle), 3) Exemple 3 - Intégration multijoueur (connexion Supabase, synchronisation temps réel, tests avec 2 devices). Pour chaque exemple, montrer comment les 5 étapes s'appliquent concrètement avec des snippets de code courts si pertinent
+
+## 4. Documenter les anti-patterns et pièges à éviter [pending]
+### Dependencies: 15.3
+### Description: Lister clairement les pratiques à éviter dans l'approche Feature-First avec explications des conséquences négatives
+### Details:
+Section 'Anti-Patterns à Éviter' avec : 1) Ne pas écrire de tests avant le code (ralentit l'itération initiale), 2) Sur-ingénierie prématurée (YAGNI - You Ain't Gonna Need It), 3) Créer des abstractions trop tôt (attendre de voir les patterns émerger), 4) Perfectionnisme sur le premier jet (mieux vaut fonctionnel que parfait), 5) Ignorer complètement les tests (ils restent importants pour la régression), 6) Committer du code cassé (toujours vérifier que ça compile). Pour chaque anti-pattern, expliquer brièvement pourquoi c'est problématique (1-2 lignes)
+
+## 5. Créer le quickstart, ajouter la référence dans README et finaliser le document [pending]
+### Dependencies: 15.4
+### Description: Rédiger une section quickstart concise, expliquer quand refactorer, puis intégrer la documentation dans le projet
+### Details:
+1) Section 'Quickstart pour Nouveaux Développeurs' avec checklist : cloner le repo, lire ce doc, choisir une tâche dans TaskMaster, suivre les 5 étapes, demander une review. 2) Section 'Quand Refactorer' : uniquement en sessions dédiées, après 3-4 features similaires, quand la dette technique devient bloquante. 3) Garder le document sous 3 pages (vérifier la longueur). 4) Ajouter dans README.md une section 'Workflow de Développement' avec lien vers docs/DEVELOPMENT_WORKFLOW.md. 5) Relecture finale pour cohérence et clarté
+

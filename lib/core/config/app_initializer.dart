@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -108,95 +109,96 @@ class AppInitializer {
     debugPrint('Supabase initialized successfully');
   }
 
-  /// Initialize Sentry with enhanced performance monitoring
+  /// Initialize Sentry automatically if DSN is available
   static Future<void> _initializeSentry() async {
-    final sentryEnabled = dotenv.env['SENTRY_ENABLED']?.toLowerCase() == 'true';
     final sentryDsn = dotenv.env['SENTRY_DSN'];
 
-    if (!sentryEnabled) {
-      debugPrint('Sentry is disabled in configuration');
-      return;
-    }
-
+    // Skip initialization if DSN is not available
     if (sentryDsn == null || sentryDsn.isEmpty) {
-      debugPrint('Sentry DSN not found, skipping Sentry initialization');
+      if (kDebugMode) {
+        debugPrint('Sentry DSN not found, skipping Sentry initialization');
+      }
       return;
     }
 
-    await SentryFlutter.init((options) {
-      options.dsn = sentryDsn;
+    try {
+      // Get app release version before initializing Sentry
+      final appRelease = await _getAppRelease();
 
-      // Enhanced configuration for performance monitoring
-      options.tracesSampleRate = _getTracesSampleRate();
-      options.profilesSampleRate = _getProfilesSampleRate();
-      options.enableAutoPerformanceTracing = true;
-      options.enableUserInteractionTracing = true;
+      await SentryFlutter.init((options) {
+        options.dsn = sentryDsn;
 
-      // Screenshot and view hierarchy for better debugging
-      options.attachScreenshot = _shouldAttachScreenshot();
-      options.attachViewHierarchy = true;
+        // Automatic environment detection
+        options.environment = kDebugMode ? 'debug' : 'release';
 
-      // Environment configuration
-      options.environment = _getEnvironment();
+        // Performance monitoring optimized for environment
+        options.tracesSampleRate = kDebugMode ? 1.0 : 0.1;
+        options.profilesSampleRate = kDebugMode ? 1.0 : 0.1;
+        options.enableAutoPerformanceTracing = true;
+        options.enableUserInteractionTracing = true;
 
-      // Release tracking
-      options.release = _getAppRelease();
+        // Debug features - more verbose in debug mode
+        options.attachScreenshot = true;
+        options.attachViewHierarchy = kDebugMode;
 
-      // Breadcrumb configuration
-      options.maxBreadcrumbs = 100;
-      options.enableAutoNativeBreadcrumbs = true;
+        // Release tracking
+        options.release = appRelease;
 
-      // Session tracking
-      options.enableAutoSessionTracking = true;
-    });
+        // Breadcrumb configuration
+        options.maxBreadcrumbs = kDebugMode ? 100 : 50;
+        options.enableAutoNativeBreadcrumbs = true;
 
-    debugPrint('Sentry initialized successfully');
-  }
+        // Session tracking
+        options.enableAutoSessionTracking = true;
 
-  /// Get traces sample rate based on environment
-  static double _getTracesSampleRate() {
-    final environment = _getEnvironment();
+        // Debug configuration
+        options.debug = kDebugMode;
 
-    switch (environment) {
-      case 'production':
-        return 0.1; // 10% in production
-      case 'staging':
-        return 0.5; // 50% in staging
-      default:
-        return 1.0; // 100% in development
+        // Filter errors with beforeSend to avoid spam
+        options.beforeSend = (event, hint) {
+          // Skip certain development-related errors in debug mode
+          if (kDebugMode && event.throwable != null) {
+            final errorMessage = event.throwable.toString().toLowerCase();
+            
+            // Filter out common development errors that aren't critical
+            if (errorMessage.contains('hot reload') ||
+                errorMessage.contains('hot restart') ||
+                errorMessage.contains('debug service') ||
+                errorMessage.contains('observatory')) {
+              return null; // Don't send to Sentry
+            }
+          }
+
+          // Add custom context to all events
+          event.contexts.app?.buildType = kDebugMode ? 'debug' : 'release';
+
+          return event;
+        };
+      });
+
+      if (kDebugMode) {
+        debugPrint('Sentry initialized successfully in ${kDebugMode ? 'debug' : 'release'} mode');
+      }
+    } catch (e, stackTrace) {
+      // Silently fail if Sentry initialization fails
+      if (kDebugMode) {
+        debugPrint('Warning: Sentry initialization failed: $e');
+        debugPrint('Stack trace: $stackTrace');
+      }
+      // Don't rethrow - app should continue even if Sentry fails
     }
   }
 
-  /// Get profiles sample rate based on environment
-  static double _getProfilesSampleRate() {
-    final environment = _getEnvironment();
 
-    switch (environment) {
-      case 'production':
-        return 0.1; // 10% in production
-      case 'staging':
-        return 0.3; // 30% in staging
-      default:
-        return 1.0; // 100% in development
+  /// Get app release version dynamically
+  static Future<String> _getAppRelease() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      return '${packageInfo.appName}@${packageInfo.version}+${packageInfo.buildNumber}';
+    } catch (e) {
+      // Fallback to static version if package info fails
+      return 'ojyx@1.0.0+1';
     }
-  }
-
-  /// Check if screenshots should be attached
-  static bool _shouldAttachScreenshot() {
-    final enableScreenshots = dotenv.env['ENABLE_ERROR_SCREENSHOTS'];
-    return enableScreenshots?.toLowerCase() == 'true';
-  }
-
-  /// Get current environment
-  static String _getEnvironment() {
-    return dotenv.env['ENVIRONMENT'] ?? 'development';
-  }
-
-  /// Get app release version
-  static String _getAppRelease() {
-    // This would typically come from your pubspec.yaml version
-    // For now, we'll use a placeholder
-    return 'ojyx@1.0.0+1';
   }
 
   /// Get the Supabase client instance

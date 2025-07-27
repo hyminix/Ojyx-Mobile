@@ -987,11 +987,1094 @@
             "testStrategy": "Faire relire par un tiers non familier avec le projet pour valider que le quickstart est suffisant pour démarrer. Vérifier que le lien dans README fonctionne"
           }
         ]
+      },
+      {
+        "id": 17,
+        "title": "Implémentation LogService multi-outputs avec façade unifiée",
+        "description": "Créer un service de logging centralisé qui écrit simultanément dans Sentry et fichiers locaux avec format JSON structuré",
+        "details": "Créer LogService en Singleton avec Riverpod provider, implémenter interface ILogger avec méthodes debug/info/warning/error, créer LogEntry model avec Freezed incluant timestamp, level, category, message, data, stackTrace, deviceInfo, userId, sessionId. Utiliser multiple outputs: SentryLogger pour erreurs critiques, FileLogger pour logs locaux. Implémenter rate limiting avec sliding window pour éviter spam. Code: @riverpod LogService logService(LogServiceRef ref) => LogService([SentryLogger(), FileLogger()])",
+        "testStrategy": "Vérifier écriture simultanée Sentry et fichiers, tester rate limiting, valider format JSON structuré, confirmer rotation automatique des logs",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer l'architecture de base du LogService avec interface ILogger",
+            "description": "Définir l'interface ILogger et créer la structure singleton du LogService avec le provider Riverpod",
+            "dependencies": [],
+            "details": "Créer lib/core/services/logging/i_logger.dart avec abstract class ILogger contenant les méthodes debug(), info(), warning(), error() avec paramètres (String message, {String? category, Map<String, dynamic>? data, StackTrace? stackTrace}). Créer lib/core/services/logging/log_service.dart avec class LogService implements ILogger et pattern Singleton. Créer le provider Riverpod: @riverpod LogService logService(LogServiceRef ref) => LogService.instance. Implémenter le pattern de façade pour gérer multiple outputs (List<ILogger> _outputs).",
+            "status": "pending",
+            "testStrategy": "Vérifier que le LogService est bien un singleton, tester que l'interface ILogger est correctement implémentée, valider l'injection via Riverpod"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter le modèle LogEntry avec Freezed",
+            "description": "Créer le modèle de données LogEntry avec tous les champs nécessaires pour un log structuré",
+            "dependencies": [],
+            "details": "Créer lib/core/models/log_entry.dart avec @freezed class LogEntry contenant: DateTime timestamp, LogLevel level (enum: debug, info, warning, error), String category, String message, Map<String, dynamic>? data, StackTrace? stackTrace, DeviceInfo? deviceInfo (OS, version, modèle), String? userId, String sessionId. Ajouter factory LogEntry.create() avec génération automatique du timestamp et sessionId. Implémenter toJson() pour sérialisation JSON structurée. Créer enum LogLevel avec méthodes helper pour conversion string.",
+            "status": "pending",
+            "testStrategy": "Tester la sérialisation/désérialisation JSON, vérifier que tous les champs sont correctement générés, valider les valeurs par défaut"
+          },
+          {
+            "id": 3,
+            "title": "Développer SentryLogger pour les erreurs critiques",
+            "description": "Créer l'implémentation SentryLogger qui envoie uniquement les logs error et warning vers Sentry",
+            "dependencies": [
+              "17.1",
+              "17.2"
+            ],
+            "details": "Créer lib/core/services/logging/outputs/sentry_logger.dart implémentant ILogger. Filtrer les logs: seuls warning et error sont envoyés à Sentry. Convertir LogEntry en SentryEvent avec mapping des champs (message, level, extra data, user context). Utiliser Sentry.captureMessage() pour warnings et Sentry.captureException() pour errors. Enrichir le contexte Sentry avec deviceInfo et userId si disponibles. Gérer les cas d'erreur réseau gracieusement sans crash.",
+            "status": "pending",
+            "testStrategy": "Mock Sentry SDK pour vérifier les appels, tester le filtrage par niveau, valider la conversion LogEntry vers SentryEvent"
+          },
+          {
+            "id": 4,
+            "title": "Implémenter FileLogger avec rotation automatique",
+            "description": "Créer FileLogger pour écrire tous les logs dans des fichiers locaux JSON avec rotation automatique",
+            "dependencies": [
+              "17.1",
+              "17.2"
+            ],
+            "details": "Créer lib/core/services/logging/outputs/file_logger.dart. Utiliser path_provider pour obtenir le dossier Documents/logs/. Écrire chaque LogEntry en JSON sur une nouvelle ligne (format JSONL). Implémenter rotation: nouveau fichier chaque jour (ojyx_2025-07-27.log) et suppression des fichiers > 7 jours. Gérer la taille max par fichier (10MB) avec création d'un nouveau fichier si dépassé. Utiliser File.writeAsString avec mode append et flush immédiat. Gérer les permissions d'écriture sur différentes plateformes.",
+            "status": "pending",
+            "testStrategy": "Tester l'écriture de fichiers, vérifier la rotation quotidienne, valider la suppression des anciens logs, tester la limite de taille"
+          },
+          {
+            "id": 5,
+            "title": "Ajouter le rate limiting avec sliding window",
+            "description": "Implémenter un système de rate limiting pour éviter le spam de logs et protéger les performances",
+            "dependencies": [
+              "17.1",
+              "17.3",
+              "17.4"
+            ],
+            "details": "Créer lib/core/services/logging/rate_limiter.dart avec algorithme sliding window. Configurer des limites: 100 logs/minute global, 10 logs/seconde par catégorie. Utiliser Queue<DateTime> pour tracker les timestamps des logs. Implémenter shouldAllow(String category): bool qui vérifie les limites. Si limite atteinte, logger un warning unique 'Rate limit exceeded for category X' puis silence. Reset automatique des compteurs après la fenêtre de temps. Intégrer dans LogService.log() avant dispatch aux outputs.",
+            "status": "pending",
+            "testStrategy": "Tester les limites avec logs rapides, vérifier le reset des compteurs, valider que les logs critiques passent toujours"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "title": "FileLogger pour logs locaux accessibles sous Windows",
+        "description": "Implémenter système d'écriture de logs dans dossier /logs/ accessible depuis l'explorateur Windows",
+        "details": "Utiliser path_provider: ^2.1.4 pour getApplicationDocumentsDirectory, créer sous-dossier 'logs', implémenter rotation automatique (max 7 jours, 100MB), écriture asynchrone avec buffer pour performances, compression des anciens logs avec archive: ^3.6.1. Nommage: ojyx_logs_YYYY-MM-DD.json. Buffer avec Timer.periodic pour flush toutes les 30s. Code: final logsDir = await getApplicationDocumentsDirectory(); final file = File('${logsDir.path}/logs/ojyx_logs_${DateFormat('yyyy-MM-dd').format(DateTime.now())}.json')",
+        "testStrategy": "Vérifier création dossier logs accessible Windows, tester rotation automatique, valider compression anciens fichiers, confirmer performances écriture asynchrone",
+        "priority": "high",
+        "dependencies": [
+          17
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configurer l'architecture du FileLogger et les dépendances",
+            "description": "Créer la structure de base du FileLogger avec intégration de path_provider et archive pour la gestion des logs",
+            "dependencies": [],
+            "details": "Ajouter les dépendances path_provider: ^2.1.4 et archive: ^3.6.1 dans pubspec.yaml. Créer la classe FileLogger dans lib/core/utils/file_logger.dart avec singleton pattern. Implémenter la méthode d'initialisation qui obtient le répertoire documents via getApplicationDocumentsDirectory() et crée le sous-dossier 'logs' s'il n'existe pas. Définir les constantes: MAX_LOG_SIZE = 100MB, MAX_LOG_DAYS = 7, FLUSH_INTERVAL = 30 secondes.",
+            "status": "pending",
+            "testStrategy": "Vérifier que les dépendances sont correctement ajoutées, que la classe FileLogger est un singleton fonctionnel, et que le dossier logs est créé dans le bon répertoire Windows"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter le système de buffer et d'écriture asynchrone",
+            "description": "Développer le mécanisme de buffering avec flush périodique pour optimiser les performances d'écriture",
+            "dependencies": [
+              "18.1"
+            ],
+            "details": "Créer une List<Map<String, dynamic>> comme buffer interne pour stocker les logs en mémoire. Implémenter la méthode log() qui ajoute les entrées au buffer avec timestamp, level, message et metadata. Configurer un Timer.periodic de 30 secondes pour déclencher automatiquement le flush. Créer la méthode _flushBuffer() asynchrone qui écrit le contenu du buffer dans le fichier JSON du jour au format ojyx_logs_YYYY-MM-DD.json. Utiliser jsonEncode pour la sérialisation et File.writeAsString en mode append.",
+            "status": "pending",
+            "testStrategy": "Tester l'accumulation des logs dans le buffer, vérifier le flush automatique toutes les 30s, valider l'écriture asynchrone sans blocage du thread principal"
+          },
+          {
+            "id": 3,
+            "title": "Développer la rotation automatique des fichiers de logs",
+            "description": "Créer le système de rotation qui gère la taille maximale et l'ancienneté des fichiers de logs",
+            "dependencies": [
+              "18.2"
+            ],
+            "details": "Implémenter _checkRotation() appelée avant chaque écriture pour vérifier: 1) Si le fichier actuel dépasse 100MB, créer un nouveau fichier avec suffixe incrémental (ojyx_logs_YYYY-MM-DD_2.json). 2) Scanner le répertoire logs pour identifier les fichiers de plus de 7 jours via DateTime.parse sur le nom de fichier. Créer _rotateOldLogs() qui supprime ou archive les fichiers dépassant la limite d'âge. Intégrer la vérification de rotation dans le processus de flush.",
+            "status": "pending",
+            "testStrategy": "Simuler des fichiers de 100MB+ pour tester la création de nouveaux fichiers, créer des fichiers avec dates anciennes pour valider la suppression après 7 jours"
+          },
+          {
+            "id": 4,
+            "title": "Intégrer la compression des anciens logs avec archive",
+            "description": "Implémenter la compression automatique des fichiers de logs avant suppression pour économiser l'espace disque",
+            "dependencies": [
+              "18.3"
+            ],
+            "details": "Utiliser le package archive pour créer _compressOldLogs() qui compresse les fichiers de plus de 1 jour en .zip. Implémenter: 1) Lecture du fichier JSON à compresser, 2) Création d'une Archive avec ArchiveFile contenant les données, 3) Encodage avec ZipEncoder en ojyx_logs_YYYY-MM-DD.zip, 4) Suppression du fichier JSON original après compression réussie. Modifier _rotateOldLogs() pour supprimer les .zip de plus de 7 jours au lieu des .json.",
+            "status": "pending",
+            "testStrategy": "Vérifier la création des fichiers .zip, valider la suppression des JSON originaux, tester la décompression manuelle des archives pour intégrité"
+          },
+          {
+            "id": 5,
+            "title": "Finaliser l'intégration et l'accessibilité Windows",
+            "description": "Assurer l'accessibilité complète des logs depuis l'explorateur Windows et intégrer le FileLogger dans l'application",
+            "dependencies": [
+              "18.4"
+            ],
+            "details": "Créer une méthode openLogsFolder() utilisant url_launcher pour ouvrir l'explorateur Windows directement dans le dossier logs. Ajouter un bouton dans les paramètres de debug pour accéder aux logs. Intégrer FileLogger.instance.log() dans les points stratégiques de l'app: erreurs Supabase, changements d'état critiques, actions utilisateur importantes. Implémenter différents niveaux (debug, info, warning, error) avec filtrage configurable. Documenter le chemin complet des logs pour les utilisateurs Windows: C:\\Users\\[Username]\\Documents\\logs\\",
+            "status": "pending",
+            "testStrategy": "Tester l'ouverture du dossier logs depuis l'app, vérifier l'écriture des logs depuis différents points de l'application, valider l'accessibilité complète sous Windows"
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "title": "Console debug overlay in-app avec geste secret",
+        "description": "Créer une console de debug superposée accessible via 5 taps rapides coin supérieur droit",
+        "details": "Implémenter DebugConsoleOverlay avec Overlay widget, détecter geste secret avec GestureDetector multi-tap, afficher logs en temps réel avec ListView.builder, filtrage par niveau/catégorie, search functionality, export logs vers clipboard. Utiliser StreamBuilder pour logs temps réel. Design: Container semi-transparent avec backdrop blur, boutons Clear/Export/Filter. Code: Overlay.of(context).insert(OverlayEntry(builder: (context) => DebugConsoleOverlay()))",
+        "testStrategy": "Tester activation par geste secret, vérifier affichage logs temps réel, valider filtres et recherche, confirmer export vers clipboard",
+        "priority": "high",
+        "dependencies": [
+          17
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer le widget DebugConsoleOverlay avec UI semi-transparente",
+            "description": "Implémenter le widget principal de la console avec Container semi-transparent et backdrop blur",
+            "dependencies": [],
+            "details": "Créer DebugConsoleOverlay comme StatefulWidget avec Container semi-transparent (Colors.black87), ClipRect avec BackdropFilter pour effet blur (sigmaX: 5, sigmaY: 5). Structure: AppBar avec titre 'Debug Console' et boutons actions (Clear, Export, Filter), body avec ListView.builder pour afficher les logs. Utiliser SafeArea et Material pour éviter conflits avec système. Prévoir AnimatedContainer pour transitions smooth lors de l'ouverture/fermeture.",
+            "status": "pending",
+            "testStrategy": "Vérifier le rendu visuel de l'overlay, tester la transparence et l'effet blur, valider que l'UI ne bloque pas les interactions avec l'app en arrière-plan"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter la détection du geste secret 5 taps",
+            "description": "Créer un detector de geste multi-tap dans le coin supérieur droit de l'écran",
+            "dependencies": [],
+            "details": "Ajouter GestureDetector global avec Stack au niveau racine de l'app. Positionner Container invisible 100x100 pixels en haut à droite avec Positioned(top: 0, right: 0). Utiliser onTap avec counter et Timer pour détecter 5 taps en moins de 2 secondes. Code: int _tapCount = 0; Timer? _tapTimer; onTap: () { _tapCount++; _tapTimer?.cancel(); if (_tapCount >= 5) { _showDebugConsole(); _tapCount = 0; } else { _tapTimer = Timer(Duration(seconds: 2), () => _tapCount = 0); }}",
+            "status": "pending",
+            "testStrategy": "Tester la détection avec exactement 5 taps rapides, vérifier le reset après timeout, confirmer que les taps en dehors de la zone ne comptent pas"
+          },
+          {
+            "id": 3,
+            "title": "Intégrer le système de logs avec StreamController",
+            "description": "Créer le service de logging avec Stream pour affichage temps réel des logs",
+            "dependencies": [
+              "19.1"
+            ],
+            "details": "Créer DebugLoggerService singleton avec StreamController<LogEntry>.broadcast(). LogEntry: class LogEntry { final String message; final LogLevel level; final DateTime timestamp; final String? category; }. Méthodes: log(String message, {LogLevel level, String? category}), clearLogs(), getFilteredLogs(). Utiliser StreamBuilder dans DebugConsoleOverlay pour écouter _logStream. Implémenter buffer circulaire de 1000 entrées max pour éviter saturation mémoire.",
+            "status": "pending",
+            "testStrategy": "Vérifier l'ajout de logs en temps réel, tester la limite du buffer circulaire, valider que les logs apparaissent instantanément dans l'UI"
+          },
+          {
+            "id": 4,
+            "title": "Ajouter filtrage par niveau et recherche de logs",
+            "description": "Implémenter les fonctionnalités de filtrage et recherche dans la console",
+            "dependencies": [
+              "19.1",
+              "19.3"
+            ],
+            "details": "Ajouter DropdownButton pour filtrer par LogLevel (All, Error, Warning, Info, Debug). TextField avec InputDecoration pour recherche avec debounce 300ms. Utiliser where() sur la liste des logs pour filtrer. État local: LogLevel? _selectedLevel; String _searchQuery = ''; Méthode de filtrage: logs.where((log) => (_selectedLevel == null || log.level == _selectedLevel) && log.message.toLowerCase().contains(_searchQuery.toLowerCase())). Ajouter chips pour catégories avec FilterChip.",
+            "status": "pending",
+            "testStrategy": "Tester chaque niveau de filtre individuellement, vérifier la recherche avec différents termes, confirmer que les filtres se combinent correctement"
+          },
+          {
+            "id": 5,
+            "title": "Implémenter l'export des logs vers clipboard",
+            "description": "Ajouter la fonctionnalité d'export des logs filtrés vers le presse-papier",
+            "dependencies": [
+              "19.3",
+              "19.4"
+            ],
+            "details": "Utiliser package clipboard: ^0.1.3 ou services.dart Clipboard. Bouton Export dans AppBar avec IconButton(icon: Icon(Icons.copy)). Formater les logs: String formatLogs(List<LogEntry> logs) => logs.map((log) => '[${DateFormat('HH:mm:ss').format(log.timestamp)}] [${log.level.name}] ${log.category != null ? '[${log.category}] ' : ''}${log.message}').join('\\n'). Afficher SnackBar de confirmation après copie. Limiter export à 10000 caractères pour éviter problèmes clipboard.",
+            "status": "pending",
+            "testStrategy": "Vérifier que l'export copie bien les logs filtrés uniquement, tester la limite de caractères, confirmer l'affichage du SnackBar de confirmation"
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "title": "Device Info et Context enrichi pour monitoring",
+        "description": "Collecter informations device et contexte app pour enrichir les logs et erreurs Sentry",
+        "details": "Installer device_info_plus: ^10.1.2 et package_info_plus: ^8.0.2, créer DeviceInfoService pour collecter platform, version OS, model device, app version, build number. Intégrer dans LogEntry et Sentry contexts. Créer UserContext avec userId anonyme généré, sessionId unique par session. Code: await DeviceInfoPlugin().androidInfo pour Android, await PackageInfo.fromPlatform() pour app info. Sentry.configureScope((scope) => scope.setContext('device', deviceInfo))",
+        "testStrategy": "Vérifier collecte infos device sur Android/iOS, valider anonymisation userId, confirmer envoi contexts vers Sentry, tester persistance sessionId",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Installation des packages device_info_plus et package_info_plus",
+            "description": "Ajouter les dépendances nécessaires pour collecter les informations du device et de l'application",
+            "dependencies": [],
+            "details": "Ajouter dans pubspec.yaml: device_info_plus: ^10.1.2 et package_info_plus: ^8.0.2. Exécuter flutter pub get pour installer les packages. Vérifier l'importation correcte dans les fichiers nécessaires.",
+            "status": "pending",
+            "testStrategy": "Vérifier que les packages sont correctement installés via flutter pub deps, confirmer absence d'erreurs de compilation"
+          },
+          {
+            "id": 2,
+            "title": "Création du DeviceInfoService",
+            "description": "Implémenter un service centralisé pour collecter toutes les informations du device et de l'application",
+            "dependencies": [
+              "20.1"
+            ],
+            "details": "Créer lib/core/services/device_info_service.dart avec classe DeviceInfoService. Implémenter méthodes getDeviceInfo() retournant Map<String, dynamic> avec platform, OS version, device model via DeviceInfoPlugin().androidInfo/iosInfo. Méthode getAppInfo() avec PackageInfo.fromPlatform() pour version, buildNumber. Utiliser pattern Singleton ou provider Riverpod.",
+            "status": "pending",
+            "testStrategy": "Tester collecte sur émulateur Android et iOS, vérifier tous les champs retournés, valider gestion des erreurs si info non disponible"
+          },
+          {
+            "id": 3,
+            "title": "Implémentation du UserContext avec génération d'identifiants anonymes",
+            "description": "Créer système de génération et persistance d'identifiants utilisateur anonymes et sessions uniques",
+            "dependencies": [
+              "20.2"
+            ],
+            "details": "Créer UserContextService avec génération userId anonyme via Uuid().v4(), persisté dans SharedPreferences. SessionId unique généré à chaque lancement app. Méthodes getUserContext() retournant userId, sessionId, sessionStartTime. Intégration avec DeviceInfoService pour contexte complet.",
+            "status": "pending",
+            "testStrategy": "Vérifier persistance userId entre redémarrages, confirmer unicité sessionId par session, valider format UUID, tester récupération après réinstallation"
+          },
+          {
+            "id": 4,
+            "title": "Intégration des contextes dans LogEntry et LogService",
+            "description": "Enrichir les logs locaux avec les informations device et user collectées",
+            "dependencies": [
+              "20.2",
+              "20.3"
+            ],
+            "details": "Modifier LogEntry pour inclure deviceInfo et userContext optionnels. Dans LogService.log(), appeler automatiquement DeviceInfoService et UserContextService pour enrichir chaque entrée. Adapter formatage des logs pour inclure ces infos de manière lisible. Gérer cache pour éviter appels répétés.",
+            "status": "pending",
+            "testStrategy": "Vérifier présence infos device/user dans fichiers logs, tester performance avec cache, valider formatage lisible, confirmer enrichissement automatique"
+          },
+          {
+            "id": 5,
+            "title": "Configuration des contextes Sentry avec scope enrichi",
+            "description": "Intégrer les informations device et user dans les contextes Sentry pour enrichir les rapports d'erreurs",
+            "dependencies": [
+              "20.2",
+              "20.3",
+              "20.4"
+            ],
+            "details": "Dans SentryConfig, après init Sentry, utiliser Sentry.configureScope() pour définir contexts. scope.setContext('device', deviceInfo) avec toutes infos device, scope.setContext('app', appInfo) pour version/build, scope.setUser(SentryUser(id: userId)) pour user anonyme. Mettre à jour contexts au changement de session.",
+            "status": "pending",
+            "testStrategy": "Déclencher erreur test, vérifier présence contexts dans Sentry dashboard, confirmer mise à jour session, valider données complètes et correctes"
+          }
+        ]
+      },
+      {
+        "id": 21,
+        "title": "Tests monitoring avec erreurs volontaires et validation",
+        "description": "Créer suite de tests pour valider le bon fonctionnement du système de monitoring complet",
+        "details": "Créer écran debug test avec boutons pour déclencher erreurs volontaires: Exception Dart, Error network, Warning business logic, Info action user. Valider réception dans Sentry dashboard, vérification fichiers logs locaux, test console debug. Implémenter TestErrorService avec différents types d'erreurs. Code: TestErrorService().triggerNetworkError() qui lance http timeout, triggerDartError() qui lance null pointer exception, etc.",
+        "testStrategy": "Déclencher chaque type d'erreur, vérifier présence dans Sentry dashboard, confirmer écriture fichiers logs, valider affichage console debug, mesurer délais transmission",
+        "priority": "high",
+        "dependencies": [
+          18,
+          19,
+          20
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Création du TestErrorService avec différents types d'erreurs",
+            "description": "Implémenter un service centralisé pour déclencher différents types d'erreurs volontaires pour les tests de monitoring",
+            "dependencies": [],
+            "details": "Créer TestErrorService dans lib/core/services/test_error_service.dart avec méthodes: triggerDartError() pour null pointer exception, triggerNetworkError() pour timeout HTTP, triggerBusinessWarning() pour logique métier, triggerUserInfo() pour action utilisateur. Utiliser dio pour erreurs réseau, throw Exception pour Dart errors. Ajouter delay configurable pour simuler latence réseau.",
+            "status": "pending",
+            "testStrategy": "Vérifier que chaque méthode déclenche bien le type d'erreur attendu, tester avec différents paramètres de configuration"
+          },
+          {
+            "id": 2,
+            "title": "Création de l'écran de debug avec interface de test",
+            "description": "Développer un écran dédié aux tests de monitoring avec boutons pour déclencher chaque type d'erreur",
+            "dependencies": [
+              "21.1"
+            ],
+            "details": "Créer DebugTestScreen dans lib/features/debug/presentation/screens/ avec GridView de boutons colorés: rouge pour Dart Exception, orange pour Network Error, jaune pour Business Warning, bleu pour User Info. Ajouter indicateurs visuels de confirmation après déclenchement. Intégrer route dans go_router accessible uniquement en mode debug. Afficher timestamp et type d'erreur déclenchée.",
+            "status": "pending",
+            "testStrategy": "Naviguer vers l'écran, cliquer sur chaque bouton, vérifier feedback visuel et logs console"
+          },
+          {
+            "id": 3,
+            "title": "Validation de la réception dans Sentry Dashboard",
+            "description": "Configurer et vérifier que toutes les erreurs déclenchées apparaissent correctement dans Sentry",
+            "dependencies": [
+              "21.2"
+            ],
+            "details": "Se connecter au dashboard Sentry du projet, créer vue filtrée par environment (debug/dev). Déclencher chaque type d'erreur depuis l'app, noter timestamps. Vérifier présence dans Issues avec bon niveau (error/warning/info), contexte device enrichi, stack traces complètes. Documenter délais de transmission typiques (< 30s attendu). Créer alertes Sentry pour notifications temps réel.",
+            "status": "pending",
+            "testStrategy": "Chronométrer délai entre déclenchement et apparition Sentry, vérifier tous les champs de contexte sont présents"
+          },
+          {
+            "id": 4,
+            "title": "Vérification des fichiers logs locaux",
+            "description": "Valider que le système de logging local enregistre correctement toutes les erreurs dans les fichiers",
+            "dependencies": [
+              "21.2"
+            ],
+            "details": "Utiliser path_provider pour localiser répertoire logs de l'app. Implémenter LogFileViewer pour lire et afficher contenu des logs directement dans l'app. Vérifier format JSON des entrées, présence des timestamps, niveaux de log corrects. Tester rotation des fichiers si taille > 10MB. Ajouter bouton export logs dans l'écran debug pour partage facile.",
+            "status": "pending",
+            "testStrategy": "Déclencher erreurs, ouvrir fichier log, parser JSON et valider structure complète de chaque entrée"
+          },
+          {
+            "id": 5,
+            "title": "Tests de la console debug et métriques de performance",
+            "description": "Valider l'affichage dans la console de développement et mesurer l'impact performance du monitoring",
+            "dependencies": [
+              "21.3",
+              "21.4"
+            ],
+            "details": "Configurer flutter_logs pour affichage coloré dans console (rouge=error, jaune=warning, blanc=info). Mesurer overhead mémoire/CPU avec DevTools pendant déclenchement massif d'erreurs. Implémenter compteurs dans TestErrorService pour statistiques (total errors, par type, temps moyen). Créer rapport de synthèse avec graphiques performance. Vérifier aucune fuite mémoire après 100+ erreurs.",
+            "status": "pending",
+            "testStrategy": "Profiler l'app avec DevTools, déclencher 100 erreurs rapides, analyser courbes mémoire et CPU"
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "title": "Page des règles du jeu avec contenu structuré",
+        "description": "Créer interface claire expliquant toutes les règles d'Ojyx avec navigation intuitive",
+        "details": "Créer RulesScreen avec sections: Objectif du jeu, Mise en place, Déroulement tour, Cartes actions, Fin de partie, Cas spéciaux. Utiliser ExpansionTile pour navigation, illustrations avec des widgets custom cards mockup. Intégrer video explicative future. Structure: AppBar avec titre, body ScrollView avec sections expandables, FloatingActionButton pour retour rapide home. Code: class RulesScreen extends ConsumerWidget avec sections List<RuleSection>",
+        "testStrategy": "Vérifier lisibilité contenu règles, tester navigation entre sections, valider illustrations cartes, confirmer accessibilité taille texte",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer la structure de base RulesScreen",
+            "description": "Implémenter le widget RulesScreen avec navigation de base et structure des sections",
+            "dependencies": [],
+            "details": "Créer lib/features/rules/presentation/screens/rules_screen.dart avec ConsumerWidget. Définir la structure List<RuleSection> avec propriétés title, content, iconData. Implémenter AppBar personnalisé avec titre 'Règles d'Ojyx' et action de retour. Ajouter ScrollView principal et FloatingActionButton pour retour rapide en haut. Intégrer route dans go_router configuration.",
+            "status": "pending",
+            "testStrategy": "Vérifier navigation vers RulesScreen, confirmer affichage AppBar et FAB, tester scroll performance avec contenu volumineux"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter le système d'ExpansionTile pour les sections",
+            "description": "Créer des widgets ExpansionTile personnalisés pour chaque section de règles avec animations fluides",
+            "dependencies": [
+              "22.1"
+            ],
+            "details": "Créer RulesSectionTile widget personnalisé héritant d'ExpansionTile avec styling cohérent. Implémenter les 6 sections principales: Objectif du jeu, Mise en place, Déroulement tour, Cartes actions, Fin de partie, Cas spéciaux. Ajouter icônes thématiques pour chaque section (ex: Target pour Objectif, Settings pour Mise en place). Gérer état expansion avec ExpansionTileController pour permettre fermeture automatique des autres sections.",
+            "status": "pending",
+            "testStrategy": "Tester expansion/collapse de chaque section, vérifier animations fluides, confirmer une seule section ouverte à la fois"
+          },
+          {
+            "id": 3,
+            "title": "Rédiger et structurer le contenu textuel des règles",
+            "description": "Écrire le contenu complet des règles en français avec formatage riche et hiérarchie claire",
+            "dependencies": [
+              "22.2"
+            ],
+            "details": "Rédiger texte complet pour chaque section en utilisant RichText avec TextSpan pour formattage. Structurer avec titres, sous-titres, listes à puces, texte en gras pour points importants. Contenu: Objectif (obtenir score le plus bas), Mise en place (distribution 12 cartes face cachée), Déroulement (piocher/défausser, révéler, actions), Cartes actions (détail de chaque carte avec effets), Fin de partie (déclenchement, calcul scores), Cas spéciaux (colonnes identiques, déconnexions).",
+            "status": "pending",
+            "testStrategy": "Valider lisibilité avec différentes tailles d'écran, vérifier cohérence terminologie, tester accessibilité avec lecteur d'écran"
+          },
+          {
+            "id": 4,
+            "title": "Créer les illustrations de cartes mockup",
+            "description": "Développer des widgets custom pour illustrer visuellement les exemples de cartes et situations de jeu",
+            "dependencies": [
+              "22.3"
+            ],
+            "details": "Créer CardIllustrationWidget réutilisable avec CustomPainter pour dessiner cartes. Implémenter variations: carte face cachée, cartes numériques (valeurs), cartes actions avec symboles. Créer GameSituationWidget pour illustrer exemples: grille 3x4, colonnes identiques, défausse. Utiliser Container avec decoration et Transform pour effets 3D légers. Intégrer illustrations dans sections appropriées des règles.",
+            "status": "pending",
+            "testStrategy": "Vérifier rendu illustrations sur différentes densités écran, tester performance avec multiples illustrations, valider clarté visuelle"
+          },
+          {
+            "id": 5,
+            "title": "Préparer l'intégration vidéo et finaliser l'UX",
+            "description": "Ajouter placeholder pour vidéo explicative future et optimiser l'expérience utilisateur globale",
+            "dependencies": [
+              "22.4"
+            ],
+            "details": "Créer VideoPlaceholderWidget avec message 'Vidéo explicative bientôt disponible' et icône play. Prévoir structure pour future intégration video_player package. Implémenter recherche dans les règles avec TextField filtrant sections. Ajouter mode lecture continue avec auto-expansion sections. Optimiser tailles police selon préférences utilisateur (intégration avec SettingsScreen). Ajouter analytics pour tracker sections les plus consultées.",
+            "status": "pending",
+            "testStrategy": "Tester placeholder vidéo responsive, vérifier fonction recherche performante, valider adaptation taille texte, confirmer tracking analytics"
+          }
+        ]
+      },
+      {
+        "id": 23,
+        "title": "Écran paramètres avec personnalisation utilisateur",
+        "description": "Implémenter interface de paramètres pour contrôle volume, thème, langue, vibrations",
+        "details": "Créer SettingsScreen avec sections: Audio (volume sounds/music), Haptics (vibrations on/off), Display (theme light/dark/auto), Language (français/anglais), Account (futur). Utiliser ListTile avec Switch/Slider widgets, intégration avec SettingsService et SharedPreferences. Provider: @riverpod class SettingsNotifier extends _$SettingsNotifier avec state SettingsState. Code: SharedPreferences.getInstance() pour persistance, theme switching avec ThemeMode",
+        "testStrategy": "Tester sauvegarde préférences, valider changement thème temps réel, vérifier contrôle volume, confirmer activation/désactivation vibrations",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer la structure de base de SettingsScreen",
+            "description": "Implémenter l'écran de paramètres avec scaffold et navigation de base",
+            "dependencies": [],
+            "details": "Créer settings_screen.dart dans lib/features/settings/presentation/screens/. Implémenter StatelessWidget avec Scaffold contenant AppBar 'Paramètres' et body avec SingleChildScrollView. Ajouter route dans router_config.dart. Structure initiale avec sections placeholder pour Audio, Haptics, Display, Language et Account (désactivé). Utiliser Material Design avec ListTile pour chaque section.",
+            "status": "pending",
+            "testStrategy": "Vérifier que l'écran s'affiche correctement, tester la navigation vers/depuis l'écran, valider le scroll si contenu dépasse la hauteur"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter SettingsService avec SharedPreferences",
+            "description": "Créer service de persistance des préférences utilisateur avec SharedPreferences",
+            "dependencies": [],
+            "details": "Créer settings_service.dart dans lib/features/settings/data/datasources/. Implémenter classe SettingsService avec méthodes: getSoundVolume(), setSoundVolume(), getMusicVolume(), setMusicVolume(), getVibrationsEnabled(), setVibrationsEnabled(), getThemeMode(), setThemeMode(), getLanguage(), setLanguage(). Utiliser SharedPreferences.getInstance() avec gestion async. Définir valeurs par défaut: volumes 0.5, vibrations true, theme auto, langue français.",
+            "status": "pending",
+            "testStrategy": "Tester lecture/écriture de chaque préférence, vérifier valeurs par défaut au premier lancement, valider persistance après redémarrage app"
+          },
+          {
+            "id": 3,
+            "title": "Créer SettingsNotifier et SettingsState avec Riverpod",
+            "description": "Implémenter la gestion d'état des paramètres avec Riverpod et Freezed",
+            "dependencies": [
+              "23.2"
+            ],
+            "details": "Créer settings_state.dart avec @freezed class SettingsState contenant: soundVolume, musicVolume, vibrationsEnabled, themeMode, language. Créer settings_provider.dart avec @riverpod class SettingsNotifier extends _$SettingsNotifier. Implémenter méthodes: updateSoundVolume(), updateMusicVolume(), toggleVibrations(), updateTheme(), updateLanguage(). Charger état initial depuis SettingsService dans build(). Sauvegarder automatiquement dans SharedPreferences à chaque modification.",
+            "status": "pending",
+            "testStrategy": "Tester chaque mutation d'état, vérifier synchronisation avec SharedPreferences, valider rechargement état après restart"
+          },
+          {
+            "id": 4,
+            "title": "Implémenter les widgets de contrôle pour chaque paramètre",
+            "description": "Créer les widgets interactifs pour modifier chaque paramètre dans l'interface",
+            "dependencies": [
+              "23.1",
+              "23.3"
+            ],
+            "details": "Dans settings_screen.dart, implémenter sections complètes: Audio avec 2 Slider (0.0 à 1.0) pour sons/musique avec IconButton mute. Haptics avec SwitchListTile pour vibrations on/off. Display avec SegmentedButton pour thème (clair/sombre/auto) avec preview immédiat. Language avec RadioListTile (français/anglais) avec drapeaux. Connecter chaque widget au SettingsNotifier via ref.watch/read. Ajouter animations fluides pour les changements.",
+            "status": "pending",
+            "testStrategy": "Tester interaction avec chaque contrôle, vérifier mise à jour temps réel de l'UI, valider limites des sliders"
+          },
+          {
+            "id": 5,
+            "title": "Intégrer le changement de thème et langue dans l'app",
+            "description": "Appliquer les changements de thème et langue à toute l'application en temps réel",
+            "dependencies": [
+              "23.4"
+            ],
+            "details": "Dans main.dart, écouter settingsProvider pour themeMode et l'appliquer à MaterialApp. Créer ThemeData light/dark dans theme_config.dart avec couleurs Ojyx. Pour la langue, intégrer flutter_localizations et créer fichiers ARB pour français/anglais dans lib/l10n/. Utiliser AppLocalizations.of(context) pour les textes. Implémenter LocaleProvider écoutant settingsProvider.language. Redémarrage non requis pour changements.",
+            "status": "pending",
+            "testStrategy": "Vérifier changement thème immédiat sur tous écrans, tester traduction complète de l'app, valider persistance après redémarrage"
+          }
+        ]
+      },
+      {
+        "id": 24,
+        "title": "SettingsService pour gestion préférences avec SharedPreferences",
+        "description": "Service backend pour persister et gérer toutes les préférences utilisateur",
+        "details": "Créer SettingsService avec méthodes get/set pour chaque préférence: soundVolume (0.0-1.0), musicVolume (0.0-1.0), vibrationsEnabled (bool), themeMode (ThemeMode enum), language (Locale). Utiliser shared_preferences: ^2.3.2, implémenter avec Riverpod provider, cache en mémoire pour performances. Code: class SettingsService avec _prefs = SharedPreferences.getInstance(), méthodes async setSoundVolume(double volume) await _prefs.setDouble('sound_volume', volume)",
+        "testStrategy": "Vérifier persistance entre redémarrages app, tester valeurs par défaut, valider types de données, confirmer cache mémoire fonctionnel",
+        "priority": "medium",
+        "dependencies": [
+          23
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer la structure de base du SettingsService avec SharedPreferences",
+            "description": "Initialiser le service singleton avec injection de dépendances Riverpod et gestion de l'instance SharedPreferences",
+            "dependencies": [],
+            "details": "Créer la classe SettingsService avec pattern singleton, initialiser SharedPreferences de manière asynchrone dans un provider Riverpod. Implémenter la logique de base avec gestion des erreurs d'initialisation. Structure: class SettingsService { late SharedPreferences _prefs; final _cache = <String, dynamic>{}; Future<void> init() async { _prefs = await SharedPreferences.getInstance(); } }. Créer le provider: @riverpod Future<SettingsService> settingsService(SettingsServiceRef ref) async",
+            "status": "pending",
+            "testStrategy": "Vérifier l'initialisation correcte du service, tester le comportement en cas d'échec SharedPreferences, valider le pattern singleton"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter les méthodes de gestion des volumes audio",
+            "description": "Créer les getters/setters pour soundVolume et musicVolume avec validation des valeurs et cache mémoire",
+            "dependencies": [
+              "24.1"
+            ],
+            "details": "Implémenter getSoundVolume(), setSoundVolume(double volume), getMusicVolume(), setMusicVolume(double volume). Validation des valeurs entre 0.0 et 1.0, valeurs par défaut à 0.5. Cache en mémoire pour éviter lectures répétées. Code: Future<void> setSoundVolume(double volume) async { final clampedVolume = volume.clamp(0.0, 1.0); await _prefs.setDouble('sound_volume', clampedVolume); _cache['sound_volume'] = clampedVolume; }",
+            "status": "pending",
+            "testStrategy": "Tester le clamping des valeurs, vérifier la persistance, valider le cache mémoire, tester les valeurs par défaut"
+          },
+          {
+            "id": 3,
+            "title": "Ajouter la gestion des vibrations et du thème",
+            "description": "Implémenter les méthodes pour vibrationsEnabled (bool) et themeMode (ThemeMode enum) avec sérialisation appropriée",
+            "dependencies": [
+              "24.1"
+            ],
+            "details": "Créer getVibrationsEnabled(), setVibrationsEnabled(bool enabled), getThemeMode(), setThemeMode(ThemeMode mode). Sérialiser ThemeMode en string pour SharedPreferences. Valeurs par défaut: vibrations=true, theme=ThemeMode.system. Code: Future<void> setThemeMode(ThemeMode mode) async { await _prefs.setString('theme_mode', mode.name); _cache['theme_mode'] = mode; }. Parser le string lors de la lecture",
+            "status": "pending",
+            "testStrategy": "Vérifier conversion enum<->string, tester valeurs par défaut, valider persistance bool et enum"
+          },
+          {
+            "id": 4,
+            "title": "Intégrer la gestion de la langue avec Locale",
+            "description": "Implémenter les méthodes pour gérer la langue de l'application avec support des Locale Flutter",
+            "dependencies": [
+              "24.1"
+            ],
+            "details": "Créer getLanguage(), setLanguage(Locale locale). Sérialiser Locale en format 'languageCode_countryCode' ou juste 'languageCode'. Valeur par défaut: Locale système ou 'fr'. Code: Future<void> setLanguage(Locale locale) async { final localeString = locale.countryCode != null ? '${locale.languageCode}_${locale.countryCode}' : locale.languageCode; await _prefs.setString('language', localeString); _cache['language'] = locale; }",
+            "status": "pending",
+            "testStrategy": "Tester parsing Locale avec/sans countryCode, vérifier locale par défaut, valider format stockage"
+          },
+          {
+            "id": 5,
+            "title": "Optimiser les performances avec cache complet et notifications",
+            "description": "Implémenter un système de cache complet avec préchargement et notifications de changements via streams",
+            "dependencies": [
+              "24.2",
+              "24.3",
+              "24.4"
+            ],
+            "details": "Ajouter méthode loadAllSettings() pour précharger toutes les préférences au démarrage. Implémenter StreamController pour notifier les changements. Créer méthode resetToDefaults() pour réinitialiser. Code: final _settingsController = StreamController<SettingsEvent>.broadcast(); Stream<SettingsEvent> get settingsStream => _settingsController.stream; Future<void> loadAllSettings() async { _cache['sound_volume'] = _prefs.getDouble('sound_volume') ?? 0.5; // etc pour tous }",
+            "status": "pending",
+            "testStrategy": "Vérifier préchargement au démarrage, tester notifications via stream, valider reset to defaults, mesurer amélioration performances avec cache"
+          }
+        ]
+      },
+      {
+        "id": 25,
+        "title": "Intégration sons et vibrations avec contrôles utilisateur",
+        "description": "Implémenter système audio et haptique respectant les préférences utilisateur",
+        "details": "Installer audioplayers: ^6.1.0 et vibration: ^2.0.0, créer AudioService et HapticService avec contrôle volume depuis settings. Implémenter sons: card flip, card place, game win/lose, button tap. Vibrations: card selection, error feedback, success actions. Code: AudioPlayer avec setVolume(settingsService.soundVolume), HapticFeedback.lightImpact() seulement si vibrationsEnabled. Preload sounds pour performances.",
+        "testStrategy": "Tester respect volume settings, vérifier activation/désactivation vibrations, valider preload sounds, confirmer feedback haptique approprié",
+        "priority": "medium",
+        "dependencies": [
+          24
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Installation et configuration des dépendances audio/vibration",
+            "description": "Ajouter audioplayers et vibration au projet, configurer les permissions Android/iOS",
+            "dependencies": [],
+            "details": "Ajouter dans pubspec.yaml: audioplayers: ^6.1.0 et vibration: ^2.0.0. Pour Android, ajouter permission VIBRATE dans AndroidManifest.xml. Pour iOS, ajouter les configurations audio dans Info.plist pour permettre la lecture en arrière-plan si nécessaire. Exécuter flutter pub get et vérifier que les packages sont correctement installés.",
+            "status": "pending",
+            "testStrategy": "Vérifier que flutter pub get s'exécute sans erreur, confirmer présence des permissions dans les manifests, créer un test simple de vibration et audio pour valider l'installation"
+          },
+          {
+            "id": 2,
+            "title": "Création AudioService avec gestion volume et preload",
+            "description": "Implémenter service singleton pour gérer tous les sons du jeu avec contrôle volume",
+            "dependencies": [
+              "25.1"
+            ],
+            "details": "Créer lib/features/audio/data/services/audio_service.dart avec pattern Singleton. Utiliser AudioPlayer pour chaque son (card_flip.mp3, card_place.mp3, game_win.mp3, game_lose.mp3, button_tap.mp3). Implémenter preloadSounds() pour charger tous les sons au démarrage. Méthode playSound(SoundType type) qui respecte settingsService.soundVolume (0.0 à 1.0). Gérer le cache des AudioPlayer pour éviter recreations. Utiliser AudioCache pour assets audio.",
+            "status": "pending",
+            "testStrategy": "Tester preload de tous les sons au démarrage app, vérifier que setVolume fonctionne en temps réel, valider que les sons se jouent sans latence après preload"
+          },
+          {
+            "id": 3,
+            "title": "Création HapticService avec contrôles utilisateur",
+            "description": "Implémenter service pour vibrations avec respect des préférences utilisateur",
+            "dependencies": [
+              "25.1"
+            ],
+            "details": "Créer lib/features/haptic/data/services/haptic_service.dart avec dépendance sur SettingsService. Implémenter méthodes: lightImpact() pour sélection carte, mediumImpact() pour placement carte, heavyImpact() pour erreurs, notificationSuccess() pour actions réussies. Chaque méthode vérifie d'abord if (settingsService.vibrationsEnabled) avant d'appeler HapticFeedback. Gérer gracieusement les appareils sans support vibration.",
+            "status": "pending",
+            "testStrategy": "Vérifier que vibrations ne se déclenchent que si enabled dans settings, tester tous les types de feedback sur device physique, valider gestion erreur sur simulateur"
+          },
+          {
+            "id": 4,
+            "title": "Intégration audio/haptique dans les widgets de jeu",
+            "description": "Connecter les services audio/haptique aux interactions utilisateur dans l'UI",
+            "dependencies": [
+              "25.2",
+              "25.3"
+            ],
+            "details": "Dans GameCardWidget: ajouter audioService.playSound(SoundType.cardFlip) sur révélation et hapticService.lightImpact() sur sélection. Dans GameBoardWidget: audioService.playSound(SoundType.cardPlace) et hapticService.mediumImpact() sur placement valide. Dans GameEndDialog: audioService.playSound(SoundType.gameWin/gameLose) selon résultat. Pour tous les boutons UI: audioService.playSound(SoundType.buttonTap). Gérer les erreurs avec hapticService.heavyImpact().",
+            "status": "pending",
+            "testStrategy": "Tester chaque interaction utilisateur pour vérifier déclenchement approprié des sons/vibrations, valider timing et synchronisation avec animations"
+          },
+          {
+            "id": 5,
+            "title": "Ajout contrôles volume/vibration dans SettingsScreen",
+            "description": "Créer l'interface utilisateur pour contrôler volume sons et activation vibrations",
+            "dependencies": [
+              "25.2",
+              "25.3"
+            ],
+            "details": "Dans SettingsScreen, ajouter Slider pour volume (0-100%) lié à settingsService.soundVolume. Ajouter SwitchListTile pour vibrationsEnabled. Persister les valeurs avec SharedPreferences dans SettingsService. Ajouter bouton test pour preview volume actuel. Rafraîchir AudioService.setVolume() en temps réel lors du changement. Utiliser des icônes appropriées (volume_up, vibration) avec états visuels selon activation.",
+            "status": "pending",
+            "testStrategy": "Vérifier persistance des réglages après redémarrage app, tester que changements volume s'appliquent immédiatement, valider que toggle vibration désactive bien tous les feedbacks"
+          }
+        ]
+      },
+      {
+        "id": 26,
+        "title": "Tutoriel interactif step-by-step pour nouveaux joueurs",
+        "description": "Créer guide interactif expliquant les mécaniques de base d'Ojyx avec progression sauvegardée",
+        "details": "Créer TutorialScreen avec étapes: 1) Présentation grille, 2) Révélation première carte, 3) Pioche et défausse, 4) Cartes actions basiques, 5) Objectif colonnes, 6) Fin de partie. Utiliser PageView avec indicateur progression, animations guidées avec AnimatedContainer, tooltips contextuels. Sauvegarder progression avec TutorialProgress model. Code: PageController pour navigation, TutorialStep widgets custom, OverlayEntry pour tooltips pointant éléments UI",
+        "testStrategy": "Vérifier compréhension étapes, tester sauvegarde progression, valider skipping possible, confirmer tooltips bien positionnés",
+        "priority": "medium",
+        "dependencies": [
+          22,
+          24
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer la structure de base du tutoriel et le modèle de progression",
+            "description": "Mettre en place l'architecture du système de tutoriel avec gestion de la progression sauvegardée",
+            "dependencies": [],
+            "details": "Créer TutorialProgress entity dans domain/entities avec champs: currentStep, completedSteps, skipped, startedAt. Implémenter TutorialRepository interface et TutorialRepositoryImpl avec SharedPreferences pour persistance locale. Créer TutorialScreen base avec PageView et PageController. Ajouter TutorialProvider avec Riverpod pour gérer l'état global du tutoriel. Structure: features/tutorial/domain/, features/tutorial/data/, features/tutorial/presentation/",
+            "status": "pending",
+            "testStrategy": "Vérifier sauvegarde/chargement progression dans SharedPreferences, tester navigation entre étapes avec PageController, valider état TutorialProvider"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter les étapes 1-3 du tutoriel (Grille, Révélation, Pioche)",
+            "description": "Créer les trois premières étapes interactives du tutoriel avec animations et guidage visuel",
+            "dependencies": [
+              "26.1"
+            ],
+            "details": "Étape 1: GridIntroductionStep avec animation zoom sur grille 3x4, explication disposition cartes face cachée. Étape 2: CardRevealStep avec guidage doigt animé (AnimatedPositioned), forcer clic sur carte spécifique, afficher valeur et explication scoring. Étape 3: DrawDiscardStep avec mise en évidence zones pioche/défausse (AnimatedContainer avec glow effect), simulation d'un tour complet. Utiliser OverlayEntry pour flèches directionnelles et bulles explicatives positionnées dynamiquement",
+            "status": "pending",
+            "testStrategy": "Vérifier animations fluides, tester interactions forcées (empêcher actions non-tutoriel), valider positionnement overlays sur différentes tailles écran"
+          },
+          {
+            "id": 3,
+            "title": "Implémenter les étapes 4-6 du tutoriel (Actions, Colonnes, Fin)",
+            "description": "Créer les trois dernières étapes couvrant les mécaniques avancées et conditions de victoire",
+            "dependencies": [
+              "26.2"
+            ],
+            "details": "Étape 4: ActionCardsStep présenter 3 cartes actions basiques (Révéler, Échanger, Voler), animations d'utilisation avec effets visuels. Étape 5: ColumnObjectiveStep démontrer mécanisme 3 cartes identiques = colonne à 0 points, animation de défausse colonne. Étape 6: EndGameStep expliquer déclenchement fin (12ème carte révélée), calcul score final, pénalité double. Chaque étape avec TutorialStepWidget custom héritant base commune, indicateurs de progression (dots) en bas",
+            "status": "pending",
+            "testStrategy": "Tester compréhension cartes actions via quiz interactif, vérifier animation défausse colonne, valider explication claire scoring final"
+          },
+          {
+            "id": 4,
+            "title": "Créer le système de tooltips contextuels avec détection intelligente",
+            "description": "Implémenter service de hints adaptatifs basés sur le contexte de jeu et l'historique du joueur",
+            "dependencies": [
+              "26.3"
+            ],
+            "details": "Créer TooltipService singleton avec logique de détection: analyser GameState pour identifier moments clés (première carte à révéler, colonne complétable, carte action disponible). Implémenter TooltipOverlay widget réutilisable avec positionnement automatique via RenderBox. Conditions d'affichage: isFirstGame && !tutorialCompleted && specificContext. Tooltips prédéfinis: 'Tapez une carte pour la révéler', 'Cette colonne peut être défaussée!', 'Glissez pour utiliser cette carte action'. Fade in/out avec AnimationController, dismissible par tap",
+            "status": "pending",
+            "testStrategy": "Vérifier déclenchement tooltips aux bons moments, tester positionnement adaptatif, valider persistence état vu/non-vu, confirmer non-affichage après tutoriel"
+          },
+          {
+            "id": 5,
+            "title": "Intégrer navigation tutoriel et options de personnalisation",
+            "description": "Finaliser l'expérience tutoriel avec navigation fluide et paramètres utilisateur",
+            "dependencies": [
+              "26.4"
+            ],
+            "details": "Ajouter TutorialNavigationBar avec boutons Précédent/Suivant/Passer, progression visuelle (LinearProgressIndicator animé). Implémenter skip confirmation dialog pour éviter sorties accidentelles. Créer TutorialSettingsScreen pour options: vitesse animations, taille texte, réinitialiser progression. Intégrer démarrage tutoriel depuis HomeScreen avec bouton prominent pour nouveaux joueurs (détection via SharedPreferences). Transition smooth vers mode Practice après complétion avec CTA 'Essayer contre l'IA'",
+            "status": "pending",
+            "testStrategy": "Tester navigation bidirectionnelle, vérifier sauvegarde position lors interruption, valider transitions entre écrans, confirmer réinitialisation progression"
+          }
+        ]
+      },
+      {
+        "id": 27,
+        "title": "Mode pratique vs IA simple pour apprentissage",
+        "description": "Implémenter mode de jeu contre IA basique pour s'exercer sans pression multijoueur",
+        "details": "Créer AIOpponent class avec stratégie simple: révéler cartes aléatoirement, jouer cartes actions basiques selon règles. Implémenter PracticeGameScreen réutilisant GameScreen existant mais avec AI players. 3 niveaux: Easy (actions aléatoires), Medium (stratégie basique), Hard (anticipation coups joueur). Code: class AIPlayer extends Player avec makeMove() retournant AIAction, intégration dans GameLogic existant via isAI flag",
+        "testStrategy": "Tester comportement IA réaliste, vérifier respect des règles, valider différence niveaux difficulté, confirmer expérience apprentissage",
+        "priority": "medium",
+        "dependencies": [
+          26
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer la classe AIPlayer et l'architecture de base",
+            "description": "Implémenter la classe AIPlayer qui étend Player avec les méthodes nécessaires pour les décisions de l'IA",
+            "dependencies": [],
+            "details": "Créer AIPlayer extends Player dans features/game/domain/entities/ai_player.dart. Ajouter propriétés: difficultyLevel (enum: Easy, Medium, Hard), strategyEngine. Implémenter méthode abstraite makeMove() qui retourne Future<AIAction>. Créer AIAction model avec type (reveal, playCard, discard) et target. Ajouter flag isAI dans Player existant. Créer AIStrategy interface pour permettre différentes implémentations selon niveau.",
+            "status": "pending",
+            "testStrategy": "Vérifier que AIPlayer hérite correctement de Player, tester instantiation avec différents niveaux, valider que makeMove() retourne des actions valides"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter les stratégies d'IA par niveau de difficulté",
+            "description": "Développer les trois stratégies d'IA (Easy, Medium, Hard) avec leurs logiques de décision respectives",
+            "dependencies": [
+              "27.1"
+            ],
+            "details": "Créer EasyAIStrategy: actions totalement aléatoires, révèle cartes au hasard, joue cartes actions sans logique. MediumAIStrategy: révèle d'abord cartes aux coins, évite de révéler cartes déjà vues si possible, utilise cartes actions basiques (Spy sur adversaire avec moins de cartes révélées). HardAIStrategy: mémorise cartes vues avec Spy/Exchange, calcule score probable, anticipe colonnes à défausser, utilise cartes actions stratégiquement. Implémenter dans features/game/domain/use_cases/ai_strategies/.",
+            "status": "pending",
+            "testStrategy": "Simuler parties avec chaque niveau, vérifier que Easy fait vraiment du random, Medium suit une logique basique, Hard démontre anticipation et mémoire"
+          },
+          {
+            "id": 3,
+            "title": "Adapter GameLogic pour supporter les joueurs IA",
+            "description": "Modifier la logique de jeu existante pour gérer automatiquement les tours des joueurs IA",
+            "dependencies": [
+              "27.2"
+            ],
+            "details": "Dans GameLogic/GameService, ajouter détection isAI dans processNextTurn(). Implémenter autoPlayForAI() qui: attend 1-2 secondes (simuler réflexion), appelle aiPlayer.makeMove(), exécute l'action retournée via les méthodes existantes (revealCard, playActionCard). Ajouter gestion des timeouts spécifiques IA (plus courts). Assurer que les animations et feedbacks visuels fonctionnent aussi pour actions IA. Modifier GameStateNotifier pour trigger automatiquement tours IA.",
+            "status": "pending",
+            "testStrategy": "Lancer partie avec mix humain/IA, vérifier alternance fluide des tours, confirmer que IA respecte toutes les règles, valider délais réalistes"
+          },
+          {
+            "id": 4,
+            "title": "Créer PracticeGameScreen et menu de sélection",
+            "description": "Développer l'écran de jeu pratique réutilisant GameScreen avec configuration spéciale IA",
+            "dependencies": [
+              "27.3"
+            ],
+            "details": "Créer PracticeGameScreen dans features/practice/presentation/screens/. Ajouter PracticeModeSelectionDialog: choix nombre adversaires IA (1-7), sélection niveau pour chaque IA, option 'Tous même niveau'. Réutiliser GameScreen existant en passant configuration avec AI players. Créer PracticeGameProvider qui initialise GameState avec joueurs IA. Ajouter entrée menu principal 'Mode Pratique' dans HomeScreen. Router: ajouter route '/practice' dans go_router config.",
+            "status": "pending",
+            "testStrategy": "Naviguer vers mode pratique depuis menu, configurer partie avec différents niveaux IA, vérifier que GameScreen fonctionne identiquement avec IA"
+          },
+          {
+            "id": 5,
+            "title": "Ajouter indicateurs visuels et statistiques mode pratique",
+            "description": "Implémenter feedback visuel pour actions IA et tracking des performances du joueur",
+            "dependencies": [
+              "27.4"
+            ],
+            "details": "Ajouter badge 'IA' avec niveau sur avatars joueurs IA dans GameScreen. Créer AnimatedAIThinking widget (points animés '...') pendant réflexion IA. Implémenter PracticeStatsTracker: victoires/défaites par niveau, score moyen, meilleures performances. Afficher mini récap fin de partie pratique avec suggestions ('Essayez niveau supérieur' si victoire facile). Sauvegarder stats pratique dans SharedPreferences. Optionnel: replay des coups IA pour apprentissage.",
+            "status": "pending",
+            "testStrategy": "Vérifier visibilité badges IA, confirmer animation thinking pendant tours IA, valider sauvegarde et affichage stats, tester suggestions pertinentes"
+          }
+        ]
+      },
+      {
+        "id": 28,
+        "title": "Tooltips contextuels durant premières parties réelles",
+        "description": "Système de hints intelligents pendant les vraies parties pour guider nouveaux joueurs",
+        "details": "Créer TooltipService qui détecte contexte de jeu et affiche hints appropriés: 'Cliquez pour révéler carte', 'Vous pouvez défausser cette colonne', 'Carte action disponible'. Utiliser Tooltip widget avec custom styling, déclenchement conditionnel basé sur GameState et tutorial completion. Code: if (!tutorialCompleted && isFirstGame) showTooltip('hint_reveal_card'), utilisation Overlay pour positionnement dynamique",
+        "testStrategy": "Vérifier pertinence hints selon contexte, tester déclenchement conditionnel, valider non-intrusion pour joueurs expérimentés, confirmer aide réelle apprentissage",
+        "priority": "low",
+        "dependencies": [
+          26
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer TooltipService avec détection contextuelle intelligente",
+            "description": "Implémenter un service qui analyse le contexte de jeu en temps réel pour déclencher les tooltips appropriés",
+            "dependencies": [],
+            "details": "Créer tooltip_service.dart dans features/game/domain/services. Implémenter classe TooltipService avec méthodes: shouldShowTooltip(TooltipType type, GameState state, PlayerProfile profile), getTooltipForContext(GameContext context). Utiliser pattern Singleton avec Riverpod. Gérer conditions: isFirstGame, tutorialCompleted, currentGamePhase, lastPlayerAction. Enum TooltipType: revealCard, discardColumn, useActionCard, endTurn, specialCardEffect",
+            "status": "pending",
+            "testStrategy": "Tests unitaires pour logique de déclenchement selon différents contextes, vérifier que chaque tooltip s'affiche uniquement dans les bonnes conditions"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter système de widgets Tooltip personnalisés avec animations",
+            "description": "Créer des widgets tooltip réutilisables avec styling Ojyx et animations fluides",
+            "dependencies": [],
+            "details": "Créer game_tooltip.dart dans features/game/presentation/widgets. Widget GameTooltip avec propriétés: message, position (top/bottom/left/right), arrowDirection, backgroundColor, textStyle. Utiliser AnimatedContainer pour transitions smooth. Implémenter auto-positionnement pour éviter débordement écran. Ajouter effet pulsation subtile pour attirer attention. Support multi-lignes et icônes optionnelles. Durée affichage configurable (3-5 secondes)",
+            "status": "pending",
+            "testStrategy": "Tests visuels pour vérifier rendu sur différentes tailles d'écran, tester animations et positionnement automatique"
+          },
+          {
+            "id": 3,
+            "title": "Intégrer détection d'événements de jeu pour déclencher les hints",
+            "description": "Connecter le TooltipService aux événements du GameState pour afficher les tooltips au bon moment",
+            "dependencies": [
+              "28.1",
+              "28.2"
+            ],
+            "details": "Dans game_screen.dart, ajouter listeners sur GameState changes. Détecter événements: playerTurnStarted, cardRevealed, columnCompleted, actionCardDrawn. Appeler TooltipService.shouldShowTooltip() à chaque événement. Utiliser Overlay.of(context) pour afficher tooltips au-dessus du jeu. Gérer queue de tooltips pour éviter superposition. Ajouter délai entre tooltips consécutifs (minimum 2 secondes). Stocker tooltips déjà vus en SharedPreferences",
+            "status": "pending",
+            "testStrategy": "Tests d'intégration simulant une partie complète, vérifier séquence d'affichage des tooltips selon actions joueur"
+          },
+          {
+            "id": 4,
+            "title": "Créer catalogue de messages hints contextuels en français",
+            "description": "Définir tous les messages d'aide avec variations pour éviter répétition",
+            "dependencies": [],
+            "details": "Créer tooltip_messages.dart avec Map<TooltipType, List<String>>. Messages pour: révéler première carte ('Touchez une carte pour la révéler'), défausser colonne ('Bravo! 3 cartes identiques, touchez pour défausser'), utiliser carte action ('Glissez la carte action sur votre stock'), fin de tour ('Piochez une carte ou défaussez'), carte spéciale ('Cette carte s'active immédiatement!'). Ajouter variations pour chaque type. Utiliser ton encourageant et tutoriel",
+            "status": "pending",
+            "testStrategy": "Revue des messages par l'équipe UX, vérifier clarté et ton approprié pour débutants"
+          },
+          {
+            "id": 5,
+            "title": "Implémenter système de désactivation progressive des hints",
+            "description": "Créer logique pour réduire puis désactiver les tooltips au fur et à mesure que le joueur progresse",
+            "dependencies": [
+              "28.1",
+              "28.3",
+              "28.4"
+            ],
+            "details": "Dans TooltipService, tracker nombre de fois où chaque tooltip a été vu (Map<TooltipType, int>). Réduire fréquence après 3 affichages, désactiver après 5. Ajouter bouton 'Désactiver les conseils' dans GameScreen. Persister préférences utilisateur. Option dans ProfileScreen pour réactiver. Logique spéciale: toujours afficher hints pour nouvelles mécaniques (cartes action rares). Reset hints si joueur n'a pas joué depuis 30 jours",
+            "status": "pending",
+            "testStrategy": "Tests de progression sur plusieurs parties, vérifier diminution graduelle des hints et persistence des préférences"
+          }
+        ]
+      },
+      {
+        "id": 29,
+        "title": "Mode hors-ligne avec sauvegarde locale SQLite",
+        "description": "Permettre jeu complet sans connexion avec sauvegarde locale et synchronisation différée",
+        "details": "Installer sqflite: ^2.4.1, créer DatabaseService avec tables: offline_games, game_moves, player_stats. Implémenter OfflineGameRepository pour CRUD operations, sync queue pour actions différées. Modifier GameService pour détecter connectivité avec connectivity_plus: ^6.1.0, basculer automatiquement mode offline/online. Code: class OfflineGameRepository avec saveGame(Game game), loadGames(), createSyncQueue() pour replay vers Supabase quand connexion revenue",
+        "testStrategy": "Tester jeu complet sans connexion, vérifier sauvegarde locale fonctionnelle, valider sync différée reconnexion, confirmer cohérence données local/distant",
+        "priority": "low",
+        "dependencies": [
+          27
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configuration SQLite et structure de base de données",
+            "description": "Installer et configurer SQLite avec création du schéma de base de données pour le mode hors-ligne",
+            "dependencies": [],
+            "details": "Ajouter sqflite: ^2.4.1 dans pubspec.yaml. Créer DatabaseService dans /lib/core/services/database_service.dart avec méthode initDatabase() qui crée les tables: offline_games (id, game_data, created_at, last_modified, sync_status), game_moves (id, game_id, move_data, timestamp, sync_status), player_stats (id, player_name, games_played, total_score, best_score). Implémenter singleton pattern pour garantir une seule instance de la base de données. Ajouter migrations pour évolutions futures du schéma.",
+            "status": "pending",
+            "testStrategy": "Vérifier création correcte des tables avec requêtes SELECT, tester insertion/lecture de données test, valider gestion des erreurs SQLite"
+          },
+          {
+            "id": 2,
+            "title": "Implémentation OfflineGameRepository avec opérations CRUD",
+            "description": "Créer le repository pour gérer toutes les opérations de données en mode hors-ligne",
+            "dependencies": [
+              "29.1"
+            ],
+            "details": "Créer OfflineGameRepository dans /lib/features/game/data/repositories/offline_game_repository.dart. Implémenter méthodes: saveGame(Game game) pour sérialiser et stocker une partie, loadGames() pour récupérer toutes les parties sauvegardées, updateGame(String gameId, Game game), deleteGame(String gameId), getGameById(String gameId). Utiliser json_serializable pour la sérialisation des entités Game. Ajouter gestion des transactions pour cohérence des données. Implémenter cache mémoire pour optimiser les lectures fréquentes.",
+            "status": "pending",
+            "testStrategy": "Tester cycle complet CRUD avec données réelles, vérifier intégrité après crash simulé, valider performances avec 100+ parties"
+          },
+          {
+            "id": 3,
+            "title": "Système de queue de synchronisation pour actions différées",
+            "description": "Créer un système de file d'attente pour stocker et rejouer les actions en attente de synchronisation",
+            "dependencies": [
+              "29.1"
+            ],
+            "details": "Créer SyncQueueService dans /lib/core/services/sync_queue_service.dart. Implémenter table sync_queue (id, action_type, payload, retry_count, created_at, status). Créer méthodes: addToQueue(SyncAction action) pour ajouter une action, processQueue() pour traiter la file, retryFailedActions() avec backoff exponentiel. Gérer les types d'actions: CREATE_GAME, UPDATE_GAME, SUBMIT_MOVE, UPDATE_STATS. Implémenter mécanisme de priorité pour ordonner les actions. Ajouter limite de retry (max 3) et archivage des échecs permanents.",
+            "status": "pending",
+            "testStrategy": "Simuler perte de connexion pendant actions, vérifier ordre de replay correct, tester gestion des échecs répétés"
+          },
+          {
+            "id": 4,
+            "title": "Service de détection de connectivité et bascule automatique",
+            "description": "Implémenter la détection de connexion réseau et la bascule transparente entre modes online/offline",
+            "dependencies": [
+              "29.2",
+              "29.3"
+            ],
+            "details": "Ajouter connectivity_plus: ^6.1.0 dans pubspec.yaml. Créer ConnectivityService dans /lib/core/services/connectivity_service.dart avec Stream<ConnectivityResult> pour monitoring temps réel. Modifier GameService pour intégrer ConnectivityService: détecter état initial, écouter changements, basculer automatiquement entre OfflineGameRepository et GameRepository Supabase. Implémenter pattern Strategy pour abstraction du repository utilisé. Ajouter indicateur visuel (SnackBar ou Badge) pour informer l'utilisateur du mode actuel. Gérer cas edge: connexion intermittente, timeout réseau.",
+            "status": "pending",
+            "testStrategy": "Tester transitions online->offline->online pendant partie, vérifier pas de perte de données, valider UX fluide sans interruption"
+          },
+          {
+            "id": 5,
+            "title": "Synchronisation bidirectionnelle et résolution de conflits",
+            "description": "Implémenter la synchronisation complète des données locales vers Supabase à la reconnexion",
+            "dependencies": [
+              "29.3",
+              "29.4"
+            ],
+            "details": "Créer SyncService dans /lib/core/services/sync_service.dart. Implémenter syncOfflineData() qui: 1) Vérifie connexion active, 2) Récupère toutes les actions de la sync_queue, 3) Les exécute dans l'ordre avec gestion d'erreurs, 4) Met à jour sync_status dans les tables locales, 5) Nettoie la queue des actions réussies. Gérer conflits potentiels: partie modifiée des deux côtés, utiliser timestamp pour résolution (last-write-wins). Implémenter pull des changements serveur manqués pendant offline. Ajouter progress indicator pendant sync. Notifier utilisateur du résultat (succès/échecs partiels).",
+            "status": "pending",
+            "testStrategy": "Créer scénarios de conflit volontaires, vérifier cohérence finale, tester sync avec volume important de données"
+          }
+        ]
+      },
+      {
+        "id": 30,
+        "title": "Profil joueur avec statistiques et historique parties",
+        "description": "Interface profil avec pseudo, avatar, stats victoires, scores moyens, historique complet",
+        "details": "Créer ProfileScreen avec sections: User Info (pseudo, avatar), Statistics (games played, win rate, average score, best score), History (dernières 20 parties avec détails). Utiliser Supabase profiles table + cache local SQLite. Charts avec fl_chart: ^0.69.0 pour visualisation stats. Code: class PlayerProfile avec fields nickname, avatarUrl, totalGames, winRate, averageScore, recentGames. ProfileRepository pour data management",
+        "testStrategy": "Vérifier calcul stats précis, tester cache local, valider affichage historique, confirmer modification pseudo/avatar, vérifier charts lisibles",
+        "priority": "low",
+        "dependencies": [
+          24,
+          29
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer la structure de base ProfileScreen avec navigation",
+            "description": "Implémenter l'écran profil avec AppBar personnalisée et structure de base des sections",
+            "dependencies": [],
+            "details": "Créer ProfileScreen extends ConsumerWidget dans lib/features/profile/presentation/screens/. AppBar avec titre 'Mon Profil' et bouton retour. Scaffold avec SingleChildScrollView contenant Column pour les futures sections. Ajouter route dans router_config.dart: GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()). Intégrer navigation depuis HomeScreen avec ListTile ou bouton profil",
+            "status": "pending",
+            "testStrategy": "Vérifier navigation depuis home, tester scroll si contenu dépasse écran, valider affichage AppBar"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter section User Info avec avatar et pseudo modifiables",
+            "description": "Créer la section supérieure du profil avec avatar cliquable et pseudo éditable",
+            "dependencies": [
+              "30.1"
+            ],
+            "details": "Créer UserInfoWidget dans widgets/. CircleAvatar de 100px avec placeholder si pas d'image. GestureDetector sur avatar pour future sélection image. TextField pour pseudo avec IconButton edit, validation max 20 caractères. Design: Card avec padding 16px, Row pour avatar à gauche et infos à droite. Provider: userProfileProvider pour gérer état local. Intégration future avec Supabase profiles table",
+            "status": "pending",
+            "testStrategy": "Tester modification pseudo avec validation longueur, vérifier tap sur avatar, valider responsive design"
+          },
+          {
+            "id": 3,
+            "title": "Développer section Statistics avec calculs et affichage des données",
+            "description": "Créer widgets pour afficher statistiques de jeu avec calculs temps réel",
+            "dependencies": [
+              "30.1"
+            ],
+            "details": "Créer StatisticsWidget avec GridView 2 colonnes pour stats: Total parties, Taux victoire %, Score moyen, Meilleur score. Chaque stat dans Card avec Icon, titre et valeur. Calculer stats depuis gameHistoryProvider qui récupère données Supabase. Design Material3 avec couleurs thématiques. Format: winRate en pourcentage avec 1 décimale, scores arrondis. Placeholder '---' si aucune partie jouée",
+            "status": "pending",
+            "testStrategy": "Vérifier calculs précis avec données test, tester affichage sans données, valider format nombres"
+          },
+          {
+            "id": 4,
+            "title": "Créer section History avec liste scrollable des parties récentes",
+            "description": "Implémenter historique des 20 dernières parties avec détails expandables",
+            "dependencies": [
+              "30.1",
+              "30.3"
+            ],
+            "details": "Créer GameHistoryWidget avec ListView.builder limité à 20 items. Chaque partie dans ListTile avec: date formatée, score final, position/nombre joueurs, durée partie. ExpansionTile pour détails: adversaires avec scores, cartes actions utilisées. Utiliser timeago package pour affichage relatif dates. Pagination future si plus de 20 parties. Empty state avec illustration si aucune partie",
+            "status": "pending",
+            "testStrategy": "Tester scroll performances avec 20+ items, vérifier expansion détails, valider formatage dates"
+          },
+          {
+            "id": 5,
+            "title": "Intégrer graphiques statistiques avec fl_chart",
+            "description": "Ajouter visualisations graphiques pour évolution scores et performances",
+            "dependencies": [
+              "30.3",
+              "30.4"
+            ],
+            "details": "Ajouter fl_chart: ^0.69.0 dans pubspec.yaml. Créer ChartsWidget avec 2 graphiques: LineChart pour évolution score moyen sur 10 dernières parties, PieChart pour répartition victoires/défaites. Couleurs cohérentes avec thème app. Animations smooth sur apparition. Légendes et tooltips informatifs. Graphiques responsive avec AspectRatio. Toggle pour afficher/masquer charts si utilisateur préfère vue simple",
+            "status": "pending",
+            "testStrategy": "Vérifier rendu graphiques avec différentes données, tester animations, valider tooltips interactifs"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "title": "Configuration Sentry automatique avec DSN depuis .env",
+        "description": "Configurer Sentry pour activation automatique au démarrage de l'app en utilisant le DSN déjà présent dans .env, sans configuration utilisateur requise",
+        "details": "Le DSN Sentry est déjà dans .env et accessible via flutter_dotenv. Objectif : Sentry actif automatiquement dès flutter run, détection auto de l'environnement debug/release, aucune configuration manuelle. Intégration dans AppInitializer pour transparence totale.",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialiser Sentry dans AppInitializer avec détection automatique d'environnement",
+            "description": "Intégrer l'initialisation de Sentry dans la classe AppInitializer existante avec détection automatique debug/release",
+            "dependencies": [],
+            "details": "Modifier AppInitializer pour ajouter l'initialisation Sentry après le chargement de dotenv. Utiliser kDebugMode et kReleaseMode de Flutter pour détecter l'environnement. Configurer SentryFlutter.init avec le DSN depuis dotenv.env['SENTRY_DSN']. Définir environment: kDebugMode ? 'debug' : 'release' et désactiver Sentry si DSN absent ou vide.\n<info added on 2025-07-27T15:02:08.953Z>\nAppInitializer mis à jour pour détecter automatiquement l'environnement (debug/release) en utilisant kDebugMode et initialiser Sentry avec le DSN depuis .env. Suppression de la dépendance à SENTRY_ENABLED - fonctionne maintenant automatiquement si le DSN est présent. Ajout d'une gestion d'erreur appropriée avec fallback silencieux si l'initialisation Sentry échoue. Configuration de paramètres optimaux pour les environnements debug vs release. Problèmes de build sur Windows dus au chemin .env mais la logique du code est complète.\n</info added on 2025-07-27T15:02:08.953Z>",
+            "status": "done",
+            "testStrategy": "Vérifier que Sentry s'initialise automatiquement au démarrage en mode debug et release. Tester avec DSN valide et invalide. Confirmer que les erreurs sont capturées sans intervention utilisateur."
+          },
+          {
+            "id": 2,
+            "title": "Configurer la capture automatique des erreurs Flutter et Dart",
+            "description": "Mettre en place la capture globale des erreurs non gérées dans Flutter et Dart",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "Dans main.dart, wrapper runApp avec SentryFlutter.wrapApp() pour capturer les erreurs Flutter. Configurer FlutterError.onError = SentryFlutter.captureException. Pour les erreurs Dart, utiliser runZonedGuarded et rediriger vers Sentry. Ajouter beforeSend pour filtrer les erreurs de développement non pertinentes.\n<info added on 2025-07-27T15:04:47.846Z>\nSystème de capture d'erreurs complet implémenté dans main.dart. Ajout de runZonedGuarded pour les erreurs Dart, SentryWidget wrapper pour les erreurs Flutter, handler FlutterError.onError, et PlatformDispatcher.onError pour les erreurs de la plateforme. Configuration du filtre beforeSend dans AppInitializer pour éviter le spam d'erreurs de développement. Toutes les erreurs sont maintenant automatiquement taguées et envoyées à Sentry avec le contexte approprié.\n</info added on 2025-07-27T15:04:47.846Z>",
+            "status": "done",
+            "testStrategy": "Déclencher des erreurs intentionnelles (throw Exception, null safety violations) et vérifier leur apparition dans le dashboard Sentry. Tester en mode debug et release."
+          },
+          {
+            "id": 3,
+            "title": "Implémenter la configuration avancée Sentry pour l'environnement Ojyx",
+            "description": "Personnaliser Sentry avec les métadonnées spécifiques au projet et optimiser les performances",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "Configurer tracesSampleRate: kDebugMode ? 1.0 : 0.1 pour limiter l'impact en production. Définir dist avec le numéro de version depuis pubspec.yaml. Ajouter des tags personnalisés (platform, flavor). Configurer attachScreenshot: true pour les erreurs critiques. Définir maxBreadcrumbs: 50 et considérer l'ajout d'intégrations spécifiques (dio, sqflite si utilisés).",
+            "status": "done",
+            "testStrategy": "Vérifier que les métadonnées apparaissent correctement dans Sentry. Mesurer l'impact performance avec Flutter DevTools. Confirmer que les screenshots sont attachés aux erreurs."
+          },
+          {
+            "id": 4,
+            "title": "Créer un système de fallback silencieux si Sentry échoue",
+            "description": "Implémenter une gestion d'erreur robuste pour que l'app continue même si Sentry ne peut pas s'initialiser",
+            "dependencies": [
+              "16.1",
+              "16.2"
+            ],
+            "details": "Entourer l'initialisation Sentry dans un try-catch pour gérer les échecs silencieusement. Logger l'échec dans la console en mode debug uniquement. Créer une variable _sentryEnabled pour tracker l'état. Si Sentry échoue, continuer l'exécution normale de l'app. Implémenter un mécanisme de retry optionnel après 30 secondes si le DSN est valide.",
+            "status": "done",
+            "testStrategy": "Tester avec un DSN invalide, sans connexion internet, et avec des permissions réseau bloquées. L'app doit démarrer normalement dans tous les cas."
+          },
+          {
+            "id": 5,
+            "title": "Documenter la configuration automatique et tester l'intégration complète",
+            "description": "Ajouter une documentation minimale dans CLAUDE.md et valider le système end-to-end",
+            "dependencies": [
+              "16.1",
+              "16.2",
+              "16.3",
+              "16.4"
+            ],
+            "details": "Ajouter une section 'Monitoring avec Sentry' dans CLAUDE.md expliquant : activation automatique via .env, aucune config requise, comportement en debug/release. Créer un test d'intégration simple qui vérifie que Sentry est bien initialisé au démarrage. Tester avec flutter run en mode debug et release pour confirmer le comportement transparent.\n<info added on 2025-07-27T15:07:06.954Z>\nDocumentation ajoutée couvrant tous les aspects de l'intégration automatique de Sentry : activation transparente via le DSN dans .env, aucune configuration manuelle requise, détection automatique de l'environnement debug/release, mécanisme de fallback silencieux. Test d'intégration créé pour valider le fonctionnement end-to-end. Smoke test réussi confirmant que l'app démarre correctement avec Sentry initialisé automatiquement.\n</info added on 2025-07-27T15:07:06.954Z>",
+            "status": "done",
+            "testStrategy": "Exécuter l'app avec différentes configurations (.env valide/invalide, modes debug/release). Déclencher une vraie erreur et vérifier sa présence dans le dashboard Sentry du projet."
+          }
+        ]
+      },
+      {
+        "id": 31,
+        "title": "Système de capture et logging centralisé des erreurs Supabase/PostgreSQL",
+        "description": "Créer un système complet pour intercepter, logger dans Sentry et afficher dans la console toutes les erreurs Supabase et PostgreSQL qui s'affichent actuellement uniquement dans des bandeaux rouges",
+        "details": "1. Créer un wrapper SupabaseErrorHandler avec méthode générique wrapSupabaseCall<T> qui encapsule toutes les opérations Supabase\n2. Intercepter spécifiquement PostgrestException et toutes les erreurs Supabase (AuthException, RealtimeException, StorageException)\n3. Intégrer avec Sentry déjà configuré (Task 16) via captureException avec contexte enrichi\n4. Logger dans la console debug (intégration future avec Task 19) avec formatage structuré\n5. Créer des types d'erreur personnalisés : NetworkError, AuthError, DatabaseError avec messages utilisateur appropriés\n6. Implémenter retry logic configurable pour erreurs réseau temporaires\n7. Code exemple:\n```dart\nclass SupabaseErrorHandler {\n  static Future<T> wrapSupabaseCall<T>({\n    required Future<T> Function() call,\n    required String operation,\n    int maxRetries = 3,\n  }) async {\n    try {\n      return await call();\n    } on PostgrestException catch (e, stackTrace) {\n      final error = DatabaseError(\n        code: e.code,\n        message: e.message,\n        details: e.details,\n        operation: operation,\n      );\n      await Sentry.captureException(error, stackTrace: stackTrace);\n      debugPrint('[SUPABASE ERROR] $operation: ${e.message}');\n      throw error;\n    } on AuthException catch (e, stackTrace) {\n      final error = AuthError(message: e.message, operation: operation);\n      await Sentry.captureException(error, stackTrace: stackTrace);\n      debugPrint('[AUTH ERROR] $operation: ${e.message}');\n      throw error;\n    } catch (e, stackTrace) {\n      await Sentry.captureException(e, stackTrace: stackTrace);\n      debugPrint('[UNKNOWN ERROR] $operation: $e');\n      rethrow;\n    }\n  }\n}\n```\n8. Créer extension methods sur SupabaseClient pour usage transparent\n9. Configurer Sentry breadcrumbs pour tracer les opérations Supabase avant erreur\n10. Ajouter métriques de performance pour identifier les opérations lentes",
+        "testStrategy": "1. Simuler erreur PostgreSQL avec requête invalide et vérifier capture dans Sentry\n2. Provoquer timeout réseau et vérifier retry logic\n3. Tester erreur d'authentification et vérifier message utilisateur approprié\n4. Confirmer que toutes les erreurs apparaissent dans console avec bon formatage\n5. Vérifier que les breadcrumbs Sentry contiennent contexte complet\n6. Tester que les bandeaux rouges disparaissent au profit du nouveau système",
+        "status": "pending",
+        "dependencies": [
+          16,
+          7
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer la structure de base du SupabaseErrorHandler",
+            "description": "Implémenter la classe SupabaseErrorHandler avec les types d'erreur personnalisés et la structure de base pour l'interception des erreurs",
+            "dependencies": [],
+            "details": "Créer dans /lib/core/errors/ les fichiers suivants : supabase_error_handler.dart contenant la classe principale, custom_errors.dart avec les classes NetworkError, AuthError et DatabaseError héritant toutes d'une classe abstraite AppError. Chaque type d'erreur doit contenir : code, message, details, operation, timestamp. Implémenter la méthode toString() pour un affichage formaté et toJson() pour la sérialisation. Ajouter des factory constructors pour créer des erreurs depuis les exceptions Supabase natives.\n<info added on 2025-07-27T16:04:06.701Z>\nCréer une classe SupabaseExceptionHandler dans /lib/core/errors/supabase_exceptions.dart avec méthode statique handleSupabaseCall<T> qui wrap les appels async et capture PostgrestException, AuthException et StorageException. Dans la capture, logger en console avec couleurs ANSI (rouge pour erreurs, jaune pour warnings) en mode debug uniquement via if (kDebugMode). Transformer les codes d'erreur Supabase en messages français : 'PGRST116' -> 'Aucune donnée trouvée', '23505' -> 'Cette valeur existe déjà', 'AUTH_SESSION_MISSING' -> 'Session expirée, veuillez vous reconnecter'. Pour Sentry, ajouter breadcrumb avant l'appel avec operation details, puis captureException avec extra context incluant operation, table, filters. Créer extension SupabaseErrorHandling sur SupabaseClient avec méthodes comme safeFrom(table) et safeRpc(function) qui utilisent handleSupabaseCall. Dans supabase_room_datasource.dart, remplacer tous les appels directs par les versions safe : _supabase.safeFrom('rooms') au lieu de _supabase.from('rooms').\n</info added on 2025-07-27T16:04:06.701Z>",
+            "status": "done",
+            "testStrategy": "Créer des instances de chaque type d'erreur et vérifier que les propriétés sont correctement initialisées, tester la sérialisation JSON et la méthode toString()"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter la méthode wrapSupabaseCall avec gestion des retry",
+            "description": "Développer la méthode générique wrapSupabaseCall<T> qui encapsule les appels Supabase avec retry logic configurable et capture d'exceptions",
+            "dependencies": [
+              "31.1"
+            ],
+            "details": "Implémenter wrapSupabaseCall<T> avec les paramètres : Future<T> Function() call, String operation, int maxRetries (défaut 3), Duration retryDelay (défaut 1 seconde avec backoff exponentiel). Gérer les cas spécifiques : PostgrestException, AuthException, RealtimeException, StorageException, SocketException pour les erreurs réseau. Implémenter une logique de retry intelligente : retry uniquement sur erreurs réseau temporaires (timeout, connexion refusée), pas sur erreurs d'authentification ou de validation. Ajouter un paramètre shouldRetry callback optionnel pour personnaliser la logique de retry.",
+            "status": "done",
+            "testStrategy": "Simuler différents types d'échecs avec des mocks et vérifier que le retry fonctionne correctement pour les erreurs réseau mais pas pour les erreurs d'authentification"
+          },
+          {
+            "id": 3,
+            "title": "Intégrer Sentry avec contexte enrichi et breadcrumbs",
+            "description": "Connecter le SupabaseErrorHandler à Sentry pour capturer les exceptions avec un contexte détaillé et configurer les breadcrumbs Supabase",
+            "dependencies": [
+              "31.2"
+            ],
+            "details": "Dans wrapSupabaseCall, avant chaque appel Supabase, ajouter un breadcrumb Sentry avec : category='supabase', message=operation, level=SentryLevel.info, data contenant les paramètres de l'opération (sans données sensibles). En cas d'erreur, capturer avec Sentry.captureException incluant : withScope pour ajouter le contexte (operation, error_type, retry_count, duration), tags pour catégoriser (error.type, operation.name, retry.attempted), extras pour les détails techniques. Créer une méthode _sanitizeData pour nettoyer les données sensibles avant envoi à Sentry. Ajouter des User Feedback hints pour les erreurs utilisateur.",
+            "status": "pending",
+            "testStrategy": "Vérifier que les breadcrumbs sont correctement ajoutés avant chaque opération et que les erreurs sont capturées dans Sentry avec tout le contexte nécessaire"
+          },
+          {
+            "id": 4,
+            "title": "Créer les extension methods sur SupabaseClient",
+            "description": "Développer des extensions sur SupabaseClient pour permettre l'utilisation transparente du error handler dans toute l'application",
+            "dependencies": [
+              "31.3"
+            ],
+            "details": "Créer le fichier supabase_extensions.dart avec une extension sur SupabaseClient. Ajouter des méthodes wrapper pour les opérations courantes : safeFrom(String table) retournant un SupabaseQueryBuilder wrappé, safeAuth pour les opérations d'authentification, safeStorage pour le stockage, safeRealtime pour les souscriptions. Chaque méthode utilise wrapSupabaseCall en interne. Exemple : Future<List<Map<String, dynamic>>> safeSelect(String table, {String columns = '*'}) => SupabaseErrorHandler.wrapSupabaseCall(call: () => from(table).select(columns), operation: 'select_$table'). Ajouter une méthode configureErrorHandler pour définir des options globales.",
+            "status": "pending",
+            "testStrategy": "Tester chaque extension method avec des opérations réelles Supabase et vérifier que les erreurs sont correctement interceptées et transformées"
+          },
+          {
+            "id": 5,
+            "title": "Implémenter le logging structuré dans la console avec formatage",
+            "description": "Créer un système de logging console avec formatage structuré et intégration future avec le FileLogger (Task 18)",
+            "dependencies": [
+              "31.4"
+            ],
+            "details": "Créer une classe ErrorLogger avec méthodes : logError, logWarning, logInfo. Utiliser des codes couleur ANSI pour la console (rouge pour erreurs, jaune pour warnings). Format de log structuré : [TIMESTAMP] [LEVEL] [CATEGORY] Message | Details. Pour les erreurs Supabase, inclure : operation, error_code, error_message, retry_count, duration, stack_trace (en mode debug uniquement). Créer une interface IErrorLogger pour permettre l'ajout futur du FileLogger. Ajouter une option pour désactiver les couleurs (utile pour les logs fichiers). Implémenter un buffer de logs avec flush périodique pour optimiser les performances. Prévoir l'intégration avec Task 19 via un callback onLog optionnel.",
+            "status": "pending",
+            "testStrategy": "Vérifier que les logs apparaissent correctement formatés dans la console avec les bonnes couleurs et que toutes les informations pertinentes sont présentes"
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-27T12:23:57.279Z",
+      "updated": "2025-07-27T16:16:20.025Z",
       "description": "Tasks for master context"
     }
   }

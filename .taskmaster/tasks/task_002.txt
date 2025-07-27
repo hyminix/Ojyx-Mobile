@@ -1,0 +1,51 @@
+# Task ID: 2
+# Title: Suppression Complète des Tests et Infrastructure TDD
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Éliminer totalement le répertoire /test et toute trace de l'infrastructure TDD précédente pour repartir sur une base vierge
+# Details:
+1. Supprimer complètement le répertoire /test avec 'rm -rf test/'
+2. Supprimer /integration_test si présent
+3. Nettoyer pubspec.yaml :
+   - Retirer les dépendances de test (test:, mockito:, etc.) de dev_dependencies
+   - Garder uniquement flutter_test si nécessaire pour tests futurs
+4. Supprimer les imports de test dans tout le code
+5. Rechercher et supprimer toute référence à des mocks ou stubs
+6. Supprimer les fichiers de couverture (.lcov, coverage/)
+7. Mettre à jour .gitignore pour retirer les entrées liées aux tests
+
+# Test Strategy:
+Vérification que le projet compile sans aucune référence aux tests. Exécuter 'flutter clean' puis 'flutter pub get' pour s'assurer qu'aucune dépendance de test n'est manquante.
+
+# Subtasks:
+## 1. Suppression du répertoire /test et /integration_test [done]
+### Dependencies: None
+### Description: Supprimer complètement les répertoires de tests et vérifier qu'aucun fichier de test n'est présent ailleurs
+### Details:
+Exécuter 'rm -rf test/' et 'rm -rf integration_test/' depuis la racine du projet. Utiliser 'find . -name "*_test.dart" -o -name "*.test.dart"' pour identifier tout fichier de test restant dans d'autres répertoires. Supprimer également test_driver/ si présent.
+
+## 2. Nettoyage des dépendances de test dans pubspec.yaml [done]
+### Dependencies: 2.1
+### Description: Retirer toutes les dépendances liées aux tests de dev_dependencies tout en conservant flutter_test
+### Details:
+Ouvrir pubspec.yaml et supprimer de dev_dependencies : test:, mockito:, build_runner: (si utilisé uniquement pour les mocks), mocktail:, faker:, et autres packages de test. Conserver uniquement flutter_test: et flutter_lints:. Exécuter 'flutter pub get' après modification.
+
+## 3. Suppression des imports et références aux tests dans le code [done]
+### Dependencies: 2.2
+### Description: Rechercher et supprimer tous les imports de packages de test et références aux mocks dans le code de production
+### Details:
+Utiliser 'grep -r "import.*test" lib/' et 'grep -r "import.*mock" lib/' pour trouver les imports résiduels. Rechercher également les annotations @visibleForTesting et les supprimer. Vérifier dans lib/core/, lib/features/ et tout autre répertoire source.
+
+## 4. Suppression des fichiers de couverture et artefacts de test [done]
+### Dependencies: 2.3
+### Description: Éliminer tous les fichiers et dossiers générés par les tests et la couverture de code
+### Details:
+Supprimer : coverage/, lcov.info, *.lcov, .dart_tool/test/, .dart_tool/coverage/. Rechercher et supprimer tout fichier .g.dart généré uniquement pour les mocks (mockito). Nettoyer également les fichiers temporaires de test dans .dart_tool/.
+
+## 5. Mise à jour de .gitignore et validation finale [done]
+### Dependencies: 2.4
+### Description: Nettoyer .gitignore des entrées liées aux tests et valider que le projet compile sans infrastructure TDD
+### Details:
+Retirer de .gitignore : /coverage/, *.lcov, test/.test_coverage.dart, et autres entrées spécifiques aux tests. Exécuter 'flutter clean' puis 'flutter pub get' pour une installation propre. Compiler l'application avec 'flutter build apk --debug' pour confirmer l'absence de dépendances manquantes.
+

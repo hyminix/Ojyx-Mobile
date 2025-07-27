@@ -1,0 +1,43 @@
+# Task ID: 17
+# Title: Implémentation LogService multi-outputs avec façade unifiée
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Créer un service de logging centralisé qui écrit simultanément dans Sentry et fichiers locaux avec format JSON structuré
+# Details:
+Créer LogService en Singleton avec Riverpod provider, implémenter interface ILogger avec méthodes debug/info/warning/error, créer LogEntry model avec Freezed incluant timestamp, level, category, message, data, stackTrace, deviceInfo, userId, sessionId. Utiliser multiple outputs: SentryLogger pour erreurs critiques, FileLogger pour logs locaux. Implémenter rate limiting avec sliding window pour éviter spam. Code: @riverpod LogService logService(LogServiceRef ref) => LogService([SentryLogger(), FileLogger()])
+
+# Test Strategy:
+Vérifier écriture simultanée Sentry et fichiers, tester rate limiting, valider format JSON structuré, confirmer rotation automatique des logs
+
+# Subtasks:
+## 1. Créer l'architecture de base du LogService avec interface ILogger [pending]
+### Dependencies: None
+### Description: Définir l'interface ILogger et créer la structure singleton du LogService avec le provider Riverpod
+### Details:
+Créer lib/core/services/logging/i_logger.dart avec abstract class ILogger contenant les méthodes debug(), info(), warning(), error() avec paramètres (String message, {String? category, Map<String, dynamic>? data, StackTrace? stackTrace}). Créer lib/core/services/logging/log_service.dart avec class LogService implements ILogger et pattern Singleton. Créer le provider Riverpod: @riverpod LogService logService(LogServiceRef ref) => LogService.instance. Implémenter le pattern de façade pour gérer multiple outputs (List<ILogger> _outputs).
+
+## 2. Implémenter le modèle LogEntry avec Freezed [pending]
+### Dependencies: None
+### Description: Créer le modèle de données LogEntry avec tous les champs nécessaires pour un log structuré
+### Details:
+Créer lib/core/models/log_entry.dart avec @freezed class LogEntry contenant: DateTime timestamp, LogLevel level (enum: debug, info, warning, error), String category, String message, Map<String, dynamic>? data, StackTrace? stackTrace, DeviceInfo? deviceInfo (OS, version, modèle), String? userId, String sessionId. Ajouter factory LogEntry.create() avec génération automatique du timestamp et sessionId. Implémenter toJson() pour sérialisation JSON structurée. Créer enum LogLevel avec méthodes helper pour conversion string.
+
+## 3. Développer SentryLogger pour les erreurs critiques [pending]
+### Dependencies: 17.1, 17.2
+### Description: Créer l'implémentation SentryLogger qui envoie uniquement les logs error et warning vers Sentry
+### Details:
+Créer lib/core/services/logging/outputs/sentry_logger.dart implémentant ILogger. Filtrer les logs: seuls warning et error sont envoyés à Sentry. Convertir LogEntry en SentryEvent avec mapping des champs (message, level, extra data, user context). Utiliser Sentry.captureMessage() pour warnings et Sentry.captureException() pour errors. Enrichir le contexte Sentry avec deviceInfo et userId si disponibles. Gérer les cas d'erreur réseau gracieusement sans crash.
+
+## 4. Implémenter FileLogger avec rotation automatique [pending]
+### Dependencies: 17.1, 17.2
+### Description: Créer FileLogger pour écrire tous les logs dans des fichiers locaux JSON avec rotation automatique
+### Details:
+Créer lib/core/services/logging/outputs/file_logger.dart. Utiliser path_provider pour obtenir le dossier Documents/logs/. Écrire chaque LogEntry en JSON sur une nouvelle ligne (format JSONL). Implémenter rotation: nouveau fichier chaque jour (ojyx_2025-07-27.log) et suppression des fichiers > 7 jours. Gérer la taille max par fichier (10MB) avec création d'un nouveau fichier si dépassé. Utiliser File.writeAsString avec mode append et flush immédiat. Gérer les permissions d'écriture sur différentes plateformes.
+
+## 5. Ajouter le rate limiting avec sliding window [pending]
+### Dependencies: 17.1, 17.3, 17.4
+### Description: Implémenter un système de rate limiting pour éviter le spam de logs et protéger les performances
+### Details:
+Créer lib/core/services/logging/rate_limiter.dart avec algorithme sliding window. Configurer des limites: 100 logs/minute global, 10 logs/seconde par catégorie. Utiliser Queue<DateTime> pour tracker les timestamps des logs. Implémenter shouldAllow(String category): bool qui vérifie les limites. Si limite atteinte, logger un warning unique 'Rate limit exceeded for category X' puis silence. Reset automatique des compteurs après la fenêtre de temps. Intégrer dans LogService.log() avant dispatch aux outputs.
+
