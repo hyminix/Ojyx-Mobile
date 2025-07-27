@@ -62,7 +62,7 @@
               "1.4"
             ],
             "details": "Exécuter 'flutter clean' puis 'flutter pub get' pour réinitialiser les dépendances. Vérifier avec 'flutter analyze --no-fatal-infos' que le code compile toujours. Tester un build rapide avec 'flutter build apk --debug' pour confirmer la compilation. Faire un 'git status' pour voir tous les fichiers supprimés. Utiliser 'git add -A' pour stager toutes les suppressions. Committer avec exactement ce message : 'chore: purge massive des fichiers superflus - suppression tests, CI/CD, docs'. Optionnel : créer un tag 'pre-purge' avant le commit pour pouvoir revenir en arrière si nécessaire",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Le projet doit compiler sans erreur avec 'flutter build apk --debug'. 'flutter analyze' ne doit montrer aucune erreur liée aux suppressions. Le commit doit montrer au moins 100+ fichiers supprimés"
           }
         ]
@@ -1016,7 +1016,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-27T08:10:40.879Z",
+      "updated": "2025-07-27T08:18:15.027Z",
       "description": "Tasks for master context"
     }
   }
