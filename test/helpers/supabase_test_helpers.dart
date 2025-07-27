@@ -71,7 +71,9 @@ void setupAuthStubs(MockGoTrueClient auth, {User? currentUser}) {
 
   // Auth state changes stream
   final authStateController = StreamController<AuthState>.broadcast();
-  when(() => auth.onAuthStateChange).thenAnswer((_) => authStateController.stream);
+  when(
+    () => auth.onAuthStateChange,
+  ).thenAnswer((_) => authStateController.stream);
 
   // Sign in methods
   when(
@@ -81,9 +83,9 @@ void setupAuthStubs(MockGoTrueClient auth, {User? currentUser}) {
     ),
   ).thenAnswer((_) async => MockAuthResponse());
 
-  when(() => auth.signInAnonymously()).thenAnswer(
-    (_) async => MockAuthResponse(),
-  );
+  when(
+    () => auth.signInAnonymously(),
+  ).thenAnswer((_) async => MockAuthResponse());
 
   // Sign out
   when(() => auth.signOut()).thenAnswer((_) async {});
@@ -98,8 +100,10 @@ MockRealtimeChannel setupRealtimeChannel({
   Map<String, dynamic>? params,
 }) {
   final channel = MockRealtimeChannel();
-  final presenceController = StreamController<RealtimePresencePayload>.broadcast();
-  final broadcastController = StreamController<Map<String, dynamic>>.broadcast();
+  final presenceController =
+      StreamController<RealtimePresencePayload>.broadcast();
+  final broadcastController =
+      StreamController<Map<String, dynamic>>.broadcast();
   final postgresController = StreamController<Map<String, dynamic>>.broadcast();
 
   // Basic channel properties
@@ -113,17 +117,11 @@ MockRealtimeChannel setupRealtimeChannel({
   when(() => channel.unsubscribe()).thenAnswer((_) async => 'ok');
 
   // Presence
-  when(
-    () => channel.onPresenceSync(any()),
-  ).thenReturn(channel);
+  when(() => channel.onPresenceSync(any())).thenReturn(channel);
 
-  when(
-    () => channel.onPresenceJoin(any()),
-  ).thenReturn(channel);
+  when(() => channel.onPresenceJoin(any())).thenReturn(channel);
 
-  when(
-    () => channel.onPresenceLeave(any()),
-  ).thenReturn(channel);
+  when(() => channel.onPresenceLeave(any())).thenReturn(channel);
 
   // Broadcast
   when(
@@ -203,17 +201,22 @@ void setupFilterBuilderStubs<T>(
   when(() => filterBuilder.rangeGte(any(), any())).thenReturn(filterBuilder);
   when(() => filterBuilder.rangeLt(any(), any())).thenReturn(filterBuilder);
   when(() => filterBuilder.rangeLte(any(), any())).thenReturn(filterBuilder);
-  when(() => filterBuilder.rangeAdjacent(any(), any())).thenReturn(filterBuilder);
+  when(
+    () => filterBuilder.rangeAdjacent(any(), any()),
+  ).thenReturn(filterBuilder);
   when(() => filterBuilder.overlaps(any(), any())).thenReturn(filterBuilder);
   when(() => filterBuilder.textSearch(any(), any())).thenReturn(filterBuilder);
   when(() => filterBuilder.match(any())).thenReturn(filterBuilder);
   when(() => filterBuilder.not(any(), any(), any())).thenReturn(filterBuilder);
   when(() => filterBuilder.or(any())).thenReturn(filterBuilder);
-  when(() => filterBuilder.filter(any(), any(), any())).thenReturn(filterBuilder);
+  when(
+    () => filterBuilder.filter(any(), any(), any()),
+  ).thenReturn(filterBuilder);
 
   // Order and limit
-  when(() => filterBuilder.order(any(), ascending: any(named: 'ascending')))
-      .thenReturn(filterBuilder);
+  when(
+    () => filterBuilder.order(any(), ascending: any(named: 'ascending')),
+  ).thenReturn(filterBuilder);
   when(() => filterBuilder.limit(any())).thenReturn(filterBuilder);
   when(() => filterBuilder.range(any(), any())).thenReturn(filterBuilder);
 
@@ -231,14 +234,15 @@ void setupFilterBuilderStubs<T>(
 
     // Special handling for single() and maybeSingle()
     if (response is List && (response as List).isNotEmpty) {
-      when(() => filterBuilder.single()).thenAnswer((_) async => (response as List).first);
-      when(() => filterBuilder.maybeSingle()).thenAnswer((_) async => (response as List).first);
+      when(
+        () => filterBuilder.single(),
+      ).thenAnswer((_) async => (response as List).first);
+      when(
+        () => filterBuilder.maybeSingle(),
+      ).thenAnswer((_) async => (response as List).first);
     } else if (response is List && (response as List).isEmpty) {
       when(() => filterBuilder.single()).thenThrow(
-        PostgrestException(
-          message: 'Row not found',
-          code: 'PGRST116',
-        ),
+        PostgrestException(message: 'Row not found', code: 'PGRST116'),
       );
       when(() => filterBuilder.maybeSingle()).thenAnswer((_) async => null);
     } else {
@@ -315,10 +319,7 @@ class SupabaseTestFixtures {
 /// Extension to add async error matchers
 extension AsyncErrorMatchers on Future {
   /// Verify that a future throws a PostgrestException
-  Future<void> throwsPostgrestException({
-    String? code,
-    String? message,
-  }) async {
+  Future<void> throwsPostgrestException({String? code, String? message}) async {
     try {
       await this;
       fail('Expected PostgrestException but no exception was thrown');
@@ -387,10 +388,7 @@ class RealtimeTestHelper {
     required Map<String, dynamic> payload,
   }) {
     final controller = getController(channel);
-    controller.add({
-      'event': event,
-      'payload': payload,
-    });
+    controller.add({'event': event, 'payload': payload});
   }
 
   /// Simulate presence sync
@@ -399,10 +397,7 @@ class RealtimeTestHelper {
     required Map<String, dynamic> state,
   }) {
     final controller = getController(channel);
-    controller.add({
-      'type': 'sync',
-      'state': state,
-    });
+    controller.add({'type': 'sync', 'state': state});
   }
 
   /// Clean up all controllers

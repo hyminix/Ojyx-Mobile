@@ -41,9 +41,7 @@ void main() {
       // Launch app with mocked Supabase
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            supabaseClientProvider.overrideWithValue(mockSupabase),
-          ],
+          overrides: [supabaseClientProvider.overrideWithValue(mockSupabase)],
           child: const app.MyApp(),
         ),
       );
@@ -62,9 +60,7 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            supabaseClientProvider.overrideWithValue(mockSupabase),
-          ],
+          overrides: [supabaseClientProvider.overrideWithValue(mockSupabase)],
           child: const app.MyApp(),
         ),
       );
@@ -76,10 +72,10 @@ void main() {
       if (createRoomButton.evaluate().isNotEmpty) {
         await tester.tap(createRoomButton);
         await tester.pumpAndSettle();
-        
+
         // Verify we're on create room screen
         expect(find.text('Créer une nouvelle partie'), findsOneWidget);
-        
+
         // Go back
         await tester.pageBack();
         await tester.pumpAndSettle();
@@ -90,18 +86,18 @@ void main() {
       if (joinRoomButton.evaluate().isNotEmpty) {
         await tester.tap(joinRoomButton);
         await tester.pumpAndSettle();
-        
+
         // Verify we're on join room screen
         expect(find.text('Rejoindre une partie'), findsOneWidget);
       }
     });
 
-    testWidgets('should handle Riverpod state management correctly', (tester) async {
+    testWidgets('should handle Riverpod state management correctly', (
+      tester,
+    ) async {
       // Create a test container to verify providers
       final container = createTestContainer(
-        overrides: [
-          supabaseClientProvider.overrideWithValue(mockSupabase),
-        ],
+        overrides: [supabaseClientProvider.overrideWithValue(mockSupabase)],
       );
 
       // Test auth provider
@@ -121,16 +117,16 @@ void main() {
     testWidgets('should validate Freezed models serialization', (tester) async {
       // This test ensures Freezed generated code works correctly
       // We'll test a simple model creation and serialization
-      
+
       // Import a Freezed model and test it
       // This would be done with actual models from the app
-      
+
       // Example pseudo-code:
       // final room = Room(id: 'test', code: 'ABC123', ...);
       // final json = room.toJson();
       // final restored = Room.fromJson(json);
       // expect(restored, equals(room));
-      
+
       expect(true, true); // Placeholder for actual model tests
     });
 
@@ -139,9 +135,7 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            supabaseClientProvider.overrideWithValue(mockSupabase),
-          ],
+          overrides: [supabaseClientProvider.overrideWithValue(mockSupabase)],
           child: const app.MyApp(),
         ),
       );
@@ -151,7 +145,7 @@ void main() {
 
       // Log startup time
       debugPrint('App startup time: ${stopwatch.elapsedMilliseconds}ms');
-      
+
       // Verify startup is under reasonable threshold (adjust as needed)
       expect(stopwatch.elapsedMilliseconds, lessThan(3000));
     });
@@ -159,9 +153,7 @@ void main() {
     testWidgets('should validate go_router navigation', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            supabaseClientProvider.overrideWithValue(mockSupabase),
-          ],
+          overrides: [supabaseClientProvider.overrideWithValue(mockSupabase)],
           child: const app.MyApp(),
         ),
       );
@@ -169,8 +161,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Get the router from context
-      final BuildContext context = tester.element(find.byType(MaterialApp).first);
-      
+      final BuildContext context = tester.element(
+        find.byType(MaterialApp).first,
+      );
+
       // Test programmatic navigation (if router is accessible)
       // context.go('/create-room');
       // await tester.pumpAndSettle();
@@ -180,15 +174,13 @@ void main() {
     testWidgets('should handle errors gracefully', (tester) async {
       // Setup auth to fail
       when(() => mockAuth.currentUser).thenReturn(null);
-      when(() => mockAuth.signInAnonymously()).thenThrow(
-        AuthException('Test error'),
-      );
+      when(
+        () => mockAuth.signInAnonymously(),
+      ).thenThrow(AuthException('Test error'));
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            supabaseClientProvider.overrideWithValue(mockSupabase),
-          ],
+          overrides: [supabaseClientProvider.overrideWithValue(mockSupabase)],
           child: const app.MyApp(),
         ),
       );
@@ -210,9 +202,7 @@ void main() {
             home: Consumer(
               builder: (context, ref, child) {
                 rebuildCount++;
-                return const Scaffold(
-                  body: Center(child: Text('Test')),
-                );
+                return const Scaffold(body: Center(child: Text('Test')));
               },
             ),
           ),
@@ -220,11 +210,11 @@ void main() {
       );
 
       final initialRebuilds = rebuildCount;
-      
+
       // Trigger some state changes
       await tester.pump();
       await tester.pump();
-      
+
       // Verify minimal unnecessary rebuilds
       expect(rebuildCount - initialRebuilds, lessThanOrEqualTo(2));
     });
@@ -232,13 +222,11 @@ void main() {
     testWidgets('should validate memory usage patterns', (tester) async {
       // This is a placeholder for memory profiling
       // In real scenarios, you'd use Flutter DevTools or memory profiling APIs
-      
+
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
-            home: Scaffold(
-              body: Center(child: Text('Memory Test')),
-            ),
+            home: Scaffold(body: Center(child: Text('Memory Test'))),
           ),
         ),
       );

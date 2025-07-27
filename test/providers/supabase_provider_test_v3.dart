@@ -41,7 +41,6 @@ void main() {
       // Note: In real migration, we'd import only one
       // This is just to verify they work the same way
       final legacyClient = container.read(legacy.supabaseClientProvider);
-import './helpers/supabase_test_helpers.dart';
       final modernClient = container.read(modern.supabaseClientProvider);
 
       expect(modernClient, equals(legacyClient));

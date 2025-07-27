@@ -22,9 +22,7 @@ void main() {
     testWidgets('should measure frame rendering performance', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            supabaseClientProvider.overrideWithValue(mockSupabase),
-          ],
+          overrides: [supabaseClientProvider.overrideWithValue(mockSupabase)],
           child: const app.MyApp(),
         ),
       );
@@ -32,14 +30,18 @@ void main() {
       await binding.watchPerformance(() async {
         // Perform various UI operations
         await tester.pumpAndSettle();
-        
+
         // Simulate scrolling if there's a scrollable widget
         final scrollableFinder = find.byType(Scrollable);
         if (scrollableFinder.evaluate().isNotEmpty) {
-          await tester.fling(scrollableFinder.first, const Offset(0, -200), 1000);
+          await tester.fling(
+            scrollableFinder.first,
+            const Offset(0, -200),
+            1000,
+          );
           await tester.pumpAndSettle();
         }
-        
+
         // Simulate navigation
         final buttons = find.byType(ElevatedButton);
         if (buttons.evaluate().isNotEmpty) {
@@ -55,9 +57,7 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            supabaseClientProvider.overrideWithValue(mockSupabase),
-          ],
+          overrides: [supabaseClientProvider.overrideWithValue(mockSupabase)],
           child: MaterialApp(
             home: Consumer(
               builder: (context, ref, _) {
@@ -66,7 +66,7 @@ void main() {
                 ref.watch(authNotifierProvider);
                 providerReadCount++;
                 stopwatch.stop();
-                
+
                 return Scaffold(
                   body: Center(
                     child: Text('Provider reads: $providerReadCount'),
@@ -85,7 +85,7 @@ void main() {
 
       final avgTime = stopwatch.elapsedMicroseconds / providerReadCount;
       debugPrint('Average provider read time: ${avgTime}μs');
-      
+
       // Verify provider reads are fast
       expect(avgTime, lessThan(1000)); // Less than 1ms per read
     });
@@ -93,9 +93,7 @@ void main() {
     testWidgets('should measure navigation performance', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            supabaseClientProvider.overrideWithValue(mockSupabase),
-          ],
+          overrides: [supabaseClientProvider.overrideWithValue(mockSupabase)],
           child: const app.MyApp(),
         ),
       );
@@ -104,7 +102,7 @@ void main() {
 
       // Measure navigation time
       final stopwatch = Stopwatch();
-      
+
       // Find navigation button
       final createRoomButton = find.text('Créer une partie');
       if (createRoomButton.evaluate().isNotEmpty) {
@@ -112,7 +110,7 @@ void main() {
         await tester.tap(createRoomButton);
         await tester.pumpAndSettle();
         stopwatch.stop();
-        
+
         debugPrint('Navigation time: ${stopwatch.elapsedMilliseconds}ms');
         expect(stopwatch.elapsedMilliseconds, lessThan(500));
       }
@@ -121,7 +119,7 @@ void main() {
     testWidgets('should validate memory efficiency', (tester) async {
       // Track widget count
       final widgetCounts = <Type, int>{};
-      
+
       void countWidgets() {
         final elements = tester.allElements;
         widgetCounts.clear();
@@ -133,16 +131,14 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            supabaseClientProvider.overrideWithValue(mockSupabase),
-          ],
+          overrides: [supabaseClientProvider.overrideWithValue(mockSupabase)],
           child: const app.MyApp(),
         ),
       );
 
       await tester.pumpAndSettle();
       countWidgets();
-      
+
       final initialCount = widgetCounts.values.fold(0, (a, b) => a + b);
       debugPrint('Initial widget count: $initialCount');
 
@@ -169,15 +165,15 @@ void main() {
       const iterations = 1000;
 
       // Example with mock data
-      final testData = List.generate(100, (i) => {
-        'id': 'id_$i',
-        'name': 'Name $i',
-        'value': i,
-        'nested': {
-          'field1': 'value1',
-          'field2': i * 2,
-        }
-      });
+      final testData = List.generate(
+        100,
+        (i) => {
+          'id': 'id_$i',
+          'name': 'Name $i',
+          'value': i,
+          'nested': {'field1': 'value1', 'field2': i * 2},
+        },
+      );
 
       // Measure serialization time
       stopwatch.start();
@@ -189,7 +185,7 @@ void main() {
 
       final avgTime = stopwatch.elapsedMicroseconds / iterations;
       debugPrint('Average serialization time: ${avgTime}μs');
-      
+
       // Verify serialization is efficient
       expect(avgTime, lessThan(100)); // Less than 100μs per operation
     });

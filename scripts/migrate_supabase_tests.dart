@@ -86,7 +86,8 @@ String migrateContent(String content, String filePath) {
     if (importIndex != -1) {
       final endOfImport = migrated.indexOf(';\n', importIndex) + 2;
       final relativePath = calculateRelativePath(filePath);
-      migrated = migrated.substring(0, endOfImport) +
+      migrated =
+          migrated.substring(0, endOfImport) +
           "import '${relativePath}helpers/supabase_test_helpers.dart';\n" +
           migrated.substring(endOfImport);
     }
@@ -104,7 +105,9 @@ String migrateContent(String content, String filePath) {
       replacement: (match) => 'supabase.auth.currentUser',
     ),
     Migration(
-      pattern: RegExp(r'\.auth\.onAuthStateChange\s*\(\s*\(event,\s*session\)\s*'),
+      pattern: RegExp(
+        r'\.auth\.onAuthStateChange\s*\(\s*\(event,\s*session\)\s*',
+      ),
       replacement: (match) => '.auth.onAuthStateChange.listen((data) ',
     ),
 
@@ -138,7 +141,9 @@ String migrateContent(String content, String filePath) {
 
     // Error handling
     Migration(
-      pattern: RegExp(r'if\s*\(\s*response\.error\s*!=\s*null\s*\)\s*\{[^}]+\}'),
+      pattern: RegExp(
+        r'if\s*\(\s*response\.error\s*!=\s*null\s*\)\s*\{[^}]+\}',
+      ),
       replacement: (match) => '''} on PostgrestException catch (error) {
       throw error;
     }
@@ -163,7 +168,8 @@ String migrateContent(String content, String filePath) {
   if (migrated.contains('.execute()')) {
     final index = migrated.indexOf('void main()');
     if (index != -1) {
-      migrated = migrated.substring(0, index) +
+      migrated =
+          migrated.substring(0, index) +
           '''// TODO: Migration Notes
 // 1. Remove all .execute() calls - queries now return directly
 // 2. Replace response.error checks with try-catch PostgrestException

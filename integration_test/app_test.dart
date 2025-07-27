@@ -3,7 +3,7 @@ import 'migration_validation_test.dart' as migration_tests;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  
+
   // Run all integration test suites
   migration_tests.main();
 }

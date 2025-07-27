@@ -12,7 +12,7 @@ void main() {
     setUp(() {
       mockAuth = MockGoTrueClient();
       mockSupabase = createMockSupabaseClient(auth: mockAuth);
-      
+
       // Setup auth stubs
       setupAuthStubs(mockAuth);
     });
@@ -134,18 +134,13 @@ void main() {
       // Execute and expect error
       expect(
         mockSupabase.from('rooms').insert({'code': 'DUP'}).select(),
-        throwsPostgrestException(
-          code: '23505',
-          message: 'duplicate key',
-        ),
+        throwsPostgrestException(code: '23505', message: 'duplicate key'),
       );
     });
 
     test('should handle realtime subscription', () async {
       // Create mock channel
-      final channel = setupRealtimeChannel(
-        topic: 'room:room-123',
-      );
+      final channel = setupRealtimeChannel(topic: 'room:room-123');
 
       // Setup channel return
       when(() => mockSupabase.channel(any())).thenReturn(channel);
@@ -198,10 +193,10 @@ void main() {
     test('should handle auth state changes', () async {
       // Create auth state stream
       final authStateController = StreamController<AuthState>.broadcast();
-      
-      when(() => mockAuth.onAuthStateChange).thenAnswer(
-        (_) => authStateController.stream,
-      );
+
+      when(
+        () => mockAuth.onAuthStateChange,
+      ).thenAnswer((_) => authStateController.stream);
 
       // Listen to auth changes
       final states = <AuthChangeEvent>[];
@@ -211,10 +206,7 @@ void main() {
 
       // Simulate sign in
       authStateController.add(
-        AuthState(
-          event: AuthChangeEvent.signedIn,
-          session: MockSession(),
-        ),
+        AuthState(event: AuthChangeEvent.signedIn, session: MockSession()),
       );
 
       // Wait for async processing
@@ -229,11 +221,11 @@ void main() {
 
     test('should use RealtimeTestHelper for complex scenarios', () async {
       final realtimeHelper = RealtimeTestHelper();
-      
+
       // Setup channel to use helper's stream
       final channel = MockRealtimeChannel();
       final stream = realtimeHelper.getController('test-channel').stream;
-      
+
       // Capture events
       final events = <Map<String, dynamic>>[];
       stream.listen(events.add);
@@ -243,21 +235,14 @@ void main() {
         channel: 'test-channel',
         table: 'rooms',
         eventType: 'INSERT',
-        newRecord: {
-          'id': 'new-room',
-          'code': 'NEW456',
-          'status': 'waiting',
-        },
+        newRecord: {'id': 'new-room', 'code': 'NEW456', 'status': 'waiting'},
       );
 
       // Simulate broadcast
       realtimeHelper.simulateBroadcast(
         channel: 'test-channel',
         event: 'game_update',
-        payload: {
-          'action': 'player_joined',
-          'playerId': 'player-123',
-        },
+        payload: {'action': 'player_joined', 'playerId': 'player-123'},
       );
 
       // Wait for async processing

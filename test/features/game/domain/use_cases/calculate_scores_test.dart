@@ -2,8 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ojyx/features/game/domain/use_cases/calculate_scores.dart';
 import 'package:ojyx/features/game/domain/entities/game_state.dart';
 import 'package:ojyx/features/game/domain/entities/game_player.dart';
+import 'package:ojyx/features/game/domain/entities/player_state.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
+import 'package:ojyx/features/game/domain/entities/deck_state.dart';
+import 'package:ojyx/features/game/domain/entities/play_direction.dart';
+import '../../../../helpers/test_data_builders.dart';
+import '../../../../helpers/custom_matchers.dart';
 
 void main() {
   late CalculateScores calculateScores;
@@ -12,460 +17,477 @@ void main() {
     calculateScores = CalculateScores();
   });
 
-  group('Competitive Score Calculation for Strategic Game Ranking', () {
-    test(
-      'should provide comprehensive competitive scoring and ranking system for strategic game conclusion',
-      () async {
-        // Test behavior: scoring system determines winners and provides fair competitive rankings based on strategic performance
+  group('CalculateScores Use Case', () {
+    // Test constants for clarity
+    const int NEGATIVE_BONUS_VALUE = -2;
+    const int ZERO_VALUE = 0;
+    const int LOW_PENALTY_VALUE = 3;
+    const int MEDIUM_PENALTY_VALUE = 7;
+    const int HIGH_PENALTY_VALUE = 10;
+    const double PENALTY_MULTIPLIER = 2.0;
 
-        final competitivePlayerScenarios = [
-          // Strategic winner with optimal play
-          GamePlayer(
-            id: 'strategic-winner-123',
-            name: 'Elite Strategic Player',
-            grid: PlayerGrid.empty()
-                .placeCard(
-                  const Card(value: -2, isRevealed: true),
-                  0,
-                  0,
-                ) // Bonus points
-                .placeCard(
-                  const Card(value: -1, isRevealed: true),
-                  0,
-                  1,
-                ) // Bonus points
-                .placeCard(
-                  const Card(value: 0, isRevealed: true),
-                  1,
-                  0,
-                ), // Neutral
-            isHost: false,
-            scoreMultiplier: 1,
-          ),
-
-          // Average competitive performance
-          GamePlayer(
-            id: 'competitive-player-456',
-            name: 'Tactical Competitor',
-            grid: PlayerGrid.empty()
-                .placeCard(const Card(value: 5, isRevealed: true), 0, 0)
-                .placeCard(const Card(value: 3, isRevealed: true), 0, 1)
-                .placeCard(
-                  const Card(value: 8, isRevealed: false),
-                  1,
-                  0,
-                ), // Hidden card
-            isHost: false,
-            scoreMultiplier: 1,
-          ),
-
-          // Host with penalty multiplier
-          GamePlayer(
-            id: 'penalized-host-789',
-            name: 'Tournament Organizer',
-            grid: PlayerGrid.empty()
-                .placeCard(const Card(value: 6, isRevealed: true), 0, 0)
-                .placeCard(const Card(value: 4, isRevealed: true), 0, 1),
-            isHost: true,
-            scoreMultiplier: 2, // Double penalty for initiating round
-          ),
-
-          // Player with mixed revealed/hidden strategy
-          GamePlayer(
-            id: 'strategic-player-999',
-            name: 'Mixed Strategy Player',
-            grid: PlayerGrid.empty()
-                .placeCard(const Card(value: 10, isRevealed: true), 0, 0)
-                .placeCard(const Card(value: -2, isRevealed: true), 0, 1)
-                .placeCard(
-                  const Card(value: 12, isRevealed: false),
-                  1,
-                  0,
-                ) // High hidden value
-                .placeCard(
-                  const Card(value: 1, isRevealed: false),
-                  1,
-                  1,
-                ), // Low hidden value
-            isHost: false,
-            scoreMultiplier: 1,
-          ),
-        ];
-
-        final competitiveGameState = GameState.initial(
-          roomId: 'tournament-arena-555',
-          players: competitivePlayerScenarios,
-        );
-
-        // Competitive ranking calculation - revealed cards only (standard endgame)
-        final revealedScoresResult = await calculateScores(
-          CalculateScoresParams(
-            gameState: competitiveGameState,
-            onlyRevealed: true,
-            sorted: true,
-          ),
-        );
-
-        expect(
-          revealedScoresResult.isRight(),
-          true,
-          reason: 'Scoring calculation should succeed for competitive ranking',
-        );
-
-        revealedScoresResult.fold(
-          (failure) => fail('Competitive scoring should not fail'),
-          (rankedScores) {
-            final competitiveRanking = rankedScores.entries.toList();
-
-            // Strategic winner should rank first (lowest score)
-            expect(
-              competitiveRanking[0].key,
-              'strategic-winner-123',
-              reason: 'Strategic player with bonus cards should win',
-            );
-            expect(
-              competitiveRanking[0].value,
-              -3,
-              reason: 'Bonus cards should provide competitive advantage',
-            );
-
-            // Tactical player should rank second
-            expect(
-              competitiveRanking[1].key,
-              'competitive-player-456',
-              reason: 'Moderate performance should rank in middle',
-            );
-            expect(
-              competitiveRanking[1].value,
-              8,
-              reason: 'Standard scoring should reflect revealed card values',
-            );
-
-            // Mixed strategy player should rank third
-            expect(
-              competitiveRanking[2].key,
-              'strategic-player-999',
-              reason: 'Mixed strategy should rank based on revealed cards',
-            );
-            expect(
-              competitiveRanking[2].value,
-              8,
-              reason: 'Only revealed cards count for strategic ranking',
-            );
-
-            // Penalized host should rank last (highest score due to multiplier)
-            expect(
-              competitiveRanking[3].key,
-              'penalized-host-789',
-              reason: 'Host penalty should affect competitive ranking',
-            );
-            expect(
-              competitiveRanking[3].value,
-              20,
-              reason: 'Score multiplier should penalize round initiator',
-            );
-          },
-        );
-
-        // Complete scoring calculation - all cards (for detailed analysis)
-        final completeScoresResult = await calculateScores(
-          CalculateScoresParams(
-            gameState: competitiveGameState,
-            onlyRevealed: false,
-            sorted: false,
-          ),
-        );
-
-        expect(
-          completeScoresResult.isRight(),
-          true,
-          reason: 'Complete scoring should succeed for analysis',
-        );
-
-        completeScoresResult.fold(
-          (failure) => fail('Complete scoring should not fail'),
-          (allScores) {
-            expect(
-              allScores['strategic-winner-123'],
-              -3,
-              reason:
-                  'Strategic winner maintains advantage with complete scoring',
-            );
-            expect(
-              allScores['competitive-player-456'],
-              16,
-              reason: 'Complete scoring includes hidden cards for analysis',
-            );
-            expect(
-              allScores['strategic-player-999'],
-              21,
-              reason: 'Hidden high-value cards affect complete analysis',
-            );
-            expect(
-              allScores['penalized-host-789'],
-              20,
-              reason: 'Host penalty applies regardless of calculation method',
-            );
-          },
-        );
-      },
-    );
-
-    group('should handle specialized competitive scoring scenarios', () {
+    group('Basic Score Calculation', () {
       test(
-        'when players achieve negative scores through strategic bonus card collection',
+        'should_calculate_sum_of_revealed_cards_when_only_revealed_is_true',
         () async {
-          // Test behavior: negative scores should be properly handled for competitive advantage
+          // Arrange
+          final playerGrid = PlayerGridBuilder().withCards([
+            CardBuilder().withValue(LOW_PENALTY_VALUE).revealed().build(),
+            CardBuilder().withValue(MEDIUM_PENALTY_VALUE).revealed().build(),
+            CardBuilder()
+                .withValue(HIGH_PENALTY_VALUE)
+                .hidden()
+                .build(), // Should be ignored
+          ]).build();
 
-          final bonusCardMaster = GamePlayer(
-            id: 'bonus-specialist-123',
-            name: 'Bonus Card Specialist',
-            grid: PlayerGrid.empty()
-                .placeCard(const Card(value: -2, isRevealed: true), 0, 0)
-                .placeCard(const Card(value: -2, isRevealed: true), 0, 1)
-                .placeCard(const Card(value: -1, isRevealed: true), 1, 0)
-                .placeCard(
-                  const Card(value: 3, isRevealed: true),
-                  1,
-                  1,
-                ), // One penalty card
-            isHost: false,
-          );
+          final playerState = PlayerStateBuilder()
+              .withPlayerId('player-1')
+              .withGrid(playerGrid)
+              .build();
 
-          final gameState = GameState.initial(
-            roomId: 'bonus-test-room',
-            players: [bonusCardMaster],
-          );
+          final gameState = GameStateBuilder()
+              .withPlayers([GamePlayerBuilder().withId('player-1').build()])
+              .withPlayerStates({'player-1': playerState})
+              .build();
 
+          // Act
           final result = await calculateScores(
-            CalculateScoresParams(gameState: gameState),
+            CalculateScoresParams(
+              gameState: gameState,
+              onlyRevealed: true,
+              sorted: false,
+            ),
           );
 
+          // Assert
           expect(
             result.isRight(),
             true,
-            reason: 'Negative score calculation should succeed',
+            reason: 'Score calculation should succeed for valid game state',
           );
-          result.fold((failure) => fail('Bonus scoring should not fail'), (
-            scores,
-          ) {
-            expect(
-              scores['bonus-specialist-123'],
-              -2,
-              reason: 'Negative scores should provide competitive advantage',
-            );
-          });
+
+          result.fold(
+            (failure) => fail('Should not fail with valid parameters'),
+            (scores) {
+              expect(
+                scores['player-1'],
+                LOW_PENALTY_VALUE + MEDIUM_PENALTY_VALUE, // 3 + 7 = 10
+                reason: 'Score should equal sum of revealed card values only',
+              );
+            },
+          );
         },
       );
 
       test(
-        'when only revealed cards contribute to competitive final scoring',
+        'should_calculate_sum_of_all_cards_when_only_revealed_is_false',
         () async {
-          // Test behavior: hidden cards should not affect competitive rankings in standard gameplay
+          // Arrange
+          final playerGrid = PlayerGridBuilder().withCards([
+            CardBuilder().withValue(LOW_PENALTY_VALUE).revealed().build(),
+            CardBuilder().withValue(MEDIUM_PENALTY_VALUE).revealed().build(),
+            CardBuilder().withValue(HIGH_PENALTY_VALUE).hidden().build(),
+          ]).build();
 
-          final strategicPlayer = GamePlayer(
-            id: 'strategic-revealer-456',
-            name: 'Strategic Card Revealer',
-            grid: PlayerGrid.empty()
-                .placeCard(
-                  const Card(value: 10, isRevealed: false),
-                  0,
-                  0,
-                ) // Hidden high penalty
-                .placeCard(
-                  const Card(value: 5, isRevealed: true),
-                  0,
-                  1,
-                ) // Revealed moderate
-                .placeCard(
-                  const Card(value: 8, isRevealed: false),
-                  1,
-                  0,
-                ) // Hidden moderate penalty
-                .placeCard(
-                  const Card(value: 2, isRevealed: true),
-                  1,
-                  1,
-                ), // Revealed low
-            isHost: false,
-          );
+          final playerState = PlayerStateBuilder()
+              .withPlayerId('player-1')
+              .withGrid(playerGrid)
+              .build();
 
-          final gameState = GameState.initial(
-            roomId: 'revealed-test-room',
-            players: [strategicPlayer],
-          );
+          final gameState = GameStateBuilder()
+              .withPlayers([GamePlayerBuilder().withId('player-1').build()])
+              .withPlayerStates({'player-1': playerState})
+              .build();
 
+          // Act
           final result = await calculateScores(
-            CalculateScoresParams(gameState: gameState, onlyRevealed: true),
+            CalculateScoresParams(
+              gameState: gameState,
+              onlyRevealed: false,
+              sorted: false,
+            ),
           );
 
+          // Assert
           expect(
             result.isRight(),
             true,
-            reason: 'Revealed-only scoring should succeed',
+            reason: 'Score calculation should succeed for valid game state',
           );
-          result.fold((failure) => fail('Revealed scoring should not fail'), (
-            scores,
-          ) {
-            expect(
-              scores['strategic-revealer-456'],
-              7,
-              reason:
-                  'Only revealed cards should contribute to competitive score',
-            );
-          });
+
+          result.fold(
+            (failure) => fail('Should not fail with valid parameters'),
+            (scores) {
+              expect(
+                scores['player-1'],
+                LOW_PENALTY_VALUE +
+                    MEDIUM_PENALTY_VALUE +
+                    HIGH_PENALTY_VALUE, // 3 + 7 + 10 = 20
+                reason: 'Score should equal sum of all card values',
+              );
+            },
+          );
         },
       );
 
       test(
-        'when score multipliers apply competitive penalties for round initiation',
+        'should_handle_negative_scores_when_player_has_bonus_cards',
         () async {
-          // Test behavior: multipliers should fairly penalize players who trigger final rounds without winning
+          // Arrange
+          final playerGrid = PlayerGridBuilder().withCards([
+            CardBuilder().withValue(NEGATIVE_BONUS_VALUE).revealed().build(),
+            CardBuilder().withValue(NEGATIVE_BONUS_VALUE).revealed().build(),
+            CardBuilder().withValue(LOW_PENALTY_VALUE).revealed().build(),
+          ]).build();
 
-          final competitiveScenarios = [
-            GamePlayer(
-              id: 'successful-initiator-123',
-              name: 'Successful Round Initiator',
-              grid: PlayerGrid.empty()
-                  .placeCard(const Card(value: 3, isRevealed: true), 0, 0)
-                  .placeCard(const Card(value: 2, isRevealed: true), 0, 1),
-              isHost: false,
-              scoreMultiplier: 1, // No penalty for successful strategy
-            ),
-            GamePlayer(
-              id: 'failed-initiator-456',
-              name: 'Failed Round Initiator',
-              grid: PlayerGrid.empty()
-                  .placeCard(const Card(value: 3, isRevealed: true), 0, 0)
-                  .placeCard(const Card(value: 2, isRevealed: true), 0, 1),
-              isHost: false,
-              scoreMultiplier: 2, // Double penalty for failed strategy
-            ),
-          ];
+          final playerState = PlayerStateBuilder()
+              .withPlayerId('bonus-player')
+              .withGrid(playerGrid)
+              .build();
 
-          final gameState = GameState.initial(
-            roomId: 'multiplier-test-room',
-            players: competitiveScenarios,
-          );
+          final gameState = GameStateBuilder()
+              .withPlayers([GamePlayerBuilder().withId('bonus-player').build()])
+              .withPlayerStates({'bonus-player': playerState})
+              .build();
 
+          // Act
           final result = await calculateScores(
             CalculateScoresParams(gameState: gameState),
           );
 
-          expect(
-            result.isRight(),
-            true,
-            reason: 'Multiplier scoring should succeed',
+          // Assert
+          result.fold(
+            (failure) => fail('Should not fail with negative scores'),
+            (scores) {
+              expect(
+                scores['bonus-player'],
+                NEGATIVE_BONUS_VALUE +
+                    NEGATIVE_BONUS_VALUE +
+                    LOW_PENALTY_VALUE, // -2 + -2 + 3 = -1
+                reason: 'Negative scores should be correctly calculated',
+              );
+            },
           );
-          result.fold((failure) => fail('Multiplier scoring should not fail'), (
+        },
+      );
+    });
+
+    group('Score Multiplier Application', () {
+      test('should_apply_multiplier_when_player_has_penalty', () async {
+        // Arrange
+        final playerGrid = PlayerGridBuilder().withCards([
+          CardBuilder().withValue(LOW_PENALTY_VALUE).revealed().build(),
+          CardBuilder().withValue(MEDIUM_PENALTY_VALUE).revealed().build(),
+        ]).build();
+
+        final playerState = PlayerStateBuilder()
+            .withPlayerId('penalized-player')
+            .withGrid(playerGrid)
+            .build();
+
+        final gameState = GameStateBuilder()
+            .withPlayers([
+              GamePlayerBuilder().withId('penalized-player').build(),
+            ])
+            .withPlayerStates({'penalized-player': playerState})
+            .build()
+            .copyWith(
+              playerStates: {
+                'penalized-player': playerState.copyWith(
+                  scoreMultiplier: PENALTY_MULTIPLIER,
+                ),
+              },
+            );
+
+        // Act
+        final result = await calculateScores(
+          CalculateScoresParams(gameState: gameState),
+        );
+
+        // Assert
+        result.fold((failure) => fail('Should not fail with multiplier'), (
+          scores,
+        ) {
+          final baseScore = LOW_PENALTY_VALUE + MEDIUM_PENALTY_VALUE; // 10
+          final expectedScore = (baseScore * PENALTY_MULTIPLIER).toInt(); // 20
+
+          expect(
+            scores['penalized-player'],
+            expectedScore,
+            reason: 'Score should be multiplied by penalty factor',
+          );
+        });
+      });
+
+      test('should_not_apply_multiplier_when_multiplier_is_one', () async {
+        // Arrange
+        final playerGrid = PlayerGridBuilder().withCards([
+          CardBuilder().withValue(LOW_PENALTY_VALUE).revealed().build(),
+          CardBuilder().withValue(MEDIUM_PENALTY_VALUE).revealed().build(),
+        ]).build();
+
+        final playerState = PlayerStateBuilder()
+            .withPlayerId('normal-player')
+            .withGrid(playerGrid)
+            .build();
+
+        final gameState = GameStateBuilder()
+            .withPlayers([GamePlayerBuilder().withId('normal-player').build()])
+            .withPlayerStates({'normal-player': playerState})
+            .build();
+
+        // Act
+        final result = await calculateScores(
+          CalculateScoresParams(gameState: gameState),
+        );
+
+        // Assert
+        result.fold(
+          (failure) => fail('Should not fail with normal multiplier'),
+          (scores) {
+            expect(
+              scores['normal-player'],
+              LOW_PENALTY_VALUE + MEDIUM_PENALTY_VALUE, // 10
+              reason: 'Score should not be multiplied when multiplier is 1',
+            );
+          },
+        );
+      });
+    });
+
+    group('Sorted Rankings', () {
+      test('should_return_sorted_scores_when_sorted_is_true', () async {
+        // Arrange
+        final player1State = PlayerStateBuilder()
+            .withPlayerId('player-1')
+            .withGrid(
+              PlayerGridBuilder().withCards([
+                CardBuilder().withValue(HIGH_PENALTY_VALUE).revealed().build(),
+              ]).build(),
+            )
+            .build();
+
+        final player2State = PlayerStateBuilder()
+            .withPlayerId('player-2')
+            .withGrid(
+              PlayerGridBuilder().withCards([
+                CardBuilder().withValue(LOW_PENALTY_VALUE).revealed().build(),
+              ]).build(),
+            )
+            .build();
+
+        final player3State = PlayerStateBuilder()
+            .withPlayerId('player-3')
+            .withGrid(
+              PlayerGridBuilder().withCards([
+                CardBuilder()
+                    .withValue(MEDIUM_PENALTY_VALUE)
+                    .revealed()
+                    .build(),
+              ]).build(),
+            )
+            .build();
+
+        final gameState = GameStateBuilder()
+            .withPlayers([
+              GamePlayerBuilder().withId('player-1').build(),
+              GamePlayerBuilder().withId('player-2').build(),
+              GamePlayerBuilder().withId('player-3').build(),
+            ])
+            .withPlayerStates({
+              'player-1': player1State,
+              'player-2': player2State,
+              'player-3': player3State,
+            })
+            .build();
+
+        // Act
+        final result = await calculateScores(
+          CalculateScoresParams(gameState: gameState, sorted: true),
+        );
+
+        // Assert
+        result.fold((failure) => fail('Should not fail when sorting'), (
+          scores,
+        ) {
+          final rankedPlayers = scores.entries.toList();
+
+          expect(
+            rankedPlayers[0].key,
+            'player-2',
+            reason: 'Player with lowest score should rank first',
+          );
+          expect(
+            rankedPlayers[0].value,
+            LOW_PENALTY_VALUE,
+            reason: 'First place score should be lowest',
+          );
+
+          expect(
+            rankedPlayers[1].key,
+            'player-3',
+            reason: 'Player with middle score should rank second',
+          );
+          expect(
+            rankedPlayers[1].value,
+            MEDIUM_PENALTY_VALUE,
+            reason: 'Second place score should be middle value',
+          );
+
+          expect(
+            rankedPlayers[2].key,
+            'player-1',
+            reason: 'Player with highest score should rank last',
+          );
+          expect(
+            rankedPlayers[2].value,
+            HIGH_PENALTY_VALUE,
+            reason: 'Last place score should be highest',
+          );
+        });
+      });
+
+      test('should_maintain_insertion_order_when_sorted_is_false', () async {
+        // Arrange
+        final player1State = PlayerStateBuilder()
+            .withPlayerId('player-1')
+            .withGrid(
+              PlayerGridBuilder().withCards([
+                CardBuilder().withValue(HIGH_PENALTY_VALUE).revealed().build(),
+              ]).build(),
+            )
+            .build();
+
+        final player2State = PlayerStateBuilder()
+            .withPlayerId('player-2')
+            .withGrid(
+              PlayerGridBuilder().withCards([
+                CardBuilder().withValue(LOW_PENALTY_VALUE).revealed().build(),
+              ]).build(),
+            )
+            .build();
+
+        final gameState = GameStateBuilder()
+            .withPlayers([
+              GamePlayerBuilder().withId('player-1').build(),
+              GamePlayerBuilder().withId('player-2').build(),
+            ])
+            .withPlayerStates({
+              'player-1': player1State,
+              'player-2': player2State,
+            })
+            .build();
+
+        // Act
+        final result = await calculateScores(
+          CalculateScoresParams(gameState: gameState, sorted: false),
+        );
+
+        // Assert
+        result.fold((failure) => fail('Should not fail when not sorting'), (
+          scores,
+        ) {
+          final playerIds = scores.keys.toList();
+
+          expect(
+            playerIds,
+            ['player-1', 'player-2'],
+            reason:
+                'Order should match game state player order when not sorted',
+          );
+        });
+      });
+    });
+
+    group('Edge Cases and Error Handling', () {
+      test('should_handle_empty_player_grid_when_calculating_scores', () async {
+        // Arrange
+        final playerState = PlayerStateBuilder()
+            .withPlayerId('empty-grid-player')
+            .withGrid(PlayerGridBuilder().withCards([]).build())
+            .build();
+
+        final gameState = GameStateBuilder()
+            .withPlayers([
+              GamePlayerBuilder().withId('empty-grid-player').build(),
+            ])
+            .withPlayerStates({'empty-grid-player': playerState})
+            .build();
+
+        // Act
+        final result = await calculateScores(
+          CalculateScoresParams(gameState: gameState),
+        );
+
+        // Assert
+        result.fold((failure) => fail('Should handle empty grid gracefully'), (
+          scores,
+        ) {
+          expect(
+            scores['empty-grid-player'],
+            0,
+            reason: 'Empty grid should result in score of 0',
+          );
+        });
+      });
+
+      test(
+        'should_calculate_scores_for_multiple_players_independently',
+        () async {
+          // Arrange
+          final player1State = PlayerStateBuilder()
+              .withPlayerId('player-1')
+              .withGrid(
+                PlayerGridBuilder().withCards([
+                  CardBuilder().withValue(5).revealed().build(),
+                  CardBuilder().withValue(3).revealed().build(),
+                ]).build(),
+              )
+              .build();
+
+          final player2State = PlayerStateBuilder()
+              .withPlayerId('player-2')
+              .withGrid(
+                PlayerGridBuilder().withCards([
+                  CardBuilder().withValue(-2).revealed().build(),
+                  CardBuilder().withValue(7).revealed().build(),
+                ]).build(),
+              )
+              .build();
+
+          final gameState = GameStateBuilder()
+              .withPlayers([
+                GamePlayerBuilder().withId('player-1').build(),
+                GamePlayerBuilder().withId('player-2').build(),
+              ])
+              .withPlayerStates({
+                'player-1': player1State,
+                'player-2': player2State,
+              })
+              .build();
+
+          // Act
+          final result = await calculateScores(
+            CalculateScoresParams(gameState: gameState),
+          );
+
+          // Assert
+          result.fold((failure) => fail('Should calculate all player scores'), (
             scores,
           ) {
             expect(
-              scores['successful-initiator-123'],
-              5,
-              reason: 'Successful initiator should receive standard scoring',
+              scores['player-1'],
+              8, // 5 + 3
+              reason: 'Player 1 score should be calculated independently',
             );
             expect(
-              scores['failed-initiator-456'],
-              10,
-              reason: 'Failed initiator should receive penalty multiplier',
+              scores['player-2'],
+              5, // -2 + 7
+              reason: 'Player 2 score should be calculated independently',
             );
           });
         },
       );
     });
-
-    test(
-      'should provide sorted competitive rankings for tournament organization and winner determination',
-      () async {
-        // Test behavior: ranking system should organize players from best to worst performance for competitive clarity
-
-        final tournamentPlayers = [
-          GamePlayer(
-            id: 'third-place-789',
-            name: 'Bronze Medal Player',
-            grid: PlayerGrid.empty().placeCard(
-              const Card(value: 10, isRevealed: true),
-              0,
-              0,
-            ),
-            isHost: false,
-          ),
-          GamePlayer(
-            id: 'champion-123',
-            name: 'Gold Medal Winner',
-            grid: PlayerGrid.empty().placeCard(
-              const Card(value: 3, isRevealed: true),
-              0,
-              0,
-            ),
-            isHost: false,
-          ),
-          GamePlayer(
-            id: 'runner-up-456',
-            name: 'Silver Medal Player',
-            grid: PlayerGrid.empty().placeCard(
-              const Card(value: 7, isRevealed: true),
-              0,
-              0,
-            ),
-            isHost: false,
-          ),
-        ];
-
-        final tournamentGameState = GameState.initial(
-          roomId: 'tournament-finals',
-          players: tournamentPlayers,
-        );
-
-        final result = await calculateScores(
-          CalculateScoresParams(gameState: tournamentGameState, sorted: true),
-        );
-
-        expect(
-          result.isRight(),
-          true,
-          reason: 'Tournament ranking should succeed',
-        );
-        result.fold((failure) => fail('Tournament ranking should not fail'), (
-          tournamentRanking,
-        ) {
-          final rankedResults = tournamentRanking.entries.toList();
-
-          expect(
-            rankedResults[0].key,
-            'champion-123',
-            reason: 'Lowest score should achieve first place',
-          );
-          expect(
-            rankedResults[0].value,
-            3,
-            reason: 'Champion should have best competitive score',
-          );
-
-          expect(
-            rankedResults[1].key,
-            'runner-up-456',
-            reason: 'Second lowest score should achieve second place',
-          );
-          expect(
-            rankedResults[1].value,
-            7,
-            reason: 'Runner-up should have intermediate competitive score',
-          );
-
-          expect(
-            rankedResults[2].key,
-            'third-place-789',
-            reason: 'Highest score should achieve last place',
-          );
-          expect(
-            rankedResults[2].value,
-            10,
-            reason: 'Third place should have highest competitive score',
-          );
-        });
-      },
-    );
   });
 }

@@ -1043,7 +1043,7 @@
               "16.1"
             ],
             "details": "1. Identifier tous les tests dans lib/features/*/domain/\n2. Pour chaque fichier de test:\n   - Renommer selon 'should_[expected]_when_[condition]'\n   - Restructurer avec sections Arrange/Act/Assert commentées\n   - Remplacer les données en dur par des Test Data Builders\n   - Extraire les constantes (ex: MAX_CARDS = 12)\n3. Exemples de refactoring:\n   - 'test card validation' → 'should_return_error_when_card_value_exceeds_maximum'\n   - Utiliser CardBuilder().withValue(15).build() au lieu de Card(value: 15)\n4. Améliorer les assertions:\n   - expect(result.isError, isTrue, reason: 'Card validation should fail for value > 13')\n5. Grouper les tests par fonctionnalité avec group()",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Exécuter chaque test refactorisé en mode verbose pour vérifier la clarté des messages. Introduire des erreurs volontaires pour valider que les tests échouent avec des messages explicites"
           },
           {
@@ -1094,7 +1094,7 @@
         "dependencies": [
           16
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -1111,7 +1111,7 @@
             "description": "Adapter tous les tests utilisant Riverpod pour utiliser riverpod_test et les nouvelles APIs de la version 2.6.1",
             "dependencies": [],
             "details": "1. Remplacer les imports mockito par riverpod_test:\n   - Installer riverpod_test: ^2.0.0\n   - Remplacer MockProviderContainer par TestProviderContainer\n   - Utiliser les nouveaux ProviderScope.overrides\n2. Migrer les tests de providers:\n   - Utiliser createContainer() au lieu de ProviderContainer()\n   - Adapter les overrides avec la nouvelle syntaxe\n   - Implémenter les AsyncNotifier mocks correctement\n3. Adapter les widget tests avec Riverpod:\n   - Utiliser testWidgets avec ProviderScope wrapper\n   - Implémenter les nouveaux patterns pour tester les ConsumerWidget\n   - Créer des helpers pour les tests de ConsumerStatefulWidget\n4. Mettre à jour les tests d'état:\n   - Utiliser container.listen() pour observer les changements\n   - Tester les AsyncValue.guard patterns\n   - Vérifier les AutoDispose providers\n5. Créer riverpod_test_helpers.dart avec des utilities réutilisables",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Commencer par les tests des providers critiques (auth, game state). Utiliser flutter test test/providers --coverage pour identifier les zones non couvertes. Documenter les nouveaux patterns dans test/README.md."
           },
           {
@@ -1123,7 +1123,7 @@
               "17.2"
             ],
             "details": "1. Installer et configurer go_router_test:\n   - Ajouter go_router_test: ^15.0.0 aux dev_dependencies\n   - Importer MockGoRouter et les helpers de test\n   - Configurer les mocks de navigation de base\n2. Adapter les tests de routes:\n   - Utiliser les nouveaux matchers pour tester les routes\n   - Tester StatefulShellRoute avec les états préservés\n   - Vérifier les routes imbriquées avec la nouvelle syntaxe\n3. Migrer les tests de guards:\n   - Tester les nouveaux onEnter/onExit callbacks\n   - Implémenter des tests pour les guards asynchrones\n   - Vérifier les redirections avec NavigationObserver\n4. Adapter les tests de deep links:\n   - Utiliser les nouveaux patterns pour pathParameters\n   - Tester queryParameters et extra objects\n   - Vérifier la navigation avec goNamed vs go\n5. Créer go_router_test_utils.dart avec des factories de routes mockées",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Tester d'abord les routes critiques (auth flow, game flow). Utiliser des tests d'intégration pour valider les parcours utilisateur complets. Documenter les cas de test de navigation complexes."
           },
           {
@@ -1136,7 +1136,7 @@
               "17.3"
             ],
             "details": "1. Installer et configurer supabase_test:\n   - Ajouter supabase_test: ^3.0.0 aux dev_dependencies\n   - Configurer MockSupabaseClient avec les nouvelles options\n   - Créer des fixtures pour les réponses Supabase\n2. Adapter les tests d'authentification:\n   - Mocker signInWithPassword() au lieu de signIn()\n   - Tester onAuthStateChange avec les nouveaux events\n   - Implémenter les tests de refresh token automatique\n3. Migrer les tests de database:\n   - Retirer les .execute() obsolètes des tests\n   - Utiliser .single() et .maybeSingle() dans les assertions\n   - Tester les nouvelles erreurs typées PostgrestException\n4. Adapter les tests realtime:\n   - Mocker les nouveaux RealtimeChannel\n   - Tester subscribe() avec les callbacks modernes\n   - Vérifier les presence et broadcast features\n5. Créer supabase_test_helpers.dart avec des builders de réponses mockées",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Prioriser les tests critiques: auth anonyme, sync des parties, realtime updates. Créer des scénarios de test end-to-end simulant des parties complètes. Utiliser des fixtures JSON pour les données de test."
           },
           {
@@ -1150,7 +1150,7 @@
               "17.4"
             ],
             "details": "1. Créer integration_test/migration_validation_test.dart:\n   - Test complet du flow d'authentification anonyme\n   - Test de création et synchronisation de partie\n   - Test de navigation entre tous les écrans\n   - Test des modèles Freezed avec données réelles\n2. Implémenter des tests de performance:\n   - Mesurer les temps de démarrage de l'app\n   - Vérifier la consommation mémoire avec les nouvelles versions\n   - Tester les rebuilds Riverpod et optimisations\n3. Créer des tests de régression:\n   - Comparer les comportements avant/après migration\n   - Vérifier la rétrocompatibilité des données\n   - Tester les edge cases identifiés durant la migration\n4. Documenter les helpers de test:\n   - Créer test/helpers/README.md avec exemples\n   - Fournir des templates pour nouveaux tests\n   - Lister les patterns de test recommandés\n5. Configurer CI/CD pour les nouveaux tests:\n   - Adapter les GitHub Actions pour les tests d'intégration\n   - Configurer les rapports de couverture détaillés\n   - Mettre en place des benchmarks de performance",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Exécuter flutter test --coverage --merge-coverage pour obtenir une vue globale. Viser minimum 85% de couverture. Utiliser flutter drive pour les tests d'intégration sur émulateur. Documenter tous les cas de test critiques."
           }
         ]
@@ -1436,7 +1436,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-27T05:31:20.157Z",
+      "updated": "2025-07-27T06:49:42.058Z",
       "description": "Tasks for master context"
     }
   }

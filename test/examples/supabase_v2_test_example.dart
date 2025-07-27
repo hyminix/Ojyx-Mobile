@@ -12,7 +12,7 @@ void main() {
     setUp(() {
       mockAuth = MockGoTrueClient();
       mockSupabase = createMockSupabaseClient(auth: mockAuth);
-      
+
       // Setup auth stubs
       setupAuthStubs(mockAuth);
     });
@@ -131,12 +131,12 @@ void main() {
       // Test anonymous sign in
       final mockAuthResponse = MockAuthResponse();
       final mockSession = MockSession();
-      
+
       when(() => mockAuthResponse.user).thenReturn(mockUser);
       when(() => mockAuthResponse.session).thenReturn(mockSession);
-      when(() => mockAuth.signInAnonymously()).thenAnswer(
-        (_) async => mockAuthResponse,
-      );
+      when(
+        () => mockAuth.signInAnonymously(),
+      ).thenAnswer((_) async => mockAuthResponse);
 
       final authResponse = await mockSupabase.auth.signInAnonymously();
       expect(authResponse.user, isNotNull);
@@ -145,7 +145,7 @@ void main() {
     test('should test v2 to v3 migration pattern', () async {
       // V2 pattern with execute()
       final roomDataV2 = [SupabaseTestFixtures.createRoomFixture()];
-      
+
       setupQueryBuilder(
         client: mockSupabase,
         table: 'rooms',
@@ -158,7 +158,7 @@ void main() {
           .select()
           .eq('code', 'TEST')
           .execute();
-      
+
       expect(responseV2.data, roomDataV2);
 
       // V3 way (using then() which is also stubbed)
@@ -166,23 +166,23 @@ void main() {
           .from('rooms')
           .select()
           .eq('code', 'TEST');
-      
+
       expect(responseV3, roomDataV2);
     });
 
     test('should handle error checking patterns', () async {
       // V2 pattern - check response.error
       final mockResponse = MockPostgrestResponse();
-      when(() => mockResponse.error).thenReturn(
-        PostgrestException(message: 'Not found', code: '404'),
-      );
+      when(
+        () => mockResponse.error,
+      ).thenReturn(PostgrestException(message: 'Not found', code: '404'));
       when(() => mockResponse.data).thenReturn(null);
 
       // In real v2 code, you would check:
-      // if (response.error != null) { 
+      // if (response.error != null) {
       //   throw response.error!;
       // }
-      
+
       expect(mockResponse.error, isNotNull);
       expect(mockResponse.error!.message, 'Not found');
     });

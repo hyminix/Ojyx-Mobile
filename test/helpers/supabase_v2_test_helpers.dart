@@ -18,7 +18,7 @@ class MockUser extends Mock implements User {
 /// Mock implementation for Session
 class MockSession extends Mock implements Session {}
 
-/// Mock implementation for AuthResponse  
+/// Mock implementation for AuthResponse
 class MockAuthResponse extends Mock implements AuthResponse {}
 
 /// Mock implementation for PostgrestResponse
@@ -35,9 +35,7 @@ class MockSupabaseQueryBuilder extends Mock implements SupabaseQueryBuilder {}
 class MockRealtimeChannel extends Mock implements RealtimeChannel {}
 
 /// Helper to create a test SupabaseClient with all mocks configured
-MockSupabaseClient createMockSupabaseClient({
-  MockGoTrueClient? auth,
-}) {
+MockSupabaseClient createMockSupabaseClient({MockGoTrueClient? auth}) {
   final client = MockSupabaseClient();
   final mockAuth = auth ?? MockGoTrueClient();
 
@@ -56,7 +54,9 @@ void setupAuthStubs(MockGoTrueClient auth, {User? currentUser}) {
 
   // Auth state changes stream
   final authStateController = StreamController<AuthState>.broadcast();
-  when(() => auth.onAuthStateChange).thenAnswer((_) => authStateController.stream);
+  when(
+    () => auth.onAuthStateChange,
+  ).thenAnswer((_) => authStateController.stream);
 
   // Sign in methods
   when(
@@ -66,9 +66,9 @@ void setupAuthStubs(MockGoTrueClient auth, {User? currentUser}) {
     ),
   ).thenAnswer((_) async => MockAuthResponse());
 
-  when(() => auth.signInAnonymously()).thenAnswer(
-    (_) async => MockAuthResponse(),
-  );
+  when(
+    () => auth.signInAnonymously(),
+  ).thenAnswer((_) async => MockAuthResponse());
 
   // Sign out
   when(() => auth.signOut()).thenAnswer((_) async {});
@@ -117,11 +117,14 @@ void setupFilterBuilderStubs<T>(
   when(() => filterBuilder.ilike(any(), any())).thenReturn(filterBuilder);
   when(() => filterBuilder.match(any())).thenReturn(filterBuilder);
   when(() => filterBuilder.or(any())).thenReturn(filterBuilder);
-  when(() => filterBuilder.filter(any(), any(), any())).thenReturn(filterBuilder);
+  when(
+    () => filterBuilder.filter(any(), any(), any()),
+  ).thenReturn(filterBuilder);
 
   // Order and limit
-  when(() => filterBuilder.order(any(), ascending: any(named: 'ascending')))
-      .thenReturn(filterBuilder);
+  when(
+    () => filterBuilder.order(any(), ascending: any(named: 'ascending')),
+  ).thenReturn(filterBuilder);
   when(() => filterBuilder.limit(any())).thenReturn(filterBuilder);
   when(() => filterBuilder.range(any(), any())).thenReturn(filterBuilder);
 
@@ -138,7 +141,7 @@ void setupFilterBuilderStubs<T>(
 
     // Execute returns response
     when(() => filterBuilder.execute()).thenAnswer((_) async => mockResponse);
-    
+
     // Single is chainable and affects the response
     when(() => filterBuilder.single()).thenReturn(filterBuilder);
   }
@@ -217,10 +220,7 @@ class SupabaseTestFixtures {
 /// Extension to add async error matchers
 extension AsyncErrorMatchers on Future {
   /// Verify that a future throws a PostgrestException
-  Future<void> throwsPostgrestException({
-    String? code,
-    String? message,
-  }) async {
+  Future<void> throwsPostgrestException({String? code, String? message}) async {
     try {
       await this;
       fail('Expected PostgrestException but no exception was thrown');
@@ -289,10 +289,7 @@ class RealtimeTestHelper {
     required Map<String, dynamic> payload,
   }) {
     final controller = getController(channel);
-    controller.add({
-      'event': event,
-      'payload': payload,
-    });
+    controller.add({'event': event, 'payload': payload});
   }
 
   /// Clean up all controllers
