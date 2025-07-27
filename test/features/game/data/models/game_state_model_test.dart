@@ -5,11 +5,18 @@ import 'package:ojyx/features/game/domain/entities/game_player.dart';
 import 'package:ojyx/features/game/domain/entities/card.dart';
 import 'package:ojyx/features/game/domain/entities/action_card.dart';
 import 'package:ojyx/features/game/domain/entities/player_grid.dart';
+import 'package:ojyx/features/game/domain/entities/player_state.dart';
+import 'package:ojyx/features/game/domain/entities/deck_state.dart';
+import 'package:ojyx/features/game/domain/entities/play_direction.dart';
+import '../../../../helpers/test_data_builders_simple.dart';
 
 void main() {
   group('GameStateModel', () {
-    late GameState testGameState;
-    late DateTime testDateTime;
+    // Test data constants
+    const TEST_GAME_ID = 'test-game-123';
+    const TEST_ROOM_ID = 'test-room-456';
+    const TEST_PLAYER_1_ID = 'player-1';
+    const TEST_PLAYER_2_ID = 'player-2';
 
     setUp(() {
       testDateTime = DateTime.now();
