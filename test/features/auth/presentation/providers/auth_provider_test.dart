@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../helpers/riverpod_test_helpers.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
@@ -30,13 +31,9 @@ void main() {
 
     when(() => mockSupabaseClient.auth).thenReturn(mockAuth);
 
-    container = ProviderContainer(
+    container = createTestContainer(
       overrides: [supabaseClientProvider.overrideWithValue(mockSupabaseClient)],
     );
-  });
-
-  tearDown(() {
-    container.dispose();
   });
 
   group('AuthNotifier', () {

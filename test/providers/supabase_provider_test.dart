@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../helpers/riverpod_test_helpers.dart';
 import 'package:ojyx/core/providers/supabase_provider.dart' as legacy;
 import 'package:ojyx/core/providers/supabase_provider_v2.dart' as modern;
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,7 +16,7 @@ void main() {
     });
 
     test('legacy provider should provide SupabaseClient', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final client = container.read(legacy.supabaseClientProvider);
 
       expect(client, isNotNull);
@@ -25,7 +26,7 @@ void main() {
     });
 
     test('modern provider should provide same SupabaseClient', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final client = container.read(modern.supabaseClientProvider);
 
       expect(client, isNotNull);
@@ -36,8 +37,7 @@ void main() {
     });
 
     test('both providers should return the same instance', () {
-      final container = ProviderContainer();
-
+      final container = createTestContainer();
       // Note: In real migration, we'd import only one
       // This is just to verify they work the same way
       final legacyClient = container.read(legacy.supabaseClientProvider);

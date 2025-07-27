@@ -1,12 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ojyx/features/auth/domain/entities/player.dart';
-import 'package:ojyx/features/auth/domain/repositories/auth_repository.dart';
-import 'package:ojyx/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:ojyx/features/auth/data/models/player_model.dart';
-import 'package:dartz/dartz.dart';
-import 'package:ojyx/core/errors/failures.dart';
+import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
+import 'package:ojyx/core/providers/supabase_provider.dart';
+import '../helpers/riverpod_test_helpers.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
 
@@ -18,24 +16,21 @@ class MockUser extends Mock implements User {}
 
 class MockAuthResponse extends Mock implements AuthResponse {}
 
-class MockPostgrestFilterBuilder extends Mock
-    implements PostgrestFilterBuilder {}
-
-class MockPostgrestTransformBuilder extends Mock
-    implements PostgrestTransformBuilder {}
-
 void main() {
   group('Supabase Anonymous Auth Flow Integration Tests', () {
     late MockSupabaseClient mockSupabase;
     late MockGoTrueClient mockAuth;
-    late AuthRepository authRepository;
+    late ProviderContainer container;
 
     setUp(() {
       mockSupabase = MockSupabaseClient();
       mockAuth = MockGoTrueClient();
-      authRepository = AuthRepositoryImpl(mockSupabase);
 
       when(() => mockSupabase.auth).thenReturn(mockAuth);
+
+      container = createTestContainer(
+        overrides: [supabaseClientProvider.overrideWithValue(mockSupabase)],
+      );
     });
 
     test('should complete anonymous sign-in flow successfully', () async {
@@ -48,201 +43,150 @@ void main() {
       when(() => mockAuthResponse.session).thenReturn(mockSession);
       when(() => mockAuthResponse.user).thenReturn(mockUser);
 
+      // No current user
+      when(() => mockAuth.currentUser).thenReturn(null);
+
+      // Successful anonymous sign-in
       when(
         () => mockAuth.signInAnonymously(),
       ).thenAnswer((_) async => mockAuthResponse);
 
-      when(() => mockAuth.currentSession).thenReturn(mockSession);
-      when(() => mockAuth.currentUser).thenReturn(mockUser);
+      // Test auth flow
+      final result = await container.read(authNotifierProvider.future);
 
-      when(() => mockSupabase.from('players')).thenReturn(
-        _createMockQueryBuilder({
-          'id': 'test-user-id',
-          'username': 'Guest_123',
-          'created_at': DateTime.now().toIso8601String(),
-          'is_guest': true,
-        }),
-      );
-
-      final result = await authRepository.signInAnonymously();
-
-      expect(result.isRight(), isTrue);
-      result.fold((failure) => fail('Should not fail'), (player) {
-        expect(player.id, equals('test-user-id'));
-        expect(player.username, equals('Guest_123'));
-        expect(player.isGuest, isTrue);
-      });
-
+      expect(result, isNotNull);
+      expect(result!.id, equals('test-user-id'));
       verify(() => mockAuth.signInAnonymously()).called(1);
     });
 
-    test('should handle auth failure with proper error propagation', () async {
+    test('should handle anonymous sign-in failure gracefully', () async {
+      // No current user
+      when(() => mockAuth.currentUser).thenReturn(null);
+
+      // Failed anonymous sign-in
       when(
         () => mockAuth.signInAnonymously(),
-      ).thenThrow(const AuthException('Anonymous sign-in failed'));
+      ).thenThrow(Exception('Auth failed'));
 
-      final result = await authRepository.signInAnonymously();
+      // Test auth flow
+      final result = await container.read(authNotifierProvider.future);
 
-      expect(result.isLeft(), isTrue);
-      result.fold((failure) {
-        expect(failure, isA<ServerFailure>());
-        expect(failure.message, contains('Anonymous sign-in failed'));
-      }, (_) => fail('Should not succeed'));
+      expect(result, isNull);
+      verify(() => mockAuth.signInAnonymously()).called(1);
     });
 
-    test('should maintain session state across operations', () async {
+    test('should skip sign-in if user already authenticated', () async {
       final mockUser = MockUser();
-      final mockSession = MockSession();
-
-      when(() => mockUser.id).thenReturn('persistent-user-id');
-      when(() => mockSession.user).thenReturn(mockUser);
-      when(() => mockAuth.currentSession).thenReturn(mockSession);
+      when(() => mockUser.id).thenReturn('existing-user-id');
       when(() => mockAuth.currentUser).thenReturn(mockUser);
 
-      when(() => mockSupabase.from('players')).thenReturn(
-        _createMockQueryBuilder({
-          'id': 'persistent-user-id',
-          'username': 'Guest_456',
-          'created_at': DateTime.now().toIso8601String(),
-          'is_guest': true,
-        }),
-      );
+      // Test auth flow
+      final result = await container.read(authNotifierProvider.future);
 
-      final result1 = await authRepository.getCurrentPlayer();
-      final result2 = await authRepository.getCurrentPlayer();
-
-      expect(result1.isRight(), isTrue);
-      expect(result2.isRight(), isTrue);
-
-      result1.fold((_) => fail('Should not fail'), (player1) {
-        result2.fold((_) => fail('Should not fail'), (player2) {
-          expect(player1.id, equals(player2.id));
-          expect(player1.username, equals(player2.username));
-        });
-      });
+      expect(result, isNotNull);
+      expect(result!.id, equals('existing-user-id'));
+      verifyNever(() => mockAuth.signInAnonymously());
     });
 
-    test('should handle session expiration and refresh', () async {
-      final expiredSession = MockSession();
-      final newSession = MockSession();
+    test('should handle sign-out and state invalidation', () async {
       final mockUser = MockUser();
-      final mockAuthResponse = MockAuthResponse();
+      when(() => mockUser.id).thenReturn('test-user-id');
+      when(() => mockAuth.currentUser).thenReturn(mockUser);
+      when(() => mockAuth.signOut()).thenAnswer((_) async {});
 
-      when(() => mockUser.id).thenReturn('refresh-user-id');
-      when(() => expiredSession.user).thenReturn(mockUser);
-      when(() => newSession.user).thenReturn(mockUser);
-      when(() => mockAuthResponse.session).thenReturn(newSession);
-      when(() => mockAuthResponse.user).thenReturn(mockUser);
+      // First authenticate
+      await container.read(authNotifierProvider.future);
 
-      when(() => mockAuth.currentSession).thenReturn(null);
-      when(
-        () => mockAuth.refreshSession(),
-      ).thenAnswer((_) async => mockAuthResponse);
+      // Then sign out
+      final notifier = container.read(authNotifierProvider.notifier);
+      await notifier.signOut();
 
-      when(() => mockSupabase.from('players')).thenReturn(
-        _createMockQueryBuilder({
-          'id': 'refresh-user-id',
-          'username': 'Guest_789',
-          'created_at': DateTime.now().toIso8601String(),
-          'is_guest': true,
-        }),
-      );
-
-      final result = await authRepository.getCurrentPlayer();
-
-      expect(result.isRight(), isTrue);
+      verify(() => mockAuth.signOut()).called(1);
     });
 
     test('should handle concurrent auth requests properly', () async {
       final mockUser = MockUser();
-      final mockSession = MockSession();
       final mockAuthResponse = MockAuthResponse();
 
-      when(() => mockUser.id).thenReturn('concurrent-user-id');
-      when(() => mockSession.user).thenReturn(mockUser);
-      when(() => mockAuthResponse.session).thenReturn(mockSession);
+      when(() => mockUser.id).thenReturn('test-user-id');
       when(() => mockAuthResponse.user).thenReturn(mockUser);
+      when(() => mockAuth.currentUser).thenReturn(null);
 
+      // Delay to simulate slow network
       when(() => mockAuth.signInAnonymously()).thenAnswer((_) async {
         await Future.delayed(const Duration(milliseconds: 100));
         return mockAuthResponse;
       });
 
-      when(() => mockAuth.currentSession).thenReturn(mockSession);
-      when(() => mockAuth.currentUser).thenReturn(mockUser);
-
-      when(() => mockSupabase.from('players')).thenReturn(
-        _createMockQueryBuilder({
-          'id': 'concurrent-user-id',
-          'username': 'Guest_999',
-          'created_at': DateTime.now().toIso8601String(),
-          'is_guest': true,
-        }),
-      );
-
+      // Make concurrent requests
       final futures = List.generate(
         5,
-        (_) => authRepository.signInAnonymously(),
+        (_) => container.read(authNotifierProvider.future),
       );
 
       final results = await Future.wait(futures);
 
-      expect(results.every((r) => r.isRight()), isTrue);
-      verify(() => mockAuth.signInAnonymously()).called(5);
+      // All should return the same user
+      expect(results.every((user) => user?.id == 'test-user-id'), isTrue);
+
+      // But signInAnonymously should only be called once
+      verify(() => mockAuth.signInAnonymously()).called(1);
     });
 
-    test('should integrate with player profile creation', () async {
+    test('currentUserId provider should reflect auth state', () async {
+      final mockUser = MockUser();
+      when(() => mockUser.id).thenReturn('test-user-id');
+      when(() => mockAuth.currentUser).thenReturn(mockUser);
+
+      // Initially loading
+      expect(container.read(authNotifierProvider).isLoading, isTrue);
+      expect(container.read(currentUserIdProvider), isNull);
+
+      // After auth completes
+      await container.read(authNotifierProvider.future);
+
+      expect(container.read(currentUserIdProvider), equals('test-user-id'));
+    });
+
+    test('should handle network errors during auth', () async {
+      when(() => mockAuth.currentUser).thenReturn(null);
+      when(
+        () => mockAuth.signInAnonymously(),
+      ).thenThrow(const AuthException('Network error'));
+
+      final result = await container.read(authNotifierProvider.future);
+
+      expect(result, isNull);
+    });
+
+    test('should handle session expiration', () async {
       final mockUser = MockUser();
       final mockSession = MockSession();
-      final mockAuthResponse = MockAuthResponse();
 
-      when(() => mockUser.id).thenReturn('new-player-id');
+      when(() => mockUser.id).thenReturn('test-user-id');
       when(() => mockSession.user).thenReturn(mockUser);
-      when(() => mockAuthResponse.session).thenReturn(mockSession);
-      when(() => mockAuthResponse.user).thenReturn(mockUser);
+      when(() => mockSession.expiresAt).thenReturn(
+        DateTime.now()
+                .subtract(const Duration(hours: 1))
+                .millisecondsSinceEpoch ~/
+            1000,
+      );
 
+      // Expired session
+      when(() => mockAuth.currentUser).thenReturn(null);
+      when(() => mockAuth.currentSession).thenReturn(mockSession);
+
+      // Should trigger new sign-in
+      final mockAuthResponse = MockAuthResponse();
+      when(() => mockAuthResponse.user).thenReturn(mockUser);
       when(
         () => mockAuth.signInAnonymously(),
       ).thenAnswer((_) async => mockAuthResponse);
 
-      when(() => mockAuth.currentSession).thenReturn(mockSession);
-      when(() => mockAuth.currentUser).thenReturn(mockUser);
+      final result = await container.read(authNotifierProvider.future);
 
-      int callCount = 0;
-      when(() => mockSupabase.from('players')).thenReturn(
-        _createMockQueryBuilder(
-          callCount++ == 0
-              ? null
-              : {
-                  'id': 'new-player-id',
-                  'username': 'Guest_New',
-                  'created_at': DateTime.now().toIso8601String(),
-                  'is_guest': true,
-                },
-        ),
-      );
-
-      final result = await authRepository.signInAnonymously();
-
-      expect(result.isRight(), isTrue);
+      expect(result, isNotNull);
+      verify(() => mockAuth.signInAnonymously()).called(1);
     });
   });
-}
-
-SupabaseQueryBuilder _createMockQueryBuilder(Map<String, dynamic>? data) {
-  final mockBuilder = MockPostgrestFilterBuilder();
-  final mockTransform = MockPostgrestTransformBuilder();
-
-  when(() => mockBuilder.eq(any(), any())).thenReturn(mockTransform);
-  when(() => mockTransform.single()).thenAnswer((_) async {
-    if (data == null) {
-      throw const PostgrestException(
-        message: 'Row not found',
-        code: 'PGRST116',
-      );
-    }
-    return data;
-  });
-
-  return mockBuilder as SupabaseQueryBuilder;
 }

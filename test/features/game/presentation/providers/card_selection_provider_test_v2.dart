@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../helpers/riverpod_test_helpers.dart';
 import 'package:ojyx/features/game/presentation/providers/card_selection_provider_v2.dart';
 
 void main() {
@@ -7,11 +8,7 @@ void main() {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
-    });
-
-    tearDown(() {
-      container.dispose();
+      container = createTestContainer();
     });
 
     test(

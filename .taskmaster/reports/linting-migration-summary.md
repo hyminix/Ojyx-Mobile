@@ -1,5 +1,5 @@
 # Migration flutter_lints 5.0.0 → 6.0.0
-Date: 2025-07-26 22:23:42.016732
+Date: 2025-07-27 07:43:58.037320
 
 ## Résumé
 - **Avant migration**: 10 errors, 87 warnings, 267 info (364 total)

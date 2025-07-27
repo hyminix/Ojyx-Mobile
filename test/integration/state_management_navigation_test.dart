@@ -18,7 +18,7 @@ class MockUser extends Mock implements User {
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
 
-class MockGotrueAuth extends Mock implements GotrueAuth {}
+class MockGoTrueClient extends Mock implements GoTrueClient {}
 
 void main() {
   group('State Management & Navigation Integration Tests', () {

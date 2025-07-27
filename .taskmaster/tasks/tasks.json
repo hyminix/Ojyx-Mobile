@@ -1111,7 +1111,7 @@
             "description": "Adapter tous les tests utilisant Riverpod pour utiliser riverpod_test et les nouvelles APIs de la version 2.6.1",
             "dependencies": [],
             "details": "1. Remplacer les imports mockito par riverpod_test:\n   - Installer riverpod_test: ^2.0.0\n   - Remplacer MockProviderContainer par TestProviderContainer\n   - Utiliser les nouveaux ProviderScope.overrides\n2. Migrer les tests de providers:\n   - Utiliser createContainer() au lieu de ProviderContainer()\n   - Adapter les overrides avec la nouvelle syntaxe\n   - Implémenter les AsyncNotifier mocks correctement\n3. Adapter les widget tests avec Riverpod:\n   - Utiliser testWidgets avec ProviderScope wrapper\n   - Implémenter les nouveaux patterns pour tester les ConsumerWidget\n   - Créer des helpers pour les tests de ConsumerStatefulWidget\n4. Mettre à jour les tests d'état:\n   - Utiliser container.listen() pour observer les changements\n   - Tester les AsyncValue.guard patterns\n   - Vérifier les AutoDispose providers\n5. Créer riverpod_test_helpers.dart avec des utilities réutilisables",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Commencer par les tests des providers critiques (auth, game state). Utiliser flutter test test/providers --coverage pour identifier les zones non couvertes. Documenter les nouveaux patterns dans test/README.md."
           },
           {
@@ -1436,7 +1436,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-26T20:37:29.231Z",
+      "updated": "2025-07-27T05:31:20.157Z",
       "description": "Tasks for master context"
     }
   }
