@@ -9,7 +9,7 @@
         "testStrategy": "Validation manuelle post-purge : vérifier que 'flutter pub get' et 'flutter analyze' passent sans erreur. S'assurer que le projet compile toujours.",
         "priority": "high",
         "dependencies": [],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -77,7 +77,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -85,7 +85,7 @@
             "description": "Supprimer complètement les répertoires de tests et vérifier qu'aucun fichier de test n'est présent ailleurs",
             "dependencies": [],
             "details": "Exécuter 'rm -rf test/' et 'rm -rf integration_test/' depuis la racine du projet. Utiliser 'find . -name \"*_test.dart\" -o -name \"*.test.dart\"' pour identifier tout fichier de test restant dans d'autres répertoires. Supprimer également test_driver/ si présent.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Vérifier avec 'ls -la' que les répertoires n'existent plus et que la commande find ne retourne aucun résultat"
           },
           {
@@ -96,7 +96,7 @@
               "2.1"
             ],
             "details": "Ouvrir pubspec.yaml et supprimer de dev_dependencies : test:, mockito:, build_runner: (si utilisé uniquement pour les mocks), mocktail:, faker:, et autres packages de test. Conserver uniquement flutter_test: et flutter_lints:. Exécuter 'flutter pub get' après modification.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Vérifier que 'flutter pub get' s'exécute sans erreur et que pubspec.lock est mis à jour sans les dépendances supprimées"
           },
           {
@@ -107,7 +107,7 @@
               "2.2"
             ],
             "details": "Utiliser 'grep -r \"import.*test\" lib/' et 'grep -r \"import.*mock\" lib/' pour trouver les imports résiduels. Rechercher également les annotations @visibleForTesting et les supprimer. Vérifier dans lib/core/, lib/features/ et tout autre répertoire source.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Exécuter 'flutter analyze' pour s'assurer qu'aucune erreur d'import manquant n'apparaît"
           },
           {
@@ -118,7 +118,7 @@
               "2.3"
             ],
             "details": "Supprimer : coverage/, lcov.info, *.lcov, .dart_tool/test/, .dart_tool/coverage/. Rechercher et supprimer tout fichier .g.dart généré uniquement pour les mocks (mockito). Nettoyer également les fichiers temporaires de test dans .dart_tool/.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Vérifier que 'find . -name \"*.lcov\" -o -name \"coverage\" -type d' ne retourne aucun résultat"
           },
           {
@@ -129,7 +129,7 @@
               "2.4"
             ],
             "details": "Retirer de .gitignore : /coverage/, *.lcov, test/.test_coverage.dart, et autres entrées spécifiques aux tests. Exécuter 'flutter clean' puis 'flutter pub get' pour une installation propre. Compiler l'application avec 'flutter build apk --debug' pour confirmer l'absence de dépendances manquantes.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "L'application doit compiler avec succès et 'flutter analyze --no-fatal-infos' ne doit signaler aucune erreur liée aux tests supprimés"
           }
         ]
@@ -1016,7 +1016,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-27T08:18:15.027Z",
+      "updated": "2025-07-27T08:25:57.096Z",
       "description": "Tasks for master context"
     }
   }

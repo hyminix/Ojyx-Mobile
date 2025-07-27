@@ -44,8 +44,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Claude Code TDD enforcement
-.claude-code-violations.log
 
 # Environment files
 .env
@@ -77,4 +75,4 @@ node_modules/
 
 # Task files
 # tasks.json
-# tasks/ 
+# tasks/
