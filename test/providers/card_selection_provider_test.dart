@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../helpers/riverpod_test_helpers.dart';
 import 'package:ojyx/features/game/presentation/providers/card_selection_provider_v2.dart';
 import 'package:ojyx/features/game/domain/entities/card_position.dart';
 
@@ -9,12 +10,8 @@ void main() {
     late CardSelection notifier;
 
     setUp(() {
-      container = ProviderContainer();
+      container = createTestContainer();
       notifier = container.read(cardSelectionProvider.notifier);
-    });
-
-    tearDown(() {
-      container.dispose();
     });
 
     test('initial state should be not selecting', () {

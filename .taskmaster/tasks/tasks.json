@@ -957,7 +957,7 @@
         "dependencies": [
           13
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -965,7 +965,7 @@
             "description": "Parcourir récursivement le répertoire test/ pour créer un inventaire complet de tous les fichiers *_test.dart avec leurs statistiques",
             "dependencies": [],
             "details": "Utiliser un script Dart pour analyser automatiquement tous les fichiers de tests et générer un rapport structuré incluant : le chemin de chaque fichier, le nombre total de tests, le nombre de tests commentés (lignes contenant //.*test ou /*.*test), le nombre de tests avec skip: true, la taille du fichier en lignes, et la date de dernière modification. Exporter le résultat dans un fichier JSON structuré pour faciliter l'analyse ultérieure.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Créer un test unitaire pour le script d'inventaire vérifiant qu'il détecte correctement les différents patterns de tests commentés et skippés dans des fichiers de test échantillons"
           },
           {
@@ -976,7 +976,7 @@
               "15.1"
             ],
             "details": "À partir de l'inventaire généré, parcourir chaque fichier identifié comme contenant des tests commentés ou skippés. Supprimer automatiquement : toutes les lignes de test commentées (// test, /* test */), tous les blocs de code test avec skip: true, et les imports inutilisés après suppression. Générer un rapport de suppression listant chaque test supprimé avec sa localisation pour traçabilité. Commiter les changements par batch de 10 fichiers maximum pour faciliter la revue.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Vérifier que le script de suppression préserve l'indentation et la structure des fichiers. Exécuter flutter test après chaque batch pour s'assurer qu'aucun test valide n'a été supprimé par erreur"
           },
           {
@@ -987,7 +987,7 @@
               "15.2"
             ],
             "details": "Analyser chaque test selon les critères de suppression définis : tests d'implémentation testant des méthodes privées ou des détails internes, tests triviaux vérifiant uniquement des getters/setters sans logique, tests dupliqués ayant la même structure Arrange-Act-Assert, tests sans assertions significatives ou avec des expect triviaux. Utiliser l'AST (Abstract Syntax Tree) Dart pour analyser la structure des tests programmatiquement. Créer un rapport détaillé justifiant chaque suppression proposée avant d'effectuer les suppressions.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Comparer la couverture de code avant et après suppression pour s'assurer qu'aucune logique métier critique n'est plus couverte. La couverture doit rester stable ou augmenter"
           },
           {
@@ -998,7 +998,7 @@
               "15.3"
             ],
             "details": "Pour chaque test conservé, vérifier et corriger : la nomenclature en utilisant group/test pour Dart (pas describe/it), la structure claire avec les trois sections AAA identifiables (ajouter des commentaires // Arrange, // Act, // Assert si nécessaire), l'isolation complète sans état partagé entre tests (vérifier l'absence de variables globales ou de setUp mal utilisés), les assertions explicites et significatives avec des messages d'erreur clairs. Refactoriser les tests qui ne respectent pas ces critères en préservant leur intention originale.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Exécuter les tests en mode aléatoire (--test-randomize-ordering-seed) pour vérifier l'isolation. Chaque test doit passer indépendamment de l'ordre d'exécution"
           },
           {
@@ -1009,7 +1009,7 @@
               "15.4"
             ],
             "details": "Créer le fichier TEST_AUDIT.md documentant : le nombre total de tests avant/après purge, la liste détaillée des tests supprimés avec justification, les patterns de tests problématiques identifiés, les recommandations pour éviter ces anti-patterns. Réorganiser les tests restants selon la structure features/[nom_feature]/[layer]/ pour matcher l'architecture Clean Architecture. Déplacer les tests unitaires dans les bons répertoires (presentation/domain/data). Mettre à jour tous les imports après réorganisation. Mesurer et documenter l'amélioration du temps d'exécution de la suite de tests.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Valider que tous les tests passent après réorganisation. Vérifier que la structure des dossiers de test reflète exactement la structure du code source"
           }
         ]
@@ -1032,7 +1032,7 @@
             "description": "Mettre en place les Test Data Builders, Custom Matchers et helpers réutilisables pour standardiser l'écriture des tests",
             "dependencies": [],
             "details": "1. Créer un dossier test/helpers/ pour centraliser les utilitaires\n2. Implémenter des Test Data Builders pour chaque entité principale:\n   - CardBuilder pour créer des cartes de test\n   - PlayerBuilder pour les joueurs\n   - GameStateBuilder pour les états de jeu\n3. Développer des Custom Matchers spécifiques:\n   - isValidCard() pour valider les propriétés des cartes\n   - hasScore() pour vérifier les scores\n   - isInState() pour les états de jeu\n4. Créer des helpers de test communs:\n   - createMockSupabaseClient()\n   - setupTestProviders()\n   - waitForAnimation()\n5. Documenter chaque pattern avec des exemples d'utilisation",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Écrire des tests unitaires pour chaque Builder et Matcher créé. Vérifier que les helpers génèrent des données cohérentes et que les Matchers produisent des messages d'erreur clairs"
           },
           {
@@ -1102,7 +1102,7 @@
             "description": "Migrer tous les tests unitaires des modèles Freezed pour utiliser les nouvelles annotations et méthodes de la version 2.5.7",
             "dependencies": [],
             "details": "1. Identifier tous les fichiers de test *_test.dart testant des modèles Freezed\n2. Adapter les tests de sérialisation:\n   - Utiliser les nouvelles méthodes fromJson/toJson générées\n   - Vérifier la compatibilité avec json_serializable 6.8.0\n   - Tester les @JsonKey avec les nouvelles options\n3. Mettre à jour les tests copyWith:\n   - Tester explicitement les valeurs nullable avec copyWith\n   - Vérifier que copyWith(field: null) fonctionne correctement\n   - Ajouter des tests pour les @Default() values\n4. Adapter les tests des unions et sealed classes:\n   - Utiliser les nouveaux patterns de pattern matching\n   - Tester les méthodes when/maybeWhen/map générées\n   - Vérifier l'exhaustivité des switch statements\n5. Créer un helper de test freezed_test_utils.dart avec des matchers personnalisés",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Exécuter flutter test test/models --reporter=expanded pour identifier tous les tests échouants. Corriger par ordre de priorité: entités métier critiques (Card, Player, Game) puis modèles secondaires. Viser 100% de couverture sur les modèles."
           },
           {
@@ -1111,7 +1111,7 @@
             "description": "Adapter tous les tests utilisant Riverpod pour utiliser riverpod_test et les nouvelles APIs de la version 2.6.1",
             "dependencies": [],
             "details": "1. Remplacer les imports mockito par riverpod_test:\n   - Installer riverpod_test: ^2.0.0\n   - Remplacer MockProviderContainer par TestProviderContainer\n   - Utiliser les nouveaux ProviderScope.overrides\n2. Migrer les tests de providers:\n   - Utiliser createContainer() au lieu de ProviderContainer()\n   - Adapter les overrides avec la nouvelle syntaxe\n   - Implémenter les AsyncNotifier mocks correctement\n3. Adapter les widget tests avec Riverpod:\n   - Utiliser testWidgets avec ProviderScope wrapper\n   - Implémenter les nouveaux patterns pour tester les ConsumerWidget\n   - Créer des helpers pour les tests de ConsumerStatefulWidget\n4. Mettre à jour les tests d'état:\n   - Utiliser container.listen() pour observer les changements\n   - Tester les AsyncValue.guard patterns\n   - Vérifier les AutoDispose providers\n5. Créer riverpod_test_helpers.dart avec des utilities réutilisables",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Commencer par les tests des providers critiques (auth, game state). Utiliser flutter test test/providers --coverage pour identifier les zones non couvertes. Documenter les nouveaux patterns dans test/README.md."
           },
           {
@@ -1436,7 +1436,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-26T18:57:59.404Z",
+      "updated": "2025-07-27T05:31:20.157Z",
       "description": "Tasks for master context"
     }
   }

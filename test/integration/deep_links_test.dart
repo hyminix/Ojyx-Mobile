@@ -5,6 +5,7 @@ import 'package:ojyx/core/config/router_config.dart';
 import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mocktail/mocktail.dart';
+import '../helpers/riverpod_test_helpers.dart';
 
 class MockUser extends Mock implements User {
   @override
@@ -16,11 +17,11 @@ void main() {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
+      container = createTestContainer();
     });
 
     tearDown(() {
-      container.dispose();
+      // Container disposal handled by createTestContainer
     });
 
     testWidgets('should handle room deep link when authenticated', (

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ojyx/core/config/router_config.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mocktail/mocktail.dart';
+import '../helpers/riverpod_test_helpers.dart';
 
 class MockUser extends Mock implements User {
   @override
@@ -15,11 +16,11 @@ void main() {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
+      container = createTestContainer();
     });
 
     tearDown(() {
-      container.dispose();
+      // Container disposal handled by createTestContainer
     });
 
     test('should create router successfully', () {
@@ -61,7 +62,7 @@ void main() {
 
   group('Route Guards', () {
     test('create-room route should have guard', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
 
       final createRoomRoute = router.configuration.routes
@@ -73,7 +74,7 @@ void main() {
     });
 
     test('room route should have guard', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
 
       final roomRoute = router.configuration.routes
@@ -85,7 +86,7 @@ void main() {
     });
 
     test('game route should have guard', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
 
       final gameRoute = router.configuration.routes
@@ -99,7 +100,7 @@ void main() {
 
   group('Route Configuration', () {
     test('game route should use pageBuilder for transitions', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
 
       final gameRoute = router.configuration.routes
@@ -112,7 +113,7 @@ void main() {
     });
 
     test('all routes should have names', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final router = container.read(routerProvider);
 
       final namedRoutes = router.configuration.routes

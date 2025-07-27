@@ -3,17 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ojyx/features/game/presentation/providers/card_selection_provider_v2.dart';
 import 'package:ojyx/features/game/presentation/providers/game_animation_provider_v2.dart';
 import 'package:ojyx/core/config/router_config.dart';
+import '../helpers/riverpod_test_helpers.dart';
 
 void main() {
   group('Task 3 - Complete Validation Tests', () {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
+      container = createTestContainer();
     });
 
     tearDown(() {
-      container.dispose();
+      // Container disposal handled by createTestContainer
     });
 
     group('3.1 & 3.2 - Riverpod Migration Validation', () {

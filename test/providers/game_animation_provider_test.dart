@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../helpers/riverpod_test_helpers.dart';
 import 'package:ojyx/features/game/presentation/providers/game_animation_provider_v2.dart';
 import 'package:ojyx/features/game/domain/entities/play_direction.dart';
 
@@ -9,12 +10,8 @@ void main() {
     late GameAnimation notifier;
 
     setUp(() {
-      container = ProviderContainer();
+      container = createTestContainer();
       notifier = container.read(gameAnimationProvider.notifier);
-    });
-
-    tearDown(() {
-      container.dispose();
     });
 
     test('initial state should have correct default values', () {

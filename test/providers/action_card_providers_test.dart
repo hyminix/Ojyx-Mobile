@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../helpers/riverpod_test_helpers.dart';
 import 'package:ojyx/features/game/presentation/providers/action_card_providers.dart';
 
 void main() {
@@ -8,12 +9,8 @@ void main() {
     late ActionCardStateNotifier notifier;
 
     setUp(() {
-      container = ProviderContainer();
+      container = createTestContainer();
       notifier = container.read(actionCardStateNotifierProvider.notifier);
-    });
-
-    tearDown(() {
-      container.dispose();
     });
 
     test('initial state should have correct values', () {
@@ -68,11 +65,7 @@ void main() {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
-    });
-
-    tearDown(() {
-      container.dispose();
+      container = createTestContainer();
     });
 
     test('initial state should be AsyncData with null', () {
@@ -88,14 +81,14 @@ void main() {
 
   group('Provider Functions', () {
     test('actionCardLocalDataSource provider should provide instance', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final dataSource = container.read(actionCardLocalDataSourceProvider);
       expect(dataSource, isNotNull);
       container.dispose();
     });
 
     test('actionCardRepository provider should provide instance', () {
-      final container = ProviderContainer();
+      final container = createTestContainer();
       final repository = container.read(actionCardRepositoryProvider);
       expect(repository, isNotNull);
       container.dispose();

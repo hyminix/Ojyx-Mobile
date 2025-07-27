@@ -1,14 +1,15 @@
 {
-  "timestamp": "2025-07-26T17:07:59.301766",
+  "timestamp": "2025-07-27T08:28:40.802095",
   "jsonSerializableVersion": "6.8.0",
   "files": {
-    "lib/core/config/router_refresh_notifier.g.dart": "66578ab4aac4c9b3467b57e09a24633f",
+    "lib/core/config/router_refresh_notifier.g.dart": "b29dd6e88cbc13ea3bc7493485e54129",
     "lib/core/providers/connectivity_provider.g.dart": "df8777dfcbcaa2b296a960f0dd973590",
-    "lib/core/providers/file_provider.g.dart": "892a78927fb5a68b922560523dc213c9",
+    "lib/core/providers/file_provider.g.dart": "565b2c8ab46464a6c437d1330af1550a",
     "lib/core/providers/sentry_provider.g.dart": "80cbde3b2577918bf6181a1b5b3a4f15",
     "lib/core/providers/storage_provider.g.dart": "96cd1848fae6b045366d0b4160c98f8e",
     "lib/core/providers/supabase_provider_v2.g.dart": "6809d037dbb176d51d68731c9b4c3aef",
     "lib/features/auth/presentation/providers/auth_provider.g.dart": "97af6e15cd7a7e0a898b5223adb2800a",
+    "lib/features/auth/presentation/providers/supabase_auth_provider.g.dart": "0b5fec97a022fb33be6e7578fb9369df",
     "lib/features/end_game/domain/entities/end_game_state.g.dart": "c9ba7c85c4678c950653212e1c59b4c4",
     "lib/features/end_game/presentation/providers/end_game_provider_v2.g.dart": "4310e9d25babdf3807171cac6e25057d",
     "lib/features/game/data/models/db_player_grid_model.g.dart": "86fa94a53e5132fc60a2462b66f6f726",
@@ -32,10 +33,12 @@
     "lib/features/global_scores/presentation/providers/global_score_providers_v2.g.dart": "dd704d114df8a8ca2270d155e25c8614",
     "lib/features/multiplayer/data/models/player_model.g.dart": "a7ff6289cc02dc1b48ce4ca88b5669bf",
     "lib/features/multiplayer/data/models/room_model.g.dart": "9402ee4693b5ae251181cbc800c0f78b",
+    "lib/features/multiplayer/data/services/game_realtime_service.g.dart": "dc6d837553dda78889b3ce99b3dd3bfb",
     "lib/features/multiplayer/domain/entities/lobby_player.g.dart": "459e0b52cba7e9179ff005dc58f3e144",
     "lib/features/multiplayer/domain/entities/room.g.dart": "bde76daa2cf778930a7ba5452d405437",
     "lib/features/multiplayer/domain/entities/room_event.g.dart": "9bdd78e64e44afc1edadd13e1da446f8",
     "lib/features/multiplayer/presentation/providers/multiplayer_game_notifier.g.dart": "c0c0b26d0dc586f49f5069eddfe3b9b7",
-    "lib/features/multiplayer/presentation/providers/room_providers.g.dart": "56398ce413dd5929860cd7533bf968e6"
+    "lib/features/multiplayer/presentation/providers/room_providers.g.dart": "56398ce413dd5929860cd7533bf968e6",
+    "lib/features/storage/services/avatar_storage_service.g.dart": "2c30da7c9f1ceada83b9e8f1d964909d"
   }
 }

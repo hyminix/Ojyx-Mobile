@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ojyx/features/home/presentation/screens/home_screen.dart';
 import 'package:ojyx/features/auth/presentation/providers/auth_provider.dart';
 import 'package:ojyx/core/providers/supabase_provider.dart';
+import '../../../../helpers/go_router_test_helpers.dart';
 
 class MockUser extends Mock implements User {
   @override
