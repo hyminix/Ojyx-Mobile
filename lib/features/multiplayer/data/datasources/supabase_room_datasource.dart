@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/errors/supabase_exceptions.dart';
+import '../../../../core/extensions/supabase_extensions.dart';
 import '../models/room_model.dart';
 
 class SupabaseRoomDatasource {
@@ -11,26 +12,22 @@ class SupabaseRoomDatasource {
     required String creatorId,
     required int maxPlayers,
   }) async {
-    final response = await SupabaseExceptionHandler.handleSupabaseCall(
-      call: () => _supabase
-          .from('rooms')
-          .insert({
-            'creator_id': creatorId,
-            'player_ids': [creatorId],
-            'status': 'waiting',
-            'max_players': maxPlayers,
-            'created_at': DateTime.now().toIso8601String(),
-          })
-          .select()
-          .single(),
-      operation: 'create_room',
+    final response = await _supabase.safeInsert(
+      'rooms',
+      {
+        'creator_id': creatorId,
+        'player_ids': [creatorId],
+        'status': 'waiting',
+        'max_players': maxPlayers,
+        'created_at': DateTime.now().toIso8601String(),
+      },
       context: {
         'creator_id': creatorId,
         'max_players': maxPlayers,
       },
     );
 
-    return RoomModel.fromJson(response);
+    return RoomModel.fromJson(response.first);
   }
 
   Future<RoomModel?> joinRoom({
@@ -101,17 +98,15 @@ class SupabaseRoomDatasource {
 
   Future<RoomModel?> getRoom(String roomId) async {
     try {
-      final response = await SupabaseExceptionHandler.handleSupabaseCall(
-        call: () => _supabase
-            .from('rooms')
-            .select()
-            .eq('id', roomId)
-            .single(),
-        operation: 'get_room',
+      final response = await _supabase.safeSelectWhere(
+        'rooms',
+        column: 'id',
+        value: roomId,
         context: {'room_id': roomId},
       );
 
-      return RoomModel.fromJson(response);
+      if (response.isEmpty) return null;
+      return RoomModel.fromJson(response.first);
     } catch (e) {
       // Si la room n'existe pas, retourner null
       return null;
@@ -130,14 +125,14 @@ class SupabaseRoomDatasource {
     required String roomId,
     required Map<String, dynamic> eventData,
   }) async {
-    await SupabaseExceptionHandler.handleSupabaseCall(
-      call: () => _supabase.from('room_events').insert({
+    await _supabase.safeInsert(
+      'room_events',
+      {
         'room_id': roomId,
         'event_type': eventData['type'],
         'event_data': eventData,
         'created_at': DateTime.now().toIso8601String(),
-      }),
-      operation: 'send_room_event',
+      },
       context: {
         'room_id': roomId,
         'event_type': eventData['type'],
@@ -155,16 +150,14 @@ class SupabaseRoomDatasource {
   }
 
   Future<List<RoomModel>> getAvailableRooms() async {
-    final response = await SupabaseExceptionHandler.handleSupabaseCall(
-      call: () => _supabase
-          .from('rooms')
-          .select()
-          .eq('status', 'waiting')
-          .order('created_at', ascending: false),
-      operation: 'get_available_rooms',
+    final response = await _supabase.safeSelectWhere(
+      'rooms',
+      column: 'status',
+      value: 'waiting',
+      context: {'operation': 'list_available_rooms'},
     );
 
-    return (response as List).map((json) => RoomModel.fromJson(json)).toList();
+    return response.map((json) => RoomModel.fromJson(json)).toList();
   }
 
   Future<void> updateRoomStatus({
