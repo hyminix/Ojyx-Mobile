@@ -1,0 +1,149 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: '3.32.6'
+  JAVA_VERSION: '17'
+
+jobs:
+  integration-test:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+
+    - name: Cache pub dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ runner.tool_cache }}/flutter
+          ~/.pub-cache
+        key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pub-
+
+    - name: Get dependencies
+      run: flutter pub get
+
+    - name: Generate code
+      run: flutter packages pub run build_runner build --delete-conflicting-outputs
+
+    # For integration tests on Linux, we can use a virtual framebuffer
+    - name: Setup virtual display
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y xvfb
+        export DISPLAY=:99
+        sudo Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+
+    - name: Run integration tests
+      run: |
+        export DISPLAY=:99
+        flutter test integration_test --reporter=expanded || true
+        # Note: Integration tests may require Android emulator
+        # For now, we run them but don't fail the build
+
+    - name: Upload integration test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: integration-test-results
+        path: |
+          test-results/
+          screenshots/
+        retention-days: 7
+
+  # Optional: Run on Android emulator (more complex setup)
+  android-integration-test:
+    name: Android Integration Tests
+    runs-on: macos-latest  # macOS for hardware acceleration
+    timeout-minutes: 45
+    continue-on-error: true  # Don't fail the build if this fails
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+
+    - name: Get dependencies
+      run: flutter pub get
+
+    - name: Generate code
+      run: flutter packages pub run build_runner build --delete-conflicting-outputs
+
+    - name: AVD cache
+      uses: actions/cache@v4
+      id: avd-cache
+      with:
+        path: |
+          ~/.android/avd/*
+          ~/.android/adb*
+        key: avd-api-29
+
+    - name: Create AVD and generate snapshot for caching
+      if: steps.avd-cache.outputs.cache-hit != 'true'
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+        target: google_apis
+        arch: x86_64
+        force-avd-creation: false
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: true
+        script: echo "Generated AVD snapshot for caching."
+
+    - name: Run integration tests on Android
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+        target: google_apis
+        arch: x86_64
+        force-avd-creation: false
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: true
+        script: |
+          flutter test integration_test --reporter=expanded
+
+    - name: Upload Android test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-integration-test-results
+        path: |
+          test-results/
+          screenshots/
+        retention-days: 7
