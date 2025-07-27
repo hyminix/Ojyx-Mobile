@@ -1024,7 +1024,7 @@
         "dependencies": [
           15
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -1054,7 +1054,7 @@
               "16.1"
             ],
             "details": "1. Localiser tous les tests dans lib/features/*/data/\n2. Implémenter des mocks structurés:\n   - Créer MockSupabaseClient avec comportements prédéfinis\n   - Utiliser when().thenAnswer() pour simuler les délais réseau\n   - Implémenter des stubs pour les WebSockets Realtime\n3. Refactoring des tests:\n   - Séparer clairement les tests unitaires des tests d'intégration\n   - Utiliser PlayerBuilder et GameStateBuilder pour les fixtures\n   - Ajouter des tests de cas limites (timeout, erreurs réseau)\n4. Améliorer la lisibilité:\n   - Variables explicites: 'validAuthResponse' au lieu de 'response'\n   - Commentaires sur les comportements attendus des mocks\n5. Implémenter tearDown() pour nettoyer les ressources",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Vérifier que chaque mock est utilisé correctement avec verify(). S'assurer que les tests d'intégration peuvent être désactivés facilement pour les builds rapides"
           },
           {
@@ -1066,7 +1066,7 @@
               "16.2"
             ],
             "details": "1. Analyser tous les tests dans lib/features/*/presentation/\n2. Standardiser les tests de widgets:\n   - Utiliser pumpWidget avec un wrapper de test commun\n   - Implémenter des helpers comme findButtonByText()\n   - Tester les interactions utilisateur de manière exhaustive\n3. Pour les providers Riverpod:\n   - Créer ProviderContainer de test avec overrides\n   - Tester chaque état possible du StateNotifier\n   - Vérifier les effets de bord avec des mocks\n4. Améliorer les assertions visuelles:\n   - findsOneWidget avec reason descriptif\n   - Vérifier les animations avec pumpAndSettle()\n5. Grouper par écran/fonctionnalité:\n   - group('LoginScreen', () => { /* tests */ })\n   - Sous-groupes pour les différents états",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Utiliser golden tests pour les composants critiques. Vérifier l'accessibilité avec les Semantics. Tester sur différentes tailles d'écran avec des MediaQuery overrides"
           },
           {
@@ -1079,7 +1079,7 @@
               "16.4"
             ],
             "details": "1. Créer un script de validation test/validate_tdd_compliance.dart:\n   - Vérifier la nomenclature des tests (should_when pattern)\n   - Détecter les tests sans assertions claires\n   - Identifier les tests commentés ou skip\n   - Calculer le ratio de couverture par feature\n2. Implémenter un test de mutation manuel:\n   - Liste de mutations communes à tester\n   - Script pour introduire des bugs et vérifier la détection\n3. Créer test/README.md avec:\n   - Guide des patterns de test utilisés\n   - Exemples de chaque type de test\n   - Conventions de nommage\n   - Checklist de revue\n4. Configurer les hooks pre-commit:\n   - Exécution du script de validation\n   - Rejet si non-conformité détectée\n5. Générer un rapport de conformité TDD",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Tester le script de validation avec des cas positifs et négatifs. Vérifier que la documentation est synchronisée avec le code. Faire une revue croisée simulée de 5 tests aléatoires"
           }
         ]
@@ -1436,7 +1436,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-27T06:49:42.058Z",
+      "updated": "2025-07-27T07:11:04.469Z",
       "description": "Tasks for master context"
     }
   }
