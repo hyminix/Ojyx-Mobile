@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../errors/supabase_exceptions.dart';
 
@@ -223,8 +224,8 @@ extension SupabaseClientExtensions on SupabaseClient {
     return SupabaseExceptionHandler.handleSupabaseCall(
       call: () => storage.from(bucket).uploadBinary(
         path,
-        fileBytes,
-        fileOptions: fileOptions,
+        Uint8List.fromList(fileBytes),
+        fileOptions: fileOptions ?? const FileOptions(),
       ),
       operation: 'storage_upload',
       context: {
@@ -297,7 +298,7 @@ extension SupabaseClientExtensions on SupabaseClient {
     return SupabaseExceptionHandler.handleSupabaseCall(
       call: () => storage.from(bucket).list(
         path: path,
-        searchOptions: searchOptions,
+        searchOptions: searchOptions ?? const SearchOptions(),
       ),
       operation: 'storage_list',
       context: {
@@ -312,12 +313,9 @@ extension SupabaseClientExtensions on SupabaseClient {
   // ===== Realtime Operations =====
   
   /// Create a safe realtime channel
-  RealtimeChannel safeChannel(
-    String name, {
-    RealtimeChannelConfig? params,
-  }) {
+  RealtimeChannel safeChannel(String name) {
     try {
-      return channel(name, params: params);
+      return channel(name);
     } catch (e) {
       // For channel creation, return a dummy channel that won't connect
       throw Exception('Failed to create channel: $e');
@@ -328,7 +326,7 @@ extension SupabaseClientExtensions on SupabaseClient {
   RealtimeChannel safeFromTable(
     String table, {
     String? schema,
-    Map<String, dynamic>? filter,
+    PostgresChangeFilter? filter,
   }) {
     try {
       final channel = safeChannel('db-changes-$table');
@@ -337,9 +335,7 @@ extension SupabaseClientExtensions on SupabaseClient {
         event: PostgresChangeEvent.all,
         schema: schema ?? 'public',
         table: table,
-        filter: filter != null 
-            ? filter.entries.map((e) => '${e.key}=eq.${e.value}').join('&')
-            : null,
+        filter: filter,
         callback: (payload) {
           // Callback will be set by the caller
         },
@@ -393,7 +389,10 @@ extension RealtimeChannelExtensions on RealtimeChannel {
     void Function(dynamic error)? onError,
   }) async {
     try {
-      await subscribe();
+      final future = subscribe();
+      if (future is Future) {
+        await future;
+      }
       onSuccess?.call();
     } catch (e) {
       onError?.call(e);

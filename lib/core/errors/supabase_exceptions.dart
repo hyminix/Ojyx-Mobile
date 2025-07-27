@@ -5,6 +5,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../utils/data_sanitizer.dart';
 import '../services/logging/console_logger.dart';
+import '../services/logging/i_error_logger.dart';
 
 /// Enhanced wrapper to catch and log Supabase errors with retry logic
 class SupabaseExceptionHandler {
@@ -23,7 +24,6 @@ class SupabaseExceptionHandler {
   }) async {
     int attempts = 0;
     dynamic lastException;
-    StackTrace? lastStackTrace;
     final stopwatch = Stopwatch()..start();
     
     // Add initial breadcrumb for operation start
@@ -89,7 +89,6 @@ class SupabaseExceptionHandler {
         return result;
       } on PostgrestException catch (e, stackTrace) {
         lastException = e;
-        lastStackTrace = stackTrace;
         attemptStopwatch.stop();
         
         // Add error breadcrumb
@@ -125,7 +124,6 @@ class SupabaseExceptionHandler {
         throw _transformPostgrestError(e, operation);
       } on AuthException catch (e, stackTrace) {
         lastException = e;
-        lastStackTrace = stackTrace;
         attemptStopwatch.stop();
         
         // Add error breadcrumb
@@ -160,7 +158,6 @@ class SupabaseExceptionHandler {
         throw _transformAuthError(e, operation);
       } on StorageException catch (e, stackTrace) {
         lastException = e;
-        lastStackTrace = stackTrace;
         attemptStopwatch.stop();
         
         // Check if we should retry storage errors
@@ -215,7 +212,6 @@ class SupabaseExceptionHandler {
         rethrow;
       } on SocketException catch (e, stackTrace) {
         lastException = e;
-        lastStackTrace = stackTrace;
         attemptStopwatch.stop();
         
         // Retry network errors
@@ -269,7 +265,6 @@ class SupabaseExceptionHandler {
         throw Exception('Erreur de connexion réseau. Veuillez vérifier votre connexion.');
       } on TimeoutException catch (e, stackTrace) {
         lastException = e;
-        lastStackTrace = stackTrace;
         attemptStopwatch.stop();
         
         // Retry timeout errors
@@ -323,7 +318,6 @@ class SupabaseExceptionHandler {
         throw Exception('La connexion a pris trop de temps. Veuillez réessayer.');
       } catch (e, stackTrace) {
         lastException = e;
-        lastStackTrace = stackTrace;
         attemptStopwatch.stop();
         
         // Check if we should retry unknown errors

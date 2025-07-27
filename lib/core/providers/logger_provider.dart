@@ -11,9 +11,7 @@ IErrorLogger errorLogger(ErrorLoggerRef ref) {
   
   // Dispose when provider is disposed
   ref.onDispose(() {
-    if (logger is ConsoleLogger) {
-      logger.dispose();
-    }
+    logger.dispose();
   });
   
   return logger;

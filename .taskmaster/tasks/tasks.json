@@ -2066,7 +2066,7 @@
               "31.4"
             ],
             "details": "Créer une classe ErrorLogger avec méthodes : logError, logWarning, logInfo. Utiliser des codes couleur ANSI pour la console (rouge pour erreurs, jaune pour warnings). Format de log structuré : [TIMESTAMP] [LEVEL] [CATEGORY] Message | Details. Pour les erreurs Supabase, inclure : operation, error_code, error_message, retry_count, duration, stack_trace (en mode debug uniquement). Créer une interface IErrorLogger pour permettre l'ajout futur du FileLogger. Ajouter une option pour désactiver les couleurs (utile pour les logs fichiers). Implémenter un buffer de logs avec flush périodique pour optimiser les performances. Prévoir l'intégration avec Task 19 via un callback onLog optionnel.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Vérifier que les logs apparaissent correctement formatés dans la console avec les bonnes couleurs et que toutes les informations pertinentes sont présentes"
           }
         ]
@@ -2074,7 +2074,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-27T19:11:37.145Z",
+      "updated": "2025-07-27T19:20:17.391Z",
       "description": "Tasks for master context"
     }
   }
