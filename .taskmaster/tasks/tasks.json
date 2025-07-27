@@ -144,7 +144,7 @@
         "dependencies": [
           1
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -152,7 +152,7 @@
             "description": "Supprimer toutes les règles de protection configurées sur la branche main via l'interface GitHub ou GitHub CLI",
             "dependencies": [],
             "details": "Se connecter à l'interface GitHub du projet, naviguer vers Settings > Branches. Identifier toutes les règles de protection actives sur la branche 'main'. Désactiver systématiquement : 'Require pull request reviews before merging', 'Require status checks to pass before merging', 'Require branches to be up to date before merging', 'Include administrators', et toute autre restriction. Si utilisation de GitHub CLI : gh api repos/:owner/:repo/branches/main/protection -X DELETE",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Créer une branche test locale, faire une modification mineure et tenter de push directement sur main sans créer de PR. Le push doit réussir sans aucune validation requise."
           },
           {
@@ -161,7 +161,7 @@
             "description": "Éliminer tous les fichiers de workflows CI/CD dans .github/workflows/ pour empêcher leur exécution automatique",
             "dependencies": [],
             "details": "Naviguer vers le répertoire .github/workflows/. Lister tous les fichiers YAML présents (ci.yml, release.yml, etc.). Option 1 : Supprimer définitivement avec 'rm -rf .github/workflows/*.yml'. Option 2 : Créer un répertoire .github/workflows.disabled/ et déplacer tous les fichiers dedans pour conservation temporaire. Vérifier aussi la présence de .github/dependabot.yml et le supprimer/désactiver si présent.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Faire un commit et push sur main. Vérifier dans l'onglet Actions de GitHub qu'aucun workflow ne se déclenche. La section Actions devrait être vide ou afficher 'No workflows'."
           },
           {
@@ -170,7 +170,7 @@
             "description": "Supprimer tous les hooks Git du projet ainsi que les scripts d'installation et de validation qui les gèrent",
             "dependencies": [],
             "details": "Exécuter 'rm -rf .git/hooks/*' pour supprimer tous les hooks actifs. Naviguer vers le répertoire scripts/ et identifier tous les fichiers liés aux hooks : install-hooks.sh, pre-commit-hook.sh, commit-msg-hook.sh, test-hooks.sh, validate_project.sh. Supprimer ces fichiers avec 'rm scripts/*hook*.sh scripts/validate*.sh'. Vérifier qu'aucun autre script ne fait référence aux hooks supprimés.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Tenter de faire un commit avec un message non conforme aux conventions. Le commit doit passer sans aucune validation. Vérifier que 'ls .git/hooks/' ne retourne aucun fichier exécutable."
           },
           {
@@ -183,7 +183,7 @@
               "3.3"
             ],
             "details": "Ouvrir README.md et rechercher toutes les sections mentionnant : workflows GitHub Actions, protection de branches, pull requests obligatoires, CI/CD, hooks Git. Supprimer ou commenter ces sections. Retirer tous les badges de statut CI/CD en haut du fichier. Dans CLAUDE.md, localiser la section 'Processus de Développement' et supprimer les parties sur la protection de main, les PR obligatoires et les conditions de merge. Ajouter une note temporaire indiquant que les protections sont désactivées pour accélérer le développement.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Relire les deux fichiers pour s'assurer qu'aucune référence aux anciennes protections ne subsiste. Vérifier que les instructions restantes sont cohérentes avec le nouveau workflow direct sur main."
           },
           {
@@ -197,7 +197,7 @@
               "3.4"
             ],
             "details": "Créer un fichier temporaire .taskmaster/PROTECTIONS_DISABLED.md listant toutes les protections désactivées avec la date. Faire un test complet : créer un fichier test, le committer avec un message simple, et pusher directement sur main. Vérifier sur GitHub que : aucune PR n'est requise, aucun workflow ne s'exécute, le commit apparaît immédiatement sur main. Documenter dans le fichier créé la procédure pour réactiver les protections si nécessaire plus tard.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Le push direct sur main doit fonctionner en moins de 5 secondes sans aucune intervention. Vérifier l'historique Git pour confirmer que le commit est bien sur main sans PR associée."
           }
         ]
@@ -1016,7 +1016,7 @@
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-27T08:26:19.884Z",
+      "updated": "2025-07-27T08:27:42.477Z",
       "description": "Tasks for master context"
     }
   }
