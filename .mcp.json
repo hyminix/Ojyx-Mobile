@@ -12,9 +12,6 @@
         "SUPABASE_ACCESS_TOKEN": "sbp_bffc9c5281426fe9c32b4d04abd8839f2c057b29"
       }
     },
-    "Sentry": {
-      "url": "https://mcp.sentry.dev/mcp"
-    },
     "taskmaster-ai": {
       "type": "stdio",
       "command": "npx",
