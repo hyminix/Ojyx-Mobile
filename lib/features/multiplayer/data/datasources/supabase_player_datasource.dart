@@ -51,7 +51,11 @@ class SupabasePlayerDataSource implements PlayerDataSource {
         .update(player.toSupabaseJson())
         .eq('id', player.id)
         .select()
-        .single();
+        .maybeSingle();
+
+    if (response == null) {
+      throw Exception('Player not found or update failed');
+    }
 
     return PlayerModel.fromJson(response);
   }

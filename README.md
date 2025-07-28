@@ -71,12 +71,33 @@ flutter test
 # Note : Un simple smoke test vérifie que l'app démarre
 ```
 
+## 🔍 Monitoring & Debugging
+
+### Sentry Integration
+L'application intègre Sentry pour le tracking des erreurs en production :
+- Capture automatique des erreurs Flutter, Dart et Platform
+- Monitoring des performances et transactions
+- Breadcrumbs personnalisés pour tracer le contexte
+- Dashboard : https://ojyx.sentry.io
+
+### Supabase Monitoring
+Requêtes SQL de monitoring disponibles dans `.taskmaster/docs/supabase-monitoring-queries.sql` :
+- Détection des violations RLS
+- Analyse des performances
+- Métriques des parties actives
+- Détection des requêtes N+1
+
+### Services de Monitoring
+- `SentryMonitoringService` : Service centralisé pour enrichir le contexte Sentry
+- Monitoring views dans Supabase : `v_rls_violations_monitor`, `v_active_games_stats`, etc.
+
 ## 📖 Documentation
 
 - [CLAUDE.md](./CLAUDE.md) - Règles et contraintes techniques
 - [GITHUB_BRANCH_PROTECTION.md](./GITHUB_BRANCH_PROTECTION.md) - Configuration des protections
 - [PROJECT_RULES.md](./PROJECT_RULES.md) - Règles du projet
 - [.githooks/README.md](./.githooks/README.md) - Documentation des git hooks
+- [.taskmaster/docs/sentry-supabase-fixes.md](./.taskmaster/docs/sentry-supabase-fixes.md) - Post-mortem des erreurs corrigées
 
 ## 🤝 Contribution
 

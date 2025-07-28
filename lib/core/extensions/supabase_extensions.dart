@@ -37,6 +37,21 @@ extension SupabaseClientExtensions on SupabaseClient {
     );
   }
 
+  /// Safely execute a single row select that may return null
+  Future<Map<String, dynamic>?> safeSelectMaybeSingle(
+    String table, {
+    String columns = '*',
+    Map<String, dynamic>? context,
+    int maxRetries = 3,
+  }) async {
+    return SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => from(table).select(columns).maybeSingle(),
+      operation: 'select_maybe_single_$table',
+      context: context,
+      maxRetries: maxRetries,
+    );
+  }
+
   /// Safely execute a select with filters
   Future<List<Map<String, dynamic>>> safeSelectWhere(
     String table, {

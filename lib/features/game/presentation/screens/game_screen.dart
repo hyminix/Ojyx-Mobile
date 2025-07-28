@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/utils/safe_ref_mixin.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../multiplayer/presentation/providers/room_providers.dart';
 import '../../../multiplayer/presentation/providers/multiplayer_game_notifier.dart';
@@ -30,7 +31,8 @@ class GameScreen extends ConsumerStatefulWidget {
   ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends ConsumerState<GameScreen> {
+class _GameScreenState extends ConsumerState<GameScreen> 
+    with SafeRefMixin {
   ActionCard? _pendingTeleportCard;
 
   @override
@@ -45,13 +47,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         ref.read(heartbeatServiceManagerProvider.notifier).startHeartbeat(currentUserId);
       }
     });
-  }
-  
-  @override
-  void dispose() {
-    // Arrêter le heartbeat
-    ref.read(heartbeatServiceManagerProvider.notifier).stopHeartbeat();
-    super.dispose();
+    
+    // Register cleanup callback to stop heartbeat on disposal
+    // This is safe because we register the callback while the widget is active
+    addCleanupCallback(() {
+      // Using safeRef to ensure we don't use ref after disposal
+      safeRef(() {
+        ref.read(heartbeatServiceManagerProvider.notifier).stopHeartbeat();
+      });
+    });
   }
 
   @override

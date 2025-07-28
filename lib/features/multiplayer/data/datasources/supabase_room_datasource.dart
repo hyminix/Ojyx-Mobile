@@ -17,6 +17,36 @@ class SupabaseRoomDatasource {
     required String creatorId,
     required int maxPlayers,
   }) async {
+    // First ensure creator exists in players table
+    final existingPlayer = await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase
+          .from('players')
+          .select()
+          .eq('id', creatorId)
+          .maybeSingle(),
+      operation: 'check_creator_exists',
+      context: {
+        'creator_id': creatorId,
+      },
+    );
+
+    // If creator doesn't exist, create them
+    if (existingPlayer == null) {
+      await SupabaseExceptionHandler.handleSupabaseCall(
+        call: () => _supabase
+            .from('players')
+            .insert({
+              'id': creatorId,
+              'name': 'Player', // Default name, can be updated later
+              'connection_status': 'online',
+            }),
+        operation: 'create_creator_player',
+        context: {
+          'creator_id': creatorId,
+        },
+      );
+    }
+
     final response = await _supabase.safeInsert(
       'rooms',
       {
@@ -29,6 +59,22 @@ class SupabaseRoomDatasource {
       context: {
         'creator_id': creatorId,
         'max_players': maxPlayers,
+      },
+    );
+
+    // Update player's current room
+    await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase
+          .from('players')
+          .update({
+            'current_room_id': response.first['id'],
+            'last_seen_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', creatorId),
+      operation: 'update_player_room',
+      context: {
+        'player_id': creatorId,
+        'room_id': response.first['id'],
       },
     );
 
@@ -50,6 +96,55 @@ class SupabaseRoomDatasource {
       return null;
     }
 
+    // Ensure joining player exists in players table
+    final existingPlayer = await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase
+          .from('players')
+          .select()
+          .eq('id', playerId)
+          .maybeSingle(),
+      operation: 'check_joining_player_exists',
+      context: {
+        'player_id': playerId,
+      },
+    );
+
+    // If player doesn't exist, create them
+    if (existingPlayer == null) {
+      await SupabaseExceptionHandler.handleSupabaseCall(
+        call: () => _supabase
+            .from('players')
+            .insert({
+              'id': playerId,
+              'name': 'Player ${room.playerIds.length + 1}', // Default name
+              'connection_status': 'online',
+              'current_room_id': roomId,
+            }),
+        operation: 'create_joining_player',
+        context: {
+          'player_id': playerId,
+          'room_id': roomId,
+        },
+      );
+    } else {
+      // Update existing player's current room
+      await SupabaseExceptionHandler.handleSupabaseCall(
+        call: () => _supabase
+            .from('players')
+            .update({
+              'current_room_id': roomId,
+              'last_seen_at': DateTime.now().toIso8601String(),
+              'connection_status': 'online',
+            })
+            .eq('id', playerId),
+        operation: 'update_joining_player_room',
+        context: {
+          'player_id': playerId,
+          'room_id': roomId,
+        },
+      );
+    }
+
     final updatedPlayerIds = [...room.playerIds, playerId];
 
     final response = await SupabaseExceptionHandler.handleSupabaseCall(
@@ -61,7 +156,7 @@ class SupabaseRoomDatasource {
           })
           .eq('id', roomId)
           .select()
-          .single(),
+          .maybeSingle(),
       operation: 'join_room',
       context: {
         'room_id': roomId,
@@ -70,6 +165,11 @@ class SupabaseRoomDatasource {
         'max_players': room.maxPlayers,
       },
     );
+
+    if (response == null) {
+      // Room was deleted or doesn't exist anymore
+      throw Exception('Room not found or was deleted');
+    }
 
     return RoomModel.fromJson(response);
   }
@@ -97,6 +197,22 @@ class SupabaseRoomDatasource {
       context: {
         'room_id': roomId,
         'player_id': playerId,
+      },
+    );
+
+    // Update player's current room to null
+    await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase
+          .from('players')
+          .update({
+            'current_room_id': null,
+            'last_seen_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', playerId),
+      operation: 'update_leaving_player',
+      context: {
+        'player_id': playerId,
+        'room_id': roomId,
       },
     );
   }
@@ -225,6 +341,41 @@ class SupabaseRoomDatasource {
     String? gameId;
 
     try {
+      // First, ensure all players exist in the players table
+      for (final playerId in room.playerIds) {
+        // Check if player exists
+        final existingPlayer = await SupabaseExceptionHandler.handleSupabaseCall(
+          call: () => _supabase
+              .from('players')
+              .select()
+              .eq('id', playerId)
+              .maybeSingle(),
+          operation: 'check_player_exists',
+          context: {
+            'player_id': playerId,
+          },
+        );
+
+        // If player doesn't exist, create them
+        if (existingPlayer == null) {
+          await SupabaseExceptionHandler.handleSupabaseCall(
+            call: () => _supabase
+                .from('players')
+                .insert({
+                  'id': playerId,
+                  'name': 'Player ${room.playerIds.indexOf(playerId) + 1}', // Default name
+                  'connection_status': 'online',
+                  'current_room_id': roomId,
+                }),
+            operation: 'create_player',
+            context: {
+              'player_id': playerId,
+              'room_id': roomId,
+            },
+          );
+        }
+      }
+
       // Créer le game state
       final gameStateResponse = await SupabaseExceptionHandler.handleSupabaseCall(
         call: () => _supabase
@@ -320,6 +471,15 @@ class SupabaseRoomDatasource {
                     'status': 'waiting',
                   })
                   .eq('id', roomId);
+              
+              // Note: We don't delete players as they might be used in other rooms
+              // Only update their current_room_id if needed
+              await _supabase
+                  .from('players')
+                  .update({
+                    'current_room_id': null,
+                  })
+                  .inFilter('id', room.playerIds);
             },
             operation: 'rollback_game_creation',
             context: {

@@ -8,21 +8,21 @@ class GridGenerator {
 
   /// Distribution des cartes selon les règles d'Ojyx
   static const Map<int, int> cardDistribution = {
-    -2: 4,  // 4 cartes de valeur -2
-    0: 8,   // 8 cartes de valeur 0
-    1: 8,   // 8 cartes de valeur 1
-    2: 8,   // 8 cartes de valeur 2
-    3: 8,   // 8 cartes de valeur 3
-    4: 8,   // 8 cartes de valeur 4
-    5: 8,   // 8 cartes de valeur 5
-    6: 8,   // 8 cartes de valeur 6
-    7: 8,   // 8 cartes de valeur 7
-    8: 8,   // 8 cartes de valeur 8
-    9: 8,   // 8 cartes de valeur 9
-    10: 8,  // 8 cartes de valeur 10
-    11: 8,  // 8 cartes de valeur 11
-    12: 8,  // 8 cartes de valeur 12
-    13: 8,  // 8 cartes de valeur 13
+    -2: 5,  // 5 cartes de valeur -2
+    -1: 10, // 10 cartes de valeur -1
+    0: 15,  // 15 cartes de valeur 0
+    1: 10,  // 10 cartes de valeur 1
+    2: 10,  // 10 cartes de valeur 2
+    3: 10,  // 10 cartes de valeur 3
+    4: 10,  // 10 cartes de valeur 4
+    5: 10,  // 10 cartes de valeur 5
+    6: 10,  // 10 cartes de valeur 6
+    7: 10,  // 10 cartes de valeur 7
+    8: 10,  // 10 cartes de valeur 8
+    9: 10,  // 10 cartes de valeur 9
+    10: 10, // 10 cartes de valeur 10
+    11: 10, // 10 cartes de valeur 11
+    12: 10, // 10 cartes de valeur 12
   };
 
   /// Génère une grille initiale avec 12 cartes face cachée

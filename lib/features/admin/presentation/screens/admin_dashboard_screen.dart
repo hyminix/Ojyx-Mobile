@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/utils/safe_ref_mixin.dart';
 import '../providers/cleanup_monitoring_provider.dart';
 
 class AdminDashboardScreen extends ConsumerStatefulWidget {
@@ -10,7 +11,8 @@ class AdminDashboardScreen extends ConsumerStatefulWidget {
   ConsumerState<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
 }
 
-class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
+class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> 
+    with SafeRefMixin {
   @override
   void initState() {
     super.initState();
@@ -18,12 +20,12 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     Future.delayed(Duration.zero, () {
       ref.read(cleanupMonitoringProvider.notifier).startAutoRefresh();
     });
-  }
-
-  @override
-  void dispose() {
-    ref.read(cleanupMonitoringProvider.notifier).stopAutoRefresh();
-    super.dispose();
+    
+    // Register cleanup callback to stop auto-refresh on disposal
+    // This is safe because we capture the notifier reference while widget is active
+    addCleanupCallback(() {
+      ref.read(cleanupMonitoringProvider.notifier).stopAutoRefresh();
+    });
   }
 
   @override

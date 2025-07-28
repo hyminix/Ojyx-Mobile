@@ -20,7 +20,7 @@ class HeartbeatService {
     _retryCount = 0;
     
     // Mettre à jour immédiatement le statut à connecté
-    _updatePlayerStatus(playerId, 'connected');
+    _updatePlayerStatus(playerId, 'online');
     
     // Démarrer le timer périodique
     _heartbeatTimer?.cancel();
@@ -36,7 +36,7 @@ class HeartbeatService {
     
     // Mettre à jour le statut à déconnecté
     if (_currentPlayerId != null) {
-      _updatePlayerStatus(_currentPlayerId!, 'disconnected');
+      _updatePlayerStatus(_currentPlayerId!, 'offline');
     }
     _currentPlayerId = null;
   }
@@ -51,7 +51,7 @@ class HeartbeatService {
             .from('players')
             .update({
               'last_seen_at': DateTime.now().toIso8601String(),
-              'connection_status': 'connected',
+              'connection_status': 'online',
             })
             .eq('id', _currentPlayerId!),
         operation: 'heartbeat',

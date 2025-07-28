@@ -2,20 +2,46 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'core/config/app_initializer.dart';
 import 'core/config/router_config.dart';
+import 'core/services/sentry_monitoring_service.dart';
 
+/// Main entry point - follows the pattern required to avoid Zone mismatch errors.
+/// WidgetsFlutterBinding.ensureInitialized() must be called in the main zone,
+/// before runZonedGuarded creates a custom zone.
 Future<void> main() async {
-  // Initialize all app services (including Sentry)
-  await AppInitializer.initialize();
+  // CRITICAL: Initialize Flutter bindings in the main zone
+  // This must happen before runZonedGuarded to avoid Zone mismatch errors
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables early in the main zone
+  // This is safe to do before runZonedGuarded
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    if (kDebugMode) {
+      debugPrint('Warning: .env file not found. Using compile-time constants.');
+    }
+  }
 
   // Set up global error handlers for comprehensive error capture
   _setupGlobalErrorHandlers();
 
-  // Wrap the app with Sentry's runZonedGuarded for Dart error capture
+  // Wrap the app execution with Sentry's runZonedGuarded for Dart error capture
+  // All app initialization that doesn't require bindings goes inside this zone
   runZonedGuarded(
-    () {
+    () async {
+      // Initialize remaining services (Supabase, Sentry, etc.)
+      // This is now safe because bindings are already initialized
+      await AppInitializer.initialize();
+
+      // Initialize monitoring service and log zone success
+      final monitoring = SentryMonitoringService();
+      await monitoring.initializeMonitoring();
+      monitoring.logZoneInitialization(success: true);
+
       // Run the app with Sentry's wrapper for Flutter error capture
       runApp(
         SentryWidget(
@@ -24,10 +50,21 @@ Future<void> main() async {
       );
     },
     (error, stackTrace) {
-      // Capture unhandled Dart errors
-      Sentry.captureException(error, stackTrace: stackTrace);
-      if (kDebugMode) {
-        print('Unhandled Dart error caught: $error');
+      // Log zone initialization failure if it happens early
+      if (!Sentry.isEnabled) {
+        // Sentry not yet initialized, just print
+        if (kDebugMode) {
+          print('Early error before Sentry init: $error');
+        }
+      } else {
+        // Capture unhandled Dart errors with monitoring context
+        final monitoring = SentryMonitoringService();
+        monitoring.logZoneInitialization(success: false, error: error.toString());
+        
+        Sentry.captureException(error, stackTrace: stackTrace);
+        if (kDebugMode) {
+          print('Unhandled Dart error caught: $error');
+        }
       }
     },
   );

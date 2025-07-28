@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -10,13 +9,13 @@ class AppInitializer {
   AppInitializer._();
 
   /// Initialize all app services and configurations
+  /// Note: WidgetsFlutterBinding.ensureInitialized() and dotenv.load() 
+  /// are now handled in main.dart before runZonedGuarded to avoid Zone mismatch
   static Future<void> initialize() async {
     try {
-      // Initialize Flutter bindings
-      WidgetsFlutterBinding.ensureInitialized();
-
-      // Load environment variables
-      await _loadEnvironmentVariables();
+      // Validate that environment variables are loaded
+      // (they should have been loaded in main.dart)
+      _validateEnvironmentVariables();
 
       // Initialize Supabase
       await _initializeSupabase();
@@ -33,29 +32,15 @@ class AppInitializer {
     }
   }
 
-  /// Load environment variables from .env file
-  static Future<void> _loadEnvironmentVariables() async {
-    try {
-      await dotenv.load(fileName: '.env');
-
-      // Validate required environment variables
-      _validateEnvironmentVariables();
-
-      debugPrint('Environment variables loaded successfully');
-    } catch (e) {
-      // In debug mode, allow running without .env file
-      if (kDebugMode) {
-        debugPrint('Warning: .env file not found. Using default values.');
-        // Load from compile-time constants if available
-        _loadFromDartDefine();
-      } else {
-        throw Exception('Failed to load environment variables: $e');
-      }
-    }
-  }
 
   /// Validate that all required environment variables are present
   static void _validateEnvironmentVariables() {
+    // First check if dotenv has loaded the variables
+    if (dotenv.env.isEmpty && kDebugMode) {
+      // If dotenv is empty, try to load from dart-define
+      _loadFromDartDefine();
+    }
+
     final requiredVars = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'];
 
     for (final varName in requiredVars) {

@@ -249,6 +249,143 @@ flutter run --dart-define=SUPABASE_URL=xxx --dart-define=SUPABASE_ANON_KEY=xxx
 - Aucune intervention utilisateur requise
 - Logs d'erreur en mode debug uniquement
 
+## 🚫 Patterns à Éviter - Leçons Apprises
+
+### 1. Zone Mismatch (OJYX-7)
+**❌ JAMAIS**
+```dart
+void main() async {
+  await dotenv.load();
+  runApp(MyApp());
+  await AppInitializer.initialize(); // Initialisation APRÈS runApp
+}
+```
+
+**✅ TOUJOURS**
+```dart
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
+  runZonedGuarded(() async {
+    await AppInitializer.initialize();
+    runApp(MyApp());
+  }, (error, stack) {
+    Sentry.captureException(error, stackTrace: stack);
+  });
+}
+```
+
+### 2. Riverpod Lifecycle (OJYX-C)
+**❌ JAMAIS**
+```dart
+class MyNotifier extends StateNotifier<State> {
+  void someMethod() {
+    final service = ref.read(provider); // Sans vérification
+  }
+}
+```
+
+**✅ TOUJOURS**
+```dart
+class MyNotifier extends StateNotifier<State> {
+  void someMethod() {
+    if (!mounted) return;
+    try {
+      final service = ref.read(provider);
+    } catch (e) {
+      debugPrint('Provider disposed: $e');
+    }
+  }
+}
+```
+
+### 3. RLS Policies Circulaires (OJYX-D)
+**❌ JAMAIS**
+```sql
+-- Policy qui requiert déjà ce qu'elle veut permettre
+CREATE POLICY "update_room" ON players
+FOR UPDATE USING (
+  EXISTS (
+    SELECT 1 FROM players p2
+    WHERE p2.id = auth.uid()
+    AND p2.current_room_id = players.current_room_id
+  )
+);
+```
+
+**✅ TOUJOURS**
+```sql
+-- Policy avec cas de base pour permettre l'action initiale
+CREATE POLICY "update_room" ON players
+FOR UPDATE USING (auth.uid() IS NOT NULL)
+WITH CHECK (
+  id = auth.uid() OR
+  current_room_id IS NULL OR -- Cas de base
+  -- Autres conditions...
+);
+```
+
+### 4. Performance RLS (OJYX-8)
+**❌ JAMAIS**
+```sql
+-- Appels multiples non cachés
+CREATE POLICY "policy" ON table
+USING (
+  auth.uid() = user_id OR
+  auth.uid() IN (SELECT ...) OR
+  auth.uid() = creator_id
+);
+```
+
+**✅ TOUJOURS**
+```sql
+-- Appel unique mis en cache
+CREATE POLICY "policy" ON table
+USING (
+  (SELECT auth.uid()) IS NOT NULL AND (
+    user_id = (SELECT auth.uid()) OR
+    (SELECT auth.uid()) IN (SELECT ...) OR
+    creator_id = (SELECT auth.uid())
+  )
+);
+```
+
+### 5. Vérification Auth (OJYX-9)
+**❌ JAMAIS**
+```dart
+Future<void> createGameState() async {
+  // Création directe sans vérifier auth
+  await supabase.from('game_states').insert({...});
+}
+```
+
+**✅ TOUJOURS**
+```dart
+Future<void> createGameState() async {
+  final user = supabase.auth.currentUser;
+  if (user == null) {
+    throw Exception('User not authenticated');
+  }
+  await supabase.from('game_states').insert({...});
+}
+```
+
+## Checklist de Validation
+
+### Avant chaque PR
+- [ ] `flutter analyze` sans warnings critiques
+- [ ] Pas de `auth.uid()` dans les policies RLS (utiliser `(SELECT auth.uid())`)
+- [ ] Vérification `mounted` avant `ref.read()` dans les Notifiers
+- [ ] Auth vérifiée avant opérations Supabase critiques
+- [ ] Pas de code async après `runApp()`
+- [ ] Tests manuels des flows principaux
+
+### Monitoring Continu
+- [ ] Vérifier Sentry dashboard pour nouvelles erreurs
+- [ ] Exécuter requêtes monitoring Supabase hebdomadairement
+- [ ] Analyser les violations RLS dans `v_rls_violations_monitor`
+- [ ] Vérifier les performances dans `v_policy_performance_metrics`
+
 ## Task Master AI Instructions
 **Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
 @./.taskmaster/CLAUDE.md

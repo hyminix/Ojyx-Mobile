@@ -1,0 +1,61 @@
+# Corrections des erreurs Sentry et optimisation Supabase pour Ojyx
+
+## Contexte
+Suite à l'analyse des erreurs Sentry et l'audit de sécurité/performance Supabase, plusieurs problèmes critiques ont été identifiés dans l'application Ojyx qui nécessitent une correction urgente.
+
+## Erreurs Sentry à corriger
+
+### OJYX-7 - Zone mismatch au démarrage (14 occurrences, 5 utilisateurs impactés)
+- Erreur: FlutterError: Zone mismatch lors de l'initialisation des bindings Flutter
+- Localisation: main.dart ligne 17-20
+- Cause: runZonedGuarded et ensureInitialized utilisent des zones différentes
+- Impact: Empêche le démarrage correct de l'application
+- Solution requise: Refactorer main.dart pour garantir l'utilisation de la même zone
+
+### OJYX-C - Riverpod ref utilisé après disposal (2 occurrences, 2 utilisateurs)  
+- Erreur: StateError: Cannot use "ref" after the widget was disposed
+- Localisation: GameScreen.dispose() et ConsumerStatefulElement
+- Cause: Utilisation de ref.read() dans la méthode dispose
+- Impact: Crash lors de la fermeture d'écrans
+- Solution requise: Implémenter des guards de sécurité et réviser le cycle de vie
+
+### OJYX-D - Violation RLS table players (1 occurrence)
+- Erreur: PostgrestException: new row violates row-level security policy for table "players"
+- Localisation: supabase.update_joining_player_room
+- Cause: Policies RLS trop restrictives ou auth.uid() non disponible
+- Impact: Impossible de mettre à jour les joueurs
+- Solution requise: Réviser et corriger les policies RLS de la table players
+
+## Problèmes de sécurité Supabase
+
+### Vues SECURITY DEFINER non sécurisées
+- 2 vues (rls_status, v_cleanup_monitoring) contournent les RLS
+- Risque de sécurité élevé
+- Action: Supprimer SECURITY DEFINER ou sécuriser les vues
+
+### Fonctions sans search_path
+- 31 fonctions PostgreSQL sans search_path défini
+- Risque d'injection SQL
+- Action: Ajouter SET search_path = public, pg_temp à toutes les fonctions
+
+## Problèmes de performance Supabase
+
+### Policies RLS non optimisées
+- 19 policies utilisent auth.uid() directement au lieu de (SELECT auth.uid())
+- Impact: Re-évaluation pour chaque ligne, performance dégradée
+- Tables affectées: rooms, game_states, player_grids, cards_in_play, etc.
+
+### Policies multiples permissives
+- 8 cas de policies multiples pour même rôle/action
+- Impact: Toutes les policies sont évaluées, performance réduite
+- Exemple: table rooms a 3 policies INSERT pour le rôle anon
+
+### Index et optimisations
+- 1 index dupliqué sur players (idx_players_last_seen et idx_players_last_seen_at)
+- 2 foreign keys sans index de couverture
+- 46 index non utilisés
+
+## Documentation des corrections passées
+- OJYX-8: Récursion infinie dans policy players (résolu)
+- OJYX-9: Violation RLS sur game_states (résolu)
+- Action: Documenter les solutions pour éviter les régressions

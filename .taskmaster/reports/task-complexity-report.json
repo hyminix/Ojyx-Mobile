@@ -1,37 +1,69 @@
 {
 	"meta": {
-		"generatedAt": "2025-07-27T20:00:29.278Z",
-		"tasksAnalyzed": 3,
-		"totalTasks": 34,
-		"analysisCount": 3,
+		"generatedAt": "2025-07-28T07:43:44.723Z",
+		"tasksAnalyzed": 7,
+		"totalTasks": 42,
+		"analysisCount": 7,
 		"thresholdScore": 5,
 		"projectName": "Taskmaster",
 		"usedResearch": true
 	},
 	"complexityAnalysis": [
 		{
-			"taskId": 32,
-			"taskTitle": "Corriger le système de lancement de partie multijoueur",
-			"complexityScore": 9,
-			"recommendedSubtasks": 8,
-			"expansionPrompt": "Décomposer l'implémentation du système de lancement multijoueur en étapes : création du schéma de base de données, implémentation de la logique de création de game state, gestion de la synchronisation Realtime, adaptation du GameScreen, gestion des états de transition et des erreurs, tests d'intégration avec rollback, et documentation de l'API",
-			"reasoning": "Tâche très complexe nécessitant création de plusieurs tables Supabase interdépendantes, logique transactionnelle avec rollback, synchronisation Realtime bidirectionnelle, gestion d'états complexes et cas d'erreur. L'architecture doit être robuste pour supporter la charge multijoueur avec transitions d'état atomiques."
-		},
-		{
-			"taskId": 33,
-			"taskTitle": "Système de nettoyage automatique des parties inactives",
-			"complexityScore": 8,
-			"recommendedSubtasks": 7,
-			"expansionPrompt": "Structurer l'implémentation du système de nettoyage en : création de l'Edge Function Supabase, mise en place du système de heartbeat côté client, création des triggers PostgreSQL pour détection de déconnexion, configuration du CRON job avec pg_cron, gestion des cas limites et edge cases, système de monitoring et logs, tests de charge et performance",
-			"reasoning": "Nécessite expertise en Edge Functions Supabase, triggers PostgreSQL, et CRON jobs. La complexité réside dans la coordination entre client (heartbeat) et serveur (nettoyage), avec gestion robuste des déconnexions et edge cases. Le système doit être performant pour ne pas impacter les parties actives."
-		},
-		{
-			"taskId": 34,
-			"taskTitle": "Provider Riverpod avec subscription Realtime pour liste des parties",
-			"complexityScore": 6,
+			"taskId": 36,
+			"taskTitle": "Corriger l'erreur Zone mismatch au démarrage (OJYX-7)",
+			"complexityScore": 7,
 			"recommendedSubtasks": 5,
-			"expansionPrompt": "Diviser l'implémentation en : création du AvailableRoomsNotifier avec gestion du cycle de vie, mise en place de la subscription Realtime avec filtres appropriés, optimisation des re-renders avec comparaison d'objets, intégration dans JoinGameScreen avec indicateur live, ajout du mécanisme de debounce pour performance",
-			"reasoning": "Complexité modérée nécessitant bonne compréhension de Riverpod AsyncNotifier et Supabase Realtime. Les défis principaux sont la gestion propre du cycle de vie des subscriptions, l'optimisation des performances pour éviter les re-renders excessifs, et la gestion de la reconnexion automatique."
+			"expansionPrompt": "Décomposer la correction du Zone mismatch en étapes : analyse du problème actuel dans main.dart, refactoring de l'initialisation des bindings Flutter, restructuration de runZonedGuarded, mise à jour de la gestion d'erreurs Sentry, et tests de validation sur différents environnements",
+			"reasoning": "Problème critique touchant l'architecture d'initialisation de l'app. Nécessite une compréhension approfondie de Flutter zones, Sentry integration, et l'ordre d'initialisation. Impact élevé sur la stabilité de l'application."
+		},
+		{
+			"taskId": 37,
+			"taskTitle": "Corriger l'utilisation de ref après disposal (OJYX-C)",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Structurer la correction en phases : audit complet des ConsumerStatefulWidget, implémentation des guards de sécurité, refactoring des dispose() methods, mise en place de KeepAliveProvider pour états critiques, ajout de logs de debug pour tracer le lifecycle, et tests de régression sur navigation rapide",
+			"reasoning": "Problème complexe de gestion du lifecycle Riverpod nécessitant un audit exhaustif du codebase. Risque élevé de régression si mal implémenté. Demande une expertise approfondie de Riverpod et Flutter lifecycle."
+		},
+		{
+			"taskId": 38,
+			"taskTitle": "Corriger les policies RLS de la table players (OJYX-D)",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Organiser la correction RLS : analyser les policies existantes et identifier les blocages, implémenter la nouvelle policy optimisée pour les updates anonymes, tester avec différents scénarios d'authentification, et documenter les changements pour l'équipe",
+			"reasoning": "Problème de sécurité base de données nécessitant une bonne compréhension de PostgreSQL RLS et Supabase auth. Criticité modérée mais impact direct sur fonctionnalité multijoueur."
+		},
+		{
+			"taskId": 39,
+			"taskTitle": "Sécuriser les vues et fonctions Supabase",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Diviser la sécurisation en tâches : identifier et supprimer SECURITY DEFINER des vues dangereuses, créer script automatisé pour ajouter search_path aux 31 fonctions, tester chaque modification pour éviter les régressions, auditer les permissions avec différents rôles, et documenter les changements de sécurité",
+			"reasoning": "Tâche de sécurité critique touchant de nombreux objets database. Risque de casser des fonctionnalités existantes. Nécessite automatisation pour gérer le volume et tests approfondis."
+		},
+		{
+			"taskId": 40,
+			"taskTitle": "Optimiser les policies RLS pour la performance",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Structurer l'optimisation : créer script d'analyse des 19 policies à optimiser, implémenter le remplacement automatique de auth.uid(), consolider les 8 cas de policies multiples, benchmarker avant/après avec EXPLAIN ANALYZE, valider la logique métier reste intacte, et documenter les gains de performance",
+			"reasoning": "Optimisation complexe nécessitant expertise PostgreSQL avancée. Impact performance significatif mais risque de régression fonctionnelle. Demande méthodologie rigoureuse de test et benchmark."
+		},
+		{
+			"taskId": 41,
+			"taskTitle": "Nettoyer les index et optimiser la base de données",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Organiser le nettoyage : supprimer l'index dupliqué identifié, créer les index manquants pour foreign keys, analyser et documenter les 46 index non utilisés avant suppression prudente, et mettre en place monitoring des performances post-optimisation",
+			"reasoning": "Tâche d'optimisation database standard mais nécessitant prudence. Volume important d'index à analyser mais processus bien défini. Impact performance potentiellement significatif."
+		},
+		{
+			"taskId": 42,
+			"taskTitle": "Documenter et monitorer les corrections",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Structurer la documentation : créer post-mortem détaillé des incidents, configurer alertes Sentry personnalisées avec breadcrumbs et tags, mettre en place dashboard Supabase de monitoring, et intégrer les bonnes pratiques dans la documentation projet",
+			"reasoning": "Tâche de documentation et monitoring relativement directe. Importance pour prévention future mais complexité technique limitée. Focus sur exhaustivité et clarté."
 		}
 	]
 }

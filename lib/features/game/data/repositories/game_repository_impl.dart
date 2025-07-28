@@ -217,11 +217,9 @@ class GameRepositoryImpl implements GameRepository {
         ? TurnDirection.counterClockwise 
         : TurnDirection.clockwise;
 
-    // Parser le deck
-    final deck = List<Card>.generate(
-      gameStateData['deck_count'] ?? 0,
-      (_) => const Card(value: 0), // Les cartes du deck ne sont pas révélées
-    );
+    // Parser le deck (on ne connaît pas les valeurs exactes du deck, mais on sait combien il y a de cartes)
+    // Les cartes du deck seront gérées côté serveur
+    final deck = <Card>[];
 
     // Parser la pile de défausse
     final discardPile = (json.decode(gameStateData['discard_pile'] ?? '[]') as List)
