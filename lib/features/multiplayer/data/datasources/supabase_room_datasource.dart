@@ -1,7 +1,12 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'dart:math';
+import 'dart:async';
 import '../../../../core/errors/supabase_exceptions.dart';
 import '../../../../core/extensions/supabase_extensions.dart';
 import '../models/room_model.dart';
+import '../../../game/data/services/game_state_service.dart';
+import '../../../game/domain/utils/grid_generator.dart';
 
 class SupabaseRoomDatasource {
   final SupabaseClient _supabase;
@@ -183,5 +188,153 @@ class SupabaseRoomDatasource {
         if (gameId != null) 'game_id': gameId,
       },
     );
+  }
+
+  Future<String> startGame({
+    required String roomId,
+  }) async {
+    // Timeout de 30 secondes pour la création complète
+    return await Future.any([
+      _createGameWithTimeout(roomId),
+      Future.delayed(const Duration(seconds: 30)).then((_) {
+        throw TimeoutException('Game creation timed out after 30 seconds');
+      }),
+    ]);
+  }
+  
+  Future<String> _createGameWithTimeout(String roomId) async {
+    // Ensure user is authenticated before creating game
+    final currentUser = _supabase.auth.currentUser;
+    if (currentUser == null) {
+      throw Exception('User not authenticated. Please sign in and try again.');
+    }
+
+    // Récupérer la room et les joueurs
+    final room = await getRoom(roomId);
+    if (room == null) {
+      throw Exception('Room not found');
+    }
+
+    if (room.playerIds.length < 2) {
+      throw Exception('Not enough players to start the game');
+    }
+
+    // Générer un seed pour la cohérence
+    final seed = Random().nextInt(1000000);
+    
+    String? gameId;
+
+    try {
+      // Créer le game state
+      final gameStateResponse = await SupabaseExceptionHandler.handleSupabaseCall(
+        call: () => _supabase
+            .from('game_states')
+            .insert({
+              'room_id': roomId,
+              'status': 'playing',
+              'game_phase': 'in_progress',
+              'turn_number': 0,
+              'round_number': 1,
+              'current_player_id': room.playerIds.first,
+              'direction': 'clockwise',
+              'deck_count': 100,
+              'discard_pile': json.encode([]),
+              'action_cards_deck_count': 30,
+              'action_cards_discard': json.encode([]),
+              'is_last_round': false,
+            })
+            .select()
+            .single(),
+        operation: 'create_game_state',
+        context: {
+          'room_id': roomId,
+          'player_count': room.playerIds.length,
+        },
+      );
+
+      gameId = gameStateResponse['id'] as String;
+
+      // Créer les player_grids pour chaque joueur
+      final playerGrids = <Map<String, dynamic>>[];
+      for (int i = 0; i < room.playerIds.length; i++) {
+        final playerId = room.playerIds[i];
+        final grid = GridGenerator.generateInitialGrid(seed: seed + i);
+        
+        playerGrids.add({
+          'game_state_id': gameId,
+          'player_id': playerId,
+          'position': i,
+          'grid_cards': json.encode(grid),
+          'action_cards': json.encode([]),
+          'score': 0,
+          'is_ready': false,
+          'is_active': true,
+          'has_revealed_all': false,
+        });
+      }
+
+      // Insérer tous les player_grids en une seule requête
+      await SupabaseExceptionHandler.handleSupabaseCall(
+        call: () => _supabase
+            .from('player_grids')
+            .insert(playerGrids),
+        operation: 'create_player_grids',
+        context: {
+          'game_id': gameId,
+          'player_count': playerGrids.length,
+        },
+      );
+
+      // Mettre à jour la room avec le game_id
+      await updateRoomStatus(
+        roomId: roomId,
+        status: 'in_game',
+        gameId: gameId,
+      );
+
+      return gameId;
+    } catch (e) {
+      // En cas d'erreur, essayer de nettoyer manuellement
+      if (gameId != null) {
+        try {
+          // Nettoyer en utilisant une transaction
+          await SupabaseExceptionHandler.handleSupabaseCall(
+            call: () async {
+              // Supprimer les player_grids
+              await _supabase
+                  .from('player_grids')
+                  .delete()
+                  .eq('game_state_id', gameId as Object);
+              
+              // Supprimer le game_state
+              await _supabase
+                  .from('game_states')
+                  .delete()
+                  .eq('id', gameId as Object);
+              
+              // Réinitialiser le current_game_id de la room
+              await _supabase
+                  .from('rooms')
+                  .update({
+                    'current_game_id': null,
+                    'status': 'waiting',
+                  })
+                  .eq('id', roomId);
+            },
+            operation: 'rollback_game_creation',
+            context: {
+              'room_id': roomId,
+              'game_id': gameId,
+              'error': e.toString(),
+            },
+          );
+        } catch (rollbackError) {
+          // Log l'erreur de rollback mais continuer avec l'erreur originale
+          print('Rollback failed: $rollbackError');
+        }
+      }
+      
+      throw Exception('Failed to start game: $e');
+    }
   }
 }

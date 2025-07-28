@@ -4,18 +4,30 @@ import 'package:go_router/go_router.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/room_providers.dart';
 import '../../domain/entities/room.dart';
+import '../../../rooms/presentation/providers/available_rooms_provider.dart';
+import '../../../rooms/presentation/widgets/realtime_connection_indicator.dart';
 
 class JoinRoomScreen extends ConsumerWidget {
   const JoinRoomScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final availableRoomsAsync = ref.watch(availableRoomsProvider);
+    // Utiliser le nouveau provider avec realtime MCP
+    final availableRoomsAsync = ref.watch(availableRoomsNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Rejoindre une partie'),
         centerTitle: true,
+        actions: [
+          // Indicateur de connexion MCP Realtime
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: const Center(
+              child: RealtimeConnectionIndicator(),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: availableRoomsAsync.when(
@@ -59,7 +71,8 @@ class JoinRoomScreen extends ConsumerWidget {
 
             return RefreshIndicator(
               onRefresh: () async {
-                ref.invalidate(availableRoomsProvider);
+                // Forcer le rechargement via le nouveau provider
+                await ref.read(availableRoomsNotifierProvider.notifier).refresh();
               },
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
@@ -90,7 +103,7 @@ class JoinRoomScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () => ref.refresh(availableRoomsProvider),
+                  onPressed: () => ref.refresh(availableRoomsNotifierProvider),
                   child: const Text('Réessayer'),
                 ),
               ],
@@ -111,8 +124,47 @@ class _RoomCard extends ConsumerStatefulWidget {
   ConsumerState<_RoomCard> createState() => _RoomCardState();
 }
 
-class _RoomCardState extends ConsumerState<_RoomCard> {
+class _RoomCardState extends ConsumerState<_RoomCard> with SingleTickerProviderStateMixin {
   bool _isJoining = false;
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+  int _lastPlayerCount = 0;
+  
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _pulseAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.05,
+    ).animate(CurvedAnimation(
+      parent: _pulseController,
+      curve: Curves.easeInOut,
+    ));
+    _lastPlayerCount = widget.room.currentPlayers;
+  }
+  
+  @override
+  void didUpdateWidget(_RoomCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Détecter les changements de nombre de joueurs
+    if (widget.room.currentPlayers != _lastPlayerCount) {
+      _lastPlayerCount = widget.room.currentPlayers;
+      // Animer pour signaler la mise à jour
+      _pulseController.forward().then((_) {
+        _pulseController.reverse();
+      });
+    }
+  }
+  
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
 
   Future<void> _joinRoom() async {
     setState(() => _isJoining = true);
@@ -151,73 +203,86 @@ class _RoomCardState extends ConsumerState<_RoomCard> {
   @override
   Widget build(BuildContext context) {
     final spotsAvailable =
-        widget.room.maxPlayers - widget.room.playerIds.length;
+        widget.room.maxPlayers - widget.room.currentPlayers;
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          child: Icon(
-            Icons.groups,
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-          ),
-        ),
-        title: Text('Partie #${widget.room.id.substring(0, 8)}'),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(
-                  Icons.person,
-                  size: 16,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+    return AnimatedBuilder(
+      animation: _pulseAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _pulseAnimation.value,
+          child: Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            elevation: _pulseController.isAnimating ? 4 : 1,
+            child: ListTile(
+              contentPadding: const EdgeInsets.all(16),
+              leading: CircleAvatar(
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                child: Icon(
+                  Icons.groups,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  '${widget.room.playerIds.length}/${widget.room.maxPlayers} joueurs',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
-            const SizedBox(height: 2),
-            Row(
-              children: [
-                Icon(
-                  Icons.access_time,
-                  size: 16,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'Créée ${_formatTime(widget.room.createdAt)}',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ],
-        ),
-        trailing: ElevatedButton(
-          onPressed: _isJoining || spotsAvailable == 0 ? null : _joinRoom,
-          child: _isJoining
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
+              ),
+              title: Text('Partie #${widget.room.id.substring(0, 8)}'),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.person,
+                        size: 16,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                      const SizedBox(width: 4),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: Text(
+                          '${widget.room.currentPlayers}/${widget.room.maxPlayers} joueurs',
+                          key: ValueKey('${widget.room.id}-${widget.room.currentPlayers}'),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    ],
                   ),
-                )
-              : Text(spotsAvailable == 0 ? 'Complet' : 'Rejoindre'),
-        ),
-      ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.access_time,
+                        size: 16,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Créée ${_formatTime(widget.room.createdAt)}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              trailing: ElevatedButton(
+                onPressed: _isJoining || spotsAvailable == 0 ? null : _joinRoom,
+                child: _isJoining
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(spotsAvailable == 0 ? 'Complet' : 'Rejoindre'),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

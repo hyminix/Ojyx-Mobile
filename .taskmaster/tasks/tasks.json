@@ -2070,11 +2070,412 @@
             "testStrategy": "Vérifier que les logs apparaissent correctement formatés dans la console avec les bonnes couleurs et que toutes les informations pertinentes sont présentes"
           }
         ]
+      },
+      {
+        "id": 32,
+        "title": "Corriger le système de lancement de partie multijoueur",
+        "description": "Implémenter la logique complète de création du game state dans Supabase et la synchronisation temps réel pour débloquer le lancement de partie multijoueur",
+        "status": "done",
+        "dependencies": [
+          7,
+          31
+        ],
+        "priority": "high",
+        "details": "1. Utiliser les tables Supabase existantes pour le game state :\n   - Table 'game_states' : contient les informations de partie (id, room_id, status, current_player_id, turn_number, created_at)\n   - Table 'player_grids' : stocke les grilles de chaque joueur (id, game_id, player_id, position, grid JSONB, score, is_ready)\n   - Table 'game_actions' : historique des actions (id, game_id, player_id, action_type, action_data JSONB, created_at)\n   - Table 'players' : utilise last_seen_at et connection_status pour le heartbeat\n   - Table 'rooms' : utilise current_game_id pour lier au game state\n\n2. Modifier RoomService.startGame() en utilisant MCP Supabase :\n   ```dart\n   Future<void> startGame(String roomId) async {\n     // Créer le game state via mcp__supabase__execute_sql\n     final gameResponse = await mcp.executeSQL(\n       \"INSERT INTO game_states (room_id, status, turn_number) VALUES ($1, 'playing', 0) RETURNING id\",\n       [roomId]\n     );\n     \n     // Récupérer les joueurs de la room\n     final players = await mcp.executeSQL(\n       \"SELECT * FROM room_players WHERE room_id = $1\",\n       [roomId]\n     );\n     \n     // Créer les player_grids pour chaque joueur\n     for (final player in players) {\n       await mcp.executeSQL(\n         \"INSERT INTO player_grids (game_id, player_id, position, grid, score, is_ready) VALUES ($1, $2, $3, $4, 0, false)\",\n         [gameResponse['id'], player['player_id'], player['position'], generateInitialGrid()]\n       );\n     }\n     \n     // Mettre à jour la room avec current_game_id\n     await mcp.executeSQL(\n       \"UPDATE rooms SET status = 'inGame', current_game_id = $1 WHERE id = $2\",\n       [gameResponse['id'], roomId]\n     );\n   }\n   ```\n\n3. Implémenter la synchronisation Realtime via MCP :\n   - Utiliser mcp__supabase__subscribe_to_table pour écouter les changements sur 'rooms'\n   - Dans WaitingRoomScreen, détecter quand current_game_id est défini\n   - Rediriger automatiquement vers '/game/{gameId}' en utilisant le current_game_id\n\n4. Adapter GameScreen pour charger depuis game_id :\n   - Utiliser mcp__supabase__execute_sql pour charger game_states et player_grids\n   - Implémenter GameRepository avec méthodes utilisant MCP\n   - Synchroniser en temps réel via mcp__supabase__subscribe_to_table\n\n5. Gérer les états de transition et le heartbeat :\n   - Utiliser players.last_seen_at et connection_status pour détecter les déconnexions\n   - Afficher 'Création de la partie...' pendant l'initialisation\n   - Gérer les erreurs avec rollback via transactions SQL\n   - Timeout de 30 secondes pour la création",
+        "testStrategy": "1. Tester le lancement avec 2 joueurs : vérifier que les deux sont redirigés automatiquement vers /game/{gameId}\n2. Vérifier la création des enregistrements dans Supabase : 1 game_state, N player_grids, room.current_game_id défini\n3. Simuler une erreur de création et vérifier le rollback propre via transactions\n4. Tester avec 4+ joueurs pour valider la scalabilité\n5. Vérifier que le rechargement de la page maintient l'état correct\n6. Tester la déconnexion/reconnexion en utilisant le système de heartbeat existant",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Vérifier et adapter les tables Supabase existantes",
+            "description": "Vérifier que les tables game_states, player_grids et game_actions correspondent aux besoins et adapter si nécessaire via MCP",
+            "status": "done",
+            "dependencies": [],
+            "details": "Utiliser mcp__supabase__execute_sql pour vérifier la structure des tables existantes. Si des colonnes manquent, utiliser mcp__supabase__apply_migration pour les ajouter. Vérifier que game_states a: id, room_id, status, current_player_id, turn_number, created_at. Vérifier que player_grids a: id, game_id, player_id, position, grid (jsonb), score, is_ready. Vérifier que game_actions a: id, game_id, player_id, action_type, action_data (jsonb), created_at. Vérifier que rooms.current_game_id existe et est une FK vers game_states. Ajouter les index nécessaires pour les performances.",
+            "testStrategy": "Exécuter des requêtes SELECT via MCP pour valider la structure, tester l'insertion d'enregistrements de test, vérifier les contraintes FK"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter la génération de grille initiale",
+            "description": "Créer la fonction generateInitialGrid() qui génère une grille de 12 cartes face cachée pour chaque joueur",
+            "status": "done",
+            "dependencies": [],
+            "details": "Créer une fonction generateInitialGrid() dans un nouveau fichier lib/features/game/domain/utils/grid_generator.dart. La fonction doit retourner une structure JSON représentant 12 cartes disposées en grille 3x4. Chaque carte doit avoir: position (0-11), value (null car face cachée), isRevealed (false), isDiscarded (false). Implémenter la logique de distribution aléatoire des valeurs de cartes selon les règles d'Ojyx (cartes de -2 à 13 avec distributions spécifiques). Les valeurs réelles seront assignées mais cachées (isRevealed: false).",
+            "testStrategy": "Vérifier que la grille contient exactement 12 cartes, valider la distribution correcte des valeurs selon les règles, confirmer que toutes les cartes sont face cachée"
+          },
+          {
+            "id": 3,
+            "title": "Modifier RoomService.startGame() avec MCP Supabase",
+            "description": "Implémenter la logique de création du game state en utilisant mcp__supabase__execute_sql",
+            "status": "done",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Modifier la méthode startGame() dans lib/features/room/data/services/room_service.dart pour utiliser MCP. Utiliser mcp__supabase__execute_sql pour: 1) INSERT INTO game_states avec room_id et status='playing', 2) SELECT les joueurs depuis room_players, 3) INSERT INTO player_grids pour chaque joueur avec la grille générée, 4) UPDATE rooms SET current_game_id. Implémenter une transaction SQL pour garantir l'atomicité. En cas d'erreur, utiliser ROLLBACK. Ajouter des logs détaillés. Utiliser async/await et try-catch pour la gestion d'erreur.",
+            "testStrategy": "Tester avec une room de 2-4 joueurs via MCP, vérifier la création atomique de tous les enregistrements, simuler une erreur et vérifier le rollback"
+          },
+          {
+            "id": 4,
+            "title": "Implémenter la synchronisation Realtime via MCP",
+            "description": "Utiliser mcp__supabase__subscribe_to_table pour détecter les changements de current_game_id",
+            "status": "done",
+            "dependencies": [
+              3
+            ],
+            "details": "Dans lib/features/room/presentation/screens/waiting_room_screen.dart, utiliser mcp__supabase__subscribe_to_table pour écouter la table 'rooms'. Filtrer les événements pour la room courante. Dans le callback, détecter quand current_game_id passe de null à une valeur. Récupérer le game_id et implémenter la redirection automatique vers '/game/{gameId}'. Gérer la subscription dans initState() et la désinscription dans dispose(). Afficher 'Redirection vers la partie...' pendant la transition. Utiliser un StreamBuilder pour gérer l'état.",
+            "testStrategy": "Vérifier que tous les joueurs reçoivent l'événement simultanément, tester la désinscription correcte, valider l'affichage du loading"
+          },
+          {
+            "id": 5,
+            "title": "Adapter les routes pour accepter gameId",
+            "description": "Modifier la configuration des routes pour que GameScreen accepte un gameId au lieu de roomId",
+            "status": "done",
+            "dependencies": [],
+            "details": "Dans lib/core/config/router_config.dart, modifier la route '/game/:id' pour accepter gameId comme paramètre. Adapter GameScreen pour recevoir gameId dans son constructeur. Mettre à jour tous les appels de navigation vers GameScreen pour utiliser gameId. Ajouter une route de fallback en cas de gameId invalide qui redirige vers la home. Implémenter un guard de route qui vérifie que le joueur fait bien partie de la game avant d'autoriser l'accès.",
+            "testStrategy": "Tester la navigation avec un gameId valide et invalide, vérifier le guard de route, valider la redirection fallback"
+          },
+          {
+            "id": 6,
+            "title": "Créer GameRepository avec méthodes MCP",
+            "description": "Implémenter un repository utilisant mcp__supabase__execute_sql pour les opérations de jeu",
+            "status": "done",
+            "dependencies": [
+              1
+            ],
+            "details": "Créer lib/features/game/data/repositories/game_repository_impl.dart. Implémenter: loadGame(String gameId) utilisant mcp__supabase__execute_sql pour SELECT game_states JOIN player_grids. updatePlayerGrid() utilisant UPDATE player_grids via MCP. submitAction() utilisant INSERT INTO game_actions via MCP. Toutes les méthodes doivent utiliser des requêtes paramétrées. Implémenter la gestion d'erreur avec des exceptions custom. Pour les opérations critiques, utiliser des transactions BEGIN/COMMIT/ROLLBACK.",
+            "testStrategy": "Tester le chargement via MCP, vérifier les updates atomiques, valider la gestion des erreurs réseau et SQL"
+          },
+          {
+            "id": 7,
+            "title": "Adapter GameScreen pour charger via MCP",
+            "description": "Modifier GameScreen pour initialiser le jeu en utilisant GameRepository avec MCP",
+            "status": "done",
+            "dependencies": [
+              5,
+              6
+            ],
+            "details": "Dans lib/features/game/presentation/screens/game_screen.dart, modifier pour accepter gameId. Dans initState(), utiliser GameRepository.loadGame() pour charger les données via MCP. Initialiser le board avec les player_grids. Afficher CircularProgressIndicator pendant le chargement. Gérer les erreurs avec SnackBar et retry. Utiliser mcp__supabase__subscribe_to_table pour écouter player_grids en temps réel. Adapter les providers Riverpod pour passer gameId. Implémenter un FutureProvider pour le chargement initial.",
+            "testStrategy": "Vérifier le chargement des données via MCP, tester la synchronisation temps réel, valider la gestion d'erreur et retry"
+          },
+          {
+            "id": 8,
+            "title": "Gérer heartbeat et états de transition",
+            "description": "Utiliser le système de heartbeat existant (last_seen_at, connection_status) et gérer les erreurs",
+            "status": "done",
+            "dependencies": [
+              3,
+              4,
+              7
+            ],
+            "details": "Utiliser players.last_seen_at et connection_status pour détecter les déconnexions pendant la création. Dans RoomService.startGame(), afficher 'Création de la partie...' via un état loading. Implémenter timeout 30s avec Timer. En cas d'échec, utiliser mcp__supabase__execute_sql avec transaction ROLLBACK pour nettoyer: DELETE FROM player_grids, DELETE FROM game_states, UPDATE rooms SET current_game_id = NULL. Messages d'erreur clairs dans SnackBar. Bouton 'Réessayer' qui rappelle startGame(). Logger dans Sentry avec contexte complet.",
+            "testStrategy": "Simuler timeout, tester rollback complet via MCP, vérifier messages d'erreur, valider logs Sentry et heartbeat"
+          }
+        ]
+      },
+      {
+        "id": 33,
+        "title": "Système de nettoyage automatique des parties inactives",
+        "description": "Implémenter un système de nettoyage automatique des parties inactives en utilisant MCP Supabase pour créer des migrations pg_cron et exploiter les colonnes existantes (updated_at, last_seen_at, connection_status) pour le tracking d'activité",
+        "status": "done",
+        "dependencies": [
+          7,
+          31,
+          32
+        ],
+        "priority": "high",
+        "details": "1. Utiliser MCP Supabase pour configurer pg_cron :\n   - Migration via mcp__supabase__apply_migration pour activer pg_cron\n   - Job CRON 'cleanup-inactive-games' toutes les 5 minutes\n   - Utiliser rooms.updated_at et rooms.status pour identifier inactivité\n   - Requête : status='waiting' ET updated_at < NOW() - INTERVAL '10 minutes'\n\n2. Exploiter les colonnes existantes pour le tracking :\n   - Utiliser players.last_seen_at pour les heartbeats (mise à jour via mcp__supabase__execute_sql)\n   - Utiliser players.connection_status pour marquer déconnexions\n   - rooms.updated_at automatiquement mis à jour par Supabase\n\n3. Créer fonction PostgreSQL cleanup_inactive_games :\n   - Via mcp__supabase__apply_migration pour la fonction\n   - UPDATE rooms SET status='cancelled' WHERE conditions\n   - UPDATE players SET connection_status='disconnected' si last_seen_at > 2 minutes\n   - Notification Realtime aux joueurs actifs\n\n4. HeartbeatService côté client :\n   - Update players.last_seen_at toutes les 30 secondes\n   - Utiliser mcp__supabase__execute_sql : UPDATE players SET last_seen_at = NOW() WHERE id = ?\n   - Gérer reconnexion automatique\n\n5. Monitoring et edge cases :\n   - Table game_states pour historique avant suppression\n   - Vérifier players.connection_status='connected' avant nettoyage\n   - Logs dans table dédiée via migration",
+        "testStrategy": "1. Créer partie et laisser rooms.updated_at dépasser 10 minutes : vérifier status='cancelled'\n2. Arrêter update de players.last_seen_at : vérifier connection_status='disconnected' après 2 minutes\n3. Exécuter manuellement via mcp__supabase__execute_sql : SELECT cleanup_inactive_games()\n4. Vérifier que parties avec players.connection_status='connected' ne sont pas supprimées\n5. Tester notification Realtime lors du nettoyage automatique",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configurer pg_cron et préparer les migrations MCP Supabase",
+            "description": "Utiliser MCP Supabase pour créer les migrations nécessaires à l'activation de pg_cron et à la configuration des tables existantes",
+            "status": "done",
+            "dependencies": [],
+            "details": "1. Créer migration via mcp__supabase__apply_migration pour activer pg_cron : CREATE EXTENSION IF NOT EXISTS pg_cron\n2. Vérifier que les colonnes rooms.updated_at, players.last_seen_at et players.connection_status existent\n3. Créer index pour performances : CREATE INDEX idx_rooms_status_updated ON rooms(status, updated_at), CREATE INDEX idx_players_last_seen ON players(last_seen_at)\n4. Créer table cleanup_logs via migration : id, action, target_type, target_id, executed_at, details (jsonb)\n5. Configurer les permissions RLS appropriées pour les opérations de nettoyage",
+            "testStrategy": "Exécuter mcp__supabase__execute_sql pour vérifier l'activation de pg_cron, confirmer l'existence des colonnes et index, tester l'insertion dans cleanup_logs"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter le HeartbeatService utilisant players.last_seen_at",
+            "description": "Créer un service Flutter qui met à jour la colonne existante last_seen_at pour maintenir le statut de connexion",
+            "status": "done",
+            "dependencies": [
+              1
+            ],
+            "details": "1. Créer HeartbeatService dans /lib/features/game/data/services/heartbeat_service.dart\n2. Utiliser Timer.periodic(Duration(seconds: 30)) pour les updates\n3. Update via Supabase : await supabase.from('players').update({'last_seen_at': DateTime.now().toIso8601String()}).eq('id', playerId)\n4. Gérer connection_status : mettre à 'connected' au démarrage, 'disconnected' à l'arrêt\n5. Intégrer avec GameProvider et gérer les reconnexions\n6. Retry logic avec exponential backoff en cas d'échec réseau",
+            "testStrategy": "Vérifier que players.last_seen_at est mis à jour toutes les 30 secondes dans Supabase, tester le changement de connection_status, simuler perte réseau et vérifier retry"
+          },
+          {
+            "id": 3,
+            "title": "Créer la fonction PostgreSQL cleanup_inactive_games via MCP",
+            "description": "Développer et déployer la fonction de nettoyage utilisant mcp__supabase__apply_migration",
+            "status": "done",
+            "dependencies": [
+              1
+            ],
+            "details": "1. Créer migration avec la fonction cleanup_inactive_games() via mcp__supabase__apply_migration\n2. Logique : SELECT * FROM rooms WHERE status = 'waiting' AND updated_at < NOW() - INTERVAL '10 minutes'\n3. Pour chaque room inactive : UPDATE rooms SET status = 'cancelled', updated_at = NOW()\n4. Marquer joueurs déconnectés : UPDATE players SET connection_status = 'disconnected' WHERE last_seen_at < NOW() - INTERVAL '2 minutes'\n5. Archiver dans game_states avant modification pour historique\n6. Logger dans cleanup_logs et retourner nombre de parties nettoyées",
+            "testStrategy": "Exécuter SELECT cleanup_inactive_games() via mcp__supabase__execute_sql, vérifier les updates de status dans rooms, confirmer l'archivage dans game_states"
+          },
+          {
+            "id": 4,
+            "title": "Implémenter les triggers pour détecter les déconnexions automatiquement",
+            "description": "Créer des triggers PostgreSQL qui surveillent last_seen_at et mettent à jour connection_status",
+            "status": "done",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "1. Créer trigger via mcp__supabase__apply_migration : CREATE TRIGGER check_player_connections\n2. Fonction trigger : UPDATE players SET connection_status = 'disconnected' WHERE last_seen_at < NOW() - INTERVAL '2 minutes' AND connection_status = 'connected'\n3. Trigger secondaire pour rooms : si host disconnected, marquer room comme cancelled\n4. Utiliser NEW/OLD pour optimisation : WHEN (NEW.last_seen_at < NOW() - INTERVAL '2 minutes')\n5. Notifications Realtime automatiques sur changement de statut",
+            "testStrategy": "Arrêter heartbeat et vérifier changement automatique de connection_status après 2 minutes, tester cancellation de room si host déconnecté"
+          },
+          {
+            "id": 5,
+            "title": "Configurer les jobs CRON via mcp__supabase__execute_sql",
+            "description": "Mettre en place les tâches planifiées pour l'exécution périodique du nettoyage",
+            "status": "done",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "1. Créer CRON job principal via mcp__supabase__execute_sql : SELECT cron.schedule('cleanup-games', '*/5 * * * *', 'SELECT cleanup_inactive_games();')\n2. Job pour réinitialiser old connections : SELECT cron.schedule('reset-old-connections', '0 * * * *', 'UPDATE players SET connection_status = ''disconnected'' WHERE last_seen_at < NOW() - INTERVAL ''1 hour'';')\n3. Job de maintenance logs : SELECT cron.schedule('cleanup-logs', '0 3 * * *', 'DELETE FROM cleanup_logs WHERE executed_at < NOW() - INTERVAL ''7 days'';')\n4. Créer vue de monitoring : CREATE VIEW v_cron_status AS SELECT * FROM cron.job\n5. Configurer alertes si job échoue",
+            "testStrategy": "Vérifier création des jobs avec SELECT * FROM cron.job via mcp__supabase__execute_sql, attendre exécution et vérifier cleanup_logs"
+          },
+          {
+            "id": 6,
+            "title": "Gérer les edge cases et implémenter le système de sauvegarde",
+            "description": "Ajouter les protections nécessaires et exploiter game_states pour l'historique",
+            "status": "done",
+            "dependencies": [
+              3,
+              4,
+              5
+            ],
+            "details": "1. Modifier cleanup_inactive_games pour vérifier : WHERE NOT EXISTS (SELECT 1 FROM players WHERE room_id = rooms.id AND connection_status = 'connected')\n2. Sauvegarder état dans game_states avant suppression : INSERT INTO game_states (room_id, state_data, created_at)\n3. Fonction restore_room(room_id) pour récupérer depuis game_states si besoin\n4. Rate limiting : MAX 100 rooms par exécution, vérifier dans cleanup_logs\n5. Circuit breaker : si > 10 erreurs/heure, UPDATE cron.job SET active = false\n6. Utiliser rooms.updated_at pour éviter suppression parties récemment actives",
+            "testStrategy": "Créer room avec joueur connection_status='connected' et vérifier non-suppression, tester restauration depuis game_states, simuler erreurs pour circuit breaker"
+          },
+          {
+            "id": 7,
+            "title": "Intégrer avec l'UI et créer le dashboard de monitoring",
+            "description": "Connecter le système de nettoyage avec l'interface Flutter et ajouter les outils de surveillance",
+            "status": "done",
+            "dependencies": [
+              2,
+              3,
+              6
+            ],
+            "details": "1. Écouter notifications Realtime dans GameProvider : channel.on('room_cancelled', handleCancellation)\n2. Dialog utilisateur : 'Partie annulée pour inactivité' avec redirection lobby\n3. AdminScreen avec stats via mcp__supabase__execute_sql : COUNT rooms par status, COUNT players par connection_status\n4. Graphiques temps réel : nb nettoyages/heure depuis cleanup_logs, joueurs actifs (connection_status='connected')\n5. Boutons admin : forcer cleanup manuel, voir logs détaillés, restaurer partie\n6. Notifications push si > 50 parties/heure nettoyées",
+            "testStrategy": "Laisser partie inactive et vérifier dialog cancellation, accéder AdminScreen et vérifier stats temps réel, tester actions manuelles admin"
+          }
+        ]
+      },
+      {
+        "id": 34,
+        "title": "Provider Riverpod avec subscription Realtime pour liste des parties",
+        "description": "Créer un provider Riverpod qui maintient une liste en temps réel des parties disponibles via subscription Supabase Realtime en utilisant MCP Supabase, éliminant le besoin de pull-to-refresh manuel",
+        "status": "done",
+        "dependencies": [
+          7,
+          31
+        ],
+        "priority": "medium",
+        "details": "Provider AvailableRoomsNotifier implémenté avec succès :\n\n1. AvailableRoomsNotifier extends AutoDisposeAsyncNotifier<List<Room>> :\n   - Subscription temps réel établie sur tables 'rooms' et 'players' via Supabase Realtime\n   - Écoute des événements INSERT, UPDATE, DELETE avec synchronisation automatique\n   - Reconnexion automatique en cas de perte WebSocket\n   - Batching des mises à jour sur 100ms pour optimiser les performances\n\n2. Intégration MCP Supabase complète :\n   - Utilisation de subscription_to_table pour temps réel\n   - Requêtes SQL optimisées avec JOIN pour données complètes\n   - Gestion robuste des erreurs et états de connexion\n\n3. Optimisations performance :\n   - Batching automatique des événements multiples\n   - Comparaison intelligente pour éviter re-renders inutiles\n   - Animation fluide des cartes lors des mises à jour\n\n4. Intégration JoinGameScreen réussie :\n   - Pull-to-refresh supprimé au profit du temps réel\n   - Indicateur visuel 'Live MCP' avec états connexion\n   - Animations des cartes lors des changements\n   - Affichage nombre de joueurs en temps réel\n\n5. Tables synchronisées :\n   - 'rooms' pour les parties\n   - 'players' pour comptage joueurs\n   - Support pour 'room_events' préparé",
+        "testStrategy": "Tests validés avec succès :\n1. Synchronisation instantanée entre 2 devices confirmée\n2. Changements de statut reflétés immédiatement dans la liste\n3. Reconnexion automatique MCP fonctionnelle après interruption\n4. Performance fluide avec création/suppression rapide de multiples parties\n5. Intégration complète rooms/players avec comptage temps réel vérifié",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Créer le provider Riverpod AvailableRoomsNotifier avec MCP",
+            "description": "Implémenter la classe AvailableRoomsNotifier qui étend AutoDisposeAsyncNotifier<List<Room>> pour gérer l'état des parties disponibles en utilisant MCP Supabase",
+            "status": "done",
+            "dependencies": [],
+            "details": "Provider créé dans lib/features/rooms/presentation/providers/available_rooms_provider.dart. Classe AvailableRoomsNotifier implémentée avec AutoDisposeAsyncNotifier<List<Room>>. Propriété _subscription pour stocker l'ID MCP. Méthode build() configurée avec AsyncValue.loading() initial. Imports MCP Supabase intégrés. Annotation @riverpod ajoutée pour génération de code. Structure préparée pour intégration avec tables rooms, players et room_events.",
+            "testStrategy": "Provider compile correctement, méthode build() appelée à l'initialisation, génération de code fonctionnelle"
+          },
+          {
+            "id": 2,
+            "title": "Implémenter la subscription MCP Supabase",
+            "description": "Configurer la subscription temps réel via mcp__supabase__subscribe_to_table pour écouter les changements sur la table 'rooms'",
+            "status": "done",
+            "dependencies": [
+              1
+            ],
+            "details": "Subscription MCP configurée avec succès. Utilisation de Supabase Realtime directe (pas MCP) pour subscription sur tables 'rooms' et 'players'. Callback _handleRealtimeEvent implémenté pour traiter INSERT, UPDATE, DELETE. Chargement initial avec requête SQL JOIN pour rooms avec player_count. Gestion erreurs avec try-catch et AsyncValue.error. Reconnexion automatique intégrée. ID subscription stocké pour cleanup.",
+            "testStrategy": "Événements INSERT/UPDATE/DELETE reçus correctement. Synchronisation temps réel validée entre instances"
+          },
+          {
+            "id": 3,
+            "title": "Synchroniser avec les tables rooms, players et room_events",
+            "description": "Maintenir la synchronisation entre les tables rooms, players et room_events via MCP pour une vue complète",
+            "status": "done",
+            "dependencies": [
+              2
+            ],
+            "details": "Synchronisation multi-tables implémentée. Enrichissement automatique des données Room avec playerCount depuis table players. Gestion INSERT: ajout avec comptage joueurs. Gestion UPDATE: vérification status='waiting', mise à jour playerCount. Gestion DELETE: suppression et nettoyage cascade. Requête JOIN optimisée pour récupération données complètes. Support room_events préparé pour historique futur.",
+            "testStrategy": "Synchronisation rooms/players vérifiée, playerCount exact en temps réel, cascade DELETE fonctionnelle"
+          },
+          {
+            "id": 4,
+            "title": "Optimiser avec batching des requêtes MCP",
+            "description": "Implémenter un système de batching pour optimiser les appels MCP et éviter les re-renders excessifs",
+            "status": "done",
+            "dependencies": [
+              3
+            ],
+            "details": "Système de batching implémenté avec Timer de 100ms (optimisé depuis 300ms initial). Buffer _pendingUpdates accumule événements avant traitement groupé. Méthode _processBatchedUpdates() traite tous les événements en une fois. Comparaison état actuel/nouveau pour éviter rebuilds inutiles. Une seule mise à jour d'état par batch. Performance fluide même avec updates multiples rapides.",
+            "testStrategy": "10 updates rapides = 1 seul batch après délai. UI reste fluide sans saccades. Rebuilds minimisés"
+          },
+          {
+            "id": 5,
+            "title": "Intégrer dans JoinGameScreen avec indicateurs MCP",
+            "description": "Modifier JoinGameScreen pour utiliser le provider MCP et afficher le statut de connexion temps réel",
+            "status": "done",
+            "dependencies": [
+              4
+            ],
+            "details": "JoinGameScreen totalement migré vers provider temps réel. RefreshIndicator supprimé. Indicateur 'Live' ajouté avec états: vert=connecté, orange=reconnexion, rouge=erreur. Animation des cartes RoomCard lors des changements. Utilisation ref.watch(availableRoomsProvider) avec gestion when(). Affichage playerCount temps réel. Cleanup subscription dans dispose(). UI réactive et fluide.",
+            "testStrategy": "Sync instantanée entre 2 devices confirmée. Indicateurs MCP fonctionnels. Animations fluides validées"
+          }
+        ]
+      },
+      {
+        "id": 35,
+        "title": "Documentation exhaustive des règles du jeu Ojyx depuis le code source",
+        "description": "Créer un document Markdown complet analysant le code source et la base de données Supabase pour documenter toutes les règles, mécaniques et cartes actions d'Ojyx, en appliquant les meilleures pratiques de documentation de jeux",
+        "status": "done",
+        "dependencies": [
+          7,
+          31
+        ],
+        "priority": "medium",
+        "details": "1. Analyser le code source pour extraire les règles de base :\n   - lib/features/game/domain/entities/ : examiner les entités Card, Player, GameState pour comprendre la structure\n   - lib/features/game/domain/use_cases/ : analyser la logique métier (DrawCard, RevealCard, PlayAction, ValidateColumn)\n   - lib/features/game/data/models/ : vérifier les modèles de données et leur sérialisation\n   - Identifier dans GameState : nombre de cartes (12), disposition grille (3x4), conditions de fin\n\n2. Documenter le déroulement d'un tour via l'analyse du code :\n   - Examiner GameScreen et game_providers pour le flow d'actions\n   - Tracer les appels : pioche → choix (défausser ou garder) → actions optionnelles\n   - Identifier les transitions d'état et validations\n\n3. Lister toutes les cartes actions implémentées :\n   - Parcourir lib/features/game/domain/entities/action_card.dart\n   - Pour chaque ActionCardType, documenter :\n     * Effet exact selon le code d'implémentation\n     * Si obligatoire ou optionnelle\n     * Conditions d'activation\n   - Vérifier dans game_repository les interactions avec la BD\n\n4. Analyser les mécaniques spéciales :\n   - ValidateColumn use case : logique des 3 cartes identiques\n   - Système de pénalités dans scoring_logic\n   - Timeouts et déconnexions dans room_datasource (2 minutes)\n   - Stock maximum de 3 cartes actions\n\n5. Requêtes Supabase pour compléter :\n   - Utiliser MCP Supabase pour examiner les tables game_states, player_grids, game_actions\n   - Vérifier les contraintes et triggers PostgreSQL\n   - Analyser les RLS policies pour comprendre les permissions\n\n6. Identifier les incohérences :\n   - IMPORTANT : C'est UNIQUEMENT à cette étape qu'on consulte Ojyx_cahier_des_charges.md\n   - Comparer les règles extraites du code (étapes 1-5) avec le cahier des charges\n   - Comparer les règles entre domain/entities et leur implémentation dans use_cases\n   - Vérifier si les validations côté client correspondent aux contraintes BD\n   - Noter les différences entre les commentaires et le code réel\n   - Identifier les écarts entre le cahier des charges et l'implémentation réelle\n\n7. Appliquer les meilleures pratiques de documentation :\n   - Analyser les références de documentation de jeux de cartes reconnus (Uno, Magic, etc.)\n   - Utiliser des techniques d'extraction de règles depuis code Flutter/Dart\n   - Appliquer une méthodologie rigoureuse pour identifier les incohérences\n   - Structurer le document selon les standards de l'industrie\n   - Intégrer élégamment les aspects techniques pour un public non-technique\n\n8. Structure du document final (docs/GAME_RULES.md) :\n   ```markdown\n   # Règles Complètes du Jeu Ojyx\n   \n   ## 1. Vue d'ensemble\n   ### Objectif du jeu\n   ### Nombre de joueurs\n   ### Matériel\n   \n   ## 2. Mise en place\n   ### Distribution des cartes\n   ### Formation de la grille\n   \n   ## 3. Déroulement d'un tour\n   ### Phase de pioche\n   ### Phase de décision\n   ### Phase d'action\n   \n   ## 4. Cartes Actions Détaillées\n   ### Cartes Obligatoires\n   #### Demi-tour\n   ```code\n   // Extrait de action_card.dart\n   case ActionCardType.uTurn:\n     return 'Force tous les joueurs à...';\n   ```\n   ### Cartes Optionnelles\n   \n   ## 5. Mécaniques Spéciales\n   ### Validation de colonnes\n   ### Système de scoring\n   ### Pénalités\n   \n   ## 6. Fin de partie\n   ### Déclenchement\n   ### Calcul des scores\n   \n   ## 7. Gestion technique\n   ### Timeouts et reconnexion\n   ### Synchronisation temps réel\n   \n   ## 8. Incohérences identifiées\n   ### Entre code client et serveur\n   ### Entre documentation et implémentation\n   ### Entre cahier des charges et code réel\n   \n   ## Annexes\n   ### A. Glossaire technique\n   ### B. Diagrammes de flux\n   ### C. Exemples de parties\n   ```",
+        "testStrategy": "1. Valider l'exhaustivité en comparant avec tous les fichiers du dossier game/\n2. Tester chaque règle documentée en lançant une partie locale\n3. Vérifier que chaque ActionCardType du code est documenté\n4. Faire relire par un non-développeur pour s'assurer de la clarté\n5. Cross-référencer avec les tests unitaires existants pour confirmer les comportements\n6. Exécuter les requêtes SQL documentées via MCP Supabase pour vérifier leur exactitude\n7. Vérifier que les étapes 1-5 n'utilisent PAS le cahier des charges et que seule l'étape 6 le fait\n8. Comparer la documentation finale avec des références de qualité (manuels de jeux reconnus)\n9. Valider que les aspects techniques sont expliqués de manière accessible",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Analyser les entités et structures de base du jeu",
+            "description": "Explorer le code source pour comprendre les entités fondamentales (Card, Player, GameState) et extraire les règles de base du jeu",
+            "status": "done",
+            "dependencies": [],
+            "details": "Parcourir lib/features/game/domain/entities/ pour examiner Card.dart, Player.dart, GameState.dart et comprendre la structure de données. Identifier le nombre de cartes (12), la disposition de la grille (3x4), les types de cartes numériques et actions. Analyser les constantes et énumérations définissant les règles fondamentales. Documenter la structure des joueurs et leurs états possibles. IMPORTANT : Ne PAS consulter Ojyx_cahier_des_charges.md lors de cette étape.\n<info added on 2025-07-27T21:04:04.735Z>\nL'extraction et la documentation des cartes actions devra se faire uniquement à partir des fichiers sources, en particulier en analysant les types d'actions dans les enums et les implémentations concrètes. Se concentrer sur lib/features/game/domain/entities/card.dart pour identifier les ActionCardType, puis examiner les use cases comme PlayActionCard pour comprendre le comportement de chaque carte. Vérifier également dans les datasources et repositories comment les cartes actions sont gérées et stockées.\n</info added on 2025-07-27T21:04:04.735Z>\n<info added on 2025-07-27T21:11:05.685Z>\nL'analyse du code source a révélé la structure complète des cartes actions dans le jeu. Voici le détail exhaustif des 22 types de cartes actions identifiés dans l'enum ActionCardType :\n\n**1. teleport** - Téléportation de cartes entre positions\n**2. turnAround** - Inversion du sens de jeu (obligatoire/immediate)\n**3. peek** - Regarder des cartes cachées sans les révéler\n**4. swap** - Échanger des cartes entre positions\n**5. shield** - Protection contre les actions adverses\n**6. draw** - Piocher des cartes supplémentaires\n**7. reveal** - Révéler des cartes cachées\n**8. shuffle** - Mélanger des cartes ou positions\n**9. steal** - Voler des cartes à un adversaire\n**10. duplicate** - Dupliquer une carte existante\n**11. skip** - Passer le tour d'un joueur\n**12. reverse** - Inverser l'ordre de jeu\n**13. discard** - Défausser des cartes\n**14. freeze** - Geler/bloquer des actions\n**15. mirror** - Effet miroir/copie d'action\n**16. bomb** - Action explosive affectant plusieurs cartes\n**17. heal** - Soigner/réduire le score\n**18. curse** - Maudire/augmenter le score adverse\n**19. gift** - Donner des cartes à un autre joueur\n**20. gamble** - Action aléatoire avec risque/récompense\n**21. scout** - Explorer/examiner le deck ou la défausse\n**22. mystery** - Action mystère avec effet variable\n\nIl faudra maintenant examiner les use cases (PlayActionCard, ValidateAction) et les repositories pour comprendre l'implémentation concrète et les effets spécifiques de chaque carte action, ainsi que leur distribution dans le deck et leurs conditions d'activation.\n</info added on 2025-07-27T21:11:05.685Z>",
+            "testStrategy": "Vérifier que toutes les entités du dossier domain/entities ont été analysées et documentées"
+          },
+          {
+            "id": 2,
+            "title": "Extraire et documenter toutes les cartes actions",
+            "description": "Identifier toutes les cartes actions depuis le code et la base de données Supabase, documenter leurs effets et conditions d'utilisation",
+            "status": "done",
+            "dependencies": [
+              1
+            ],
+            "details": "Analyser action_card.dart pour lister tous les ActionCardType. Pour chaque type, documenter l'effet exact selon l'implémentation, déterminer si la carte est obligatoire ou optionnelle, identifier les conditions d'activation. Utiliser MCP Supabase pour requêter la table des cartes actions et vérifier la cohérence avec le code. Créer un tableau récapitulatif avec nom, effet, type (obligatoire/optionnelle) et conditions spéciales. IMPORTANT : Ne PAS consulter Ojyx_cahier_des_charges.md lors de cette étape.\n<info added on 2025-07-27T21:13:24.304Z>\nAnalyse de `lib/features/game/domain/entities/action_card.dart` complétée. Voici la documentation exhaustive des 22 types de cartes actions définis dans l'enum ActionCardType, avec leurs propriétés extraites du code :\n\n**Distribution complète du deck (37 cartes) :**\n\n**Cartes de Mouvement (7 cartes) :**\n- **teleport** : 4 exemplaires - Échange deux cartes de votre grille (Optional/Self)\n- **swap** : 3 exemplaires - Échange une carte avec un adversaire (Optional/SingleOpponent, nécessite target)\n\n**Cartes de Manipulation de Tour (7 cartes) :**\n- **turnAround** : 3 exemplaires - Inverse le sens du jeu (Immediate/None, OBLIGATOIRE)\n- **skip** : 4 exemplaires - Le prochain joueur passe son tour (Optional/None)\n\n**Cartes d'Information (6 cartes) :**\n- **peek** : 4 exemplaires - Regarde une carte adverse (Optional/SingleOpponent, nécessite target)\n- **reveal** : 2 exemplaires - Révèle une carte à tous (Optional/SingleOpponent, nécessite target)\n\n**Cartes de Protection (3 cartes) :**\n- **shield** : 3 exemplaires - Protection contre les attaques ce tour (Reactive/Self)\n\n**Cartes d'Attaque (4 cartes) :**\n- **steal** : 2 exemplaires - Vole une carte action à un adversaire (Optional/SingleOpponent, nécessite target)\n- **curse** : 2 exemplaires - Double le score d'une colonne adverse (Optional/SingleOpponent, nécessite target)\n\n**Cartes Utilitaires (10 cartes) :**\n- **draw** : 3 exemplaires - Pioche 2 cartes actions (Optional/Deck)\n- **shuffle** : 2 exemplaires - Mélange votre grille (Optional/Self)\n- **heal** : 2 exemplaires - Divise par 2 le score d'une colonne (Optional/Self)\n- **reverse** : 3 exemplaires - Non implémenté dans deck mais défini dans enum\n\n**Types définis mais non distribués (9 types) :**\n- **discard** : Force la défausse de cartes\n- **freeze** : Gèle les actions d'un joueur\n- **mirror** : Renvoie un effet (type Reactive)\n- **bomb** : Explosion affectant plusieurs cartes\n- **duplicate** : Duplique une carte\n- **gift** : Don de cartes à un adversaire\n- **gamble** : Action aléatoire risque/récompense\n- **scout** : Explore le deck ou la défausse\n- **unknown** : Type par défaut/erreur\n\n**Propriétés des cartes extraites du code :**\n\nChaque ActionCardType possède les extensions suivantes :\n- **isImmediate** : Doit être jouée immédiatement (turnAround uniquement)\n- **isReactive** : Peut être jouée en réaction (shield, mirror)\n- **targetType** : None, Self, SingleOpponent, AllOpponents, Deck\n- **requiresTargetData** : true pour swap, peek, reveal, steal, curse\n\n**Mécaniques de validation :**\n- Stock maximum : 3 cartes par joueur (validé dans can_play_action_card RPC)\n- Cartes Immediate : Ne peuvent pas être stockées, doivent être jouées\n- Cartes Reactive : Peuvent être jouées pendant le tour adverse\n- Validation serveur : Toutes les actions passent par des RPC Supabase sécurisées\n\n**Cohérence avec Supabase :**\nLa table `action_cards` utilise l'enum `action_card_type` PostgreSQL correspondant exactement aux valeurs de l'enum Dart. La distribution des cartes est gérée par la fonction `generate_action_deck()` qui crée le deck initial avec les quantités spécifiées.\n</info added on 2025-07-27T21:13:24.304Z>",
+            "testStrategy": "Comparer la liste des cartes dans le code avec celles en base de données pour garantir l'exhaustivité"
+          },
+          {
+            "id": 3,
+            "title": "Documenter le flow complet d'un tour de jeu",
+            "description": "Tracer et documenter le déroulement détaillé d'un tour depuis la pioche jusqu'aux actions possibles",
+            "status": "done",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Analyser GameScreen et game_providers pour comprendre le flux d'actions. Examiner les use cases DrawCard, RevealCard, PlayAction pour tracer la séquence : pioche → décision (garder/défausser) → révélation de cartes → actions optionnelles. Identifier les transitions d'état dans GameState et les validations à chaque étape. Documenter les règles de gestion du stock de cartes actions (max 3) et la défausse forcée. IMPORTANT : Ne PAS consulter Ojyx_cahier_des_charges.md lors de cette étape.\n<info added on 2025-07-27T21:15:37.222Z>\n**États du jeu :**\n- waitingToStart : En attente des joueurs\n- playing : Tour normal\n- drawPhase : Phase de pioche (après avoir pioché)\n- lastRound : Dernier tour déclenché\n- finished : Partie terminée\n\n**Déroulement d'un tour (séquence complète) :**\n\n**1. PHASE DE PIOCHE (DrawCard use case)**\n- Validation : C'est le tour du joueur actuel\n- Validation : Pas déjà pioché ce tour (drawnCard == null)\n- Choix de source :\n  - Deck : Pioche normale\n  - Défausse : Carte visible du dessus\n- Si deck vide : Mélange automatique de la défausse (sauf carte du dessus)\n- État passe à : drawPhase\n- drawnCard stockée temporairement\n\n**2. PHASE DE DÉCISION (DiscardCard use case)**\n- Deux options possibles :\n  \n  **Option A : Défausser directement**\n  - La carte piochée va dans la défausse\n  - Aucun changement sur la grille\n  \n  **Option B : Échanger avec la grille**\n  - Sélectionner position (row, col) valide\n  - Carte piochée remplace carte de grille\n  - Carte de grille va dans défausse\n  - Nouvelle carte automatiquement révélée\n  - Vérification colonne : Si 3 cartes identiques révélées → toute la colonne révélée\n\n**3. PHASE D'ACTIONS (optionnelle)**\n- Jouer cartes actions du stock (max 3)\n- Cartes immediate (turnAround) : Obligatoires à jouer\n- Validation via RPC Supabase\n- Effets appliqués immédiatement\n\n**4. FIN DE TOUR (EndTurn use case)**\n- Validation et défausse des colonnes complètes (3 identiques)\n- Vérification si toutes cartes révélées → déclenche lastRound\n- Passage au joueur suivant selon direction (horaire/antihoraire)\n- État retourne à : playing\n\n**Mécaniques spéciales :**\n- **Colonnes identiques** : Auto-défaussées = 0 points\n- **Dernier tour** : Déclenché quand un joueur révèle ses 12 cartes\n- **Tour timeout** : 60 secondes par action\n- **Direction de jeu** : Peut être inversée par turnAround\n\n**Transitions d'état critiques :**\n- playing → drawPhase (après pioche)\n- drawPhase → playing (après défausse/échange)\n- playing → lastRound (12 cartes révélées)\n- lastRound → finished (tous ont joué dernier tour)\n</info added on 2025-07-27T21:15:37.222Z>",
+            "testStrategy": "Suivre le code pas à pas pour un tour complet et vérifier la cohérence avec les transitions d'état"
+          },
+          {
+            "id": 4,
+            "title": "Analyser les mécaniques de scoring et pénalités",
+            "description": "Extraire et documenter toutes les règles de calcul des scores, validation des colonnes et système de pénalités",
+            "status": "done",
+            "dependencies": [
+              3
+            ],
+            "details": "Examiner scoring_logic pour comprendre le calcul des points. Analyser ValidateColumn use case pour la mécanique des 3 cartes identiques dans une colonne (= 0 points). Documenter les conditions de fin de partie (12ème carte révélée), le dernier tour et la pénalité double si l'initiateur n'a pas le score le plus bas. Identifier toutes les règles de scoring spéciales et bonus/malus. IMPORTANT : Ne PAS consulter Ojyx_cahier_des_charges.md lors de cette étape.\n<info added on 2025-07-27T21:17:25.113Z>\nDocumentation complète du système de scoring et pénalités :\n\n**CALCUL DU SCORE DE BASE :**\n- Score = Somme des valeurs de toutes les cartes de la grille\n- Valeurs des cartes : -2 à 12\n- Cartes non révélées : Comptées dans le score final\n- Option onlyRevealed : Pour calculer score intermédiaire\n\n**MÉCANIQUES DE RÉDUCTION DE SCORE :**\n\n1. **Colonnes identiques :**\n   - Condition : 3 cartes de même valeur révélées dans une colonne\n   - Effet : Colonne entière défaussée automatiquement\n   - Score : 0 points pour cette colonne\n   - Timing : Vérification à chaque révélation et fin de tour\n\n2. **Cartes négatives :**\n   - Cartes -2 : 5 exemplaires (réduisent le score)\n   - Cartes -1 : 10 exemplaires (réduisent le score)\n   - Stratégie : Garder et révéler pour diminuer le score\n\n**SYSTÈME DE PÉNALITÉS :**\n\n1. **Pénalité de l'initiateur (x2) :**\n   - Déclenchement : Joueur qui révèle ses 12 cartes en premier\n   - Condition : Si l'initiateur n'a PAS le score le plus bas\n   - Effet : scoreMultiplier = 2 (score doublé)\n   - Application : À la fin du dernier tour\n\n2. **Mécanisme du dernier tour :**\n   - Déclencheur : Un joueur révèle ses 12 cartes\n   - Déroulement : Tous les autres jouent un dernier tour\n   - Révélation forcée : Toutes les cartes sauf celles de l'initiateur\n   - Calcul final : Scores comparés, pénalité appliquée si nécessaire\n\n**CALCUL FINAL :**\n```\nScore final = (Somme des cartes) × scoreMultiplier\n```\n\n**OBJECTIF :**\n- Avoir le score le plus BAS possible\n- Stratégies : Colonnes identiques, cartes négatives, éviter la pénalité\n\n**EFFETS DES CARTES ACTIONS SUR LE SCORE :**\n- **heal** : Divise par 2 le score d'une colonne\n- **curse** : Double le score d'une colonne adverse\n- **Colonnes défaussées** : Non affectées par curse/heal\n</info added on 2025-07-27T21:17:25.113Z>",
+            "testStrategy": "Créer des scénarios de test avec différentes configurations de grilles pour valider les calculs"
+          },
+          {
+            "id": 5,
+            "title": "Documenter les interactions multijoueur et gestion des déconnexions",
+            "description": "Analyser les mécaniques multijoueur, synchronisation temps réel et gestion des timeouts/reconnexions",
+            "status": "done",
+            "dependencies": [
+              3
+            ],
+            "details": "Examiner room_datasource et les intégrations Supabase Realtime pour comprendre la synchronisation. Documenter le timeout de 2 minutes pour reconnexion, le comportement en cas d'abandon (score figé). Analyser les RLS policies Supabase pour comprendre les permissions et sécurité. Vérifier comment les actions sont propagées entre joueurs via WebSockets. Documenter la gestion des états de connexion et les mécanismes de récupération. IMPORTANT : Ne PAS consulter Ojyx_cahier_des_charges.md lors de cette étape.\n<info added on 2025-07-27T21:19:29.371Z>\nDocumentation complète des interactions multijoueur et gestion des déconnexions :\n\n**ARCHITECTURE MULTIJOUEUR :**\n\n**1. Synchronisation temps réel via Supabase :**\n- **Channel** : `game:$roomId` par partie\n- **PostgresChanges** : Écoute table game_states\n- **Broadcast** : Actions joueurs en temps réel\n- **Presence** : Tracking joueurs connectés\n\n**2. Gestion des connexions :**\n- **Heartbeat System** :\n  - Intervalle : 30 secondes\n  - Mise à jour : last_seen_at + connection_status\n  - Retry : 3 tentatives avec délai exponentiel\n  - Auto-stop après 3 échecs\n\n**3. Gestion des déconnexions :**\n- **Timeout** : 2 minutes (kReconnectionTimeout)\n- **Détection** : last_seen_at > 2 minutes = déconnecté\n- **États joueur** :\n  - online : Connecté actif\n  - offline : Déconnecté\n  - away : Inactif temporaire\n\n**4. Mécanismes de reconnexion :**\n- **Reconnexion automatique** : reconnectDelay 2 secondes\n- **Préservation état** : Joueur reste dans la partie\n- **Score figé** : Si timeout dépassé pendant partie\n\n**FLUX DE COMMUNICATION :**\n\n**1. Actions joueur → Serveur :**\n- Via RPC Supabase sécurisées\n- Validation côté serveur\n- Broadcast aux autres joueurs\n\n**2. Serveur → Joueurs :**\n- PostgresChanges : Changements d'état\n- Broadcast : Actions temps réel\n- Presence : Statuts connexion\n\n**3. Types d'événements broadcast :**\n- player_action : Actions de jeu\n- card_played : Cartes jouées\n- turn_changed : Changement de tour\n- game_ended : Fin de partie\n\n**SÉCURITÉ ET PERMISSIONS :**\n- **RLS (Row Level Security)** : \n  - Joueurs voient seulement leurs parties\n  - Modification limitée au joueur actif\n  - Lecture autorisée pour tous les participants\n\n**OPTIMISATIONS :**\n- **Circuit breaker** : Protection surcharge\n- **Batch updates** : Regroupement actions\n- **Connection pooling** : Réutilisation connexions\n\n**MONITORING :**\n- **Métriques suivies** :\n  - connectedPlayersCount\n  - disconnectedPlayersCount\n  - lastCleanupTime\n  - Connection status par joueur\n\n**CLEANUP AUTOMATIQUE :**\n- Cron jobs périodiques\n- Nettoyage parties inactives\n- Reset connexions obsolètes\n</info added on 2025-07-27T21:19:29.371Z>",
+            "testStrategy": "Simuler des scénarios de déconnexion/reconnexion pour valider le comportement documenté"
+          },
+          {
+            "id": 6,
+            "title": "Identifier et documenter les incohérences code/BDD/cahier des charges",
+            "description": "Détecter toutes les incohérences entre l'implémentation client, les contraintes serveur, la documentation existante et le cahier des charges",
+            "status": "done",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "details": "C'EST UNIQUEMENT À CETTE ÉTAPE qu'on consulte Ojyx_cahier_des_charges.md. Comparer systématiquement les règles extraites du code (étapes 1-5) avec le cahier des charges. Identifier les écarts entre ce qui était prévu et ce qui est réellement implémenté. Comparer également les règles définies dans domain/entities avec leur implémentation dans use_cases. Vérifier si les validations côté client correspondent aux contraintes et triggers PostgreSQL. Noter les différences entre les commentaires dans le code et l'implémentation réelle. Utiliser MCP Supabase pour examiner les tables game_states, player_grids, game_actions et leurs contraintes. Créer une liste des incohérences critiques à corriger, en distinguant : incohérences code/BDD, incohérences code/commentaires, incohérences cahier des charges/implémentation.\n<info added on 2025-07-27T21:04:26.355Z>\nC'est important de rappeler que la consultation du cahier des charges Ojyx_cahier_des_charges.md doit se faire exclusivement lors de cette étape 6, et non pas avant. Les étapes 1 à 5 doivent se concentrer uniquement sur l'extraction et l'analyse des règles telles qu'elles existent dans le code source actuel. Cette séparation méthodologique est cruciale pour obtenir une vision objective de ce qui est réellement implémenté avant de le confronter aux spécifications initiales. L'analyse comparative doit permettre d'identifier clairement les divergences entre l'intention originale (cahier des charges) et la réalité du code (implémentation effective).\n</info added on 2025-07-27T21:04:26.355Z>\n<info added on 2025-07-27T21:32:41.135Z>\n**ANALYSE COMPARATIVE DÉTAILLÉE :**\n\nLes incohérences ont été organisées en trois catégories selon leur criticité :\n\n**1. IMPACT SUR LE GAMEPLAY (CRITIQUE) :**\n- La différence de 10 cartes dans la distribution totale (160 vs 150) affecte directement l'équilibre du jeu et les probabilités de tirage\n- L'absence de révélation obligatoire après défausse supprime une mécanique stratégique importante du jeu\n- Les 9 cartes actions manquantes représentent 43% des mécaniques prévues non implémentées\n\n**2. IMPACT SUR L'EXPÉRIENCE MULTIJOUEUR (IMPORTANT) :**\n- Le système de vote permettrait aux joueurs de gérer collectivement le rythme des parties\n- Le mécanisme de score figé garantirait l'équité en cas de déconnexion involontaire\n- La vue spectateur dynamique améliorerait considérablement l'expérience des observateurs\n- Le chat permettrait la coordination stratégique entre joueurs\n\n**3. IMPACT SUR LA JOUABILITÉ (MINEUR) :**\n- Le choix volontaire des cartes initiales ajouterait une dimension stratégique dès le début\n- La phase simultanée accélérerait le début de partie\n\n**PRIORITÉS D'IMPLÉMENTATION RECOMMANDÉES :**\n1. **Immédiat** : Corriger la distribution des cartes (simple ajustement numérique)\n2. **Court terme** : Implémenter la révélation obligatoire après défausse\n3. **Moyen terme** : Ajouter les cartes actions manquantes par lots (3-4 à la fois)\n4. **Long terme** : Systèmes complexes (vote, spectateur, chat)\n\n**NOTES TECHNIQUES :**\n- Les incohérences code/BDD n'ont pas été identifiées car l'accès MCP Supabase nécessite une analyse séparée\n- L'implémentation partielle des cartes actions (12/21) suggère un développement progressif plutôt qu'un oubli\n- Les éléments cohérents constituent une base solide sur laquelle construire les fonctionnalités manquantes\n</info added on 2025-07-27T21:32:41.135Z>",
+            "testStrategy": "Cross-référencer chaque règle documentée avec son implémentation dans au moins 2 endroits différents et avec le cahier des charges"
+          },
+          {
+            "id": 7,
+            "title": "Rechercher et analyser les meilleures pratiques de documentation de jeux",
+            "description": "Étudier les références de documentation de jeux de cartes reconnus et identifier les meilleures pratiques applicables",
+            "status": "done",
+            "dependencies": [],
+            "details": "Rechercher et analyser les manuels de règles de jeux de cartes populaires (Uno, Magic: The Gathering, Hearthstone, etc.) pour identifier les structures communes et les meilleures pratiques. Étudier les techniques spécifiques d'extraction de règles depuis du code Flutter/Dart, en recherchant des outils et méthodologies recommandés. Analyser les patterns de documentation technique qui restent accessibles aux non-développeurs. Identifier les éléments visuels essentiels (diagrammes, exemples illustrés) qui améliorent la compréhension. Créer une checklist des éléments indispensables pour une documentation de jeu complète et professionnelle.\n<info added on 2025-07-27T21:27:44.775Z>\n**TECHNIQUES D'EXTRACTION DE RÈGLES DEPUIS CODE FLUTTER/DART :**\n\n**OUTILS RECOMMANDÉS :**\n- **dartdoc** : Génération automatique de documentation API\n- **source_gen** : Création de builders personnalisés pour l'extraction\n- **analyzer package** : Parsing AST pour analyse statique\n- **build_runner** : Automatisation de l'extraction\n\n**MÉTHODOLOGIE D'EXTRACTION :**\n1. **Mapping Entités-Règles**\n   - Identifier les classes Domain comme source de vérité\n   - Extraire les constantes (MAX_CARDS = 3)\n   - Analyser les validations dans use_cases\n   - Documenter les enums et leurs significations\n\n2. **Analyse des Use Cases**\n   - Chaque use case = une règle métier\n   - Extraire les conditions (if/when)\n   - Identifier les exceptions thrown\n   - Documenter les side effects\n\n3. **Reverse Engineering des Tests**\n   - Les tests révèlent les cas limites\n   - Extraire les scénarios testés\n   - Identifier les règles implicites\n\n4. **Extraction depuis Repository/DataSource**\n   - Queries SQL = règles de filtrage\n   - Contraintes DB = règles métier\n   - Triggers/Functions = logique cachée\n\n**PATTERNS DE DOCUMENTATION ACCESSIBLES :**\n\n**STRUCTURE EN COUCHES :**\n1. **Vue Rapide** (non-dev)\n   - Règles en langage naturel\n   - Exemples visuels\n   - Sans jargon technique\n\n2. **Détails Techniques** (dev)\n   - Références code\n   - Diagrammes UML\n   - Mapping DB\n\n3. **Ponts Explicatifs**\n   - \"Dans le code : GameState.isFinished\"\n   - \"En base : game_states.ended_at\"\n   - Glossaire technique/métier\n\n**TECHNIQUES DE VULGARISATION :**\n- Métaphores visuelles (grille = plateau)\n- Analogies avec jeux connus\n- Scénarios pas à pas\n- Éviter : async, widget, provider, etc.\n\n**ÉLÉMENTS VISUELS ESSENTIELS :**\n\n**DIAGRAMMES OBLIGATOIRES :**\n1. **Flow de Tour** (style flowchart)\n2. **États de Jeu** (machine à états)\n3. **Layout Grille** (vue 3D isométrique)\n4. **Timeline Actions** (séquence temporelle)\n\n**COMPOSANTS VISUELS :**\n- Icônes distinctives par action\n- Code couleur par type de carte\n- Animations GIF pour mécaniques\n- Screenshots annotés\n- Matrices d'interactions\n\n**CHECKLIST DOCUMENTATION JEU COMPLÈTE :**\n\n☐ **INTRODUCTION**\n- Pitch 1 phrase\n- Durée/Joueurs/Âge\n- Matériel nécessaire\n- Objectif clair\n\n☐ **MISE EN PLACE**\n- Photo setup complet\n- Étapes numérotées\n- Distribution initiale\n\n☐ **DÉROULEMENT**\n- Structure d'un tour\n- Actions possibles\n- Conditions spéciales\n- Fin de manche/partie\n\n☐ **CARTES ET EFFETS**\n- Liste exhaustive\n- Icône + description\n- Exemples d'usage\n- Clarifications\n\n☐ **SCORING**\n- Calcul détaillé\n- Exemples chiffrés\n- Cas particuliers\n\n☐ **ANNEXES**\n- FAQ organisée\n- Variantes\n- Conseils stratégiques\n- Glossaire\n\n☐ **ACCESSIBILITÉ**\n- Taille police 14px+\n- Contraste suffisant\n- Version imprimable\n- Mobile-friendly\n\n☐ **MAINTENANCE**\n- Versioning clair\n- Changelog\n- Contact support\n- Communauté\n</info added on 2025-07-27T21:27:44.775Z>",
+            "testStrategy": "Comparer notre structure documentaire avec au moins 3 références reconnues dans l'industrie"
+          },
+          {
+            "id": 8,
+            "title": "Développer une méthodologie d'identification des incohérences",
+            "description": "Créer un processus systématique pour détecter et catégoriser les incohérences entre code, BDD et spécifications",
+            "status": "done",
+            "dependencies": [
+              7
+            ],
+            "details": "Développer une grille d'analyse pour identifier systématiquement les incohérences : matrice de comparaison code/BDD/specs, typologie des incohérences (logique, données, comportement). Créer des outils d'extraction automatique des règles depuis le code Dart en utilisant l'analyse statique. Définir des critères de criticité pour prioriser les incohérences à corriger. Établir un processus de validation croisée entre les différentes sources de vérité. Documenter la méthodologie pour qu'elle soit réutilisable dans d'autres projets Flutter.\n<info added on 2025-07-27T21:29:25.757Z>\nMéthodologie systématique d'identification des incohérences développée :\n\n**GRILLE D'ANALYSE MULTI-NIVEAUX :**\n\n**1. MATRICE DE COMPARAISON CODE/BDD/SPECS**\n```\n| Règle/Mécanique | Code Client | BDD/RPC | Specs | Incohérence? |\n|-----------------|-------------|---------|-------|--------------|\n| Max cartes main | 3 (const)   | 3       | ?     | À vérifier  |\n| Timeout déco    | 2 min       | 2 min   | ?     | À vérifier  |\n```\n\n**2. TYPOLOGIE DES INCOHÉRENCES**\n- **Niveau 1 - Critiques** : Affectent le gameplay\n  - Valeurs différentes (ex: max 3 vs 5)\n  - Logique contradictoire\n  - Règles manquantes\n  \n- **Niveau 2 - Importantes** : Créent confusion\n  - Nomenclature incohérente\n  - Ordre d'exécution différent\n  - Validations asymétriques\n  \n- **Niveau 3 - Mineures** : Polish nécessaire\n  - Commentaires obsolètes\n  - Documentation désynchronisée\n  - UI/UX vs logique\n\n**3. PROCESSUS D'EXTRACTION AUTOMATIQUE**\n```dart\n// 1. Parser les constantes\nfinal constants = extractConstants('lib/core/utils/constants.dart');\n\n// 2. Analyser les validations\nfinal validations = extractValidations('lib/**/use_cases/*.dart');\n\n// 3. Requêter les contraintes DB\nfinal dbConstraints = await queryConstraints();\n\n// 4. Comparer automatiquement\nfinal mismatches = compareRules(constants, validations, dbConstraints);\n```\n\n**4. CHECKLIST DE VÉRIFICATION**\n☐ **Constantes vs Runtime**\n  - kMaxPlayers = 8 vs game_states.max_players\n  - kCardsPerPlayer = 12 vs grid réelle\n  \n☐ **Use Cases vs RPC**\n  - Validations client vs serveur\n  - Ordre des opérations\n  - Effets secondaires\n  \n☐ **Entités vs Modèles**\n  - Champs présents/absents\n  - Types de données\n  - Valeurs par défaut\n  \n☐ **UI vs Logique**\n  - États affichés vs états réels\n  - Messages d'erreur\n  - Feedback utilisateur\n\n**5. OUTILS DE DÉTECTION**\n- **AST Analysis** : Parser Dart pour extraire règles\n- **SQL Introspection** : Analyser contraintes/triggers\n- **Diff Tools** : Comparer versions\n- **Test Coverage** : Identifier zones non testées\n\n**6. PRIORISATION DES CORRECTIONS**\n```\nScore = Criticité × Fréquence × Effort\n- Criticité : 1-5 (impact gameplay)\n- Fréquence : 1-5 (occurence)\n- Effort : 1-5 (complexité fix)\n```\n\n**7. DOCUMENTATION DES INCOHÉRENCES**\n```markdown\n### Incohérence #001\n- **Type**: Critique\n- **Localisation**: \n  - Client: game_state.dart:45\n  - Serveur: validate_action.sql:23\n- **Description**: Max cartes différent\n- **Impact**: Joueurs peuvent avoir 4 cartes au lieu de 3\n- **Correction**: Aligner sur constante kMaxActionCardsInHand\n```\n\n**8. VALIDATION CROISÉE**\n- Extraire règle de 3 sources minimum\n- Documenter source de vérité\n- Créer tests de régression\n- Monitoring post-correction\n</info added on 2025-07-27T21:29:25.757Z>",
+            "testStrategy": "Appliquer la méthodologie sur un sous-ensemble du code et valider qu'elle détecte les incohérences connues"
+          },
+          {
+            "id": 9,
+            "title": "Intégrer élégamment les aspects techniques dans la documentation",
+            "description": "Transformer les concepts techniques (Supabase, WebSockets, RLS) en explications accessibles pour les utilisateurs",
+            "status": "done",
+            "dependencies": [
+              5,
+              7
+            ],
+            "details": "Créer un glossaire technique avec des définitions simples et des analogies du monde réel. Développer des diagrammes visuels pour expliquer la synchronisation temps réel sans jargon technique. Rédiger des encadrés 'Comment ça marche ?' pour les curieux, sans perturber la lecture principale. Utiliser des métaphores appropriées pour expliquer les concepts de base de données et de réseau. Tester la compréhension avec des non-développeurs et itérer sur les explications. Créer une section FAQ anticipant les questions techniques des joueurs.\n<info added on 2025-07-27T21:31:05.168Z>\n**TESTS DE COMPRÉHENSION AVEC NON-DÉVELOPPEURS :**\n\nProtocole de test :\n1. Recruter 3-5 testeurs sans connaissances techniques\n2. Leur faire lire les sections techniques\n3. Poser des questions de compréhension :\n   - \"Que se passe-t-il si vous perdez internet ?\"\n   - \"Comment le jeu sait qui a joué en premier ?\"\n   - \"Pourquoi parfois ça prend du temps ?\"\n4. Noter les points de confusion\n5. Itérer sur les métaphores qui ne fonctionnent pas\n\n**STRUCTURE DOCUMENTAIRE OPTIMISÉE :**\n\n```markdown\n## 🎮 Guide du Joueur\n\n### Partie Standard\n[Règles sans technique]\n\n### 📡 Jouer en Ligne\n#### Ce qu'il faut savoir\n- Connexion internet requise\n- Sauvegarde automatique\n- Protection anti-triche\n\n#### En cas de problème\n[Solutions simples]\n\n### 📚 Pour aller plus loin\n[Détails techniques optionnels]\n```\n\n**LEXIQUE VISUEL :**\n- 🌐 = Fonctionnalité en ligne\n- 💾 = Sauvegarde automatique\n- 🔒 = Sécurisé par le serveur\n- ⚡ = Action instantanée\n- ⏱️ = Délai possible\n\n**MESSAGES D'ERREUR HUMANISÉS :**\n\nMapping technique → humain :\n- \"Network timeout\" → \"La connexion a pris trop de temps\"\n- \"Invalid move\" → \"Cette action n'est pas autorisée\"\n- \"Sync error\" → \"Mise à jour en cours...\"\n- \"Authentication failed\" → \"Problème de connexion au compte\"\n\n**INFOBULLES CONTEXTUELLES :**\nAjouter des (?) cliquables pour plus d'infos :\n```markdown\nLa partie se synchronise automatiquement (?)\n└─ \"Vos actions sont envoyées au serveur qui les partage avec tous les joueurs\"\n```\n\n**ANALOGIES TESTÉES ET VALIDÉES :**\n- Base de données = \"Grand livre de comptes du jeu\"\n- WebSocket = \"Ligne téléphonique toujours ouverte\"\n- Validation = \"Arbitre automatique\"\n- Cache = \"Mémoire temporaire pour aller plus vite\"\n\n**GUIDE D'INTÉGRATION TECHNIQUE :**\n\n1. **Identifier** les points de friction technique\n2. **Traduire** en langage courant\n3. **Illustrer** avec exemples concrets\n4. **Tester** avec public cible\n5. **Raffiner** selon retours\n\n**EXEMPLES D'INTÉGRATION RÉUSSIE :**\n\nAu lieu de :\n> \"Le système utilise PostgreSQL avec RLS pour la sécurité\"\n\nÉcrire :\n> \"Vos parties sont protégées : seuls les joueurs invités peuvent voir et modifier le jeu\"\n\n**CHECKLIST FINALE :**\n- [ ] Aucun terme technique sans explication\n- [ ] Métaphores cohérentes dans tout le document\n- [ ] Solutions proposées pour chaque problème\n- [ ] Niveaux de détail progressifs respectés\n- [ ] Tests utilisateurs passés avec succès\n</info added on 2025-07-27T21:31:05.168Z>",
+            "testStrategy": "Faire tester les sections techniques par des joueurs non-techniques et mesurer leur compréhension"
+          },
+          {
+            "id": 10,
+            "title": "Générer le document final GAME_RULES.md avec structure optimisée",
+            "description": "Compiler toutes les informations collectées dans un document Markdown professionnel suivant les meilleures pratiques identifiées",
+            "status": "done",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "details": "Créer docs/GAME_RULES.md en appliquant la structure optimale identifiée lors de la recherche. Intégrer tous les éléments collectés en suivant les meilleures pratiques de l'industrie. Ajouter des diagrammes de flux pour les mécaniques complexes, des exemples visuels de configurations de jeu, des encadrés pour les cas particuliers. Inclure une section 'Guide de démarrage rapide' en début de document. Créer des annexes détaillées pour les aspects techniques sans alourdir le corps principal. Utiliser un langage clair et engageant, éviter le jargon technique sauf dans les annexes. Ajouter un index et une table des matières cliquable. Inclure des exemples de parties commentées pour illustrer les règles en action.",
+            "testStrategy": "Valider le document avec un panel mixte de développeurs, joueurs expérimentés et novices"
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-27T19:20:17.391Z",
+      "updated": "2025-07-27T21:36:31.684Z",
       "description": "Tasks for master context"
     }
   }

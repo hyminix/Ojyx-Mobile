@@ -11,6 +11,7 @@ abstract class Room with _$Room {
     required List<String> playerIds,
     required RoomStatus status,
     required int maxPlayers,
+    @Default(0) int currentPlayers,
     String? currentGameId,
     DateTime? createdAt,
     DateTime? updatedAt,

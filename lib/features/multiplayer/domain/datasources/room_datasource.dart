@@ -37,4 +37,7 @@ abstract class RoomDatasource {
 
   /// Updates an existing game state
   Future<void> updateGameState(GameState gameState);
+
+  /// Starts a game for the given room
+  Future<String> startGame({required String roomId});
 }

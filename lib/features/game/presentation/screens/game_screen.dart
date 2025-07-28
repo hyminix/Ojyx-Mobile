@@ -5,6 +5,7 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../multiplayer/presentation/providers/room_providers.dart';
 import '../../../multiplayer/presentation/providers/multiplayer_game_notifier.dart';
 import '../providers/game_state_notifier.dart';
+import '../providers/game_providers.dart';
 import '../providers/direction_observer_provider.dart';
 import '../widgets/player_grid_widget.dart';
 import '../widgets/player_grid_with_selection.dart';
@@ -21,9 +22,9 @@ import '../../domain/entities/game_player.dart';
 import '../../domain/entities/action_card.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
-  final String roomId;
+  final String gameId;
 
-  const GameScreen({super.key, required this.roomId});
+  const GameScreen({super.key, required this.gameId});
 
   @override
   ConsumerState<GameScreen> createState() => _GameScreenState();
@@ -35,10 +36,22 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize multiplayer sync
+    // Le chargement est maintenant géré par gameStateManagerProvider
+    
+    // Démarrer le heartbeat
     Future.microtask(() {
-      ref.read(multiplayerGameNotifierProvider(widget.roomId));
+      final currentUserId = ref.read(currentUserIdProvider);
+      if (currentUserId != null) {
+        ref.read(heartbeatServiceManagerProvider.notifier).startHeartbeat(currentUserId);
+      }
     });
+  }
+  
+  @override
+  void dispose() {
+    // Arrêter le heartbeat
+    ref.read(heartbeatServiceManagerProvider.notifier).stopHeartbeat();
+    super.dispose();
   }
 
   @override
@@ -47,8 +60,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     ref.watch(directionObserverProvider);
 
     final currentUserId = ref.watch(currentUserIdProvider);
-    final gameStateAsync = ref.watch(gameStateNotifierProvider);
-    final roomAsync = ref.watch(currentRoomProvider(widget.roomId));
+    final gameState = ref.watch(gameStateManagerProvider(widget.gameId));
 
     return Scaffold(
       appBar: AppBar(
@@ -62,9 +74,34 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           ),
         ],
       ),
-      body: roomAsync.when(
-        data: (room) {
-          if (gameStateAsync == null) {
+      body: gameState.when(
+        loading: () => const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Chargement de la partie...'),
+            ],
+          ),
+        ),
+        error: (error, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              Text('Erreur: ${error.toString()}'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => context.go('/'),
+                child: const Text('Retour à l\'accueil'),
+              ),
+            ],
+          ),
+        ),
+        data: (gameState) {
+          if (gameState == null) {
             return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -78,14 +115,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           }
 
           final currentPlayer = _getCurrentPlayer(
-            gameStateAsync,
+            gameState,
             currentUserId!,
           );
           if (currentPlayer == null) {
             return const Center(child: Text('Erreur: Joueur non trouvé'));
           }
 
-          final isMyTurn = gameStateAsync.currentPlayer.id == currentUserId;
+          final isMyTurn = gameState.currentPlayer.id == currentUserId;
 
           return GameAnimationOverlay(
             child: SafeArea(
@@ -96,7 +133,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     padding: const EdgeInsets.all(16.0),
                     child: Center(
                       child: TurnInfoWidget(
-                        gameState: gameStateAsync,
+                        gameState: gameState,
                         currentPlayerId: currentUserId,
                       ),
                     ),
@@ -115,10 +152,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                               children: [
                                 Expanded(
                                   child: DeckAndDiscardWidget(
-                                    gameState: gameStateAsync,
+                                    gameState: gameState,
                                     canDraw:
                                         isMyTurn &&
-                                        gameStateAsync.drawnCard == null,
+                                        gameState.drawnCard == null,
                                     onDrawFromDeck: () => _drawFromDeck(ref),
                                     onDrawFromDiscard: () =>
                                         _drawFromDiscard(ref),
@@ -164,7 +201,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                                   isCurrentPlayer: true,
                                   canInteract:
                                       isMyTurn &&
-                                      gameStateAsync.drawnCard != null,
+                                      gameState.drawnCard != null,
                                   onCardTap: (row, col) =>
                                       _handleCardTap(ref, row, col),
                                 );
@@ -173,10 +210,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                             const SizedBox(height: 16),
 
                             // Other players' grids
-                            if (gameStateAsync.players.length > 1) ...[
+                            if (gameState.players.length > 1) ...[
                               const SizedBox(height: 24),
                               OpponentsViewWidget(
-                                gameState: gameStateAsync,
+                                gameState: gameState,
                                 currentPlayerId: currentUserId,
                                 onPlayerTap: (playerId) {
                                   // Pour le moment, on affiche juste un message
@@ -196,9 +233,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   ),
 
                   // GamePlayer hand (drawn card)
-                  if (gameStateAsync.drawnCard != null && isMyTurn)
+                  if (gameState.drawnCard != null && isMyTurn)
                     PlayerHandWidget(
-                      drawnCard: gameStateAsync.drawnCard,
+                      drawnCard: gameState.drawnCard,
                       canDiscard: true,
                       onDiscard: () => _discardDirectly(ref),
                       isCurrentPlayer: true,
@@ -223,24 +260,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-              const SizedBox(height: 16),
-              const Text('Erreur'),
-              const SizedBox(height: 8),
-              Text(error.toString()),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => context.go('/'),
-                child: const Text('Retour à l\'accueil'),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -255,56 +274,76 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   void _drawFromDeck(WidgetRef ref) {
     final notifier = ref.read(
-      multiplayerGameNotifierProvider(widget.roomId).notifier,
+      gameStateManagerProvider(widget.gameId).notifier,
     );
     final currentUserId = ref.read(currentUserIdProvider);
     if (currentUserId != null) {
-      notifier.drawFromDeck(currentUserId);
+      notifier.submitAction(
+        playerId: currentUserId,
+        actionType: 'draw_card',
+        actionData: {'source': 'deck'},
+      );
     }
   }
 
   void _drawFromDiscard(WidgetRef ref) {
     final notifier = ref.read(
-      multiplayerGameNotifierProvider(widget.roomId).notifier,
+      gameStateManagerProvider(widget.gameId).notifier,
     );
     final currentUserId = ref.read(currentUserIdProvider);
     if (currentUserId != null) {
-      notifier.drawFromDiscard(currentUserId);
+      notifier.submitAction(
+        playerId: currentUserId,
+        actionType: 'draw_from_discard',
+        actionData: {'source': 'discard'},
+      );
     }
   }
 
   void _handleCardTap(WidgetRef ref, int row, int col) {
-    final gameState = ref.read(gameStateNotifierProvider);
+    final gameState = ref.read(gameStateManagerProvider(widget.gameId)).valueOrNull;
     if (gameState?.drawnCard != null) {
       final notifier = ref.read(
-        multiplayerGameNotifierProvider(widget.roomId).notifier,
+        gameStateManagerProvider(widget.gameId).notifier,
       );
       final currentUserId = ref.read(currentUserIdProvider);
       if (currentUserId != null) {
         // Calculate position index (row * 4 + col for 3x4 grid)
         final position = row * 4 + col;
-        notifier.discardCard(currentUserId, position);
+        notifier.submitAction(
+          playerId: currentUserId,
+          actionType: 'exchange_card',
+          actionData: {'position': position},
+        );
       }
     }
   }
 
   void _discardDirectly(WidgetRef ref) {
     final notifier = ref.read(
-      multiplayerGameNotifierProvider(widget.roomId).notifier,
+      gameStateManagerProvider(widget.gameId).notifier,
     );
     final currentUserId = ref.read(currentUserIdProvider);
     if (currentUserId != null) {
-      notifier.discardCard(currentUserId, -1); // -1 indicates direct discard
+      notifier.submitAction(
+        playerId: currentUserId,
+        actionType: 'discard_card',
+        actionData: {'position': -1}, // -1 indicates direct discard
+      );
     }
   }
 
   void _drawActionCard(WidgetRef ref) {
     final notifier = ref.read(
-      multiplayerGameNotifierProvider(widget.roomId).notifier,
+      gameStateManagerProvider(widget.gameId).notifier,
     );
     final currentUserId = ref.read(currentUserIdProvider);
     if (currentUserId != null) {
-      notifier.drawActionCard(currentUserId);
+      notifier.submitAction(
+        playerId: currentUserId,
+        actionType: 'draw_action_card',
+        actionData: {},
+      );
     }
   }
 
@@ -317,22 +356,30 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     } else {
       // Handle other action cards normally
       final notifier = ref.read(
-        multiplayerGameNotifierProvider(widget.roomId).notifier,
+        gameStateManagerProvider(widget.gameId).notifier,
       );
       final currentUserId = ref.read(currentUserIdProvider);
       if (currentUserId != null) {
-        notifier.useActionCard(currentUserId, card);
+        notifier.submitAction(
+        playerId: currentUserId,
+        actionType: 'play_action_card',
+        actionData: {'card': card.toJson()},
+      );
       }
     }
   }
 
   void _discardActionCard(WidgetRef ref, ActionCard card) {
     final notifier = ref.read(
-      multiplayerGameNotifierProvider(widget.roomId).notifier,
+      gameStateManagerProvider(widget.gameId).notifier,
     );
     final currentUserId = ref.read(currentUserIdProvider);
     if (currentUserId != null) {
-      notifier.discardActionCard(currentUserId, card);
+      notifier.submitAction(
+        playerId: currentUserId,
+        actionType: 'discard_action_card',
+        actionData: {'card': card.toJson()},
+      );
     }
   }
 
@@ -340,15 +387,18 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     if (_pendingTeleportCard == null) return;
 
     final notifier = ref.read(
-      multiplayerGameNotifierProvider(widget.roomId).notifier,
+      gameStateManagerProvider(widget.gameId).notifier,
     );
     final currentUserId = ref.read(currentUserIdProvider);
 
     if (currentUserId != null) {
-      notifier.useActionCard(
-        currentUserId,
-        _pendingTeleportCard!,
-        targetData: targetData,
+      notifier.submitAction(
+        playerId: currentUserId,
+        actionType: 'play_action_card',
+        actionData: {
+          'card': _pendingTeleportCard!.toJson(),
+          'target': targetData,
+        },
       );
     }
 

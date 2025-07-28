@@ -7,15 +7,53 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/room_providers.dart';
 import '../../domain/entities/room.dart';
 
-class RoomLobbyScreen extends ConsumerWidget {
+class RoomLobbyScreen extends ConsumerStatefulWidget {
   final String roomId;
 
   const RoomLobbyScreen({super.key, required this.roomId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final roomAsync = ref.watch(currentRoomProvider(roomId));
+  ConsumerState<RoomLobbyScreen> createState() => _RoomLobbyScreenState();
+}
+
+class _RoomLobbyScreenState extends ConsumerState<RoomLobbyScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Listen for room changes
+    _listenForRoomChanges();
+  }
+
+  void _listenForRoomChanges() {
+    // Cette méthode sera appelée automatiquement par le watch
+    // Pas besoin d'un listener séparé grâce à Riverpod
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final roomAsync = ref.watch(currentRoomProvider(widget.roomId));
     final currentUserId = ref.watch(currentUserIdProvider);
+
+    // Redirection automatique si current_game_id est défini ou si la room est annulée
+    ref.listen(currentRoomProvider(widget.roomId), (previous, next) {
+      next.whenData((room) {
+        if (room.currentGameId != null && room.status == RoomStatus.inGame) {
+          // Rediriger vers le game screen avec le gameId
+          context.go('/game/${room.currentGameId}');
+        } else if (room.status == RoomStatus.cancelled) {
+          // La room a été annulée (inactivité ou host déconnecté)
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('La partie a été annulée pour cause d\'inactivité'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 3),
+            ),
+          );
+          // Rediriger vers l'accueil
+          context.go('/');
+        }
+      });
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +66,7 @@ class RoomLobbyScreen extends ConsumerWidget {
             if (currentUserId != null) {
               final repository = ref.read(roomRepositoryProvider);
               await repository.leaveRoom(
-                roomId: roomId,
+                roomId: widget.roomId,
                 playerId: currentUserId,
               );
             }
@@ -349,11 +387,48 @@ class RoomLobbyScreen extends ConsumerWidget {
     Room room,
   ) async {
     try {
-      // TODO: Implement game start logic
-      // For now, just navigate to game screen
-      context.go('/game/${room.id}');
+      // Ensure user is authenticated before starting game
+      final authState = await ref.read(authNotifierProvider.future);
+      if (authState == null) {
+        throw Exception('User not authenticated. Please try again.');
+      }
+
+      // Afficher un indicateur de chargement
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Création de la partie...'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Appeler startGame qui va créer le game state
+      final repository = ref.read(roomRepositoryProvider);
+      await repository.startGame(
+        roomId: room.id,
+        gameId: '', // Le gameId sera généré côté serveur
+      );
+
+      // La redirection sera gérée automatiquement par le listener
+      // quand current_game_id sera défini
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Fermer le dialog
+      }
     } catch (e) {
       if (context.mounted) {
+        Navigator.of(context).pop(); // Fermer le dialog
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erreur: ${e.toString()}'),

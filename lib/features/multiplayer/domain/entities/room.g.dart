@@ -22,6 +22,10 @@ _Room _$RoomFromJson(Map<String, dynamic> json) => $checkedCreate(
         (v) => $enumDecode(_$RoomStatusEnumMap, v),
       ),
       maxPlayers: $checkedConvert('max_players', (v) => (v as num).toInt()),
+      currentPlayers: $checkedConvert(
+        'current_players',
+        (v) => (v as num?)?.toInt() ?? 0,
+      ),
       currentGameId: $checkedConvert('current_game_id', (v) => v as String?),
       createdAt: $checkedConvert(
         'created_at',
@@ -38,6 +42,7 @@ _Room _$RoomFromJson(Map<String, dynamic> json) => $checkedCreate(
     'creatorId': 'creator_id',
     'playerIds': 'player_ids',
     'maxPlayers': 'max_players',
+    'currentPlayers': 'current_players',
     'currentGameId': 'current_game_id',
     'createdAt': 'created_at',
     'updatedAt': 'updated_at',
@@ -50,6 +55,7 @@ Map<String, dynamic> _$RoomToJson(_Room instance) => <String, dynamic>{
   'player_ids': instance.playerIds,
   'status': _$RoomStatusEnumMap[instance.status]!,
   'max_players': instance.maxPlayers,
+  'current_players': instance.currentPlayers,
   'current_game_id': instance.currentGameId,
   'created_at': instance.createdAt?.toIso8601String(),
   'updated_at': instance.updatedAt?.toIso8601String(),

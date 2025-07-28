@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Room {
 
- String get id; String get creatorId; List<String> get playerIds; RoomStatus get status; int get maxPlayers; String? get currentGameId; DateTime? get createdAt; DateTime? get updatedAt;
+ String get id; String get creatorId; List<String> get playerIds; RoomStatus get status; int get maxPlayers; int get currentPlayers; String? get currentGameId; DateTime? get createdAt; DateTime? get updatedAt;
 /// Create a copy of Room
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $RoomCopyWith<Room> get copyWith => _$RoomCopyWithImpl<Room>(this as Room, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Room&&(identical(other.id, id) || other.id == id)&&(identical(other.creatorId, creatorId) || other.creatorId == creatorId)&&const DeepCollectionEquality().equals(other.playerIds, playerIds)&&(identical(other.status, status) || other.status == status)&&(identical(other.maxPlayers, maxPlayers) || other.maxPlayers == maxPlayers)&&(identical(other.currentGameId, currentGameId) || other.currentGameId == currentGameId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Room&&(identical(other.id, id) || other.id == id)&&(identical(other.creatorId, creatorId) || other.creatorId == creatorId)&&const DeepCollectionEquality().equals(other.playerIds, playerIds)&&(identical(other.status, status) || other.status == status)&&(identical(other.maxPlayers, maxPlayers) || other.maxPlayers == maxPlayers)&&(identical(other.currentPlayers, currentPlayers) || other.currentPlayers == currentPlayers)&&(identical(other.currentGameId, currentGameId) || other.currentGameId == currentGameId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,creatorId,const DeepCollectionEquality().hash(playerIds),status,maxPlayers,currentGameId,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,creatorId,const DeepCollectionEquality().hash(playerIds),status,maxPlayers,currentPlayers,currentGameId,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'Room(id: $id, creatorId: $creatorId, playerIds: $playerIds, status: $status, maxPlayers: $maxPlayers, currentGameId: $currentGameId, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'Room(id: $id, creatorId: $creatorId, playerIds: $playerIds, status: $status, maxPlayers: $maxPlayers, currentPlayers: $currentPlayers, currentGameId: $currentGameId, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $RoomCopyWith<$Res>  {
   factory $RoomCopyWith(Room value, $Res Function(Room) _then) = _$RoomCopyWithImpl;
 @useResult
 $Res call({
- String id, String creatorId, List<String> playerIds, RoomStatus status, int maxPlayers, String? currentGameId, DateTime? createdAt, DateTime? updatedAt
+ String id, String creatorId, List<String> playerIds, RoomStatus status, int maxPlayers, int currentPlayers, String? currentGameId, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -65,13 +65,14 @@ class _$RoomCopyWithImpl<$Res>
 
 /// Create a copy of Room
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? creatorId = null,Object? playerIds = null,Object? status = null,Object? maxPlayers = null,Object? currentGameId = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? creatorId = null,Object? playerIds = null,Object? status = null,Object? maxPlayers = null,Object? currentPlayers = null,Object? currentGameId = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,creatorId: null == creatorId ? _self.creatorId : creatorId // ignore: cast_nullable_to_non_nullable
 as String,playerIds: null == playerIds ? _self.playerIds : playerIds // ignore: cast_nullable_to_non_nullable
 as List<String>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as RoomStatus,maxPlayers: null == maxPlayers ? _self.maxPlayers : maxPlayers // ignore: cast_nullable_to_non_nullable
+as int,currentPlayers: null == currentPlayers ? _self.currentPlayers : currentPlayers // ignore: cast_nullable_to_non_nullable
 as int,currentGameId: freezed == currentGameId ? _self.currentGameId : currentGameId // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
@@ -160,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String creatorId,  List<String> playerIds,  RoomStatus status,  int maxPlayers,  String? currentGameId,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String creatorId,  List<String> playerIds,  RoomStatus status,  int maxPlayers,  int currentPlayers,  String? currentGameId,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Room() when $default != null:
-return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxPlayers,_that.currentGameId,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxPlayers,_that.currentPlayers,_that.currentGameId,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -181,10 +182,10 @@ return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxP
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String creatorId,  List<String> playerIds,  RoomStatus status,  int maxPlayers,  String? currentGameId,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String creatorId,  List<String> playerIds,  RoomStatus status,  int maxPlayers,  int currentPlayers,  String? currentGameId,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _Room():
-return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxPlayers,_that.currentGameId,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxPlayers,_that.currentPlayers,_that.currentGameId,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +202,10 @@ return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxP
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String creatorId,  List<String> playerIds,  RoomStatus status,  int maxPlayers,  String? currentGameId,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String creatorId,  List<String> playerIds,  RoomStatus status,  int maxPlayers,  int currentPlayers,  String? currentGameId,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Room() when $default != null:
-return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxPlayers,_that.currentGameId,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxPlayers,_that.currentPlayers,_that.currentGameId,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -216,7 +217,7 @@ return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxP
 @JsonSerializable()
 
 class _Room implements Room {
-  const _Room({required this.id, required this.creatorId, required final  List<String> playerIds, required this.status, required this.maxPlayers, this.currentGameId, this.createdAt, this.updatedAt}): _playerIds = playerIds;
+  const _Room({required this.id, required this.creatorId, required final  List<String> playerIds, required this.status, required this.maxPlayers, this.currentPlayers = 0, this.currentGameId, this.createdAt, this.updatedAt}): _playerIds = playerIds;
   factory _Room.fromJson(Map<String, dynamic> json) => _$RoomFromJson(json);
 
 @override final  String id;
@@ -230,6 +231,7 @@ class _Room implements Room {
 
 @override final  RoomStatus status;
 @override final  int maxPlayers;
+@override@JsonKey() final  int currentPlayers;
 @override final  String? currentGameId;
 @override final  DateTime? createdAt;
 @override final  DateTime? updatedAt;
@@ -247,16 +249,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Room&&(identical(other.id, id) || other.id == id)&&(identical(other.creatorId, creatorId) || other.creatorId == creatorId)&&const DeepCollectionEquality().equals(other._playerIds, _playerIds)&&(identical(other.status, status) || other.status == status)&&(identical(other.maxPlayers, maxPlayers) || other.maxPlayers == maxPlayers)&&(identical(other.currentGameId, currentGameId) || other.currentGameId == currentGameId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Room&&(identical(other.id, id) || other.id == id)&&(identical(other.creatorId, creatorId) || other.creatorId == creatorId)&&const DeepCollectionEquality().equals(other._playerIds, _playerIds)&&(identical(other.status, status) || other.status == status)&&(identical(other.maxPlayers, maxPlayers) || other.maxPlayers == maxPlayers)&&(identical(other.currentPlayers, currentPlayers) || other.currentPlayers == currentPlayers)&&(identical(other.currentGameId, currentGameId) || other.currentGameId == currentGameId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,creatorId,const DeepCollectionEquality().hash(_playerIds),status,maxPlayers,currentGameId,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,creatorId,const DeepCollectionEquality().hash(_playerIds),status,maxPlayers,currentPlayers,currentGameId,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'Room(id: $id, creatorId: $creatorId, playerIds: $playerIds, status: $status, maxPlayers: $maxPlayers, currentGameId: $currentGameId, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'Room(id: $id, creatorId: $creatorId, playerIds: $playerIds, status: $status, maxPlayers: $maxPlayers, currentPlayers: $currentPlayers, currentGameId: $currentGameId, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -267,7 +269,7 @@ abstract mixin class _$RoomCopyWith<$Res> implements $RoomCopyWith<$Res> {
   factory _$RoomCopyWith(_Room value, $Res Function(_Room) _then) = __$RoomCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String creatorId, List<String> playerIds, RoomStatus status, int maxPlayers, String? currentGameId, DateTime? createdAt, DateTime? updatedAt
+ String id, String creatorId, List<String> playerIds, RoomStatus status, int maxPlayers, int currentPlayers, String? currentGameId, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -284,13 +286,14 @@ class __$RoomCopyWithImpl<$Res>
 
 /// Create a copy of Room
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? creatorId = null,Object? playerIds = null,Object? status = null,Object? maxPlayers = null,Object? currentGameId = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? creatorId = null,Object? playerIds = null,Object? status = null,Object? maxPlayers = null,Object? currentPlayers = null,Object? currentGameId = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_Room(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,creatorId: null == creatorId ? _self.creatorId : creatorId // ignore: cast_nullable_to_non_nullable
 as String,playerIds: null == playerIds ? _self._playerIds : playerIds // ignore: cast_nullable_to_non_nullable
 as List<String>,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as RoomStatus,maxPlayers: null == maxPlayers ? _self.maxPlayers : maxPlayers // ignore: cast_nullable_to_non_nullable
+as int,currentPlayers: null == currentPlayers ? _self.currentPlayers : currentPlayers // ignore: cast_nullable_to_non_nullable
 as int,currentGameId: freezed == currentGameId ? _self.currentGameId : currentGameId // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable

@@ -8,6 +8,7 @@ import '../../features/multiplayer/presentation/screens/join_room_screen.dart';
 import '../../features/multiplayer/presentation/screens/room_lobby_screen.dart';
 import '../../features/game/presentation/screens/game_screen.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
+import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
 import 'router_refresh_notifier.dart';
 import 'app_navigation_observer.dart';
 
@@ -136,13 +137,13 @@ GoRouter router(RouterRef ref) {
         },
       ),
       GoRoute(
-        path: '/game/:roomId',
+        path: '/game/:gameId',
         name: 'game',
         pageBuilder: (context, state) {
-          final roomId = state.pathParameters['roomId']!;
+          final gameId = state.pathParameters['gameId']!;
           return CustomTransitionPage(
             key: state.pageKey,
-            child: GameScreen(roomId: roomId),
+            child: GameScreen(gameId: gameId),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
                   return FadeTransition(opacity: animation, child: child);
@@ -151,8 +152,8 @@ GoRouter router(RouterRef ref) {
         },
         // Game-specific guard
         redirect: (context, state) {
-          final roomId = state.pathParameters['roomId'];
-          if (roomId == null || roomId.isEmpty) {
+          final gameId = state.pathParameters['gameId'];
+          if (gameId == null || gameId.isEmpty) {
             return '/';
           }
 
@@ -161,8 +162,24 @@ GoRouter router(RouterRef ref) {
             return '/?redirect=${Uri.encodeComponent(state.uri.toString())}';
           }
 
-          // TODO: Additional check if user is in the game room
+          // TODO: Additional check if user is in the game
 
+          return null;
+        },
+      ),
+      
+      // Admin routes
+      GoRoute(
+        path: '/admin',
+        name: 'adminDashboard',
+        builder: (context, state) => const AdminDashboardScreen(),
+        // Admin guard - only for development
+        redirect: (context, state) {
+          final hasUser = ref.read(authNotifierProvider).valueOrNull != null;
+          if (!hasUser) {
+            return '/?redirect=/admin';
+          }
+          // TODO: Add proper admin check in production
           return null;
         },
       ),

@@ -106,6 +106,15 @@ class SupabaseRoomDatasourceImpl implements RoomDatasource {
   }
 
   @override
+  Future<String> startGame({required String roomId}) async {
+    final gameId = await _supabaseDataSource.startGame(roomId: roomId);
+    if (gameId == null) {
+      throw Exception('Failed to start game');
+    }
+    return gameId;
+  }
+
+  @override
   Future<void> createGameState(GameState gameState) async {
     // This would be implemented when we have a game state table
     // For now, we store it as part of room events

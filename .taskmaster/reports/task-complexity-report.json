@@ -1,133 +1,37 @@
 {
 	"meta": {
-		"generatedAt": "2025-07-27T14:15:48.833Z",
-		"tasksAnalyzed": 15,
-		"totalTasks": 30,
-		"analysisCount": 15,
+		"generatedAt": "2025-07-27T20:00:29.278Z",
+		"tasksAnalyzed": 3,
+		"totalTasks": 34,
+		"analysisCount": 3,
 		"thresholdScore": 5,
 		"projectName": "Taskmaster",
 		"usedResearch": true
 	},
 	"complexityAnalysis": [
 		{
-			"taskId": 16,
-			"taskTitle": "Configuration Sentry complète avec DSN et environnements",
-			"complexityScore": 6,
-			"recommendedSubtasks": 8,
-			"expansionPrompt": "Décomposer la configuration Sentry en étapes distinctes : installation des dépendances, configuration du DSN avec variables d'environnement, création du wrapper SentryConfig, intégration dans main.dart avec runZonedGuarded, configuration des filtres beforeSend, ajout du tracking de release, activation du performance monitoring, et configuration des sessions utilisateur. Chaque sous-tâche doit inclure le code spécifique et les tests de validation.",
-			"reasoning": "Configuration complexe nécessitant plusieurs étapes interdépendantes : gestion des environnements, configuration avancée avec filtres, intégration avec Flutter zones, et multiple features Sentry. Nécessite une bonne compréhension de la gestion d'erreurs Flutter et des capacités Sentry."
-		},
-		{
-			"taskId": 17,
-			"taskTitle": "Implémentation LogService multi-outputs avec façade unifiée",
-			"complexityScore": 7,
-			"recommendedSubtasks": 10,
-			"expansionPrompt": "Créer les sous-tâches pour : définir l'interface ILogger, implémenter le modèle LogEntry avec Freezed, créer le LogService singleton avec Riverpod, implémenter SentryLogger output, implémenter FileLogger output, ajouter le système de rate limiting, configurer le formatage JSON structuré, implémenter la gestion multi-outputs, créer les providers Riverpod, et ajouter les tests d'intégration. Chaque output doit être indépendant et configurable.",
-			"reasoning": "Architecture complexe avec pattern façade, multiple outputs, rate limiting, et intégration Riverpod. Nécessite une conception solide pour gérer efficacement les différents canaux de sortie et la performance avec le rate limiting."
-		},
-		{
-			"taskId": 18,
-			"taskTitle": "FileLogger pour logs locaux accessibles sous Windows",
-			"complexityScore": 5,
-			"recommendedSubtasks": 7,
-			"expansionPrompt": "Diviser en : obtenir le chemin documents avec path_provider, créer la structure de dossiers logs, implémenter l'écriture asynchrone avec buffer, configurer la rotation automatique par date et taille, implémenter la compression des anciens logs, créer le système de flush périodique, et valider l'accessibilité Windows. Focus sur la performance avec buffer et flush asynchrone.",
-			"reasoning": "Complexité modérée avec gestion de fichiers, rotation automatique, et optimisation des performances. La principale difficulté réside dans la gestion efficace du buffer et de la rotation sans impacter les performances de l'app."
-		},
-		{
-			"taskId": 19,
-			"taskTitle": "Console debug overlay in-app avec geste secret",
-			"complexityScore": 5,
-			"recommendedSubtasks": 8,
-			"expansionPrompt": "Créer les étapes : implémenter la détection du geste secret multi-tap, créer le widget DebugConsoleOverlay, configurer l'Overlay pour superposition, implémenter l'affichage temps réel avec StreamBuilder, ajouter les filtres par niveau/catégorie, créer la fonctionnalité de recherche, implémenter l'export vers clipboard, et designer l'UI avec backdrop blur. Chaque fonctionnalité doit être testable indépendamment.",
-			"reasoning": "UI complexe avec gestion d'overlay, stream temps réel, et multiple fonctionnalités interactives. La détection de geste et l'intégration overlay nécessitent une bonne maîtrise des widgets Flutter avancés."
-		},
-		{
-			"taskId": 20,
-			"taskTitle": "Device Info et Context enrichi pour monitoring",
-			"complexityScore": 4,
-			"recommendedSubtasks": 6,
-			"expansionPrompt": "Décomposer en : installer et configurer device_info_plus, installer et configurer package_info_plus, créer DeviceInfoService pour collecter les infos, implémenter UserContext avec génération d'ID anonyme, intégrer les contexts dans LogEntry, et configurer les contexts Sentry. Assurer la compatibilité Android/iOS pour chaque collecte d'information.",
-			"reasoning": "Tâche relativement simple mais nécessitant attention aux détails pour la compatibilité cross-platform et l'anonymisation correcte. L'intégration avec les systèmes existants est directe."
-		},
-		{
-			"taskId": 21,
-			"taskTitle": "Tests monitoring avec erreurs volontaires et validation",
-			"complexityScore": 3,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "Créer : l'écran de test debug, implémenter TestErrorService avec méthodes pour chaque type d'erreur, ajouter les boutons déclencheurs dans l'UI, valider la réception Sentry, et vérifier les logs locaux et console. Chaque type d'erreur doit avoir son propre déclencheur et validation.",
-			"reasoning": "Tâche simple de validation mais importante pour vérifier le bon fonctionnement. Principalement de l'UI et des appels de service, sans complexité architecturale."
-		},
-		{
-			"taskId": 22,
-			"taskTitle": "Page des règles du jeu avec contenu structuré",
-			"complexityScore": 3,
-			"recommendedSubtasks": 5,
-			"expansionPrompt": "Diviser en : créer RulesScreen avec structure de base, implémenter les sections avec ExpansionTile, ajouter le contenu textuel des règles, créer les illustrations de cartes mockup, et configurer la navigation avec FloatingActionButton. Focus sur la clarté et l'accessibilité du contenu.",
-			"reasoning": "Principalement du travail UI avec contenu statique. La complexité réside dans l'organisation claire du contenu et la création d'illustrations explicatives."
-		},
-		{
-			"taskId": 23,
-			"taskTitle": "Écran paramètres avec personnalisation utilisateur",
-			"complexityScore": 4,
-			"recommendedSubtasks": 6,
-			"expansionPrompt": "Créer : SettingsScreen avec layout de base, implémenter section Audio avec sliders, ajouter section Haptics avec switches, créer section Display pour thème, implémenter section Language, et intégrer avec SettingsNotifier Riverpod. Chaque section doit être fonctionnelle indépendamment avec sauvegarde immédiate.",
-			"reasoning": "UI modérément complexe avec multiple types de contrôles et intégration état Riverpod. Nécessite une bonne organisation des préférences et gestion d'état réactive."
-		},
-		{
-			"taskId": 24,
-			"taskTitle": "SettingsService pour gestion préférences avec SharedPreferences",
-			"complexityScore": 4,
-			"recommendedSubtasks": 7,
-			"expansionPrompt": "Décomposer en : créer SettingsService classe de base, implémenter méthodes get/set pour chaque préférence, configurer SharedPreferences avec initialisation, ajouter cache mémoire pour performances, créer le provider Riverpod, implémenter valeurs par défaut, et gérer la migration de préférences. Assurer la robustesse avec gestion d'erreurs appropriée.",
-			"reasoning": "Service backend simple mais nécessitant attention aux détails pour la persistance, le cache, et la gestion d'erreurs. Pattern standard mais important pour l'expérience utilisateur."
-		},
-		{
-			"taskId": 25,
-			"taskTitle": "Intégration sons et vibrations avec contrôles utilisateur",
-			"complexityScore": 5,
-			"recommendedSubtasks": 8,
-			"expansionPrompt": "Créer les étapes : installer audioplayers et vibration packages, créer AudioService avec gestion volume, implémenter HapticService avec contrôles, précharger tous les sons au démarrage, implémenter sons pour chaque action (flip, place, win, tap), ajouter vibrations contextuelles, intégrer avec SettingsService, et optimiser les performances. Chaque son/vibration doit respecter les préférences utilisateur.",
-			"reasoning": "Intégration de multiples services externes avec gestion de ressources et performance. Le preloading et la gestion du volume ajoutent de la complexité technique."
-		},
-		{
-			"taskId": 26,
-			"taskTitle": "Tutoriel interactif step-by-step pour nouveaux joueurs",
-			"complexityScore": 7,
-			"recommendedSubtasks": 10,
-			"expansionPrompt": "Diviser en : créer TutorialScreen avec PageView, implémenter chaque étape du tutoriel (grille, révélation, pioche, actions, colonnes, fin), ajouter animations guidées pour chaque étape, créer système de tooltips avec OverlayEntry, implémenter indicateur de progression, gérer la navigation entre étapes, sauvegarder progression avec TutorialProgress, permettre skip du tutoriel, intégrer avec sons/vibrations, et valider l'apprentissage. Chaque étape doit être claire et engageante.",
-			"reasoning": "UI complexe avec animations, overlays, et progression sauvegardée. Nécessite une excellente UX pour guider efficacement les nouveaux joueurs sans les frustrer."
-		},
-		{
-			"taskId": 27,
-			"taskTitle": "Mode pratique vs IA simple pour apprentissage",
-			"complexityScore": 8,
-			"recommendedSubtasks": 12,
-			"expansionPrompt": "Créer : classe AIPlayer de base, implémenter stratégie Easy (aléatoire), développer stratégie Medium (règles basiques), créer stratégie Hard (anticipation), intégrer AIPlayer dans GameLogic existant, adapter PracticeGameScreen, gérer les tours IA avec délais réalistes, implémenter logique de décision pour cartes actions, ajouter évaluation de position, créer animations pour actions IA, intégrer difficulté sélectionnable, et valider comportement réaliste. L'IA doit respecter toutes les règles du jeu.",
-			"reasoning": "Implémentation IA avec 3 niveaux de difficulté nécessitant algorithmes de décision, évaluation de position, et intégration complexe avec le système de jeu existant. La difficulté principale est de créer une IA crédible et éducative."
-		},
-		{
-			"taskId": 28,
-			"taskTitle": "Tooltips contextuels durant premières parties réelles",
-			"complexityScore": 4,
-			"recommendedSubtasks": 6,
-			"expansionPrompt": "Décomposer en : créer TooltipService avec détection de contexte, définir règles de déclenchement des hints, implémenter affichage conditionnel basé sur état du jeu, créer custom Tooltip widgets, gérer positionnement dynamique avec Overlay, et intégrer avec système de tutoriel complété. Les hints doivent être pertinents sans être intrusifs.",
-			"reasoning": "Système de hints intelligent nécessitant analyse du contexte de jeu et affichage conditionnel. La difficulté est dans la pertinence et le timing des hints."
-		},
-		{
-			"taskId": 29,
-			"taskTitle": "Mode hors-ligne avec sauvegarde locale SQLite",
+			"taskId": 32,
+			"taskTitle": "Corriger le système de lancement de partie multijoueur",
 			"complexityScore": 9,
-			"recommendedSubtasks": 14,
-			"expansionPrompt": "Créer les sous-tâches : installer et configurer sqflite, designer schema base de données (games, moves, stats), créer DatabaseService avec migrations, implémenter OfflineGameRepository CRUD, ajouter détection connectivité avec connectivity_plus, créer système de queue pour sync, modifier GameService pour mode dual online/offline, implémenter sauvegarde automatique des moves, gérer conflits de synchronisation, créer stratégie de résolution de conflits, implémenter retry logic pour sync, ajouter indicateurs UI mode offline, valider intégrité des données, et tester scenarios de perte de connexion. La synchronisation doit être transparente et robuste.",
-			"reasoning": "Architecture complexe nécessitant gestion base de données locale, synchronisation bidirectionnelle, gestion des conflits, et mode dual online/offline. C'est la tâche la plus complexe avec nombreux cas limites à gérer."
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Décomposer l'implémentation du système de lancement multijoueur en étapes : création du schéma de base de données, implémentation de la logique de création de game state, gestion de la synchronisation Realtime, adaptation du GameScreen, gestion des états de transition et des erreurs, tests d'intégration avec rollback, et documentation de l'API",
+			"reasoning": "Tâche très complexe nécessitant création de plusieurs tables Supabase interdépendantes, logique transactionnelle avec rollback, synchronisation Realtime bidirectionnelle, gestion d'états complexes et cas d'erreur. L'architecture doit être robuste pour supporter la charge multijoueur avec transitions d'état atomiques."
 		},
 		{
-			"taskId": 30,
-			"taskTitle": "Profil joueur avec statistiques et historique parties",
+			"taskId": 33,
+			"taskTitle": "Système de nettoyage automatique des parties inactives",
+			"complexityScore": 8,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Structurer l'implémentation du système de nettoyage en : création de l'Edge Function Supabase, mise en place du système de heartbeat côté client, création des triggers PostgreSQL pour détection de déconnexion, configuration du CRON job avec pg_cron, gestion des cas limites et edge cases, système de monitoring et logs, tests de charge et performance",
+			"reasoning": "Nécessite expertise en Edge Functions Supabase, triggers PostgreSQL, et CRON jobs. La complexité réside dans la coordination entre client (heartbeat) et serveur (nettoyage), avec gestion robuste des déconnexions et edge cases. Le système doit être performant pour ne pas impacter les parties actives."
+		},
+		{
+			"taskId": 34,
+			"taskTitle": "Provider Riverpod avec subscription Realtime pour liste des parties",
 			"complexityScore": 6,
-			"recommendedSubtasks": 9,
-			"expansionPrompt": "Diviser en : créer ProfileScreen avec layout sections, implémenter affichage info utilisateur (pseudo/avatar), calculer et afficher statistiques globales, créer liste historique parties paginée, intégrer fl_chart pour visualisations, implémenter ProfileRepository avec cache, configurer synchronisation Supabase/SQLite, permettre modification pseudo/avatar, et optimiser performances requêtes. Les statistiques doivent être précises et les charts lisibles sur mobile.",
-			"reasoning": "UI riche avec calculs statistiques, visualisations graphiques, et gestion de données hybride local/distant. La complexité vient de l'agrégation de données et des performances avec historique potentiellement large."
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Diviser l'implémentation en : création du AvailableRoomsNotifier avec gestion du cycle de vie, mise en place de la subscription Realtime avec filtres appropriés, optimisation des re-renders avec comparaison d'objets, intégration dans JoinGameScreen avec indicateur live, ajout du mécanisme de debounce pour performance",
+			"reasoning": "Complexité modérée nécessitant bonne compréhension de Riverpod AsyncNotifier et Supabase Realtime. Les défis principaux sont la gestion propre du cycle de vie des subscriptions, l'optimisation des performances pour éviter les re-renders excessifs, et la gestion de la reconnexion automatique."
 		}
 	]
 }

@@ -6,7 +6,7 @@ part of 'logger_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$errorLoggerHash() => r'ec3784cd77ccc2354a02143458f4bcd459bc503a';
+String _$errorLoggerHash() => r'f630826abdab8c0daa250367008eb133dc24e12f';
 
 /// Provider for the error logger instance
 ///
