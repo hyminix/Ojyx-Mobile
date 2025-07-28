@@ -147,17 +147,16 @@ class SupabaseRoomDatasource {
 
     final updatedPlayerIds = [...room.playerIds, playerId];
 
-    final response = await SupabaseExceptionHandler.handleSupabaseCall(
+    // First perform the update without select
+    await SupabaseExceptionHandler.handleSupabaseCall(
       call: () => _supabase
           .from('rooms')
           .update({
             'player_ids': updatedPlayerIds,
             'updated_at': DateTime.now().toIso8601String(),
           })
-          .eq('id', roomId)
-          .select()
-          .maybeSingle(),
-      operation: 'join_room',
+          .eq('id', roomId),
+      operation: 'update_room_players',
       context: {
         'room_id': roomId,
         'player_id': playerId,
@@ -166,12 +165,21 @@ class SupabaseRoomDatasource {
       },
     );
 
-    if (response == null) {
-      // Room was deleted or doesn't exist anymore
-      throw Exception('Room not found or was deleted');
-    }
+    // Then fetch the updated room data separately
+    final updatedRoom = await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase
+          .from('rooms')
+          .select()
+          .eq('id', roomId)
+          .single(),
+      operation: 'fetch_updated_room',
+      context: {
+        'room_id': roomId,
+        'player_id': playerId,
+      },
+    );
 
-    return RoomModel.fromJson(response);
+    return RoomModel.fromJson(updatedRoom);
   }
 
   Future<void> leaveRoom({
