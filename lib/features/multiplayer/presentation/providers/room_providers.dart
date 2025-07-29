@@ -1,9 +1,17 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+// Export du controller realtime
+export 'room_realtime_controller.dart';
+export 'game_sync_controller.dart';
+
 import 'package:ojyx/features/multiplayer/data/datasources/supabase_room_datasource.dart';
 import 'package:ojyx/features/multiplayer/data/datasources/supabase_room_datasource_impl.dart';
 import 'package:ojyx/features/multiplayer/data/repositories/room_repository_impl.dart';
+import 'package:ojyx/features/multiplayer/data/services/room_heartbeat_service.dart';
+import 'package:ojyx/features/multiplayer/data/services/connection_monitor_service.dart';
+import 'package:ojyx/features/multiplayer/data/services/room_realtime_service.dart';
 import 'package:ojyx/features/multiplayer/domain/datasources/room_datasource.dart';
+import 'package:ojyx/core/config/router_config.dart';
 import 'package:ojyx/features/multiplayer/domain/repositories/room_repository.dart';
 import 'package:ojyx/features/multiplayer/domain/use_cases/create_room_use_case.dart';
 import 'package:ojyx/features/multiplayer/domain/use_cases/join_room_use_case.dart';
@@ -76,3 +84,69 @@ Future<List<Room>> availableRooms(AvailableRoomsRef ref) async {
 // Provider pour stocker l'ID de la room courante
 @riverpod
 String? currentRoomId(CurrentRoomIdRef ref) => null;
+
+// Provider pour le service de heartbeat
+@riverpod
+RoomHeartbeatService roomHeartbeatService(RoomHeartbeatServiceRef ref) {
+  final supabase = ref.watch(supabaseClientProvider);
+  final service = RoomHeartbeatService(supabase);
+  
+  // Dispose the service when provider is disposed
+  ref.onDispose(() {
+    service.dispose();
+  });
+  
+  return service;
+}
+
+// Provider pour gérer l'état du heartbeat de la room actuelle
+@riverpod
+class RoomHeartbeatController extends _$RoomHeartbeatController {
+  late final RoomHeartbeatService _heartbeatService;
+  
+  @override
+  bool build() {
+    _heartbeatService = ref.watch(roomHeartbeatServiceProvider);
+    return false; // Not active by default
+  }
+  
+  void startHeartbeat(String roomId) {
+    _heartbeatService.startHeartbeat(roomId);
+    state = true;
+  }
+  
+  void stopHeartbeat() {
+    _heartbeatService.stopHeartbeat();
+    state = false;
+  }
+  
+  void pauseHeartbeat() {
+    _heartbeatService.pauseHeartbeat();
+  }
+  
+  void resumeHeartbeat() {
+    _heartbeatService.resumeHeartbeat();
+  }
+}
+
+// Provider pour le service de monitoring de connexion
+@riverpod
+ConnectionMonitorService connectionMonitorService(ConnectionMonitorServiceRef ref) {
+  final supabase = ref.watch(supabaseClientProvider);
+  final router = ref.watch(routerProvider);
+  
+  final service = ConnectionMonitorService(
+    supabase: supabase,
+    router: router,
+  );
+  
+  // Start monitoring when service is created
+  service.startMonitoring();
+  
+  // Stop monitoring when provider is disposed
+  ref.onDispose(() {
+    service.dispose();
+  });
+  
+  return service;
+}

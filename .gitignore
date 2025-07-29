@@ -44,6 +44,14 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Android Gradle cache
+/android/android/
+/android/caches/
+/android/daemon/
+/android/kotlin-profile/
+/android/native/
+/android/wrapper/
+
 
 # Environment files
 .env

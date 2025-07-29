@@ -85,144 +85,68 @@ class SupabaseRoomDatasource {
     required String roomId,
     required String playerId,
   }) async {
-    final room = await getRoom(roomId);
-    if (room == null) return null;
-
-    if (room.playerIds.contains(playerId)) {
-      return room;
-    }
-
-    if (room.playerIds.length >= room.maxPlayers) {
-      return null;
-    }
-
-    // Ensure joining player exists in players table
-    final existingPlayer = await SupabaseExceptionHandler.handleSupabaseCall(
-      call: () => _supabase
-          .from('players')
-          .select()
-          .eq('id', playerId)
-          .maybeSingle(),
-      operation: 'check_joining_player_exists',
-      context: {
-        'player_id': playerId,
-      },
-    );
-
-    // If player doesn't exist, create them
-    if (existingPlayer == null) {
-      await SupabaseExceptionHandler.handleSupabaseCall(
-        call: () => _supabase
-            .from('players')
-            .insert({
-              'id': playerId,
-              'name': 'Player ${room.playerIds.length + 1}', // Default name
-              'connection_status': 'online',
-              'current_room_id': roomId,
-            }),
-        operation: 'create_joining_player',
-        context: {
-          'player_id': playerId,
-          'room_id': roomId,
+    // Use atomic function to ensure data consistency
+    final result = await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase.rpc(
+        'join_room_atomic',
+        params: {
+          'p_room_id': roomId,
+          'p_player_id': playerId,
         },
-      );
-    } else {
-      // Update existing player's current room
-      await SupabaseExceptionHandler.handleSupabaseCall(
-        call: () => _supabase
-            .from('players')
-            .update({
-              'current_room_id': roomId,
-              'last_seen_at': DateTime.now().toIso8601String(),
-              'connection_status': 'online',
-            })
-            .eq('id', playerId),
-        operation: 'update_joining_player_room',
-        context: {
-          'player_id': playerId,
-          'room_id': roomId,
-        },
-      );
-    }
-
-    final updatedPlayerIds = [...room.playerIds, playerId];
-
-    // First perform the update without select
-    await SupabaseExceptionHandler.handleSupabaseCall(
-      call: () => _supabase
-          .from('rooms')
-          .update({
-            'player_ids': updatedPlayerIds,
-            'updated_at': DateTime.now().toIso8601String(),
-          })
-          .eq('id', roomId),
-      operation: 'update_room_players',
-      context: {
-        'room_id': roomId,
-        'player_id': playerId,
-        'current_players': room.playerIds.length,
-        'max_players': room.maxPlayers,
-      },
-    );
-
-    // Then fetch the updated room data separately
-    final updatedRoom = await SupabaseExceptionHandler.handleSupabaseCall(
-      call: () => _supabase
-          .from('rooms')
-          .select()
-          .eq('id', roomId)
-          .single(),
-      operation: 'fetch_updated_room',
+      ),
+      operation: 'join_room_atomic',
       context: {
         'room_id': roomId,
         'player_id': playerId,
       },
     );
 
-    return RoomModel.fromJson(updatedRoom);
+    // Check if operation was successful
+    if (result['success'] != true) {
+      final error = result['error'] ?? 'Unknown error';
+      if (error == 'Room not found' || error == 'Room is full') {
+        return null;
+      }
+      throw Exception('Failed to join room: $error');
+    }
+
+    // Return the room model from the result
+    final roomData = result['room'];
+    if (roomData != null) {
+      return RoomModel.fromJson(roomData);
+    }
+
+    return null;
   }
 
   Future<void> leaveRoom({
     required String roomId,
     required String playerId,
   }) async {
-    final room = await getRoom(roomId);
-    if (room == null) return;
-
-    final updatedPlayerIds = room.playerIds
-        .where((id) => id != playerId)
-        .toList();
-
-    await SupabaseExceptionHandler.handleSupabaseCall(
-      call: () => _supabase
-          .from('rooms')
-          .update({
-            'player_ids': updatedPlayerIds,
-            'updated_at': DateTime.now().toIso8601String(),
-          })
-          .eq('id', roomId),
-      operation: 'leave_room',
+    // Use atomic function to ensure data consistency
+    final result = await SupabaseExceptionHandler.handleSupabaseCall(
+      call: () => _supabase.rpc(
+        'leave_room_atomic',
+        params: {
+          'p_room_id': roomId,
+          'p_player_id': playerId,
+        },
+      ),
+      operation: 'leave_room_atomic',
       context: {
         'room_id': roomId,
         'player_id': playerId,
       },
     );
 
-    // Update player's current room to null
-    await SupabaseExceptionHandler.handleSupabaseCall(
-      call: () => _supabase
-          .from('players')
-          .update({
-            'current_room_id': null,
-            'last_seen_at': DateTime.now().toIso8601String(),
-          })
-          .eq('id', playerId),
-      operation: 'update_leaving_player',
-      context: {
-        'player_id': playerId,
-        'room_id': roomId,
-      },
-    );
+    // Check if operation was successful
+    if (result['success'] != true) {
+      final error = result['error'] ?? 'Unknown error';
+      // Don't throw for player not in room or room not found
+      if (error != 'Room not found' && error != 'Player not in room') {
+        throw Exception('Failed to leave room: $error');
+      }
+    }
   }
 
   Future<RoomModel?> getRoom(String roomId) async {

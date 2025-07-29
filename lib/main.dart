@@ -7,6 +7,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'core/config/app_initializer.dart';
 import 'core/config/router_config.dart';
 import 'core/services/sentry_monitoring_service.dart';
+import 'features/multiplayer/presentation/providers/room_providers.dart';
 
 /// Main entry point - follows the pattern required to avoid Zone mismatch errors.
 /// WidgetsFlutterBinding.ensureInitialized() must be called in the main zone,
@@ -118,6 +119,9 @@ class OjyxApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
+    
+    // Start connection monitoring service
+    ref.watch(connectionMonitorServiceProvider);
 
     return MaterialApp.router(
       title: 'Ojyx',

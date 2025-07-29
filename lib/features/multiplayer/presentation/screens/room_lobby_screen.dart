@@ -6,6 +6,7 @@ import '../../../../core/services/deep_link_service.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/room_providers.dart';
 import '../../domain/entities/room.dart';
+import '../widgets/player_connection_status.dart';
 
 class RoomLobbyScreen extends ConsumerStatefulWidget {
   final String roomId;
@@ -20,13 +21,17 @@ class _RoomLobbyScreenState extends ConsumerState<RoomLobbyScreen> {
   @override
   void initState() {
     super.initState();
-    // Listen for room changes
-    _listenForRoomChanges();
+    // Subscribe to room with unified realtime service
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(roomRealtimeControllerProvider.notifier).subscribeToRoom(widget.roomId);
+    });
   }
-
-  void _listenForRoomChanges() {
-    // Cette méthode sera appelée automatiquement par le watch
-    // Pas besoin d'un listener séparé grâce à Riverpod
+  
+  @override
+  void dispose() {
+    // Unsubscribe from room when leaving
+    ref.read(roomRealtimeControllerProvider.notifier).unsubscribeFromRoom();
+    super.dispose();
   }
 
   @override
@@ -42,6 +47,9 @@ class _RoomLobbyScreenState extends ConsumerState<RoomLobbyScreen> {
           context.go('/game/${room.currentGameId}');
         } else if (room.status == RoomStatus.cancelled) {
           // La room a été annulée (inactivité ou host déconnecté)
+          // Stop heartbeat when room is cancelled
+          ref.read(roomHeartbeatControllerProvider.notifier).stopHeartbeat();
+          
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('La partie a été annulée pour cause d\'inactivité'),
@@ -62,7 +70,9 @@ class _RoomLobbyScreenState extends ConsumerState<RoomLobbyScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () async {
-            // Leave room before going back
+            // Stop heartbeat and leave room before going back
+            ref.read(roomHeartbeatControllerProvider.notifier).stopHeartbeat();
+            
             if (currentUserId != null) {
               final repository = ref.read(roomRepositoryProvider);
               await repository.leaveRoom(
@@ -205,15 +215,24 @@ class _RoomLobbyScreenState extends ConsumerState<RoomLobbyScreen> {
                                                 ).colorScheme.onSurfaceVariant,
                                         ),
                                       ),
-                                      title: Text(
-                                        isCurrentUser
-                                            ? 'Vous'
-                                            : 'Joueur ${index + 1}',
-                                        style: TextStyle(
-                                          fontWeight: isCurrentUser
-                                              ? FontWeight.bold
-                                              : FontWeight.normal,
-                                        ),
+                                      title: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              isCurrentUser
+                                                  ? 'Vous'
+                                                  : 'Joueur ${index + 1}',
+                                              style: TextStyle(
+                                                fontWeight: isCurrentUser
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
+                                              ),
+                                            ),
+                                          ),
+                                          // Add connection status indicator
+                                          const SizedBox(width: 8),
+                                          _buildConnectionIndicator(playerId),
+                                        ],
                                       ),
                                       subtitle: Text(
                                         isHost ? 'Créateur' : 'Joueur',
@@ -367,6 +386,17 @@ class _RoomLobbyScreenState extends ConsumerState<RoomLobbyScreen> {
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildConnectionIndicator(String playerId) {
+    // Use presence data from unified realtime service
+    final presenceState = ref.watch(currentPresenceStateProvider);
+    final playerPresence = presenceState[playerId];
+    
+    return ConnectionPulseIndicator(
+      connectionStatus: playerPresence?.connectionStatus.name ?? 'offline',
+      size: 8.0,
     );
   }
 

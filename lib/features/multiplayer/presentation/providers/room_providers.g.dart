@@ -404,5 +404,61 @@ final currentRoomIdProvider = AutoDisposeProvider<String?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentRoomIdRef = AutoDisposeProviderRef<String?>;
+String _$roomHeartbeatServiceHash() =>
+    r'844f779f3593a38c1270e6f1a6cddca4329a0a33';
+
+/// See also [roomHeartbeatService].
+@ProviderFor(roomHeartbeatService)
+final roomHeartbeatServiceProvider =
+    AutoDisposeProvider<RoomHeartbeatService>.internal(
+      roomHeartbeatService,
+      name: r'roomHeartbeatServiceProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$roomHeartbeatServiceHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef RoomHeartbeatServiceRef = AutoDisposeProviderRef<RoomHeartbeatService>;
+String _$connectionMonitorServiceHash() =>
+    r'c85537611faa6a10aab9c24ba55e86527e2df61c';
+
+/// See also [connectionMonitorService].
+@ProviderFor(connectionMonitorService)
+final connectionMonitorServiceProvider =
+    AutoDisposeProvider<ConnectionMonitorService>.internal(
+      connectionMonitorService,
+      name: r'connectionMonitorServiceProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$connectionMonitorServiceHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ConnectionMonitorServiceRef =
+    AutoDisposeProviderRef<ConnectionMonitorService>;
+String _$roomHeartbeatControllerHash() =>
+    r'284f6ed04e62d64d997b1368e546c6fd3abf4686';
+
+/// See also [RoomHeartbeatController].
+@ProviderFor(RoomHeartbeatController)
+final roomHeartbeatControllerProvider =
+    AutoDisposeNotifierProvider<RoomHeartbeatController, bool>.internal(
+      RoomHeartbeatController.new,
+      name: r'roomHeartbeatControllerProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$roomHeartbeatControllerHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$RoomHeartbeatController = AutoDisposeNotifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
