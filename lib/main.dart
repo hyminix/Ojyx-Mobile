@@ -7,6 +7,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'core/config/app_initializer.dart';
 import 'core/config/router_config.dart';
 import 'core/services/sentry_monitoring_service.dart';
+import 'core/widgets/responsive_simulator.dart';
 import 'features/multiplayer/presentation/providers/room_providers.dart';
 
 /// Main entry point - follows the pattern required to avoid Zone mismatch errors.
@@ -44,9 +45,15 @@ Future<void> main() async {
       monitoring.logZoneInitialization(success: true);
 
       // Run the app with Sentry's wrapper for Flutter error capture
+      // Wrap with ResponsiveSimulator for web development
       runApp(
         SentryWidget(
-          child: const ProviderScope(child: OjyxApp()),
+          child: ProviderScope(
+            child: ResponsiveSimulator(
+              enableSimulator: kIsWeb && const bool.fromEnvironment('ENABLE_SIMULATOR', defaultValue: true),
+              child: const OjyxApp(),
+            ),
+          ),
         ),
       );
     },

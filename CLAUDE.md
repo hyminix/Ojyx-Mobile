@@ -370,11 +370,35 @@ Future<void> createGameState() async {
 }
 ```
 
+### 6. RLS Policies Infinies (OJYX-T, OJYX-S)
+**❌ JAMAIS**
+```sql
+-- Policy avec auto-référence circulaire
+CREATE POLICY "policy" ON table
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM table t2
+    WHERE t2.id = t2.id -- TOUJOURS TRUE = RÉCURSION INFINIE
+  )
+);
+```
+
+**✅ TOUJOURS**
+```sql
+-- Policy simple sans auto-référence
+CREATE POLICY "policy" ON table
+WITH CHECK (
+  -- Condition directe basée sur les nouvelles valeurs
+  status IN ('waiting', 'in_game', 'finished', 'cancelled')
+);
+```
+
 ## Checklist de Validation
 
 ### Avant chaque PR
 - [ ] `flutter analyze` sans warnings critiques
 - [ ] Pas de `auth.uid()` dans les policies RLS (utiliser `(SELECT auth.uid())`)
+- [ ] Pas d'auto-références circulaires dans les policies RLS (`WHERE table.id = table.id`)
 - [ ] Vérification `mounted` avant `ref.read()` dans les Notifiers
 - [ ] Auth vérifiée avant opérations Supabase critiques
 - [ ] Pas de code async après `runApp()`

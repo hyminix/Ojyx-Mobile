@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'env_loader.dart';
 
 /// Centralizes app initialization logic
 class AppInitializer {
@@ -35,6 +36,9 @@ class AppInitializer {
 
   /// Validate that all required environment variables are present
   static void _validateEnvironmentVariables() {
+    // Load environment variables based on platform
+    EnvLoader.loadEnvironment();
+    
     // First check if dotenv has loaded the variables
     if (dotenv.env.isEmpty && kDebugMode) {
       // If dotenv is empty, try to load from dart-define
