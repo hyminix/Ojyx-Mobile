@@ -231,7 +231,7 @@ class MultiplayerTestHelper {
         'id': gameId,
         'room_id': roomId,
         'status': 'playing',
-        'game_phase': 'playing',
+        'game_phase': 'in_progress',
         'current_player_index': 0,
         'turn_number': 1,
         'round_number': 1,

@@ -55,7 +55,7 @@ Tâche: #53 - Création de RLS policies pour garantir la cohérence des données
 - check_player_count_non_negative : player_count >= 0
 - check_valid_room_status : status IN ('waiting', 'in_game', 'finished', 'cancelled')
 - check_valid_game_status : status IN ('waiting', 'playing', 'finished', 'abandoned')
-- check_valid_game_phase : game_phase IN ('waiting', 'playing', 'end_round', 'game_over')
+- game_states_game_phase_check : game_phase IN ('waiting', 'in_progress', 'last_round', 'round_ended', 'game_ended')
 - check_valid_direction : direction IN ('clockwise', 'counterclockwise')
 - check_valid_connection_status : connection_status IN ('online', 'offline', 'away')
 - check_max_players_range : max_players BETWEEN 2 AND 8
