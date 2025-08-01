@@ -16,8 +16,8 @@ class GameStateConverter
       status: json['status'] ?? 'waitingToStart',
       currentPlayerId:
           json['currentPlayerId'] ?? json['current_player_id'] ?? '',
-      turnNumber: json['turnNumber'] ?? json['turn_number'] ?? 0,
-      roundNumber: json['roundNumber'] ?? json['round_number'] ?? 0,
+      turnNumber: json['turnNumber'] ?? json['turn_number'] ?? 1,
+      roundNumber: json['roundNumber'] ?? json['round_number'] ?? 1,
       gameData: json['gameData'] ?? json['game_data'] ?? {},
       winnerId: json['winnerId'] ?? json['winner_id'],
       endedAt: json['endedAt'] != null ? DateTime.parse(json['endedAt']) : null,
@@ -38,8 +38,8 @@ class GameStateConverter
     final tempModel = GameStateModel.fromDomainComplete(
       gameState,
       id: 'temp-id',
-      turnNumber: 0,
-      roundNumber: 0,
+      turnNumber: 1,
+      roundNumber: 1,
       updatedAt: DateTime.now(),
     );
 

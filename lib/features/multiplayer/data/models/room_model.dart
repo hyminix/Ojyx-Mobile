@@ -12,7 +12,7 @@ abstract class RoomModel with _$RoomModel {
     @JsonKey(name: 'player_ids') required List<String> playerIds,
     required String status,
     @JsonKey(name: 'max_players') required int maxPlayers,
-    @JsonKey(name: 'current_players', defaultValue: 0) @Default(0) int currentPlayers,
+    @JsonKey(name: 'player_count', defaultValue: 0) @Default(0) int currentPlayers,
     @JsonKey(name: 'current_game_id') String? currentGameId,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,

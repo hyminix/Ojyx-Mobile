@@ -316,7 +316,7 @@ class SupabaseRoomDatasource {
               'room_id': roomId,
               'status': 'playing',
               'game_phase': 'in_progress',
-              'turn_number': 0,
+              'turn_number': 1,
               'round_number': 1,
               'current_player_id': room.playerIds.first,
               'direction': 'clockwise',

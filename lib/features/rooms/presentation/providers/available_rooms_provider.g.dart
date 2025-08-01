@@ -7,7 +7,7 @@ part of 'available_rooms_provider.dart';
 // **************************************************************************
 
 String _$availableRoomsNotifierHash() =>
-    r'88eaa1bd77e3bcf9b86b50c93bc334e380645172';
+    r'61a2970883ae6481644b2764145c516b3594a97a';
 
 /// Provider qui maintient une liste en temps réel des parties disponibles
 ///

@@ -3237,11 +3237,72 @@
             "testStrategy": "Faire réviser la documentation par des développeurs n'ayant pas travaillé sur les corrections pour valider la clarté et l'utilité des exemples"
           }
         ]
+      },
+      {
+        "id": 57,
+        "title": "Corriger le bug critique du lobby multijoueur où les joueurs rejoignent des lobbies séparés",
+        "description": "Résoudre le problème de synchronisation qui empêche les joueurs de rejoindre le même lobby, bloquant ainsi le lancement des parties multijoueur",
+        "status": "done",
+        "dependencies": [
+          32,
+          38,
+          39
+        ],
+        "priority": "high",
+        "details": "1. Problème identifié :\n   - Incohérence entre le champ `player_ids` dans la table `rooms` et `current_room_id` dans la table `players`\n   - Le provider `availableRoomsNotifierProvider` compte les joueurs via la table `players` au lieu d'utiliser le champ `player_ids` de `rooms`\n   - La fonction `join_room_atomic` met à jour correctement `player_ids` mais le provider ne l'utilise pas\n\n2. Correction nécessaire dans le provider :\n   ```dart\n   // Modifier availableRoomsNotifierProvider pour utiliser player_ids\n   Future<List<RoomModel>> fetchAvailableRooms() async {\n     final rooms = await supabase\n       .from('rooms')\n       .select('*')\n       .eq('status', 'waiting')\n       .order('created_at', ascending: false);\n     \n     // Utiliser la longueur de player_ids au lieu de compter dans players\n     return rooms.map((room) => RoomModel(\n       ...room,\n       currentPlayers: (room['player_ids'] as List?)?.length ?? 0\n     )).toList();\n   }\n   ```\n\n3. Vérifier la cohérence des données :\n   ```dart\n   // Ajouter une validation après chaque jointure\n   Future<void> validateRoomConsistency(String roomId) async {\n     final room = await supabase\n       .from('rooms')\n       .select('player_ids')\n       .eq('id', roomId)\n       .single();\n     \n     final players = await supabase\n       .from('players')\n       .select('id')\n       .eq('current_room_id', roomId);\n     \n     // Les deux listes doivent correspondre\n     assert(room['player_ids'].length == players.length);\n   }\n   ```\n\n4. Migrer les données existantes :\n   ```sql\n   -- Script de migration pour synchroniser player_ids avec current_room_id\n   UPDATE rooms r\n   SET player_ids = (\n     SELECT COALESCE(array_agg(p.id), ARRAY[]::uuid[])\n     FROM players p\n     WHERE p.current_room_id = r.id\n   )\n   WHERE r.status = 'waiting';\n   ```\n\n5. Modifier la fonction join_room_atomic existante :\n   ```sql\n   -- S'assurer que player_ids est mis à jour atomiquement\n   UPDATE rooms \n   SET player_ids = array_append(player_ids, p_player_id),\n       current_players = array_length(player_ids, 1) + 1\n   WHERE id = v_room_id;\n   ```\n\n6. Implémenter un listener de cohérence :\n   ```dart\n   // Écouter les changements sur player_ids pour synchroniser l'UI\n   supabase\n     .from('rooms')\n     .stream(primaryKey: ['id'])\n     .eq('id', roomId)\n     .map((data) => data['player_ids'] as List)\n     .listen((playerIds) {\n       // Mettre à jour l'UI avec la vraie liste des joueurs\n       ref.read(roomPlayersProvider.notifier).updatePlayers(playerIds);\n     });\n   ```",
+        "testStrategy": "1. Test de cohérence des données : Après chaque jointure, vérifier que rooms.player_ids contient exactement les mêmes IDs que SELECT id FROM players WHERE current_room_id = room_id\n\n2. Test du provider modifié : Créer une room, faire rejoindre 3 joueurs, vérifier que availableRoomsNotifierProvider retourne currentPlayers = 3 basé sur player_ids.length\n\n3. Test de migration : Sur une base de test avec des données incohérentes, exécuter le script de migration et vérifier que tous les player_ids sont synchronisés\n\n4. Test de performance du nouveau provider : Mesurer le temps de chargement des rooms disponibles avec 100 rooms, doit être < 100ms car plus de JOIN nécessaire\n\n5. Test de jointure concurrente : 5 joueurs tentent de rejoindre simultanément, vérifier que player_ids contient exactement 5 éléments sans doublons\n\n6. Test du listener temps réel : Modifier player_ids directement dans Supabase Studio, vérifier que l'UI se met à jour instantanément",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Modifier availableRoomsNotifierProvider pour utiliser player_ids",
+            "description": "Refactorer le provider pour compter les joueurs via le champ player_ids de rooms au lieu de faire un count sur la table players",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Créer un script de migration pour synchroniser les données existantes",
+            "description": "Écrire et exécuter une migration SQL pour aligner player_ids avec les current_room_id actuels",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Ajouter une validation de cohérence après chaque jointure",
+            "description": "Implémenter validateRoomConsistency() pour vérifier que player_ids et current_room_id restent synchronisés",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implémenter un listener temps réel sur player_ids",
+            "description": "Ajouter un stream listener pour synchroniser l'UI quand player_ids change dans Supabase",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Tester et valider la correction complète",
+            "description": "Exécuter tous les tests de la stratégie et vérifier que le bug est résolu",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-07-25T14:39:35.802Z",
-      "updated": "2025-07-29T04:28:01.792Z",
+      "updated": "2025-07-30T21:39:16.975Z",
       "description": "Tasks for master context"
     }
   }

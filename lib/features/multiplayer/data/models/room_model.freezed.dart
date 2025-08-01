@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RoomModel {
 
- String get id;@JsonKey(name: 'creator_id') String get creatorId;@JsonKey(name: 'player_ids') List<String> get playerIds; String get status;@JsonKey(name: 'max_players') int get maxPlayers;@JsonKey(name: 'current_players', defaultValue: 0) int get currentPlayers;@JsonKey(name: 'current_game_id') String? get currentGameId;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
+ String get id;@JsonKey(name: 'creator_id') String get creatorId;@JsonKey(name: 'player_ids') List<String> get playerIds; String get status;@JsonKey(name: 'max_players') int get maxPlayers;@JsonKey(name: 'player_count', defaultValue: 0) int get currentPlayers;@JsonKey(name: 'current_game_id') String? get currentGameId;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
 /// Create a copy of RoomModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $RoomModelCopyWith<$Res>  {
   factory $RoomModelCopyWith(RoomModel value, $Res Function(RoomModel) _then) = _$RoomModelCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'creator_id') String creatorId,@JsonKey(name: 'player_ids') List<String> playerIds, String status,@JsonKey(name: 'max_players') int maxPlayers,@JsonKey(name: 'current_players', defaultValue: 0) int currentPlayers,@JsonKey(name: 'current_game_id') String? currentGameId,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
+ String id,@JsonKey(name: 'creator_id') String creatorId,@JsonKey(name: 'player_ids') List<String> playerIds, String status,@JsonKey(name: 'max_players') int maxPlayers,@JsonKey(name: 'player_count', defaultValue: 0) int currentPlayers,@JsonKey(name: 'current_game_id') String? currentGameId,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
 });
 
 
@@ -161,7 +161,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'creator_id')  String creatorId, @JsonKey(name: 'player_ids')  List<String> playerIds,  String status, @JsonKey(name: 'max_players')  int maxPlayers, @JsonKey(name: 'current_players', defaultValue: 0)  int currentPlayers, @JsonKey(name: 'current_game_id')  String? currentGameId, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'creator_id')  String creatorId, @JsonKey(name: 'player_ids')  List<String> playerIds,  String status, @JsonKey(name: 'max_players')  int maxPlayers, @JsonKey(name: 'player_count', defaultValue: 0)  int currentPlayers, @JsonKey(name: 'current_game_id')  String? currentGameId, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RoomModel() when $default != null:
 return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxPlayers,_that.currentPlayers,_that.currentGameId,_that.createdAt,_that.updatedAt);case _:
@@ -182,7 +182,7 @@ return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxP
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'creator_id')  String creatorId, @JsonKey(name: 'player_ids')  List<String> playerIds,  String status, @JsonKey(name: 'max_players')  int maxPlayers, @JsonKey(name: 'current_players', defaultValue: 0)  int currentPlayers, @JsonKey(name: 'current_game_id')  String? currentGameId, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'creator_id')  String creatorId, @JsonKey(name: 'player_ids')  List<String> playerIds,  String status, @JsonKey(name: 'max_players')  int maxPlayers, @JsonKey(name: 'player_count', defaultValue: 0)  int currentPlayers, @JsonKey(name: 'current_game_id')  String? currentGameId, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _RoomModel():
 return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxPlayers,_that.currentPlayers,_that.currentGameId,_that.createdAt,_that.updatedAt);case _:
@@ -202,7 +202,7 @@ return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxP
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'creator_id')  String creatorId, @JsonKey(name: 'player_ids')  List<String> playerIds,  String status, @JsonKey(name: 'max_players')  int maxPlayers, @JsonKey(name: 'current_players', defaultValue: 0)  int currentPlayers, @JsonKey(name: 'current_game_id')  String? currentGameId, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'creator_id')  String creatorId, @JsonKey(name: 'player_ids')  List<String> playerIds,  String status, @JsonKey(name: 'max_players')  int maxPlayers, @JsonKey(name: 'player_count', defaultValue: 0)  int currentPlayers, @JsonKey(name: 'current_game_id')  String? currentGameId, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _RoomModel() when $default != null:
 return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxPlayers,_that.currentPlayers,_that.currentGameId,_that.createdAt,_that.updatedAt);case _:
@@ -217,7 +217,7 @@ return $default(_that.id,_that.creatorId,_that.playerIds,_that.status,_that.maxP
 @JsonSerializable()
 
 class _RoomModel implements RoomModel {
-  const _RoomModel({required this.id, @JsonKey(name: 'creator_id') required this.creatorId, @JsonKey(name: 'player_ids') required final  List<String> playerIds, required this.status, @JsonKey(name: 'max_players') required this.maxPlayers, @JsonKey(name: 'current_players', defaultValue: 0) this.currentPlayers = 0, @JsonKey(name: 'current_game_id') this.currentGameId, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt}): _playerIds = playerIds;
+  const _RoomModel({required this.id, @JsonKey(name: 'creator_id') required this.creatorId, @JsonKey(name: 'player_ids') required final  List<String> playerIds, required this.status, @JsonKey(name: 'max_players') required this.maxPlayers, @JsonKey(name: 'player_count', defaultValue: 0) this.currentPlayers = 0, @JsonKey(name: 'current_game_id') this.currentGameId, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt}): _playerIds = playerIds;
   factory _RoomModel.fromJson(Map<String, dynamic> json) => _$RoomModelFromJson(json);
 
 @override final  String id;
@@ -231,7 +231,7 @@ class _RoomModel implements RoomModel {
 
 @override final  String status;
 @override@JsonKey(name: 'max_players') final  int maxPlayers;
-@override@JsonKey(name: 'current_players', defaultValue: 0) final  int currentPlayers;
+@override@JsonKey(name: 'player_count', defaultValue: 0) final  int currentPlayers;
 @override@JsonKey(name: 'current_game_id') final  String? currentGameId;
 @override@JsonKey(name: 'created_at') final  DateTime? createdAt;
 @override@JsonKey(name: 'updated_at') final  DateTime? updatedAt;
@@ -269,7 +269,7 @@ abstract mixin class _$RoomModelCopyWith<$Res> implements $RoomModelCopyWith<$Re
   factory _$RoomModelCopyWith(_RoomModel value, $Res Function(_RoomModel) _then) = __$RoomModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'creator_id') String creatorId,@JsonKey(name: 'player_ids') List<String> playerIds, String status,@JsonKey(name: 'max_players') int maxPlayers,@JsonKey(name: 'current_players', defaultValue: 0) int currentPlayers,@JsonKey(name: 'current_game_id') String? currentGameId,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
+ String id,@JsonKey(name: 'creator_id') String creatorId,@JsonKey(name: 'player_ids') List<String> playerIds, String status,@JsonKey(name: 'max_players') int maxPlayers,@JsonKey(name: 'player_count', defaultValue: 0) int currentPlayers,@JsonKey(name: 'current_game_id') String? currentGameId,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
 });
 
 

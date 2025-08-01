@@ -47,18 +47,15 @@ class AvailableRoomsNotifier extends _$AvailableRoomsNotifier {
       
       final rooms = <Room>[];
       
-      // Pour chaque room, compter les joueurs
+      // Pour chaque room, utiliser player_ids pour compter les joueurs
       for (final roomJson in (roomsResponse as List<dynamic>).cast<Map<String, dynamic>>()) {
-        final playersCount = await _supabase
-            .from('players')
-            .select('id')
-            .eq('current_room_id', roomJson['id'])
-            .count(CountOption.exact);
+        // Utiliser la longueur du tableau player_ids au lieu de compter dans la table players
+        final playerIds = roomJson['player_ids'] as List<dynamic>? ?? [];
         
         // Enrichir les données de la room avec le nombre de joueurs
         final enrichedRoom = <String, dynamic>{
           ...roomJson,
-          'current_players': playersCount.count ?? 0,
+          'current_players': playerIds.length,
         };
         
         rooms.add(RoomModel.fromJson(enrichedRoom).toDomain());
@@ -208,16 +205,12 @@ class AvailableRoomsNotifier extends _$AvailableRoomsNotifier {
             // Room à ajouter ou mettre à jour
             roomsToAdd.add(roomId);
             
-            // Compter les joueurs pour cette room
-            final playersCount = await _supabase
-                .from('players')
-                .select('id')
-                .eq('current_room_id', roomId)
-                .count(CountOption.exact);
+            // Utiliser player_ids pour compter les joueurs
+            final playerIds = roomData['player_ids'] as List<dynamic>? ?? [];
             
             final enrichedRoom = <String, dynamic>{
               ...roomData,
-              'current_players': playersCount.count ?? 0,
+              'current_players': playerIds.length,
             };
             
             updatedRooms.add(RoomModel.fromJson(enrichedRoom).toDomain());
@@ -253,15 +246,12 @@ class AvailableRoomsNotifier extends _$AvailableRoomsNotifier {
               .eq('id', roomId)
               .single();
           
-          final playersCount = await _supabase
-              .from('players')
-              .select('id')
-              .eq('current_room_id', roomId)
-              .count(CountOption.exact);
+          // Utiliser player_ids pour compter les joueurs
+          final playerIds = roomResponse['player_ids'] as List<dynamic>? ?? [];
           
           final enrichedRoom = <String, dynamic>{
             ...roomResponse,
-            'current_players': playersCount.count ?? 0,
+            'current_players': playerIds.length,
           };
           
           updatedRooms.add(RoomModel.fromJson(enrichedRoom).toDomain());
